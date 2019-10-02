@@ -1,0 +1,14 @@
+.text-field{
+	-fx-font-family:calibri;
+	-fx-font-size:12;
+	-fx-background-color:white;
+	-fx-background-radius:0;
+	
+	-fx-border-color:#445469;
+	-fx-border-radius:0;
+	
+	-fx-effect:none;
+	
+	-fx-text-fill:#445469;
+	-fx-font-weight:bold;	
+}

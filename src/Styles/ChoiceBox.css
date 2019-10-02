@@ -1,0 +1,18 @@
+.choice-box{
+	-fx-background-color:#445469,
+	linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%),
+    linear-gradient(#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
+}
+
+.choice-box .label{
+	-fx-font-size:14;
+	-fx-padding:1;
+}
+
+.choice-box .open-button{
+	-fx-background-color:transparent;
+}
+
+.choice-box .open-button .arrow{
+	-fx-background-color:white;
+}

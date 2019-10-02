@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Rule_definition">
+   <children>
+      <Region layoutX="106.0" layoutY="78.0" minHeight="400.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url(&quot;pictures/Back.png&quot;); -fx-background-size: cover;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <GridPane layoutX="21.0" layoutY="68.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="30.0" minWidth="10.0" percentWidth="2.2" prefWidth="30.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" percentWidth="18.5" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="5.0" percentWidth="0.7" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="50.0" percentWidth="18.5" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="5.0" percentWidth="0.7" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="50.0" percentWidth="18.5" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="5.0" percentWidth="0.7" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="50.0" percentWidth="18.5" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="5.0" percentWidth="0.7" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="60.0" percentWidth="8.9" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="5.0" percentWidth="0.7" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="35.0" percentWidth="4.8" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="12.0" percentWidth="1.9" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="12.0" percentWidth="2.2" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="15.0" percentWidth="1.2" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0" percentWidth="1.2" prefWidth="0.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints percentHeight="4.1" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="4.1" vgrow="SOMETIMES" />
+          <RowConstraints percentHeight="1.6" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="3.1" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="3.1" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="1.6" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="2.7" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="8.3" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="5.0" minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="0.8" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="0.8" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="1.6" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="3.6" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="0.8" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="3.1" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="3.6" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="3.1" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="0.8" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="3.1" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="3.1" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="0.8" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" percentHeight="3.1" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="0.8" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="3.1" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="2.4" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" percentHeight="1.6" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="3.1" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="4.7" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="1.6" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="3.1" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="9.4" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="1.6" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="9.7" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="1.2" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <MenuBar stylesheets="@../Styles/MenuLightBlue.css" GridPane.columnSpan="16" GridPane.rowIndex="1">
+              <menus>
+                <Menu mnemonicParsing="false" text="Manually classified items (Today|All): 189 | 5 624" />
+                <Menu mnemonicParsing="false" text="Classified items (Today|All): 3 805 | 75 875" />
+                  <Menu mnemonicParsing="false" text="Remaining items: 65 220" />
+              </menus>
+            </MenuBar>
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Article ID: AB1020" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Long Description" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Search" GridPane.columnIndex="9" GridPane.columnSpan="5" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+            <TextArea prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextArea.css" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.rowSpan="4" />
+            <TextArea fx:id="sd" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer Werma type 110" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.rowSpan="3" />
+            <TextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparentLight.css" text="Support de fixation pour buzzer Type Werma 110" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <TextArea prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextArea.css" GridPane.columnIndex="3" GridPane.columnSpan="5" GridPane.rowIndex="4" GridPane.rowSpan="12" />
+            <TextArea fx:id="ld" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm" GridPane.columnIndex="3" GridPane.columnSpan="5" GridPane.rowIndex="4" GridPane.rowSpan="4" />
+            <TextArea fx:id="ld_translated" prefHeight="300.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparentLight.css" text="Support de montage pour le type buzzer Werma 110¶Orderref.975 109 01 (support de capuchon de protection)" GridPane.columnIndex="3" GridPane.columnSpan="5" GridPane.rowIndex="9" GridPane.rowSpan="7" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Material Group" GridPane.columnIndex="1" GridPane.rowIndex="9" GridPane.rowSpan="3" />
+            <TextField fx:id="material_group" stylesheets="@../Styles/TextField.css" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Pre-classification" GridPane.columnIndex="1" GridPane.rowIndex="14" />
+            <TextField fx:id="preclassification" stylesheets="@../Styles/TextField.css" GridPane.columnIndex="1" GridPane.rowIndex="15" />
+            <TextField fx:id="search_text" stylesheets="@../Styles/TextField.css" GridPane.columnIndex="9" GridPane.columnSpan="3" GridPane.rowIndex="4" GridPane.valignment="TOP" />
+            <Button fx:id="search_google" mnemonicParsing="false" onAction="#search_google" onContextMenuRequested="#search_google_inplace" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Logo_Google.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent;" GridPane.columnIndex="12" GridPane.rowIndex="4" GridPane.valignment="TOP">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </Button>
+            <Region fx:id="image_1" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-background-position: center center; -fx-border-color: #445469;" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.rowSpan="4" GridPane.valignment="CENTER" />
+            <Region fx:id="image_2" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-background-position: center center; -fx-border-color: #445469;" GridPane.columnIndex="11" GridPane.columnSpan="3" GridPane.rowIndex="6" GridPane.rowSpan="4" />
+            <Region fx:id="image_3" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-background-position: center center; -fx-border-color: #445469;" GridPane.columnIndex="9" GridPane.rowIndex="11" GridPane.rowSpan="5" />
+            <Region fx:id="image_4" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-background-position: center center; -fx-border-color: #445469;" GridPane.columnIndex="11" GridPane.columnSpan="3" GridPane.rowIndex="11" GridPane.rowSpan="5" />
+            <Region fx:id="image_1_up" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center; -fx-border-color: transparent; -fx-background-color: transparent;" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.rowSpan="4" GridPane.valignment="CENTER" />
+            <Region fx:id="image_2_up" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center; -fx-border-color: transparent; -fx-background-color: transparent;" GridPane.columnIndex="11" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.rowSpan="4" GridPane.valignment="CENTER" />
+            <Region fx:id="image_3_up" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center; -fx-border-color: transparent; -fx-background-color: transparent;" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.rowIndex="11" GridPane.rowSpan="5" GridPane.valignment="CENTER" />
+            <Region fx:id="image_4_up" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center; -fx-border-color: transparent; -fx-background-color: transparent;" GridPane.columnIndex="11" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="11" GridPane.rowSpan="5" GridPane.valignment="CENTER" />
+            <Region fx:id="image_1_down" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center; -fx-border-color: transparent; -fx-background-color: transparent;" GridPane.columnIndex="9" GridPane.rowIndex="6" GridPane.rowSpan="4" />
+            <Region fx:id="image_2_down" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center; -fx-border-color: transparent; -fx-background-color: transparent;" GridPane.columnIndex="11" GridPane.columnSpan="3" GridPane.rowIndex="6" GridPane.rowSpan="4" />
+            <Region fx:id="image_3_down" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center; -fx-border-color: transparent; -fx-background-color: transparent;" GridPane.columnIndex="9" GridPane.rowIndex="11" GridPane.rowSpan="5" />
+            <Region fx:id="image_4_down" prefHeight="200.0" prefWidth="200.0" style="-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center; -fx-border-color: transparent; -fx-background-color: transparent;" GridPane.columnIndex="11" GridPane.columnSpan="3" GridPane.rowIndex="11" GridPane.rowSpan="5" />
+            <Button fx:id="search_image" mnemonicParsing="false" onAction="#search_image" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_Camera.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent;" GridPane.columnIndex="13" GridPane.rowIndex="4" GridPane.valignment="TOP">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </Button>
+            <Button mnemonicParsing="false" prefWidth="20.0" style="-fx-background-image: url(&quot;pictures/ThumbUp.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent;" GridPane.columnIndex="9" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.rowSpan="2" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="-3.0" right="25.0" />
+               </GridPane.margin>
+            </Button>
+            <Button mnemonicParsing="false" prefWidth="20.0" style="-fx-background-image: url(&quot;pictures/ThumbDown.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent;" GridPane.columnIndex="9" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.rowSpan="2" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="-3.0" right="2.0" />
+               </GridPane.margin>
+            </Button>
+            <Button mnemonicParsing="false" prefWidth="20.0" style="-fx-background-image: url(&quot;pictures/ThumbUp.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent;" GridPane.columnIndex="9" GridPane.halignment="RIGHT" GridPane.rowIndex="15" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="-3.0" right="25.0" />
+               </GridPane.margin>
+            </Button>
+            <Button mnemonicParsing="false" prefWidth="20.0" style="-fx-background-image: url(&quot;pictures/ThumbDown.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent;" GridPane.columnIndex="9" GridPane.halignment="RIGHT" GridPane.rowIndex="15" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="-3.0" right="2.0" />
+               </GridPane.margin>
+            </Button>
+            <Button mnemonicParsing="false" prefWidth="20.0" style="-fx-background-image: url(&quot;pictures/ThumbUp.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent;" GridPane.columnIndex="11" GridPane.columnSpan="3" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.rowSpan="2" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="-3.0" right="25.0" />
+               </GridPane.margin>
+            </Button>
+            <Button mnemonicParsing="false" prefWidth="20.0" style="-fx-background-image: url(&quot;pictures/ThumbDown.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent;" GridPane.columnIndex="11" GridPane.columnSpan="3" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.rowSpan="2" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="-3.0" right="2.0" />
+               </GridPane.margin>
+            </Button>
+            <Button mnemonicParsing="false" prefWidth="20.0" style="-fx-background-image: url(&quot;pictures/ThumbUp.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent;" GridPane.columnIndex="11" GridPane.columnSpan="3" GridPane.halignment="RIGHT" GridPane.rowIndex="15" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="-3.0" right="25.0" />
+               </GridPane.margin>
+            </Button>
+            <Button mnemonicParsing="false" prefWidth="20.0" style="-fx-background-image: url(&quot;pictures/ThumbDown.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent;" GridPane.columnIndex="11" GridPane.columnSpan="3" GridPane.halignment="RIGHT" GridPane.rowIndex="15" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="-3.0" right="2.0" />
+               </GridPane.margin>
+            </Button>
+            <Region style="-fx-background-color: white; -fx-opacity: 30%;" GridPane.columnSpan="16" GridPane.rowIndex="17" GridPane.rowSpan="8" GridPane.valignment="CENTER" />
+            <Region style="-fx-background-color: transparent; -fx-border-color: white; -fx-scale-x: 1.1;" GridPane.columnSpan="16" GridPane.rowIndex="17" GridPane.rowSpan="8" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="Classification" GridPane.columnIndex="1" GridPane.rowIndex="18" />
+            <TextField prefHeight="100.0" stylesheets="@../Styles/TextField.css" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="19" />
+            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="19" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="Classification suggestions" GridPane.columnIndex="5" GridPane.columnSpan="9" GridPane.rowIndex="18" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Interrupteur ou bouton" GridPane.columnIndex="5" GridPane.rowIndex="19">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </Button>
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Cadre, support ou base" GridPane.columnIndex="7" GridPane.rowIndex="19" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Voyant" GridPane.columnIndex="9" GridPane.columnSpan="5" GridPane.rowIndex="19" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Relais à usage général" GridPane.columnIndex="5" GridPane.rowIndex="21" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Autre (Fixation non filetée et supports)" GridPane.columnIndex="7" GridPane.rowIndex="21" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Moniteur ou terminal graphique indus." GridPane.columnIndex="9" GridPane.columnSpan="5" GridPane.rowIndex="21" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Autre (Disjoncteurs, relais et accessoires)XXXXXxxxxxx" GridPane.columnIndex="5" GridPane.rowIndex="23">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </Button>
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Autre (Voyants et affichage digital)" GridPane.columnIndex="7" GridPane.rowIndex="23" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Afficheur LED" GridPane.columnIndex="9" GridPane.columnSpan="5" GridPane.rowIndex="23" />
+            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="19" />
+            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" GridPane.columnIndex="7" GridPane.halignment="RIGHT" GridPane.rowIndex="19">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </Button>
+            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" GridPane.columnIndex="9" GridPane.columnSpan="5" GridPane.halignment="RIGHT" GridPane.rowIndex="19" />
+            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="21" />
+            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" GridPane.columnIndex="7" GridPane.halignment="RIGHT" GridPane.rowIndex="21" />
+            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" GridPane.columnIndex="9" GridPane.columnSpan="5" GridPane.halignment="RIGHT" GridPane.rowIndex="21" />
+            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="23" />
+            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" GridPane.columnIndex="7" GridPane.halignment="RIGHT" GridPane.rowIndex="23" />
+            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" GridPane.columnIndex="9" GridPane.columnSpan="5" GridPane.halignment="RIGHT" GridPane.rowIndex="23" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: normal; -fx-text-fill: WHITE;" text="Also in this class:" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="21" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: normal; -fx-text-fill: WHITE;" text="BARGRAPH, BEUGEL VOOR  INDICATIELAMP" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="23" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="Rule creation" GridPane.columnIndex="1" GridPane.rowIndex="26" />
+            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="13" GridPane.rowIndex="27">
+               <children>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonRed.css" text="MONTAGEBEUGEL">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonRed.css" text="MONTAGE">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonRed.css" text="BEUGEL">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonOrange.css" text="ZOEMER">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonOrange.css" text="WERMA">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonDarkGreen.css" text="ORDERREFERENCE">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonDarkGreen.css" text="ORDER">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonDarkGreen.css" text="REFERENCE">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonDarkGreen.css" text="BRACKET">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonDarkGreen.css" text="PROTECTIVE">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonDarkGreen.css" text="CAP">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonDarkGreen.css" text="KLEUR">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonDarkGreen.css" text="ZWART">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonDarkGreen.css" text="DIAMETER">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonDarkGreen.css" text="HOOGTE">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="DESCRIPTION" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="29" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="APPLICATION" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.rowIndex="29" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="COMPLEMENT" GridPane.columnIndex="7" GridPane.halignment="CENTER" GridPane.rowIndex="29" />
+            <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonBlue.css" text="NEW" GridPane.columnIndex="1" GridPane.rowIndex="30" />
+            <Button disable="true" mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonBlue.css" text="Calculate coverage" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="30" />
+            <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="3" GridPane.rowIndex="30" />
+            <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="3" GridPane.rowIndex="30" />
+            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="30" />
+            <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="5" GridPane.rowIndex="30" />
+            <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="5" GridPane.rowIndex="30" />
+            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="5" GridPane.rowIndex="30" />
+            <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="7" GridPane.rowIndex="30" />
+            <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="7" GridPane.rowIndex="30" />
+            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="7" GridPane.rowIndex="30" />
+            <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Same Material Group only" GridPane.columnIndex="9" GridPane.columnSpan="5" GridPane.rowIndex="30" GridPane.valignment="TOP" />
+            <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Same Pre-classification only" GridPane.columnIndex="9" GridPane.columnSpan="5" GridPane.rowIndex="30" GridPane.valignment="CENTER" />
+            <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Parts to a drawing only" GridPane.columnIndex="9" GridPane.columnSpan="5" GridPane.rowIndex="30" GridPane.valignment="BOTTOM" />
+            <Button disable="true" mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_eye.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: -20;" GridPane.columnIndex="11" GridPane.rowIndex="30" />
+            <Button disable="true" mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_bin.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: 1;" GridPane.columnIndex="11" GridPane.rowIndex="30" />
+            <Button disable="true" mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_copy.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: 24;" GridPane.columnIndex="11" GridPane.rowIndex="30" />
+            <ScrollPane prefHeight="98.0" prefWidth="580.0" style="-fx-opacity: 50%;" stylesheets="@../Styles/ScrollPaneTransparent.css" GridPane.columnIndex="1" GridPane.columnSpan="14" GridPane.rowIndex="32">
+               <content>
+                  <GridPane maxWidth="300.0" minWidth="1215.0" prefWidth="300.0" style="-fx-background-color: transparent;">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="19.4" />
+                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="19.4" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="19.4" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="19.4" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="9.3" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="5.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="1.9" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="2.2" />
+                        <ColumnConstraints />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                    </rowConstraints>
+                     <children>
+                        <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="RULE 1" />
+                        <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonBlue.css" text="Calculate coverage" GridPane.halignment="CENTER" />
+                        <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="12 items" GridPane.halignment="RIGHT" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="2" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="2" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2">
+                           <children>
+                              <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonRed.css" text="MONTAGEBEUGEL">
+                                 <HBox.margin>
+                                    <Insets left="5.0" top="15.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="4" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="4" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="4">
+                           <children>
+                              <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonOrange.css" text="ZOEMER">
+                                 <HBox.margin>
+                                    <Insets left="5.0" top="15.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="6" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="6" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="6" />
+                        <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Same Material Group only" GridPane.columnIndex="8" GridPane.columnSpan="5" GridPane.valignment="TOP" />
+                        <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Same Pre-classification only" GridPane.columnIndex="8" GridPane.columnSpan="5" GridPane.valignment="CENTER" />
+                        <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Parts to a drawing only" GridPane.columnIndex="8" GridPane.columnSpan="5" GridPane.valignment="BOTTOM" />
+                        <Button mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_eye.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: -20;" GridPane.columnIndex="10" />
+                        <Button mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_bin.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: 1;" GridPane.columnIndex="10" />
+                        <Button mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_copy.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: 24;" GridPane.columnIndex="10" />
+                        <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="RULE 2" GridPane.rowIndex="2" />
+                        <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonBlue.css" text="Calculate coverage" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                        <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="134 items" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                           <children>
+                              <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonRed.css" text="MONTAGEBEUGEL">
+                                 <HBox.margin>
+                                    <Insets left="5.0" top="15.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="2">
+                           <children>
+                              <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonOrange.css" text="ZOEMER">
+                                 <HBox.margin>
+                                    <Insets left="5.0" top="15.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+                        <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Same Material Group only" GridPane.columnIndex="8" GridPane.columnSpan="5" GridPane.rowIndex="2" GridPane.valignment="TOP" />
+                        <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Same Pre-classification only" GridPane.columnIndex="8" GridPane.columnSpan="5" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                        <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Parts to a drawing only" GridPane.columnIndex="8" GridPane.columnSpan="5" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" />
+                        <Button mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_eye.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: -20;" GridPane.columnIndex="10" GridPane.rowIndex="2" />
+                        <Button mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_bin.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: 1;" GridPane.columnIndex="10" GridPane.rowIndex="2" />
+                        <Button mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_copy.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: 24;" GridPane.columnIndex="10" GridPane.rowIndex="2" />
+                        <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="RULE 3" GridPane.rowIndex="4" />
+                        <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonBlue.css" text="Calculate coverage" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                           <children>
+                              <Button mnemonicParsing="false" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonRed.css" text="BEUGEL">
+                                 <HBox.margin>
+                                    <Insets left="5.0" top="15.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 5;" GridPane.columnIndex="6" GridPane.rowIndex="4" />
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white; -fx-opacity: 30%; -fx-background-radius: 5;" GridPane.columnIndex="6" GridPane.rowIndex="4" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="6" GridPane.rowIndex="4" />
+                        <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Same Material Group only" GridPane.columnIndex="8" GridPane.columnSpan="5" GridPane.rowIndex="4" GridPane.valignment="TOP" />
+                        <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Same Pre-classification only" GridPane.columnIndex="8" GridPane.columnSpan="5" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                        <CheckBox mnemonicParsing="false" style="-fx-font-family: Calibri; -fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: white;" text="Parts to a drawing only" GridPane.columnIndex="8" GridPane.columnSpan="5" GridPane.rowIndex="4" GridPane.valignment="BOTTOM" />
+                        <Button disable="true" mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_eye.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: -20;" GridPane.columnIndex="10" GridPane.rowIndex="4" />
+                        <Button disable="true" mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_bin.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: 1;" GridPane.columnIndex="10" GridPane.rowIndex="4" />
+                        <Button disable="true" mnemonicParsing="false" prefWidth="100.0" style="-fx-background-image: url(&quot;pictures/Icone_copy.png&quot;); -fx-background-size: 20; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-translate-x: 75; -fx-translate-y: 24;" GridPane.columnIndex="10" GridPane.rowIndex="4" />
+                     </children>
+                  </GridPane>
+               </content>
+            </ScrollPane>
+            <Button mnemonicParsing="false" onAction="#load_next_item" prefWidth="1000.0" style="-fx-font-size: 12;" stylesheets="@../Styles/ButtonBlue.css" text="Next item" GridPane.columnIndex="11" GridPane.columnSpan="3" GridPane.rowIndex="1" />
+            <MenuBar fx:id="menubar" stylesheets="@../Styles/Main.css" GridPane.columnSpan="2147483647">
+               <menus>
+                  <Menu mnemonicParsing="false" text="Home" />
+                  <Menu mnemonicParsing="false" text="Project set-up">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Select project" />
+                        <MenuItem mnemonicParsing="false" text="Create new project" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Automated classification">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Rule definition">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Review">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Correction">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Dashboard">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                        <MenuItem mnemonicParsing="false" text="Close" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

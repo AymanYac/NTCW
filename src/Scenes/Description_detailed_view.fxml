@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.effect.InnerShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Region layoutX="106.0" layoutY="78.0" minHeight="400.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url(&quot;file:../pictures/Back.png&quot;); -fx-background-size: cover;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <GridPane layoutX="21.0" layoutY="68.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="2.3" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="2.0" />
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints maxHeight="26.0" minHeight="26.0" prefHeight="26.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="26.0" minHeight="26.0" prefHeight="26.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="26.0" minHeight="26.0" prefHeight="26.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" percentHeight="1.6" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="120.0" minHeight="120.0" prefHeight="120.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="470.0" minHeight="470.0" prefHeight="470.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <MenuBar maxWidth="1350.0" minWidth="1350.0" prefWidth="1350.0" stylesheets="@../Styles/Main.css" GridPane.columnSpan="21" GridPane.valignment="TOP">
+               <menus>
+                  <Menu mnemonicParsing="false" text="Home" />
+                  <Menu mnemonicParsing="false" text="Project set-up">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Select project" />
+                        <MenuItem mnemonicParsing="false" text="Create new project" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Automated classification">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Launch  autoclassification" />
+                        <MenuItem mnemonicParsing="false" text="Advanced parameters" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Semi-manual classification">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Sample item classification" />
+                        <MenuItem mnemonicParsing="false" text="Advanced parameters" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Classification review">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Item list" />
+                        <MenuItem mnemonicParsing="false" text="Rule list" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Dashboards">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Project dashboard" />
+                        <MenuItem mnemonicParsing="false" text="Team dashboard" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Help contents" />
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Taxonomy">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Domain 1" />
+                        <MenuItem mnemonicParsing="false" text="Domain 2" />
+                        <MenuItem mnemonicParsing="false" text="Domain 3" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Administration">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="User administration" />
+                        <MenuItem mnemonicParsing="false" text="Project administration" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <MenuBar stylesheets="@../Styles/MenuLightBlue.css" GridPane.columnSpan="21" GridPane.rowIndex="1">
+               <menus>
+                  <Menu mnemonicParsing="false" text="Reviewed items - Self (Today|All): 189 | 5 624" />
+                  <Menu mnemonicParsing="false" text="Reviewed items - Team (Today|All): 3 805 | 75 875" />
+                  <Menu mnemonicParsing="false" text="Remaining items to review (Empty|All): 5 435|65 220" />
+                  <Menu mnemonicParsing="false" text="Relais (128/172)">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Contacteurs (12/109)" />
+                        <MenuItem mnemonicParsing="false" text="Disjoncteurs (5/326)" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <ToolBar maxHeight="26.0" style="-fx-background-color: #F2F2F2;" GridPane.columnSpan="23" GridPane.rowIndex="2">
+               <items>
+                  <ToggleButton maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_stripes.png&quot;);" stylesheets="@../Styles/ButtonTool.css">
+                     <effect>
+                        <InnerShadow blurType="GAUSSIAN" height="55.4" radius="28.0875" width="58.95" />
+                     </effect>
+                  </ToggleButton>
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_resize_columns.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_increase_font_size.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_decrease_font_size.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                  <ToggleButton maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_display_class_numbers2.png&quot;);" stylesheets="@../Styles/ButtonTool.css">
+                     <effect>
+                        <InnerShadow blurType="GAUSSIAN" height="55.4" radius="28.0875" width="58.95" />
+                     </effect>
+                  </ToggleButton>
+                  <ToggleButton maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_highlight_empty_lines.png&quot;);" stylesheets="@../Styles/ButtonTool.css">
+                     <effect>
+                        <InnerShadow blurType="GAUSSIAN" height="55.4" radius="28.0875" width="58.95" />
+                     </effect>
+                  </ToggleButton>
+                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_undo.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_redo.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_first_blank.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_next_blank.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_repeat_class.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_confirm_class.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_apply_class_to_rule.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_apply_class_down.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_export.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                  <TextField maxHeight="20.0" maxWidth="800.0" minHeight="20.0" minWidth="800.0" prefHeight="20.0" prefWidth="800.0" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_google_search.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_google_trad.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_translator.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;file:../pictures/Toolbar_buttons/Icone_image_search2.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+               </items>
+               <padding>
+                  <Insets left="18.0" />
+               </padding>
+            </ToolBar>
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Article ID: AB1020" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Long Description" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+            <TextArea editable="false" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextArea.css" text="Montagebeugel voor zoemer Werma type 110" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextArea editable="false" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextArea.css" text="Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Material Group" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <TextField editable="false" stylesheets="@../Styles/TextField.css" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value (data language)" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+            <TextField editable="false" stylesheets="@../Styles/TextField.css" GridPane.columnIndex="3" GridPane.rowIndex="8" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value translation" GridPane.columnIndex="5" GridPane.rowIndex="7" />
+            <TextField editable="false" stylesheets="@../Styles/TextField.css" GridPane.columnIndex="5" GridPane.rowIndex="8" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Unit of measure" GridPane.columnIndex="7" GridPane.rowIndex="7" />
+            <TextField editable="false" stylesheets="@../Styles/TextField.css" GridPane.columnIndex="7" GridPane.rowIndex="8" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Description rule" GridPane.columnIndex="9" GridPane.rowIndex="7" />
+            <TextField stylesheets="@../Styles/TextField.css" GridPane.columnIndex="9" GridPane.rowIndex="8" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="Value suggestions" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Interrupteur ou bouton" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Cadre, support ou base" GridPane.columnIndex="3" GridPane.rowIndex="11" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Voyant" GridPane.columnIndex="5" GridPane.rowIndex="11" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Relais à usage général" GridPane.columnIndex="7" GridPane.rowIndex="11" />
+            <Button mnemonicParsing="false" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../Styles/ButtonBlue.css" text="Autre (Fixation non filetée et supports)" GridPane.columnIndex="9" GridPane.rowIndex="11" />
+            <AnchorPane prefHeight="470.0" prefWidth="398.0" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="13">
+               <children>
+                  <TableView fx:id="projectlist" onMouseClicked="#project_click" prefHeight="470.0" prefWidth="342.0" stylesheets="@../Styles/TableViewBlue.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <columns>
+                        <TableColumn fx:id="colonne111" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Article completion" />
+                        <TableColumn fx:id="colonne112" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Question status" />
+                        <TableColumn fx:id="colonne11" maxWidth="500.0" minWidth="500.0" prefWidth="500.0" text="Description" />
+                        <TableColumn fx:id="colonne1" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Fabricant" />
+                        <TableColumn fx:id="colonne2" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Référence" />
+                        <TableColumn fx:id="colonne3" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" text="Type" />
+                        <TableColumn fx:id="colonne4" maxWidth="155.0" minWidth="155.0" prefWidth="155.0" text="Tension" />
+                        <TableColumn fx:id="colonne5" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" text="Intensité" />
+                        <TableColumn fx:id="colonne6" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" text="Fréquence" />
+                        <TableColumn fx:id="colonne61" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" text="Connexion" />
+                        <TableColumn fx:id="colonne611" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" text="Température" />
+                        <TableColumn fx:id="colonne61112" minWidth="2.0" prefWidth="150.0" text="Link" />
+                        <TableColumn fx:id="colonne6111" minWidth="2.0" prefWidth="150.0" text="Source" />
+                        <TableColumn fx:id="colonne61111" minWidth="2.0" prefWidth="150.0" text="Rule" />
+                        <TableColumn fx:id="colonne611111" minWidth="2.0" prefWidth="150.0" text="Author" />
+                        <TableColumn fx:id="colonne6111111" minWidth="2.0" prefWidth="150.0" text="Article ID" />
+                     </columns>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                  </TableView>
+               </children>
+            </AnchorPane>
+            <AnchorPane maxHeight="400.0" minHeight="470.0" prefHeight="400.0" style="-fx-background-color: transparent; -fx-border-color: white;" GridPane.columnIndex="7" GridPane.columnSpan="3" GridPane.rowIndex="13">
+               <children>
+                  <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="4.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="15.5" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="15.5" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="15.5" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="15.5" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="15.5" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="15.5" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="3.0" />
+                        <ColumnConstraints />
+                        <ColumnConstraints />
+                        <ColumnConstraints />
+                        <ColumnConstraints />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints percentHeight="2.0" vgrow="SOMETIMES" />
+                        <RowConstraints percentHeight="5.0" vgrow="SOMETIMES" />
+                        <RowConstraints percentHeight="2.0" vgrow="SOMETIMES" />
+                        <RowConstraints percentHeight="5.0" vgrow="SOMETIMES" />
+                        <RowConstraints percentHeight="2.0" vgrow="SOMETIMES" />
+                        <RowConstraints percentHeight="51.0" vgrow="SOMETIMES" />
+                        <RowConstraints percentHeight="8.0" vgrow="SOMETIMES" />
+                        <RowConstraints percentHeight="5.0" vgrow="SOMETIMES" />
+                        <RowConstraints percentHeight="20.0" vgrow="SOMETIMES" />
+                        <RowConstraints percentHeight="2.0" vgrow="SOMETIMES" />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                     </rowConstraints>
+                     <children>
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #445469; -fx-opacity: 0.7;" GridPane.columnSpan="12" GridPane.rowSpan="13" />
+                        <ScrollPane stylesheets="@../Styles/ScrollPaneTransparentBlue.css" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="3" GridPane.rowSpan="8">
+                           <content>
+                              <GridPane maxWidth="550.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="5.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" percentWidth="9.5" prefWidth="0.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="9.5" prefWidth="0.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="9.5" prefWidth="0.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="9.5" prefWidth="0.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="9.5" prefWidth="0.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="9.5" prefWidth="0.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="9.5" prefWidth="0.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="9.5" prefWidth="0.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="9.5" prefWidth="0.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="9.5" prefWidth="0.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="20.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="2.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="2.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-label-padding: -8; -fx-background-radius: 1; -fx-border-radius: 1; -fx-border-width: 1;" stylesheets="@../Styles/ButtonBlue.css" text="-" GridPane.halignment="CENTER" />
+                                    <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Fabricant* / Manufacturer" GridPane.columnIndex="1" GridPane.columnSpan="10">
+                                       <GridPane.margin>
+                                          <Insets />
+                                       </GridPane.margin></Label>
+                                    <TextField text="WERMA" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2" />
+                                    <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-label-padding: -8; -fx-background-radius: 1; -fx-border-radius: 1; -fx-border-width: 1;" stylesheets="@../Styles/ButtonBlue.css" text="-" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                                    <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Référence* / Reference" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.rowIndex="4" />
+                                    <TextField text="110" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="6" />
+                                    <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-label-padding: -8; -fx-background-radius: 1; -fx-border-radius: 1; -fx-border-width: 1;" stylesheets="@../Styles/ButtonBlue.css" text="-" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+                                    <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #BD392F;" text="Type* / Type" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.rowIndex="8" />
+                                    <TextField text="SUPPORT DE MONTAGE" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="10" />
+                                    <Label style="-fx-text-fill: #ACB9CA; -fx-font-style: italic; -fx-font-size: 12;" text="English" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="10">
+                                       <GridPane.margin>
+                                          <Insets right="5.0" />
+                                       </GridPane.margin>
+                                    </Label>
+                                    <TextField style="-fx-background-color: #F4D5D2;" GridPane.columnIndex="5" GridPane.columnSpan="3" GridPane.rowIndex="10" />
+                                    <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-label-padding: -8; -fx-background-radius: 1; -fx-border-radius: 1; -fx-border-width: 1;" stylesheets="@../Styles/ButtonBlue.css" text="+" GridPane.halignment="CENTER" GridPane.rowIndex="12" />
+                                    <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Type de courant* / Current type" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.rowIndex="12" />
+                                    <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-label-padding: -8; -fx-background-radius: 1; -fx-border-radius: 1; -fx-border-width: 1;" stylesheets="@../Styles/ButtonBlue.css" text="-" GridPane.halignment="CENTER" GridPane.rowIndex="16" />
+                                    <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Nombre de contacts* / Number of contacts" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.rowIndex="16" />
+                                    <TextField text="?" GridPane.columnIndex="1" GridPane.rowIndex="18" />
+                                    <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-label-padding: -8; -fx-background-radius: 1; -fx-border-radius: 1; -fx-border-width: 1;" stylesheets="@../Styles/ButtonBlue.css" text="-" GridPane.halignment="CENTER" GridPane.rowIndex="20" />
+                                    <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #BD392F;" text="Tension* / Voltage" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.rowIndex="20" />
+                                    <TextField style="-fx-background-color: #F4D5D2;" GridPane.columnIndex="1" GridPane.rowIndex="22" />
+                                    <Label style="-fx-text-fill: #ACB9CA; -fx-font-style: italic; -fx-font-size: 12;" text="Unit" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="22">
+                                       <GridPane.margin>
+                                          <Insets right="5.0" />
+                                       </GridPane.margin>
+                                    </Label>
+                                    <TextField style="-fx-background-color: #F4D5D2;" GridPane.columnIndex="3" GridPane.rowIndex="22" />
+                                    <Label style="-fx-text-fill: #ACB9CA; -fx-font-style: italic; -fx-font-size: 12;" text="Min" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="22">
+                                       <GridPane.margin>
+                                          <Insets right="5.0" />
+                                       </GridPane.margin>
+                                    </Label>
+                                    <TextField style="-fx-background-color: #F4D5D2;" GridPane.columnIndex="5" GridPane.rowIndex="22" />
+                                    <Label style="-fx-text-fill: #ACB9CA; -fx-font-style: italic; -fx-font-size: 12;" text="Max" GridPane.columnIndex="6" GridPane.halignment="RIGHT" GridPane.rowIndex="22">
+                                       <GridPane.margin>
+                                          <Insets right="5.0" />
+                                       </GridPane.margin>
+                                    </Label>
+                                    <TextField style="-fx-background-color: #F4D5D2;" GridPane.columnIndex="7" GridPane.rowIndex="22" />
+                                    <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-label-padding: -8; -fx-background-radius: 1; -fx-border-radius: 1; -fx-border-width: 1;" stylesheets="@../Styles/ButtonBlue.css" text="-" GridPane.halignment="CENTER" GridPane.rowIndex="24" />
+                                    <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Fréquence / Frequency" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.rowIndex="24" />
+                                    <TextField GridPane.columnIndex="1" GridPane.rowIndex="26" />
+                                    <Label style="-fx-text-fill: #ACB9CA; -fx-font-style: italic; -fx-font-size: 12;" text="Unit" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="26">
+                                       <GridPane.margin>
+                                          <Insets right="5.0" />
+                                       </GridPane.margin>
+                                    </Label>
+                                    <TextField GridPane.columnIndex="3" GridPane.rowIndex="26" />
+                                    <Label style="-fx-text-fill: #ACB9CA; -fx-font-style: italic; -fx-font-size: 12;" text="Min" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="26">
+                                       <GridPane.margin>
+                                          <Insets right="5.0" />
+                                       </GridPane.margin>
+                                    </Label>
+                                    <TextField GridPane.columnIndex="5" GridPane.rowIndex="26" />
+                                    <Label style="-fx-text-fill: #ACB9CA; -fx-font-style: italic; -fx-font-size: 12;" text="Max" GridPane.columnIndex="6" GridPane.halignment="RIGHT" GridPane.rowIndex="26">
+                                       <GridPane.margin>
+                                          <Insets right="5.0" />
+                                       </GridPane.margin>
+                                    </Label>
+                                    <TextField GridPane.columnIndex="7" GridPane.rowIndex="26" />
+                                    <TextField style="-fx-background-color: #ACB9CA;" text="WERMA" GridPane.columnIndex="9" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                    <TextField style="-fx-background-color: #ACB9CA;" GridPane.columnIndex="9" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                                    <TextField style="-fx-background-color: #ACB9CA;" text="MONTAGEBEUGEL" GridPane.columnIndex="9" GridPane.columnSpan="2" GridPane.rowIndex="10" />
+                                    <TextField style="-fx-background-color: #ACB9CA;" GridPane.columnIndex="9" GridPane.columnSpan="2" GridPane.rowIndex="18" />
+                                    <TextField style="-fx-background-color: #ACB9CA;" GridPane.columnIndex="9" GridPane.columnSpan="2" GridPane.rowIndex="22" />
+                                    <TextField style="-fx-background-color: #ACB9CA;" GridPane.columnIndex="9" GridPane.columnSpan="2" GridPane.rowIndex="26" />
+                                 </children>
+                              </GridPane>
+                           </content>
+                        </ScrollPane>
+                        <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #323E4E;" GridPane.columnSpan="12" GridPane.rowIndex="1" />
+                        <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="EXPAND" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                        <CheckBox mnemonicParsing="false" style="-fx-text-fill: white;" stylesheets="@../Styles/CheckBox.css" text="Incomplete" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </CheckBox>
+                        <CheckBox mnemonicParsing="false" style="-fx-text-fill: white;" stylesheets="@../Styles/CheckBox.css" text="Complete" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </CheckBox>
+                        <CheckBox mnemonicParsing="false" style="-fx-text-fill: white;" stylesheets="@../Styles/CheckBox.css" text="Unknown" GridPane.columnIndex="4" GridPane.rowIndex="1">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </CheckBox>
+                        <CheckBox mnemonicParsing="false" style="-fx-text-fill: white;" stylesheets="@../Styles/CheckBox.css" text="Critical" GridPane.columnIndex="5" GridPane.rowIndex="1">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </CheckBox>
+                        <CheckBox mnemonicParsing="false" style="-fx-text-fill: white;" stylesheets="@../Styles/CheckBox.css" text="Non-critical" GridPane.columnIndex="6" GridPane.rowIndex="1">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </CheckBox>
+                     </children>
+                  </GridPane>
+               </children>
+            </AnchorPane>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

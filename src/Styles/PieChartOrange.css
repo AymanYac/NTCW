@@ -1,0 +1,63 @@
+.chart .chart-title{
+	-fx-font-family:calibri;
+	-fx-font-size:12;
+	-fx-text-fill:white;
+	-fx-font-weight:bold;
+	-fx-wrap-text:true;
+}
+
+.chart .chart-content .chart-pie-label{
+	-fx-font-family:calibri;
+	-fx-font-size:10;
+	-fx-text-fill:white;
+	-fx-font-weight:normal;
+	-fx-wrap-text:true;
+}
+	
+.chart .chart-content .default-color0{
+	-fx-background-color:#855007;
+	-fx-border-color:white;
+	-fx-border-width:0.5;
+	}
+	
+.chart .chart-content .default-color1{
+	-fx-background-color:#C7770C;
+	-fx-border-color:white;
+	-fx-border-width:0.5;
+	}
+	
+.chart .chart-content .default-color2{
+	-fx-background-color:#F29B26;
+	-fx-border-color:white;
+	-fx-border-width:0.5;
+	}
+	
+.chart .chart-content .default-color3{
+	-fx-background-color:#F8C47C;
+	-fx-border-color:white;
+	-fx-border-width:0.5;
+	}
+	
+.chart .chart-content .default-color4{
+	-fx-background-color:#FAD7A7;
+	-fx-border-color:white;
+	-fx-border-width:0.5;
+	}
+	
+.chart .chart-content .default-color5{
+	-fx-background-color:#FDEBD2;
+	-fx-border-color:white;
+	-fx-border-width:0.5;
+	}
+	
+.chart .chart-content .default-color6{
+	-fx-background-color:#855007;
+	-fx-border-color:white;
+	-fx-border-width:0.5;
+	}
+	
+.chart .chart-content .default-color7{
+	-fx-background-color:#C7770C;
+	-fx-border-color:white;
+	-fx-border-width:0.5;
+	}

@@ -1,0 +1,55 @@
+.label{
+	-fx-font-family:Calibri;
+	-fx-font-weight:bold;
+	-fx-font-size:14px;
+	-fx-text-fill:white;
+	-fx-padding:5 0 0.0 0;
+	
+	}
+	
+.table-view{
+	-fx-background-color:transparent;
+	-fx-border-color:transparent;
+	
+}
+
+
+
+.table-view:row-selection .virtual-flow .clipped-container .sheet .table-row-cell:even{
+	-fx-background-color:transparent;
+	-fx-border-color:transparent;	
+}
+
+.table-view:row-selection .virtual-flow .clipped-container .sheet .table-row-cell:odd{
+	-fx-background-color:transparent;
+	-fx-border-color:transparent;
+	-fx-text-fill:white;	
+}
+
+.table-view:row-selection .column-header-background .nested-column-header .table-column .label{
+		-fx-background-color:transparent;
+		-fx-border-color:transparent;
+		-fx-text-fill:white;
+}
+
+.table-view:row-selection .column-header-background .filler{
+	-fx-background-color:#445469;
+	-fx-border-color:#445469;
+}
+
+.table-view:row-selection .column-header-background .nested-column-header{
+	-fx-background-color:red;
+}
+
+.table-view:row-selection .column-header-background .nested-column-header .table-column{
+	-fx-background-color:#445469;
+}
+
+.table-view:row-selection .virtual-flow .clipped-container .sheet .table-row-cell:odd .table-column:odd .text{
+	-fx-border-color:transparent;
+}
+
+.table-column{
+	-fx-border-color:transparent;
+	-fx-text-fill:white;
+}

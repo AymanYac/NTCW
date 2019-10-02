@@ -1,0 +1,23 @@
+.radio-button .text{
+	-fx-font-family:Calibri;
+	-fx-font-weight:Bold;
+	-fx-font-style:italic;
+	-fx-font-size:14px;
+	-fx-fill:white;
+}
+
+.radio-button .radio{
+	-fx-effect:none;
+	-fx-background-color:lightgrey;
+	-fx-background-radius:10;
+	-fx-border-color:white;
+	-fx-border-radius:10;
+	-fx-pref-width:12;
+	-fx-pref-height:12;
+	
+}
+
+.radio-button:selected .radio .dot{
+	-fx-background-color:#445469;
+	-fx-translate-y:-1;
+}

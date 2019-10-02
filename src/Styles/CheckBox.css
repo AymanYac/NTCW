@@ -1,0 +1,24 @@
+.check-box{
+	-fx-font-family:calibri;
+	-fx-font-weight:bold;
+	-fx-font-size:12;
+	-fx-text-fill:#9BBB5C;
+	
+}
+
+
+.check-box .box{
+	-fx-background-color:white;
+	-fx-border-color:white;
+
+}
+
+.check-box .box{
+	-fx-font-family:calibri;
+	-fx-font-weight:bold;
+	-fx-font-size:12;
+	-fx-text-fill:#9BBB5C;	
+}
+
+
+
