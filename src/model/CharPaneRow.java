@@ -128,9 +128,9 @@ public class CharPaneRow {
 			tmp.setFill(GlobalConstants.CHAR_TXT_COLOR);
 			tmp.setFont(Font.font(GlobalConstants.CHAR_TXT_FONT,GlobalConstants.CHAR_TXT_WEIGHT,GlobalConstants.CHAR_TXT_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
 			textes.add(tmp);
-			if(this.carac.getIsTranslatable() && !parent.parent.user_language_gcode.equals(parent.parent.data_language_gcode)) {
+			if(this.carac.getIsTranslatable() && !parent.parent.user_language.equals(parent.parent.data_language)) {
 				//tmp = new Text(" ("+translateValue(this.getValue()).getNominal_value()+")");
-				tmp = new Text(this.getValue().getUserLanguageValue());
+				tmp = new Text(" ("+this.getValue().getUserLanguageValue()+")");
 				tmp.setFill(GlobalConstants.RULE_DISPLAY_SYNTAX_COLOR);
 				tmp.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,GlobalConstants.RULE_DISPLAY_SYNTAX_WEIGHT,GlobalConstants.ITALIC_DISPLAY_SYNTAX_POSTURE,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
 				textes.add(tmp);
@@ -276,9 +276,6 @@ public class CharPaneRow {
 		ret.setPrefHeight(0);
 		return ret;
 		
-	}
-	private CharacteristicValue translateValue(CharacteristicValue value2) {
-		return value2;
 	}
 	
 }

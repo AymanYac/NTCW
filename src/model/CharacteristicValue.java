@@ -2,8 +2,8 @@ package model;
 
 public class CharacteristicValue {
 	
-	public static String userLanguageCode;
-	public static String dataLanguageCode;
+	public static String userLanguage;
+	public static String dataLanguage;
 	
 	private String value_id;
 	private String nominal_value;
@@ -12,6 +12,7 @@ public class CharacteristicValue {
 	private String text_values;
 	private String note;
 	private String uom_id;
+	private ClassCharacteristic parentChar;
 	
 	
 	
@@ -88,9 +89,9 @@ public class CharacteristicValue {
 		if(text_values!=null) {
 			try {
 				for(String lang_val : text_values.split("&&&")) {
-					if(lang_val.endsWith(CharacteristicValue.userLanguageCode)) {
-						char[] ret =new char[lang_val.length()-CharacteristicValue.userLanguageCode.length()];
-						lang_val.getChars(0, lang_val.length()-CharacteristicValue.userLanguageCode.length(),ret,0);
+					if(lang_val.endsWith(CharacteristicValue.userLanguage)) {
+						char[] ret =new char[lang_val.length()-CharacteristicValue.userLanguage.length()];
+						lang_val.getChars(0, lang_val.length()-CharacteristicValue.userLanguage.length(),ret,0);
 						return new String(ret);
 					}
 				}
@@ -106,9 +107,9 @@ public class CharacteristicValue {
 		if(text_values!=null) {
 			try {
 				for(String lang_val : text_values.split("&&&")) {
-					if(lang_val.endsWith(CharacteristicValue.dataLanguageCode)) {
-						char[] ret =new char[lang_val.length()-CharacteristicValue.dataLanguageCode.length()];
-						lang_val.getChars(0, lang_val.length()-CharacteristicValue.dataLanguageCode.length(),ret,0);
+					if(lang_val.endsWith(CharacteristicValue.dataLanguage)) {
+						char[] ret =new char[lang_val.length()-CharacteristicValue.dataLanguage.length()];
+						lang_val.getChars(0, lang_val.length()-CharacteristicValue.dataLanguage.length(),ret,0);
 						return new String(ret);
 					}
 				}
@@ -117,6 +118,14 @@ public class CharacteristicValue {
 				return null;
 			}
 		}
+		//If no language was specified during upload/previous filling and the carac is not translatable
+		//Send whatever text the value contains
+		if(!this.parentChar.getIsTranslatable()) {
+			return this.text_values;
+		}
 		return null;
+	}
+	public void setParentChar(ClassCharacteristic classCharacteristic) {
+		this.parentChar=classCharacteristic;
 	}
 }

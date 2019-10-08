@@ -1104,6 +1104,7 @@ public class TablePane_CharClassif {
 			val.setMax_value(rs.getString("max_value"));
 			val.setNote(rs.getString("note"));
 			val.setUom_id(rs.getString("uom_id"));
+			val.setParentChar(this.active_characteristics.get(target_class_id).get(charIdArray.indexOf(characteristic_id)));
 			for(CharDescriptionRow row:this.itemArray) {
 				if(row.getItem_id().equals(item_id)) {
 					row.getData(target_class_id)[charIdArray.indexOf(characteristic_id)]=val;
@@ -1115,8 +1116,8 @@ public class TablePane_CharClassif {
 			}
 		}
 		//Set the static variable for CharacteristicValue
-		CharacteristicValue.dataLanguageCode=this.Parent.data_language_gcode;
-		CharacteristicValue.userLanguageCode=this.Parent.user_language_gcode;
+		CharacteristicValue.dataLanguage=this.Parent.data_language;
+		CharacteristicValue.userLanguage=this.Parent.user_language;
 		
 		rs.close();
 		stmt.close();

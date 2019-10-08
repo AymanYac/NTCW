@@ -1177,6 +1177,34 @@ public class Tools {
 			thread.setName("Sync DB for method "+METHOD);
 			thread.start();
 	}
-	
 
+
+
+	
+	public static String get_project_data_language(String active_project) throws ClassNotFoundException, SQLException {
+		Connection conn = Tools.spawn_connection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("select data_language from projects where project_id ='"+active_project+"'");
+		rs.next();
+		String ret = rs.getString("data_language");
+		rs.close();
+		stmt.close();
+		conn.close();
+		
+		return ret;
+	}
+
+
+	public static String get_project_user_language(String active_project) throws ClassNotFoundException, SQLException {
+		Connection conn = Tools.spawn_connection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("select classifier_language from projects where project_id ='"+active_project+"'");
+		rs.next();
+		String ret = rs.getString("classifier_language");
+		rs.close();
+		stmt.close();
+		conn.close();
+		
+		return ret;
+	}
 }

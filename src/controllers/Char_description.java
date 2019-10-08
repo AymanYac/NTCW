@@ -70,6 +70,7 @@ import model.UnitOfMeasure;
 import model.UserAccount;
 import service.CharClassifContext;
 import service.CharClassifProposer;
+import service.CharPatternServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
 
@@ -140,8 +141,11 @@ public class Char_description {
 	public UserAccount account;
 
 	
-	public String user_language_gcode;
-	public String data_language_gcode;
+	private String user_language_gcode;
+	private String data_language_gcode;
+	public String user_language;
+	public String data_language;
+
 	
 	public TablePane_CharClassif tableController;
 
@@ -183,6 +187,9 @@ public class Char_description {
 
 
 	public Set<CharDescriptionRow> ROW_SYNC_POOL = new HashSet<CharDescriptionRow>();
+
+
+
 	
 
 	
@@ -562,6 +569,18 @@ public class Char_description {
 			launch_search(true);
 		}
 		
+		
+		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
+			int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+			CharPatternServices.scanSelectionForRuleCreation(this,
+					this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
+					.get(active_char_index));
+		}
+		
+		
+		
+		
+		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.ESCAPE)) {
 			
 			
@@ -679,6 +698,10 @@ public class Char_description {
 		
 		this.user_language_gcode = Tools.get_project_user_language_code(account.getActive_project());
 		this.data_language_gcode = Tools.get_project_data_language_code(account.getActive_project());
+		this.user_language = Tools.get_project_user_language(account.getActive_project());
+		this.data_language = Tools.get_project_data_language(account.getActive_project());
+		
+		
 		//this.UOMS = Tools.get_units_of_measures(user_language_gcode);
 		this.UOMS = Tools.get_units_of_measures("en");
 		
