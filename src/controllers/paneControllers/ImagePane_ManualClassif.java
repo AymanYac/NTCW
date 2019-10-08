@@ -19,14 +19,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import controllers.Manual_classif;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.effect.BoxBlur;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -35,10 +33,8 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
-import model.GlobalConstants;
 import model.ImageResult;
 import service.BoxBlurFilter;
-import service.GaussianFilter;
 import transversal.generic.PixelUtils;
 
 	public class ImagePane_ManualClassif {
@@ -49,7 +45,6 @@ import transversal.generic.PixelUtils;
 		String noImageBG = this.getClass().getResource("/pictures/No_picture.png").toExternalForm();
 		String edge_style = "-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center; -fx-border-color: white;";
 		private Thread imageDownloadThread;
-		private boolean stop_image_download;
 		private Task<Void> imageDownloadTask;
 	
 		
@@ -63,6 +58,7 @@ import transversal.generic.PixelUtils;
 		
 		
 	
+	@SuppressWarnings("static-access")
 	private void download_images(boolean checkMethodSelect) throws IOException, ParseException {
 		
 		
@@ -410,11 +406,11 @@ import transversal.generic.PixelUtils;
 		    	}
 		    }
 	}
+	@SuppressWarnings("deprecation")
 	public void search_image(boolean checkMethodSelect) throws IOException, ParseException {
 		
 		try {
 			imageDownloadTask.cancel();
-			stop_image_download=true;
 			imageDownloadThread.stop();
 		}catch(Exception V) {
 			
@@ -423,7 +419,6 @@ import transversal.generic.PixelUtils;
 		    
 			@Override
 		    protected Void call() throws Exception {
-				stop_image_download = false;
 				download_images(checkMethodSelect);
 		    	return null;
 		    }

@@ -57,6 +57,6 @@
       <CheckBox fx:id="sameMG" mnemonicParsing="false" prefWidth="500.0" style="-fx-text-fill: white; -fx-font-size: 12; -fx-font-family: calibri; -fx-font-weight: bold;" text="Same material group only" GridPane.columnIndex="1" GridPane.rowIndex="9" />
       <CheckBox fx:id="samePC" mnemonicParsing="false" prefWidth="500.0" style="-fx-text-fill: white; -fx-font-size: 12; -fx-font-family: calibri; -fx-font-weight: bold;" text="Same pre-classification only" GridPane.columnIndex="3" GridPane.rowIndex="9" />
       <CheckBox fx:id="sameDWG" mnemonicParsing="false" prefWidth="500.0" style="-fx-text-fill: white; -fx-font-size: 12; -fx-font-family: calibri; -fx-font-weight: bold;" text="Part to a drawing only" GridPane.columnIndex="5" GridPane.rowIndex="9" />
-      <Button fx:id="addRule" mnemonicParsing="false" onAction="#addRule" prefWidth="500.0" style="-fx-font-size: 12;" stylesheets="@../../Styles/ButtonBlue.css" text="Add rule" GridPane.columnIndex="5" GridPane.rowIndex="11" />
+      <Button fx:id="addRule" mnemonicParsing="false" onAction="#addRuleButtonAction" prefWidth="500.0" style="-fx-font-size: 12;" stylesheets="@../../Styles/ButtonBlue.css" text="Add rule" GridPane.columnIndex="5" GridPane.rowIndex="11" />
    </children>
 </GridPane>

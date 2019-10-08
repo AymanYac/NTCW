@@ -30,16 +30,12 @@ import transversal.language_toolbox.WordUtils;
 public class AutoClassificationBenchmark {
 	
 	private HashMap<String, Double> RET = new HashMap<String,Double>();
-	private String user;
-	private String role;
 	private String pid;
 	
 	public void setUser(String user) {
-		this.user=user;
 	}
 
 	public void setRole(String role) {
-		this.role=role;
 	}
 	public void setPid(String pidx) {
 		this.pid=pidx;
@@ -118,8 +114,7 @@ public class AutoClassificationBenchmark {
 		});
 
 		TargetTask.setOnFailed(e -> {
-		    Throwable problem = TargetTask.getException();
-		    /* code to execute if task throws exception */
+		    TargetTask.getException();
 		    
 
 		});
@@ -153,8 +148,7 @@ public class AutoClassificationBenchmark {
 		});
 
 		RuleGenTask.setOnFailed(e -> {
-		    Throwable problem = RuleGenTask.getException();
-		    /* code to execute if task throws exception */
+		    RuleGenTask.getException();
 		    
 
 		});
@@ -191,8 +185,7 @@ public class AutoClassificationBenchmark {
 		});
 
 		cleanTask.setOnFailed(e -> {
-		    Throwable problem = cleanTask.getException();
-		    /* code to execute if task throws exception */
+		    cleanTask.getException();
 		    
 
 		});
@@ -213,11 +206,6 @@ public class AutoClassificationBenchmark {
 		template.setFactors(rET2);
 		template.fill(this.target_desc_cardinality,this.ref_desc_cardinality,this.preclass_ref_desc_cardinality);
 		parent.ready2Launch(template,this,rET2);
-	}
-
-	private void upload_data() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void launch_classification(int MAX_CARD) throws ClassNotFoundException, SQLException {
@@ -246,8 +234,7 @@ public class AutoClassificationBenchmark {
 		});
 
 		mainTask.setOnFailed(e -> {
-		    Throwable problem = mainTask.getException();
-		    /* code to execute if task throws exception */
+		    mainTask.getException();
 		    
 
 		});
@@ -289,8 +276,7 @@ public class AutoClassificationBenchmark {
 		});
 
 		TargetTask.setOnFailed(e -> {
-		    Throwable problem = TargetTask.getException();
-		    /* code to execute if task throws exception */
+		    TargetTask.getException();
 		    
 
 		});
@@ -321,8 +307,7 @@ public class AutoClassificationBenchmark {
 		});
 
 		RuleGenTask.setOnFailed(e -> {
-		    Throwable problem = RuleGenTask.getException();
-		    /* code to execute if task throws exception */
+		    RuleGenTask.getException();
 		    
 
 		});
@@ -355,8 +340,7 @@ public class AutoClassificationBenchmark {
 		});
 
 		cleanTask.setOnFailed(e -> {
-		    Throwable problem = cleanTask.getException();
-		    /* code to execute if task throws exception */
+		    cleanTask.getException();
 		    
 
 		});
@@ -393,7 +377,7 @@ public class AutoClassificationBenchmark {
 		}
 		
 		Instant end = Instant.now();
-		Duration timeElapsed = Duration.between(start, end);
+		Duration.between(start, end);
 		//RET.put("preclass fetch",(double) timeElapsed.toNanos());
 		if(this.ref_desc_cardinality==0) {
 			FETCH_DESCRIPTIONS(this.pid,true,mAX_CARD,true);
@@ -646,8 +630,6 @@ public class AutoClassificationBenchmark {
 		int base_desc_count = 0;
 		
 		String target_desc = this.binaryClassificationParameters.getPreclassif_baseDescriptionType().toString();
-		Integer pid;
-		
 		for(String aid:preclass_CLEAN_REFERENCES.keySet()) {
 				if( preclass_CLEAN_REFERENCES.get(aid).get("cid").length() <4 || !preclass_buildRows.contains(base_desc_count)) {
 					base_desc_count=base_desc_count+1;
@@ -721,8 +703,6 @@ public class AutoClassificationBenchmark {
 		int base_desc_count = 0;
 		
 		String target_desc = this.binaryClassificationParameters.getClassif_baseDescriptionType().toString();
-		Integer pid;
-		
 		for(String aid:CLEAN_REFERENCES.keySet()) {
 			try {
 					if( CLEAN_REFERENCES.get(aid).get("cid").length() <4 || !buildRows.contains(base_desc_count)) {
@@ -962,8 +942,6 @@ public class AutoClassificationBenchmark {
 	
 
 	private void preclass_apply_rules() throws ClassNotFoundException, SQLException {
-		int preclass_base_desc_count = 0;
-		
 		String target_desc = this.binaryClassificationParameters.getPreclassif_targetDescriptionType().toString();
 
 		for(String aid:preclass_CLEAN_TARGETS.keySet()) {
@@ -995,8 +973,6 @@ public class AutoClassificationBenchmark {
 	
 	
 	public void apply_rules() throws ClassNotFoundException, SQLException {
-		int base_desc_count = 0;
-		
 		String target_desc = this.binaryClassificationParameters.getClassif_targetDescriptionType().toString();
 
 		for(String aid:CLEAN_TARGETS.keySet()) {

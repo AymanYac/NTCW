@@ -1,10 +1,7 @@
 package service;
-import java.awt.*;
 import java.awt.image.*;
 
 import transversal.generic.ImageMath;
-
-import java.awt.geom.*;
 
 public class BoxBlurFilter extends AbstractBufferedImageOp {
 

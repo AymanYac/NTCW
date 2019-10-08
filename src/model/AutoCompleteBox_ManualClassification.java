@@ -1,6 +1,5 @@
 package model;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -16,8 +15,6 @@ import transversal.language_toolbox.Unidecode;
 
 import java.awt.AWTException;
 import java.awt.Robot;
-import java.sql.SQLException;
-import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;

@@ -1,20 +1,12 @@
 package controllers.paneControllers;
-//jqss
 import java.util.ArrayList;
 
 import controllers.Char_description;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.Tooltip;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
 import model.CharDescriptionRow;
 import model.CharPaneRow;
 import model.ClassCharacteristic;
@@ -24,12 +16,12 @@ public class CharPane_CharClassif {
 
 	public Char_description parent;
 	private CharDescriptionRow selected_row;
-	@FXML public TableView tableGrid;
-	@FXML private TableColumn critcalityColumn;
-	@FXML private TableColumn seqColumn;
-	@FXML private TableColumn charNameColumn;
-	@FXML private TableColumn uomColumn;
-	@FXML private TableColumn valueColumn;
+	@FXML public TableView<CharPaneRow> tableGrid;
+	@FXML private TableColumn<?, ?> critcalityColumn;
+	@FXML private TableColumn<?, ?> seqColumn;
+	@FXML private TableColumn<?, ?> charNameColumn;
+	@FXML private TableColumn<?, ?> uomColumn;
+	@FXML private TableColumn<?, ?> valueColumn;
 	
 	private ArrayList<CharPaneRow> paneRows = new ArrayList<CharPaneRow>();
 	private boolean triggerItemTableRefresh;

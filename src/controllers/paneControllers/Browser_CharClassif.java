@@ -7,17 +7,14 @@ import java.net.URLEncoder;
 import org.json.simple.parser.ParseException;
 
 import controllers.Char_description;
-import controllers.Manual_classif;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebHistory.Entry;
 import javafx.scene.web.WebView;
 
 public class Browser_CharClassif {
@@ -59,6 +56,7 @@ public class Browser_CharClassif {
 	
 	
 	
+	@SuppressWarnings("static-access")
 	public void search_google_inplace(boolean checkMethodSelect) throws UnsupportedEncodingException {
 		
 		/*if(parent.search_text.getText().replaceAll(" ", "").length()==0) {
@@ -109,7 +107,8 @@ public class Browser_CharClassif {
 	        parent.leftAnchor.setTopAnchor(toolBar, 5.0);
 	        
 	        search_anchor.setOnKeyPressed(new EventHandler<KeyEvent>() {
-	            @Override
+	            @SuppressWarnings("incomplete-switch")
+				@Override
 	            public void handle(KeyEvent event) {
 	                switch (event.getCode()) {
 	                    case ESCAPE:   try {

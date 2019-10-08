@@ -12,11 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleExpression;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -670,30 +667,6 @@ public class Auto_classification_parameters {
 		    	}
 		    }
 		    );
-		 
-		 
-		 ChangeListener<Number> slider_chane_event_listener = new ChangeListener<Number>() {
-
-				@Override
-				public void changed(ObservableValue<? extends Number> arg0,  Number old_val, Number new_val) {
-					/*TimeUnit.SECONDS.sleep((long) 0.5);
-					if(arg0.getValue()!=new_val) {
-						return;
-					}*/
-					update_graphs();
-					
-				}
-	        };
-	     /*
-		 ta_slider.valueProperty().addListener(slider_chane_event_listener);
-		 tb_slider.valueProperty().addListener(slider_chane_event_listener);
-		 
-		 preclass_ta_slider.valueProperty().addListener(slider_chane_event_listener);
-		 preclass_tb_slider.valueProperty().addListener(slider_chane_event_listener);
-		 
-		 build_sample_slider.valueProperty().addListener(slider_chane_event_listener);
-		 preclass_build_sample_slider.valueProperty().addListener(slider_chane_event_listener);
-		 */
 	     
 	}
 
@@ -757,6 +730,7 @@ public class Auto_classification_parameters {
 		
 	}
 
+	@SuppressWarnings("unused")
 	private void refresh_dynamic_fields(boolean sleep) {
 		
 		
@@ -876,6 +850,7 @@ public class Auto_classification_parameters {
 		
 	}
 
+	@SuppressWarnings({ "unused", "unchecked" })
 	@FXML private void update_graphs() {
 		
 		//Launch Benchmark
@@ -1273,6 +1248,7 @@ public class Auto_classification_parameters {
 		
 	}
 
+	@SuppressWarnings("unused")
 	@FXML private void save() {
 		BinaryClassificationParameters tmp = new BinaryClassificationParameters();
 		

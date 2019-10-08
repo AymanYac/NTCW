@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,6 +36,7 @@ import transversal.generic.Tools;
 public class SpreadsheetUpload {
 	
 	
+	@SuppressWarnings("resource")
 	public static void loadSheetInDatabase(String tableName, String inputFile, LinkedHashMap<String,String> columnMap) throws ClassNotFoundException, SQLException, FileNotFoundException, IOException {
 	        XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(inputFile));
 
@@ -68,7 +68,7 @@ public class SpreadsheetUpload {
     	    
     	    
     	    
-    	    ArrayList<ArrayList<String>> data = new ArrayList<ArrayList<String>>();
+    	    new ArrayList<ArrayList<String>>();
     	    
 	        while (rowIterator.hasNext()) {
 	            row = rowIterator.next();
@@ -232,7 +232,7 @@ public class SpreadsheetUpload {
 	    
 	    
 	    
-	    ArrayList<ArrayList<String>> data = new ArrayList<ArrayList<String>>();
+	    new ArrayList<ArrayList<String>>();
 	    
         while (rowIterator.hasNext()) {
             row = rowIterator.next();
@@ -377,7 +377,7 @@ public class SpreadsheetUpload {
            				ps2.setString(2, row_id);
            				ps2.setString(3, CID2SEGMENT.get(cid));
            				ps2.setString(4, ClassificationMethods.PROJECT_SETUP_UPLOAD);
-           				ps2.setString(5, account.getUser_name());
+           				ps2.setString(5, account.getUser_id());
            				ps2.setDate(6, java.sql.Date.valueOf(LocalDate.now()));
            				
            				ps2.addBatch();

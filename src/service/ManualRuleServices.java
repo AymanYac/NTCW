@@ -1,8 +1,5 @@
 package service;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,7 +13,6 @@ import java.util.stream.Collectors;
 import controllers.Manual_classif;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
-import model.AutoCompleteBox_ManualClassification;
 import model.ClassificationMethods;
 import model.GenericRule;
 import model.ItemFetcherRow;

@@ -14,17 +14,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -49,10 +44,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -66,14 +58,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import model.GlobalConstants;
 import model.AutoCompleteBox_ManualClassification;
-import model.DescriptionFetchRow;
 import model.ItemFetcherRow;
 import model.ManualClassProposition;
 import model.UserAccount;
@@ -195,6 +182,7 @@ public class Manual_classif {
 
 	}
 
+	@SuppressWarnings("static-access")
 	@FXML void switchPane() {
 		if(grid.getColumnSpan(leftAnchor)==5) {
 			setBottomRegionColumnSpans(false);
@@ -208,6 +196,7 @@ public class Manual_classif {
 		tableController.fireClassDown();
 	}
 	
+	@SuppressWarnings({ "unchecked", "resource" })
 	@FXML void export() throws SQLException, ClassNotFoundException {
 		FileChooser fileChooser = new FileChooser();
 		
@@ -790,7 +779,7 @@ public class Manual_classif {
 	}
 
 	
-	@SuppressWarnings("static-access")
+	@SuppressWarnings({ "static-access", "unchecked" })
 	private void load_table_pane() throws IOException {
 		
 		tableButton.setSelected(true);
@@ -868,7 +857,7 @@ public class Manual_classif {
 		
 	}
 	
-	@SuppressWarnings("static-access")
+	@SuppressWarnings({ "static-access", "unused" })
 	private void load_taxo_pane() throws IOException {
 		taxoButton.setSelected(true);
 		setBottomRegionColumnSpans(true);
@@ -925,11 +914,11 @@ public class Manual_classif {
 	private void load_browser_pane() throws IOException {
 		googleButton.setSelected(true);
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/Browser_ManualClassif.fxml"));
-		GridPane toolBarGrid = loader.load();
 		browserController = loader.getController();
 		browserController.setParent(this);
 	}
 
+	@SuppressWarnings("static-access")
 	public void setBottomRegionColumnSpans(boolean visibleRight) {
 		if(visibleRight) {
 			rightAnchor.getChildren().removeAll(rightAnchor.getChildren());

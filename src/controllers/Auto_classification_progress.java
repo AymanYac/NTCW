@@ -1,7 +1,6 @@
 package controllers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -10,16 +9,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -110,6 +106,7 @@ public class Auto_classification_progress {
 	@FXML private ProgressBar target_abv_clean_progress;
 	@FXML private ProgressBar target_spell_clean_progress;
 	@FXML private ProgressBar rule_app_progress;
+	@SuppressWarnings("rawtypes")
 	@FXML private StackedBarChart actualChart;
 	
 	@FXML private ProgressBar preclass_download_progress;
@@ -366,6 +363,7 @@ public class Auto_classification_progress {
 	private Task<Void> mainTask;
 	private Task<Void> forwardTask;
 	
+	@SuppressWarnings("static-access")
 	@FXML void initialize(){
 		download_button.setVisible(false);
 		decorate_menubar(menubar, account);
@@ -420,6 +418,7 @@ public class Auto_classification_progress {
 		
 	}
 
+	@SuppressWarnings("static-access")
 	private void decorate_menubar(MenuBar menubar2, UserAccount account2) {
 		
 		
@@ -848,6 +847,7 @@ public class Auto_classification_progress {
 		}
 	}
 
+	@SuppressWarnings("static-access")
 	private void launch_preclassification() {
 
 		/*
@@ -1028,6 +1028,7 @@ public class Auto_classification_progress {
 	}
 	
 	
+	@SuppressWarnings({ "resource", "deprecation" })
 	@FXML private void save_to_file() throws ClassNotFoundException, SQLException, IOException {
 		FileChooser fileChooser = new FileChooser();
 		
@@ -1779,7 +1780,6 @@ public class Auto_classification_progress {
 		return ret;
 	}
 
-	@SuppressWarnings("deprecation")
 	private void classification_complete() throws IOException, ClassNotFoundException, SQLException {
 		tm.stopRow(15);
 		block_window_close = true;
@@ -1829,8 +1829,6 @@ public class Auto_classification_progress {
 	    		for(DescriptionFetchRow rw:rws) {
 	    			
 	    			String aid = rw.getAid();
-	    			String aiud = rw.getAuid();  
-	    			
 	    			String classif_cid;
 	    			String classif_rule;
 	    			String classif_rule_id;
@@ -2004,6 +2002,7 @@ public class Auto_classification_progress {
 		
 	}
 	
+	@SuppressWarnings("static-access")
 	private void main_tasks() {
 		if(this.ref_desc_cardinality==0) {
 			for(Node noeud:grille.getChildren()) {
@@ -2344,6 +2343,7 @@ public class Auto_classification_progress {
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void update_static_graph() {
 		graph.setAnimated(false);
 		graph.setLegendVisible(false);
@@ -2588,6 +2588,7 @@ public class Auto_classification_progress {
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	private void update_actual_graph() {
 		
 		actualgraph.setAnimated(false);
@@ -2954,9 +2955,9 @@ public class Auto_classification_progress {
 		
 	}
 
+	@SuppressWarnings("static-access")
 	public void set_semi_opaque(Node node) {
 		
-		int colonne = grille.getColumnIndex(node);
 		int ligne = grille.getRowIndex(node);
 		
 		
@@ -3100,8 +3101,6 @@ public class Auto_classification_progress {
 		int base_desc_count = 0;
 		
 		String target_desc = this.binaryClassificationParameters.getPreclassif_baseDescriptionType().toString();
-		Integer pid;
-		
 		for(String aid:preclass_CLEAN_REFERENCES.keySet()) {
 			
 			preclass_word_gen_progress.setProgress(preclass_word_gen_progress.getProgress()+(1.0/preclass_ref_desc_cardinality));
@@ -3214,8 +3213,6 @@ public class Auto_classification_progress {
 		int base_desc_count = 0;
 		
 		String target_desc = this.binaryClassificationParameters.getClassif_baseDescriptionType().toString();
-		Integer pid;
-		
 		for(String aid:CLEAN_REFERENCES.keySet()) {
 			
 				word_gen_progress.setProgress(word_gen_progress.getProgress()+(1.0/ref_desc_cardinality));
@@ -3629,8 +3626,6 @@ public class Auto_classification_progress {
 		tm.startRow(28);
 		
 		
-		int preclass_base_desc_count = 0;
-		
 		String target_desc = this.binaryClassificationParameters.getPreclassif_targetDescriptionType().toString();
 
 		for(String aid:preclass_CLEAN_TARGETS.keySet()) {
@@ -3689,8 +3684,6 @@ public class Auto_classification_progress {
 		}
 		
 		tm.startRow(14);
-		int base_desc_count = 0;
-		
 		String target_desc = this.binaryClassificationParameters.getClassif_targetDescriptionType().toString();
 		
 		

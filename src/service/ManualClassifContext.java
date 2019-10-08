@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import controllers.Manual_classif;
 import controllers.paneControllers.PropositionContext_ManualClassif;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;

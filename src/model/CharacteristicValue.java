@@ -1,15 +1,26 @@
 package model;
 
 public class CharacteristicValue {
-	String value_id;
-	String nominal_value;
-	String min_value;
-	String max_value;
-	String note;
-	String uom_id;
+	
+	public static String userLanguageCode;
+	public static String dataLanguageCode;
+	
+	private String value_id;
+	private String nominal_value;
+	private String min_value;
+	private String max_value;
+	private String text_values;
+	private String note;
+	private String uom_id;
 	
 	
 	
+	public String getText_values() {
+		return text_values;
+	}
+	public void setText_values(String text_values) {
+		this.text_values = text_values;
+	}
 	public String getUom_id() {
 		return uom_id;
 	}
@@ -47,11 +58,65 @@ public class CharacteristicValue {
 		this.note = note;
 	}
 	public String getDisplayValue() {
+		String text_val = getDataLanguageValue();
+		if(text_val!=null) {
+			return text_val;
+		}
 		return nominal_value;
 	}
 	public boolean isNonEmpty() {
-		
-		return (nominal_value.length()+min_value.length()+max_value.length())>0;
+		int concatDataLength = 0;
+		try {
+			concatDataLength += getDisplayValue().length();
+		}catch(Exception V) {
+			
+		}
+		try {
+			concatDataLength += getMin_value().length();
+		}catch(Exception V) {
+			
+		}
+		try {
+			concatDataLength += getMax_value().length();
+		}catch(Exception V) {
+			
+		}
+				
+		return concatDataLength>0;
+	}
+	public String getUserLanguageValue() {
+		if(text_values!=null) {
+			try {
+				for(String lang_val : text_values.split("&&&")) {
+					if(lang_val.endsWith(CharacteristicValue.userLanguageCode)) {
+						char[] ret =new char[lang_val.length()-CharacteristicValue.userLanguageCode.length()];
+						lang_val.getChars(0, lang_val.length()-CharacteristicValue.userLanguageCode.length(),ret,0);
+						return new String(ret);
+					}
+				}
+			}catch(Exception V) {
+				V.printStackTrace();
+				return null;
+			}
+		}
+		return null;
 	}
 	
+	public String getDataLanguageValue() {
+		if(text_values!=null) {
+			try {
+				for(String lang_val : text_values.split("&&&")) {
+					if(lang_val.endsWith(CharacteristicValue.dataLanguageCode)) {
+						char[] ret =new char[lang_val.length()-CharacteristicValue.dataLanguageCode.length()];
+						lang_val.getChars(0, lang_val.length()-CharacteristicValue.dataLanguageCode.length(),ret,0);
+						return new String(ret);
+					}
+				}
+			}catch(Exception V) {
+				V.printStackTrace();
+				return null;
+			}
+		}
+		return null;
+	}
 }

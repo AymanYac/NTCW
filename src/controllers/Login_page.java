@@ -18,7 +18,6 @@ import model.GlobalConstants;
 import model.UserAccount;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
-import transversal.language_toolbox.WordUtils;
 
 
 public class Login_page {

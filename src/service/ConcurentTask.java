@@ -1,26 +1,19 @@
 package service;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import controllers.Auto_classification_launch;
-import controllers.Project_selection;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import model.TimeMasterRow;
 import transversal.data_exchange_toolbox.SpeedMonitor;
 import transversal.generic.Tools;
@@ -310,16 +303,6 @@ public class ConcurentTask {
 			    	tmr.elapsed_time = Duration.between(tmr.start, Instant.now()).getSeconds();
 			    }
 			});
-			
-			String sortie = "CurrentBandwidth: 0.0 kb";
-			try {
-				sortie = Tools.RunVBS(new File("/scripts/bandwidth.vbs"));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			//double speed = Double.valueOf((sortie.split("CurrentBandwidth: ")[1].split(" ")[0]).replace(",", ""));
-			
 			
 			
 			Platform.runLater(new Runnable() {

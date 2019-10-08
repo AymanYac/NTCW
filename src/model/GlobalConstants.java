@@ -1,8 +1,5 @@
 package model;
 
-import java.util.Collection;
-
-import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.FontPosture;

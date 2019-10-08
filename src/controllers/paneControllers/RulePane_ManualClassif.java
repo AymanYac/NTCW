@@ -1,20 +1,17 @@
 package controllers.paneControllers;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import controllers.Manual_classif;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollBar;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -40,8 +37,11 @@ public class RulePane_ManualClassif {
 	
 	
 	@FXML public TableView<RulePaneRow> ruleView;
+	@SuppressWarnings("rawtypes")
 	@FXML TableColumn ruleColumn;
+	@SuppressWarnings("rawtypes")
 	@FXML TableColumn typeColumn;
+	@SuppressWarnings("rawtypes")
 	@FXML TableColumn cbColumn;
 	
 	@FXML TextField customMAIN;
@@ -61,6 +61,7 @@ public class RulePane_ManualClassif {
 	private List<String> dw_words;
 	private ItemFetcherRow current_row;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void setParent(Manual_classif manual_classif) throws ClassNotFoundException, SQLException {
 		this.parent = manual_classif;
 		for_words = Tools.get_project_for_words(parent.account.getActive_project());
@@ -160,7 +161,7 @@ public class RulePane_ManualClassif {
 	
 	private void load_previous_rules(ItemFetcherRow row) {
 		row.itemRules.forEach((k)->{
-			GenericRule gr = row.staticRules.get(k);
+			GenericRule gr = ItemFetcherRow.staticRules.get(k);
 			addGR2List(gr,false,true);
 		});
 	}
@@ -192,8 +193,6 @@ public class RulePane_ManualClassif {
 			}
 		}
 		
-		
-		List<RulePaneRow> ruleList = new ArrayList<RulePaneRow>();
 		
 		GenericRule r1 = new GenericRule();
 		r1.setMain(w1w2);
@@ -274,7 +273,7 @@ public class RulePane_ManualClassif {
 		parent.setBottomRegionColumnSpans(false);
 		parent.classification.requestFocus();
 	}
-	@FXML public void addRule() {
+	@FXML public void addRuleButtonAction() {
 		GenericRule nouvelle = new GenericRule();
 		if(customMAIN.getText().replace(" ", "").length()>0) {
 			nouvelle.setMain(customMAIN.getText().toUpperCase().trim());
@@ -359,7 +358,7 @@ public class RulePane_ManualClassif {
 	
 	@FXML public void addRule(KeyEvent event) {
 		 if(event.getCode().equals(KeyCode.ENTER)) {
-			 addRule();
+			 addRuleButtonAction();
 		 }
 	 }
 

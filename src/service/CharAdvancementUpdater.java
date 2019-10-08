@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import controllers.Char_description;
-import controllers.Manual_classif;
 import javafx.application.Platform;
 import model.UserAccount;
 import transversal.data_exchange_toolbox.QueryFormater;

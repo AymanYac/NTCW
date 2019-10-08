@@ -54,19 +54,19 @@ public class Project_selection {
 	@FXML
 	public TableView<Project> projectlist;
 	@FXML
-	private TableColumn colonne1;
+	private TableColumn<?, ?> colonne1;
 	@FXML
-	private TableColumn colonne2;
+	private TableColumn<?, ?> colonne2;
 	@FXML
-	private TableColumn colonne3;
+	private TableColumn<?, ?> colonne3;
 	@FXML
-	private TableColumn colonne4;
+	private TableColumn<?, ?> colonne4;
 	@FXML
-	private TableColumn colonne5;
+	private TableColumn<?, ?> colonne5;
 	@FXML
-	private TableColumn colonne6;
+	private TableColumn<?, ?> colonne6;
 	@FXML
-	private TableColumn colonne7;
+	private TableColumn<?, ?> colonne7;
 	
 	@FXML
 	private Button suppress_project;
@@ -348,6 +348,7 @@ public class Project_selection {
 	
 
 	//Fills the screen table view
+	@SuppressWarnings("unchecked")
 	private void update_projects_list() {
 		
 		try {
@@ -369,7 +370,7 @@ public class Project_selection {
 		//Transform all the Project data-structure instances to rows in the table
 		projectlist.getItems().addAll(VIEWTABLE);
 		//Set column 1 as the default sorted view
-		projectlist.getSortOrder().add(colonne1);
+		projectlist.getSortOrder().add((TableColumn<Project, ?>) colonne1);
 		/*projectlist.getSortOrder().add(colonne2);
 		projectlist.getSortOrder().add(colonne3);
 		projectlist.getSortOrder().add(colonne4);
@@ -388,6 +389,7 @@ public class Project_selection {
 
 	
 	//Fills the project list data structure
+	@SuppressWarnings("rawtypes")
 	public void load_projects_list() {
 		
 		ArrayList<TableView> tmp = new ArrayList<TableView>(1);

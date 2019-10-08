@@ -28,7 +28,8 @@ public class ConfusionMatrixReader {
         }
     }
     
-    private void readConfusionMatrix() 
+    @SuppressWarnings("resource")
+	private void readConfusionMatrix() 
             throws FileNotFoundException, IOException, URISyntaxException
     {
     	FileInputStream fis;

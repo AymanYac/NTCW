@@ -2,8 +2,6 @@ package service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import controllers.Char_description;
 import controllers.paneControllers.PropositionContext_CharClassif;
 import javafx.beans.value.ChangeListener;

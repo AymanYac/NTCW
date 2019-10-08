@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import model.ClassificationMethods;
-import model.GlobalConstants;
 import model.ItemFetcherRow;
 import transversal.generic.Tools;
 

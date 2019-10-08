@@ -1,10 +1,7 @@
 package transversal.language_toolbox;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-
-import javax.sql.rowset.CachedRowSet;
 
 import model.DescriptionFetchRow;
 

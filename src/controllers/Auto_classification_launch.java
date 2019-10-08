@@ -108,8 +108,6 @@ public class Auto_classification_launch {
 	private AutoClassificationBenchmark benchmark_controller;
 	//Stores the active project's language_id
 	private String languageID;
-	//Stores the active project's general information
-	private Project targetProject;
 	//Stores the user's account details
 	private UserAccount account;
 	
@@ -135,16 +133,16 @@ public class Auto_classification_launch {
 	private TableColumn<?, ?> Classification_projectColumn;
 	@FXML
 	//Binds to the screen's classification table language column
-	private TableColumn Classification_languageColumn;
+	private TableColumn<?, ?> Classification_languageColumn;
 	@FXML
 	//Binds to the screen's classification taxonomy column
-	private TableColumn Classification_taxoColumn;
+	private TableColumn<?, ?> Classification_taxoColumn;
 	@FXML
 	//Binds to the screen's classification cardinality column
-	private TableColumn Classification_cardColumn;
+	private TableColumn<?, ?> Classification_cardColumn;
 	@FXML
 	//Binds to the screen's classficiation check box column
-	private TableColumn Classification_checkboxColumn;
+	private TableColumn<?, ?> Classification_checkboxColumn;
 	
 	
 	@FXML
@@ -155,16 +153,16 @@ public class Auto_classification_launch {
 	private TableColumn<?, ?> preClassification_projectColumn;
 	@FXML
 	//Binds to the screen's pre-classification language column
-	private TableColumn preClassification_languageColumn;
+	private TableColumn<?, ?> preClassification_languageColumn;
 	@FXML
 	//Binds to the screen's pre-classification taxonomy column
-	private TableColumn preClassification_taxoColumn;
+	private TableColumn<?, ?> preClassification_taxoColumn;
 	@FXML
 	//Binds to the screen's pre-classification cardinality column
-	private TableColumn preClassification_cardColumn;
+	private TableColumn<?, ?> preClassification_cardColumn;
 	@FXML
 	//Binds to the screen's pre-classification check box column
-	private TableColumn preClassification_checkboxColumn;
+	private TableColumn<?, ?> preClassification_checkboxColumn;
 	@FXML
 	//Binds to the screen's graph
 	private StackedBarChart<String, Number> graph;
@@ -505,6 +503,7 @@ public class Auto_classification_launch {
 	}
 	
 	//Launches automatically at the window's launch
+	@SuppressWarnings("rawtypes")
 	@FXML void initialize(){
 		Tools.decorate_menubar(menubar, account);
 		
@@ -1222,7 +1221,6 @@ public class Auto_classification_launch {
 	}
 
 	public void setTargetProject(Project activated_project) {
-		this.targetProject=activated_project;
 	}
 	
 	

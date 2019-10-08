@@ -403,7 +403,6 @@ private void duplicateKeyEvent(KeyCode key) {
 
   }
 
-@SuppressWarnings("unchecked")
 protected void send_classification_to_parent(String result)  {
 	if(result!=null) {
 		parent_controller.fireClassChange(result);

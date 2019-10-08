@@ -14,7 +14,6 @@ import transversal.generic.Tools;
 
 public class ItemDispatcher {
 
-	private Integer itemListSize;
 	private ArrayList<ItemDispatcherRow> itemList;
 	private Integer last_row_number = 0;
 	private Integer last_batch_number = -1;
@@ -31,7 +30,7 @@ public class ItemDispatcher {
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select count(item_id) from "+active_project+".project_items where item_id not in (select distinct item_id from "+active_project+".project_classification_event)");
 		rs.next();
-		itemListSize = rs.getInt(1);
+		rs.getInt(1);
 		load_next_batch();
 		rs.close();
 		stmt.close();

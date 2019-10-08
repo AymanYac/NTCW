@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 import controllers.Char_description;
 
@@ -29,11 +28,8 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
   private final List<UnitOfMeasure> entries;
   /** The popup used to select an entry. */
   private ContextMenu entriesPopup;
-  private Char_description parent_controller;
   private Map<Integer, UnitOfMeasure> RESULTMAP;
   protected boolean PopupIsVisible=false;
-  private UserAccount account;
-  
   /** Construct a new AutoCompleteTextField. 
  * @param char_description 
  * @param style 
@@ -41,10 +37,7 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
  * @param rowIndex */
   public AutoCompleteBox_UnitOfMeasure( Char_description char_description, String style, UserAccount account) {
     super();
-    this.parent_controller = char_description;
-    this.account = account;
-    
-	entries = new ArrayList<UnitOfMeasure>();
+    entries = new ArrayList<UnitOfMeasure>();
     entriesPopup = new ContextMenu();
     
     

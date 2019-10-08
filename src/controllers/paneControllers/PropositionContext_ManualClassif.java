@@ -1,25 +1,19 @@
 package controllers.paneControllers;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.controlsfx.control.textfield.TextFields;
-import org.json.simple.parser.ParseException;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import model.ManualClassProposition;
 import service.ManualClassifContext;
 
 
@@ -51,7 +45,7 @@ public class PropositionContext_ManualClassif {
 		        if (isNowSelected) { 
 		        	
 		        	keepSelected=false;
-		            parent.methods.set(idx, "FW");
+		            ManualClassifContext.methods.set(idx, "FW");
 		            parent.parent.proposer.proposeAgain();
 		        	prop2.setSelected(false);
 		        	prop3.setSelected(false);
@@ -74,7 +68,7 @@ public class PropositionContext_ManualClassif {
 		        if (isNowSelected) { 
 		        	
 		        	keepSelected=false;
-		            parent.methods.set(idx, "MG");
+		            ManualClassifContext.methods.set(idx, "MG");
 		            parent.parent.proposer.proposeAgain();
 		        	prop1.setSelected(false);
 		        	prop3.setSelected(false);
@@ -97,7 +91,7 @@ public class PropositionContext_ManualClassif {
 		        if (isNowSelected) { 
 		        	
 		        	keepSelected=false;
-		            parent.methods.set(idx, "FOR");
+		            ManualClassifContext.methods.set(idx, "FOR");
 		            parent.parent.proposer.proposeAgain();
 		        	prop2.setSelected(false);
 		        	prop1.setSelected(false);
@@ -120,7 +114,7 @@ public class PropositionContext_ManualClassif {
 		        if (isNowSelected) { 
 		        	
 		        	keepSelected=false;
-		            parent.methods.set(idx, "DW");
+		            ManualClassifContext.methods.set(idx, "DW");
 		            parent.parent.proposer.proposeAgain();
 		        	prop2.setSelected(false);
 		        	prop3.setSelected(false);
@@ -155,14 +149,14 @@ public class PropositionContext_ManualClassif {
 					int numMatches = matches.size();
 						if(numMatches==1) {
 							String key = (String) matches.keySet().toArray()[0];
-							parent.methods.set(idx,key+"&&&"+newValue);
+							ManualClassifContext.methods.set(idx,key+"&&&"+newValue);
 							enableFixedProp();
 					    	
 						}else {
-							parent.methods.set(idx, null);
+							ManualClassifContext.methods.set(idx, null);
 						}
 				}catch(Exception V) {
-					parent.methods.set(idx, null);
+					ManualClassifContext.methods.set(idx, null);
 				}
 		    	
 		    }
@@ -189,7 +183,7 @@ public class PropositionContext_ManualClassif {
 		        if (isNowSelected) { 
 		        	
 		        	keepSelected=false;
-		            parent.methods.set(idx, "ML");
+		            ManualClassifContext.methods.set(idx, "ML");
 		            parent.parent.proposer.proposeAgain();
 		            prop1.setSelected(false);
 		            prop2.setSelected(false);
@@ -221,8 +215,8 @@ public class PropositionContext_ManualClassif {
 	}
 	
 	public void selectPreviousItem() {
-		if(parent.methods.get(idx)!=null) {
-			switch(parent.methods.get(idx)){
+		if(ManualClassifContext.methods.get(idx)!=null) {
+			switch(ManualClassifContext.methods.get(idx)){
 			case "FW":
 				prop1.setSelected(true);
 				break;
@@ -240,7 +234,7 @@ public class PropositionContext_ManualClassif {
 				break;
 			default:
 				try{
-					prop5.setText(parent.methods.get(idx).split("&&&")[1]);
+					prop5.setText(ManualClassifContext.methods.get(idx).split("&&&")[1]);
 				}catch(Exception V) {
 					prop5.setText("");
 				}

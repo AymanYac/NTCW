@@ -2,15 +2,12 @@ package service;
 
 import java.util.regex.Pattern;
 
-import javax.sql.rowset.CachedRowSet;
-
 import model.GlobalConstants;
 import model.BinaryClassificationParameters;
 import model.DescriptionFetchRow;
 import transversal.language_toolbox.NgramParser;
 
 import java.util.regex.Matcher;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -290,7 +287,8 @@ public class Bigram
         goodTuringCountsAvailable = true;
     }
     
-    public void showCounts()
+    @SuppressWarnings("unused")
+	public void showCounts()
     {
         for (String word1 : counts.keySet()) {
             for (String word2 : counts.get(word1).keySet()) {

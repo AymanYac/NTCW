@@ -35,9 +35,6 @@ public class CharItemFetcher {
 	private Integer projectCardinality;
 	private Integer projectGranularity;
 	public HashMap<String, String> classifiedItems;
-	private int current_start;
-	private int current_end;
-	private Connection live_connection;
 	private HashMap<String, String> userID2Author;
 	public HashMap<String, String> ONLINE_LABELS = new HashMap<String,String>();
 	private List<String> dw_words;

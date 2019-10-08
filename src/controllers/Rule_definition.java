@@ -198,7 +198,8 @@ public class Rule_definition {
 	 	
         search_scene = new Scene(search_window);
         search_scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
+            @SuppressWarnings("incomplete-switch")
+			@Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
                     case ESCAPE:   search_stage.close(); break;

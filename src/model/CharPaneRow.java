@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import controllers.paneControllers.CharPane_CharClassif;
-import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -43,12 +42,12 @@ public class CharPaneRow {
 		
 		StackPane stack = new StackPane();
 		stack.getChildren().addAll(tmp, text);
-		stack.setVisible(Math.random()>0.5||carac.getIsCritical());
+		stack.setVisible(carac.getIsCritical());
 		
 		return stack;
 	}
 	public CharPaneRow(CharPane_CharClassif charPane_CharClassif) {
-		this.parent = charPane_CharClassif;
+		CharPaneRow.parent = charPane_CharClassif;
 	}
 	public ClassCharacteristic getCarac() {
 		return carac;
@@ -125,12 +124,13 @@ public class CharPaneRow {
 		}
 		ArrayList<Text> textes = new ArrayList<Text>();
 		if(!this.carac.getIsNumeric()) {
-			Text tmp = new Text(this.getValue().getNominal_value());
+			Text tmp = new Text(this.getValue().getDataLanguageValue());
 			tmp.setFill(GlobalConstants.CHAR_TXT_COLOR);
 			tmp.setFont(Font.font(GlobalConstants.CHAR_TXT_FONT,GlobalConstants.CHAR_TXT_WEIGHT,GlobalConstants.CHAR_TXT_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
 			textes.add(tmp);
-			if(this.carac.getIsTranslatable()) {
-				tmp = new Text(" ("+translateValue(this.getValue()).getNominal_value()+")");
+			if(this.carac.getIsTranslatable() && !parent.parent.user_language_gcode.equals(parent.parent.data_language_gcode)) {
+				//tmp = new Text(" ("+translateValue(this.getValue()).getNominal_value()+")");
+				tmp = new Text(this.getValue().getUserLanguageValue());
 				tmp.setFill(GlobalConstants.RULE_DISPLAY_SYNTAX_COLOR);
 				tmp.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,GlobalConstants.RULE_DISPLAY_SYNTAX_WEIGHT,GlobalConstants.ITALIC_DISPLAY_SYNTAX_POSTURE,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
 				textes.add(tmp);
@@ -144,21 +144,21 @@ public class CharPaneRow {
 			String local_Max_value=null;
 			try{
 				
-				UnitOfMeasure current_uom = this.parent.parent.UOMS.get(this.getValue().getUom_id());
+				UnitOfMeasure current_uom = CharPaneRow.parent.parent.UOMS.get(this.getValue().getUom_id());
 				if((!(current_uom!=null)) || carac.getAllowedUoms().contains(current_uom.getUom_id())) {
 					//Either there's no uom or the uom is included in the allowed uoms
 					//No conversion and show the input value
 					try{
 						local_uom = current_uom.getUom_symbol();
 					}catch(Exception V) {
-						V.printStackTrace(System.err);
+						//V.printStackTrace(System.err);
 					}
 					local_Nominal_value = this.value.getNominal_value();
 					local_Max_value = this.value.getMax_value();
 					local_Min_value = this.value.getMin_value();
 				}else {
 					//Converting to base uom
-					UnitOfMeasure base_uom = this.parent.parent.UOMS.get(current_uom.getUom_base_id());
+					UnitOfMeasure base_uom = CharPaneRow.parent.parent.UOMS.get(current_uom.getUom_base_id());
 					try{
 						local_uom = base_uom.getUom_symbol();
 					}catch(Exception V) {
@@ -179,8 +179,6 @@ public class CharPaneRow {
 					}catch(Exception V) {
 						
 					}
-					//Trying to convert to one of the included uom
-					boolean converted2included = false;
 					for(String uom:this.getAllowed_uom()) {
 						UnitOfMeasure loopUom = parent.parent.UOMS.get(uom);
 						if(loopUom.getUom_base_id().equals(base_uom.getUom_id())) {
@@ -205,7 +203,6 @@ public class CharPaneRow {
 							}catch(Exception V) {
 								
 							}
-							converted2included=true;
 							break;
 							
 						}

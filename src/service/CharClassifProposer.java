@@ -17,7 +17,6 @@ import javafx.scene.control.Button;
 import model.CharClassProposition;
 import model.CharDescriptionRow;
 import model.GlobalConstants;
-import model.ItemFetcherRow;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -66,6 +65,7 @@ public class CharClassifProposer {
 		
 	}
 
+	@SuppressWarnings("unused")
 	public void loadPropositionsFor_OLD(CharDescriptionRow tmp) {
 		
 		intializeRegister();
@@ -107,6 +107,7 @@ public class CharClassifProposer {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	public void loadPropositionsFor(CharDescriptionRow tmp) {
 			if(1==1) {
 				return;
@@ -165,7 +166,7 @@ public class CharClassifProposer {
 		int matchNO=0;
 		
 		while(idx < parent_controller.propButtons.size()) {
-			String meth = parent_controller.context.methods.get(idx);
+			String meth = CharClassifContext.methods.get(idx);
 			Button btn = parent_controller.propButtons.get(idx);
 			if(meth!=null && meth.equals("FW")) {
 				try {
@@ -189,6 +190,7 @@ public class CharClassifProposer {
 	}
 
 	
+	@SuppressWarnings("unused")
 	private void MGSpecific() {
 		String mg = null;
 		if(false /*item.getMaterial_group()!=null*/) {
@@ -209,7 +211,7 @@ public class CharClassifProposer {
 		int matchNO=0;
 		
 		while(idx < parent_controller.propButtons.size()) {
-			String meth = parent_controller.context.methods.get(idx);
+			String meth = CharClassifContext.methods.get(idx);
 			Button btn = parent_controller.propButtons.get(idx);
 			if(meth!=null && meth.equals("MG")) {
 				try {
@@ -252,7 +254,7 @@ public class CharClassifProposer {
 				int matchNO=0;
 				
 				while(idx < parent_controller.propButtons.size()) {
-					String meth = parent_controller.context.methods.get(idx);
+					String meth = CharClassifContext.methods.get(idx);
 					Button btn = parent_controller.propButtons.get(idx);
 					if(meth!=null && meth.equals("FOR")) {
 						try {
@@ -300,7 +302,7 @@ public class CharClassifProposer {
 				int matchNO=0;
 				
 				while(idx < parent_controller.propButtons.size()) {
-					String meth = parent_controller.context.methods.get(idx);
+					String meth = CharClassifContext.methods.get(idx);
 					Button btn = parent_controller.propButtons.get(idx);
 					if(meth!=null && meth.equals("DW")) {
 						try {
@@ -330,7 +332,7 @@ public class CharClassifProposer {
 		int idx=0;
 		
 		while(idx < parent_controller.propButtons.size()) {
-			String meth = parent_controller.context.methods.get(idx);
+			String meth = CharClassifContext.methods.get(idx);
 			Button btn = parent_controller.propButtons.get(idx);
 			if(meth!=null && !meth.equals("FW") && !meth.equals("MG") && !meth.equals("FOR") && !meth.equals("DW") && !meth.equals("ML")) {
 				try {
@@ -356,10 +358,8 @@ public class CharClassifProposer {
 		
 		
 		int idx=0;
-		int matchNO=0;
-		
 		while(idx < parent_controller.propButtons.size()) {
-			String meth = parent_controller.context.methods.get(idx);
+			String meth = CharClassifContext.methods.get(idx);
 			Button btn = parent_controller.propButtons.get(idx);
 			if(meth!=null && meth.equals("ML")) {
 				try {
@@ -450,6 +450,7 @@ public class CharClassifProposer {
 	
 	
 
+	@SuppressWarnings("unused")
 	private CharClassProposition MaterialGroup() {
 		
 		String mg = null;
@@ -503,6 +504,7 @@ public class CharClassifProposer {
 		return lastClassProp;
 	}
 
+	@SuppressWarnings("null")
 	private CharClassProposition PreClass() {
 		try {	
 			//String pcl = item.getPreclassifiation();
@@ -656,10 +658,10 @@ public class CharClassifProposer {
 		try {
 			loadPropositionsFor(item);
 			parent_controller.context.closeLast();
-			parent_controller.account.setManualPropositions(parent_controller.context.methods);
+			parent_controller.account.setManualPropositions(CharClassifContext.methods);
 		}catch(Exception V) {
 			parent_controller.context.closeLast();
-			parent_controller.account.setManualPropositions(parent_controller.context.methods);
+			parent_controller.account.setManualPropositions(CharClassifContext.methods);
 		}
 		try {
 			System.out.println("Saving propositions");

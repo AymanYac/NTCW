@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -24,7 +23,6 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,15 +31,9 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.StringJoiner;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.poi.util.IOUtils;
-import org.json.simple.parser.ParseException;
-
-import controllers.paneControllers.TablePane_ManualClassif;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -700,12 +692,10 @@ public class Tools {
 
 
 	public static ScrollBar getVerticalScrollbar(TableView table) {
-		 ScrollBar result = null;
-	        for (Node n : table.lookupAll(".scroll-bar")) {
+		 for (Node n : table.lookupAll(".scroll-bar")) {
 	            if (n instanceof ScrollBar) {
 	                ScrollBar bar = (ScrollBar) n;
 	                if (bar.getOrientation().equals(Orientation.VERTICAL)) {
-	                    result = bar;
 	                }
 	            }
 	        }        
@@ -1025,17 +1015,32 @@ public class Tools {
 		stmt.setString(2, account.getUser_id());
 		ResultSet rs = stmt.executeQuery();
 		rs.next();
+		String[] ret = null;
 		try{
-			String[] ret = (String[]) rs.getArray("user_description_classes").getArray();
+			ret = (String[]) rs.getArray("user_description_classes").getArray();
+			
+		}catch(Exception V) {
+			//User has no assigned classes, load all available classes
 			rs.close();
 			stmt.close();
-			conn.close();
-			return ret;
-		}catch(Exception V) {
-			V.printStackTrace(System.err);
-			return null;
+			stmt = conn.prepareStatement("select distinct segment_id from "+account.getActive_project()+".project_classification_event where segment_id is not null");
+			rs = stmt.executeQuery();
+			ArrayList<String> tmp = new ArrayList<String>();
+			while(rs.next()) {
+				tmp.add(rs.getString("segment_id"));
+			}
+			ret = new String[tmp.size()];
+			for(int i=0;i<tmp.size();i++) {
+				ret[i] = tmp.get(i);
+				
+			}
+			
 		}
 		
+		rs.close();
+		stmt.close();
+		conn.close();
+		return ret;
 	}
 
 

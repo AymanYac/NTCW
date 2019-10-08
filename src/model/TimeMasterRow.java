@@ -8,7 +8,6 @@ import java.util.Queue;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import service.ConcurentTask;
 import service.DownloadSegmenter;

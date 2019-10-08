@@ -3,7 +3,6 @@ package transversal.dialog_toolbox;
 import java.util.Optional;
 
 import controllers.Auto_classification_progress;
-import controllers.Manual_classif;
 import controllers.Project_parameters;
 import controllers.Project_selection;
 import javafx.event.ActionEvent;
@@ -12,7 +11,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseEvent;
-import service.ItemDispatcher;
 public class ConfirmationDialog {
 	
 	public static void show(String title,String header,String yes,String no, Project_parameters parent, boolean confirmed) {
@@ -206,7 +204,7 @@ public class ConfirmationDialog {
 		
         alert.getButtonTypes().setAll(yesButton);
 	
-		Optional<ButtonType> option = alert.showAndWait();
+		alert.showAndWait();
 		
 	}
 

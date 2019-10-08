@@ -5,13 +5,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.json.simple.parser.ParseException;
@@ -26,12 +23,9 @@ import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -47,11 +41,11 @@ import model.ObservableDeque;
 import model.UserAccount;
 import service.ItemFetcher;
 import service.ManualAdvancementUpdater;
+import service.ManualClassifContext;
 import service.ManualClassifProposer;
 import service.ManualRuleServices;
 import service.TableViewExtra;
 import service.Translator;
-import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -76,7 +70,6 @@ public class TablePane_ManualClassif {
 	private ObservableList<ItemFetcherRow> oa;
 	private TableViewExtra tvX;
 	private ItemFetcher ftc;
-	private ScrollBar bar;
 	private boolean check_selection = true;
 	private String old_item_id;
 	private String user_language_gcode;
@@ -95,6 +88,7 @@ public class TablePane_ManualClassif {
 	private List<TableColumn<ItemFetcherRow, ?>> unchangedColumns ;
 
 	
+	@SuppressWarnings("unchecked")
 	public void fillTable_DYNAMIC(List<ItemFetcherRow> fillList) {
 		setTableValueFactories();
 		tableGrid.getItems().clear();
@@ -164,7 +158,7 @@ public class TablePane_ManualClassif {
 			
 		}
 		if(account.getManualPropositions()!=null && account.getManualPropositions().size() == GlobalConstants.NUMBER_OF_MANUAL_PROPOSITIONS) {
-			Parent.context.methods = account.getManualPropositions();
+			ManualClassifContext.methods = account.getManualPropositions();
 			Parent.proposer.proposeAgain();
 		}
 		
@@ -658,35 +652,8 @@ public class TablePane_ManualClassif {
 		return Translator.translate("", this.user_language_gcode, description);
 	}
 	void scrolled(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        double newval = newValue.doubleValue();
-        double oldval = oldValue.doubleValue();
-        /*
-        
-        int scrolled_lines = (int) Math.floor((oldval - newval)*oq.size());
-        
-        scrolled_lines = (int) Math.floor( (0.5*bar.getMax() -  bar.getValue())*oq.size() );
-        
-        
-        //scrolled_lines = tvX.getFirstVisibleIndex() - previous_visible_index;
-        //previous_visible_index = tvX.getFirstVisibleIndex();
-        
-        if(scrolled_lines<-1) {
-        	try {
-				ftc.add_bottom( Math.abs(scrolled_lines), tvX, oq);
-			} catch (ClassNotFoundException | SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }else if(scrolled_lines > 1) {
-        	try {
-        		ftc.add_top( Math.abs(scrolled_lines), tvX, oq);
-			} catch (ClassNotFoundException | SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }
-        
-        */
+        newValue.doubleValue();
+        oldValue.doubleValue();
         
         
         

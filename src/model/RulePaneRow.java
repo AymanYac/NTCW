@@ -6,19 +6,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.text.TextFlow;
-import service.ManualRuleServices;
 
 public class RulePaneRow {
 	
 	GenericRule gr;
 	CheckBox cb;
 	private static Manual_classif manualClassifController;
-	private boolean engageUncheckAction=true;
-	
-	
-	
 	public RulePaneRow(Manual_classif parent,GenericRule gr, Boolean isSelected) {
-		this.manualClassifController = parent;
+		RulePaneRow.manualClassifController = parent;
 		this.gr = gr;
 		
 		cb = new CheckBox();

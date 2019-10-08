@@ -20,7 +20,6 @@ import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -37,8 +36,6 @@ import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
 import model.ClassificationMethods;
-import model.GlobalConstants;
-import model.ItemFetcherRow;
 import model.UserAccount;
 import service.CharAdvancementUpdater;
 import service.CharClassifProposer;
@@ -92,14 +89,11 @@ public class TablePane_CharClassif {
 
 
 
-	private String defaultColumnStyle;
-
-
-
 	private ArrayList<String> collapsedViewColumns;
 
 
 
+	@SuppressWarnings("rawtypes")
 	private TableViewExtra tvX;
 
 
@@ -650,8 +644,8 @@ public class TablePane_CharClassif {
 		return Translator.translate("", this.user_language_gcode, description);
 	}
 	void scrolled(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        double newval = newValue.doubleValue();
-        double oldval = oldValue.doubleValue();
+        newValue.doubleValue();
+        oldValue.doubleValue();
         
         
         
@@ -978,7 +972,7 @@ public class TablePane_CharClassif {
 	    }
 	}
 	*/
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void refresh_table_with_segment(String active_class) throws ClassNotFoundException, SQLException {
 		
 		tvX = new TableViewExtra(tableGrid);
@@ -1088,7 +1082,7 @@ public class TablePane_CharClassif {
 		PreparedStatement stmt;
 		ResultSet rs;
 		
-		stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,project_values.value_id,nominal_value,min_value,max_value,note,uom_id from "
+		stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,project_values.value_id,text_values,nominal_value,min_value,max_value,note,uom_id from "
 				+ "(select * from "+account.getActive_project()+".project_items_x_values where item_id in ('"+String.join("','", target_items)+"')"
 						+ "and characteristic_id in ('"+String.join("','", this.active_characteristics.get(target_class_id).stream().map(c->c.getCharacteristic_id()).collect(Collectors.toSet()))+"')"
 								+ ") data left join "+account.getActive_project()+".project_values "
@@ -1104,6 +1098,7 @@ public class TablePane_CharClassif {
 			String description_rule_id = rs.getString("description_rule_id");
 			CharacteristicValue val = new CharacteristicValue();
 			val.setValue_id(rs.getString("value_id"));
+			val.setText_values(rs.getString("text_values"));
 			val.setNominal_value(rs.getString("nominal_value"));
 			val.setMin_value(rs.getString("min_value"));
 			val.setMax_value(rs.getString("max_value"));
@@ -1119,6 +1114,9 @@ public class TablePane_CharClassif {
 				}
 			}
 		}
+		//Set the static variable for CharacteristicValue
+		CharacteristicValue.dataLanguageCode=this.Parent.data_language_gcode;
+		CharacteristicValue.userLanguageCode=this.Parent.user_language_gcode;
 		
 		rs.close();
 		stmt.close();
@@ -1133,6 +1131,7 @@ public class TablePane_CharClassif {
 		selectChartAtIndex(selected_col,this.Parent.charButton.isSelected());
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void selectChartAtIndex(int i,boolean collapsedView) {
 		
 		int selected_col = Math.floorMod(i,this.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size());

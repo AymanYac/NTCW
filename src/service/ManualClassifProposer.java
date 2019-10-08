@@ -2,21 +2,16 @@ package service;
 
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import controllers.Char_description;
 import controllers.Manual_classif;
 import javafx.scene.control.Button;
 import model.GlobalConstants;
@@ -70,6 +65,7 @@ public class ManualClassifProposer {
 		
 	}
 
+	@SuppressWarnings("unused")
 	public void loadPropositionsFor_OLD(ItemFetcherRow tmp) {
 		
 		intializeRegister();
@@ -189,7 +185,7 @@ public class ManualClassifProposer {
 		int matchNO=0;
 		
 		while(idx < parent_controller.propButtons.size()) {
-			String meth = parent_controller.context.methods.get(idx);
+			String meth = ManualClassifContext.methods.get(idx);
 			Button btn = parent_controller.propButtons.get(idx);
 			if(meth!=null && meth.equals("FW")) {
 				try {
@@ -233,7 +229,7 @@ public class ManualClassifProposer {
 		int matchNO=0;
 		
 		while(idx < parent_controller.propButtons.size()) {
-			String meth = parent_controller.context.methods.get(idx);
+			String meth = ManualClassifContext.methods.get(idx);
 			Button btn = parent_controller.propButtons.get(idx);
 			if(meth!=null && meth.equals("MG")) {
 				try {
@@ -276,7 +272,7 @@ public class ManualClassifProposer {
 				int matchNO=0;
 				
 				while(idx < parent_controller.propButtons.size()) {
-					String meth = parent_controller.context.methods.get(idx);
+					String meth = ManualClassifContext.methods.get(idx);
 					Button btn = parent_controller.propButtons.get(idx);
 					if(meth!=null && meth.equals("FOR")) {
 						try {
@@ -324,7 +320,7 @@ public class ManualClassifProposer {
 				int matchNO=0;
 				
 				while(idx < parent_controller.propButtons.size()) {
-					String meth = parent_controller.context.methods.get(idx);
+					String meth = ManualClassifContext.methods.get(idx);
 					Button btn = parent_controller.propButtons.get(idx);
 					if(meth!=null && meth.equals("DW")) {
 						try {
@@ -354,7 +350,7 @@ public class ManualClassifProposer {
 		int idx=0;
 		
 		while(idx < parent_controller.propButtons.size()) {
-			String meth = parent_controller.context.methods.get(idx);
+			String meth = ManualClassifContext.methods.get(idx);
 			Button btn = parent_controller.propButtons.get(idx);
 			if(meth!=null && !meth.equals("FW") && !meth.equals("MG") && !meth.equals("FOR") && !meth.equals("DW") && !meth.equals("ML")) {
 				try {
@@ -380,10 +376,8 @@ public class ManualClassifProposer {
 		
 		
 		int idx=0;
-		int matchNO=0;
-		
 		while(idx < parent_controller.propButtons.size()) {
-			String meth = parent_controller.context.methods.get(idx);
+			String meth = ManualClassifContext.methods.get(idx);
 			Button btn = parent_controller.propButtons.get(idx);
 			if(meth!=null && meth.equals("ML")) {
 				try {
@@ -678,10 +672,10 @@ public class ManualClassifProposer {
 		try {
 			loadPropositionsFor(item);
 			parent_controller.context.closeLast();
-			parent_controller.account.setManualPropositions(parent_controller.context.methods);
+			parent_controller.account.setManualPropositions(ManualClassifContext.methods);
 		}catch(Exception V) {
 			parent_controller.context.closeLast();
-			parent_controller.account.setManualPropositions(parent_controller.context.methods);
+			parent_controller.account.setManualPropositions(ManualClassifContext.methods);
 		}
 		try {
 			System.out.println("Saving propositions");

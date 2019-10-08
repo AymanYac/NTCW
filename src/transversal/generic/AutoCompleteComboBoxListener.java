@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
+@SuppressWarnings("restriction")
 public class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
 
     private ComboBox comboBox;

@@ -42,24 +42,20 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
@@ -70,7 +66,6 @@ import model.AutoCompleteBox_UnitOfMeasure;
 import model.CharDescClassComboRow;
 import model.CharDescriptionRow;
 import model.ClassCharacteristic;
-import model.ItemFetcherRow;
 import model.UnitOfMeasure;
 import model.UserAccount;
 import service.CharClassifContext;
@@ -145,8 +140,8 @@ public class Char_description {
 	public UserAccount account;
 
 	
-	private String user_language_gcode;
-	private String data_language_gcode;
+	public String user_language_gcode;
+	public String data_language_gcode;
 	
 	public TablePane_CharClassif tableController;
 
@@ -155,8 +150,6 @@ public class Char_description {
 	private Browser_CharClassif browserController;
 	
 	
-	private boolean toggleSwitch=true;
-
 	private GridPane imageGrid;
 	private GridPane ruleGrid;
 	
@@ -185,7 +178,6 @@ public class Char_description {
 
 	public ArrayList<String> CNAME_CID;
 	public HashMap<String, UnitOfMeasure> UOMS;
-	private Menu changeDescClass;
 	private CharPane_CharClassif charPaneController;
 
 
@@ -206,6 +198,7 @@ public class Char_description {
 	
 	}
 
+	@SuppressWarnings("static-access")
 	@FXML void switchPane() {
 		if(grid.getColumnSpan(leftAnchor)==5) {
 			setBottomRegionColumnSpans(false);
@@ -218,6 +211,7 @@ public class Char_description {
 	@FXML void classDD() {
 	}
 	
+	@SuppressWarnings({ "resource", "unused" })
 	@FXML void export() throws SQLException, ClassNotFoundException {
 		FileChooser fileChooser = new FileChooser();
 		
@@ -632,11 +626,6 @@ public class Char_description {
 
 		
 
-	private void deselect_toolbar_before_seprator(boolean b) {
-		
-		classification.requestFocus();
-	}
-
 	private void launch_search(boolean checkMethodSelect) throws IOException, ParseException {
 		load_image_pane(checkMethodSelect);
 		search_google_inplace(checkMethodSelect);
@@ -749,73 +738,6 @@ public class Char_description {
 			}
 		});
 	}
-	private void decorate_description_bar(Boolean addToTaskBar) {
-		
-		this.changeDescClass = new Menu("Change description class");
-		if(account.getUser_desc_classes()!=null) {
-			for(String entry:account.getUser_desc_classes()) {
-				for(String elem:CNAME_CID) {
-					if (elem.startsWith(entry)) {
-						CheckMenuItem descClass = new CheckMenuItem(elem.split("&&&")[1]);
-						if(elem.split("&&&")[0].equals(account.getUser_desc_class())) {
-							descClass.setSelected(true);
-							changeDescClass.setText("Selected class: "+elem.split("&&&")[1]);
-						}
-						
-						descClass.setOnAction(new EventHandler<ActionEvent>(){
-
-							@Override
-							public void handle(ActionEvent arg0) {
-								try {
-									tableController.refresh_table_with_segment(entry);
-									for( MenuItem submenu:changeDescClass.getItems()) {
-										if(submenu.getText().equals(elem.split("&&&")[1])) {
-											changeDescClass.setText("Selected class: "+submenu.getText());
-											continue;
-										}
-										((CheckMenuItem) submenu).setSelected(false);
-									}
-								} catch (ClassNotFoundException | SQLException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-							
-						});
-						changeDescClass.getItems().add(descClass);
-					}
-				}
-				
-				
-			}
-		}else {
-			
-		}
-		
-		if(addToTaskBar) {
-			Menu targetMenuBar = menubar.getMenus().get(4);
-			targetMenuBar.getGraphic().setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-				@Override
-				public void handle(MouseEvent event) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-			});
-			targetMenuBar.getItems().add(changeDescClass);
-			
-		}else {
-			for(int i=0;i<40;i++) {
-				secondaryMenuBar.getMenus().add(new Menu(""));
-			}
-			secondaryMenuBar.getMenus().add(changeDescClass);
-		}
-		
-		
-		
-		
-	}
 	@SuppressWarnings("static-access")
 	private void load_table_pane() throws IOException, ClassNotFoundException, SQLException {
 		
@@ -885,22 +807,6 @@ public class Char_description {
 	}
 	
 	@SuppressWarnings("static-access")
-	private void load_taxo_pane() throws IOException {
-		taxoButton.setSelected(true);
-		setBottomRegionColumnSpans(true);
-		
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/TaxoPane_ManualClassif.fxml"));
-		AnchorPane TaxoGrid = loader.load();
-		rightAnchor.getChildren().setAll(TaxoGrid);
-		
-		rightAnchor.setTopAnchor(TaxoGrid, 0.0);
-		rightAnchor.setBottomAnchor(TaxoGrid, 0.0);
-		rightAnchor.setLeftAnchor(TaxoGrid, 0.0);
-		rightAnchor.setRightAnchor(TaxoGrid, 0.0);
-		
-	}
-	
-	@SuppressWarnings("static-access")
 	public void load_char_pane() throws IOException, ClassNotFoundException, SQLException {
 		if(!charButton.isSelected()) {
 			return;
@@ -940,11 +846,12 @@ public class Char_description {
 	private void load_browser_pane() throws IOException {
 		googleButton.setSelected(true);
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/Browser_CharClassif.fxml"));
-		GridPane toolBarGrid = loader.load();
+		loader.load();
 		browserController = loader.getController();
 		browserController.setParent(this);
 	}
 
+	@SuppressWarnings("static-access")
 	public void setBottomRegionColumnSpans(boolean visibleRight) {
 		if(visibleRight) {
 			rightAnchor.getChildren().removeAll(rightAnchor.getChildren());
@@ -1132,7 +1039,7 @@ public class Char_description {
 			int selected_col = Math.floorMod(tableController.selected_col, tableController.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
 			ClassCharacteristic active_char = tableController.active_characteristics.get(row.getClass_segment().split("&&&")[0]).get(selected_col);
 			if(active_char.getIsNumeric()) {
-				if(Math.random()>0.51 && (active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0)) {
+				if( (active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0)) {
 					//Add the allowed uoms to the autocomplete box
 					for(String uom_id:active_char.getAllowedUoms()) {
 						this.uom_field.getEntries().add(UOMS.get(uom_id));
@@ -1199,7 +1106,7 @@ public class Char_description {
 						
 					}
 					rule_field.setVisible(true);
-			}else {
+				}else {
 					//Setting the nominal value
 					value_label.setText("Nominal value");
 					value_label.setVisible(true);
@@ -1258,7 +1165,7 @@ public class Char_description {
 					value_label.setText("Value ("+this.data_language_gcode.toUpperCase()+")");
 					value_label.setVisible(true);
 					try{
-						value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNominal_value());
+						value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getDataLanguageValue());
 					}catch(Exception V) {
 						
 					}
@@ -1267,7 +1174,9 @@ public class Char_description {
 					custom_label_value.setText("Value ("+this.user_language_gcode.toUpperCase()+")");
 					custom_label_value.setVisible(true);
 					try{
-						//translated_value_field.setText(this.tableController.translate2UserLanguage(row.getData()[selected_col].getNominal_value()));
+						//translated_value_field.setText(this.tableController.translate2UserLanguage(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNominal_value()));
+						translated_value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUserLanguageValue());
+						
 					}catch(Exception V) {
 						
 					}
@@ -1295,7 +1204,7 @@ public class Char_description {
 					value_label.setText("Value");
 					value_label.setVisible(true);
 					try{
-						value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNominal_value());
+						value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getDataLanguageValue());
 					}catch(Exception V) {
 						
 					}
@@ -1329,6 +1238,7 @@ public class Char_description {
 		
 		
 	}
+	@SuppressWarnings("static-access")
 	private void clear_data_fields() {
 		
 		this.grid.setColumnSpan(value_field, 1);

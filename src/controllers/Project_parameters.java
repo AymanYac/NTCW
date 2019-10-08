@@ -3,7 +3,6 @@ package controllers;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,18 +15,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import org.postgresql.util.PGobject;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -39,7 +31,6 @@ import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.RadioButton;
@@ -48,7 +39,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
@@ -60,7 +50,6 @@ import model.GlobalConstants;
 import model.Project;
 import model.ProjectTemplate;
 import model.UserAccount;
-import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.data_exchange_toolbox.SpreadsheetUpload;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.ExceptionDialog;
@@ -83,8 +72,6 @@ public class Project_parameters {
 	
 	private ArrayList<RowConstraints> rc_special = new ArrayList<RowConstraints> ();
 	private ArrayList<RowConstraints> rc_login = new ArrayList<RowConstraints> ();
-	private ObservableList<ColumnConstraints> cc_special;
-	
 	private LinkedHashSet<String> ROLES = new LinkedHashSet<String>();
 	private LinkedHashMap<String,String> LOGINS = new LinkedHashMap<String,String>();
 	
@@ -183,8 +170,6 @@ public class Project_parameters {
 	private boolean DATA_FILE_MISSING = true;
 	private boolean TAXO_FILE_MISSING = true;
 	private UserAccount account;
-
-	private Project targetProject;
 
 	private boolean REUSING_OLD_TAXO;
 
@@ -623,6 +608,7 @@ public class Project_parameters {
 	}
 
 	//Usefull function to set the DataID field in the ProjectTemplate data structure and make the layout ready
+	@SuppressWarnings("static-access")
 	private void load_datapane_layout() {
 		
 		/*if(!(dataName!=null) || dataName.length()==0) {
@@ -678,6 +664,7 @@ public class Project_parameters {
 		}
 	}
 	//Usefull function to set the DataID field in the ProjectTemplate data structure
+	@SuppressWarnings("static-access")
 	private void load_taxo(ProjectTemplate nouveau, String old_taxo) {
 		
 		try {
@@ -1193,7 +1180,8 @@ public class Project_parameters {
 		//Add to the taxonomy name text field a change listener
 		taxoName.getEditor().textProperty().addListener(new ChangeListener<String>() {
 
-		    @Override
+		    @SuppressWarnings("static-access")
+			@Override
 		    public void changed(ObservableValue<? extends String> observable, 
 		                                    String oldValue, String newValue) {
 		    	
@@ -1261,6 +1249,7 @@ public class Project_parameters {
 		});
 		//Add to the taxonomy name combo box file a change listener
 		taxoName.valueProperty().addListener(new ChangeListener<String>() {
+			@SuppressWarnings("static-access")
 			@Override
 			public void changed(ObservableValue <? extends String> arg0, String arg1, String arg2) {
 				/*if (taxoName.getValue().equals("New...")) {
@@ -1574,6 +1563,7 @@ public class Project_parameters {
 	
 
 	//Hides the inappropriate column mapping fields when the project granularity changes
+	@SuppressWarnings("static-access")
 	protected void sync_classification_level_definition(String newValue) {
 		;
 		//For every row in the classification grid pane between 2 and 15 included
@@ -1632,7 +1622,6 @@ public class Project_parameters {
 		String title_template = label_template_title.getStyle();
 		String body_template = label_template_body.getStyle();
 		String delete_template = delete_login_button.getStyle();
-		String add_template = add_button.getStyle();
 		String box_template = login_box.getStyle();
 		
 		login_pane.getChildren().clear();
@@ -1694,6 +1683,7 @@ public class Project_parameters {
 							
 							pfl.valueProperty().addListener(new ChangeListener<String>() {
 
+								@SuppressWarnings("static-access")
 								@Override
 								public void changed(ObservableValue <? extends String> arg0, String arg1, String arg2) {
 
@@ -1790,8 +1780,7 @@ public class Project_parameters {
 		String button_style = btn_template.getStyle();
 		//Make a backup of the combo box style
 		String cb_style = cb_template.getStyle();
-		//Make a backup of the column constraints
-		cc_special = special_pane.getColumnConstraints();
+		special_pane.getColumnConstraints();
 		//Clear all content from the special grid pane
 		special_pane.getChildren().clear();
 		//Set the maximum data length as the maximum size between the FOR_WORDS, STOP_WORDS of the ProjectTemplate data structure (this maximum size is helpfull in establishing the correct row constraints for the grid pane)
@@ -1877,7 +1866,8 @@ public class Project_parameters {
 							if(column==1) {
 								cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
         //						Add a change listener to the checkbox
-							        @Override
+							        @SuppressWarnings("static-access")
+									@Override
 							        public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 							            // TODO Auto-generated method stub
 							            if(newValue){
@@ -1905,7 +1895,8 @@ public class Project_parameters {
 		//					If it's column 7
 								cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
 		//						Add a change listener to the checkbox
-							        @Override
+							        @SuppressWarnings("static-access")
+									@Override
 							        public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 							            // TODO Auto-generated method stub
 							        	if(newValue){
@@ -1933,7 +1924,8 @@ public class Project_parameters {
 								cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
         //					If it's column 12
 		//						Add a change listener to the checkbox
-							        @Override
+							        @SuppressWarnings("static-access")
+									@Override
 							        public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 							            // TODO Auto-generated method stub
 							        	if(newValue){
@@ -2545,7 +2537,6 @@ public class Project_parameters {
 	}
 
 	public void setTargetProject(Project selected_project) {
-		this.targetProject = selected_project;
 	}
 	
 }

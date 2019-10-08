@@ -45,7 +45,6 @@ import transversal.generic.PixelUtils;
 		String noImageBG = this.getClass().getResource("/pictures/No_picture.png").toExternalForm();
 		String edge_style = "-fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center; -fx-border-color: white;";
 		private Thread imageDownloadThread;
-		private boolean stop_image_download;
 		private Task<Void> imageDownloadTask;
 	
 		
@@ -59,6 +58,7 @@ import transversal.generic.PixelUtils;
 		
 		
 	
+	@SuppressWarnings("static-access")
 	private void download_images(boolean checkMethodSelect) throws IOException, ParseException {
 		
 		
@@ -406,11 +406,11 @@ import transversal.generic.PixelUtils;
 		    	}
 		    }
 	}
+	@SuppressWarnings("deprecation")
 	public void search_image(boolean checkMethodSelect) throws IOException, ParseException {
 		
 		try {
 			imageDownloadTask.cancel();
-			stop_image_download=true;
 			imageDownloadThread.stop();
 		}catch(Exception V) {
 			
@@ -419,7 +419,6 @@ import transversal.generic.PixelUtils;
 		    
 			@Override
 		    protected Void call() throws Exception {
-				stop_image_download = false;
 				download_images(checkMethodSelect);
 		    	return null;
 		    }

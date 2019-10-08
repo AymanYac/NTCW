@@ -7,6 +7,7 @@ import java.util.Set;
 import java.lang.Boolean;
 import javafx.scene.input.KeyCode;
 
+@SuppressWarnings("hiding")
 public class CustomKeyboardListener<KeyCode, Boolean> implements Map<KeyCode, Boolean> {
 
     private final HashMap<KeyCode, Boolean> delegatee;
