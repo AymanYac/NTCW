@@ -975,6 +975,11 @@ public class TablePane_CharClassif {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void refresh_table_with_segment(String active_class) throws ClassNotFoundException, SQLException {
 		
+		
+		//Set the static variable for CharacteristicValue
+		CharacteristicValue.dataLanguage=this.Parent.data_language;
+		CharacteristicValue.userLanguage=this.Parent.user_language;
+			
 		tvX = new TableViewExtra(tableGrid);
 		
 		this.classItems = getActiveItemsID(active_class);
@@ -985,6 +990,9 @@ public class TablePane_CharClassif {
 		
 		assignValuesToItemsByClass(active_class,this.Parent.classCombo.getSelectionModel().getSelectedItem().getclassName(),classItems);
 		
+		//Set the static variable for CharacteristicValue
+		CharacteristicValue.dataLanguage=this.Parent.data_language;
+		CharacteristicValue.userLanguage=this.Parent.user_language;
 		
 		
 		
@@ -1031,6 +1039,8 @@ public class TablePane_CharClassif {
 			tmp.setIsTranslatable(rs.getBoolean("isTranslatable"));
 			
 			this.active_characteristics.get(target_class_id).add(tmp);
+			loadAllowedValuesAsKnownValues(tmp);
+			
 		}
 		
 		rs.close();
@@ -1048,6 +1058,38 @@ public class TablePane_CharClassif {
 		
 	}
 	
+	
+	private void loadAllowedValuesAsKnownValues(ClassCharacteristic tmp) throws ClassNotFoundException, SQLException {
+		if(tmp.getAllowedValues()!=null) {
+			Connection conn = Tools.spawn_connection();
+			String values_statement = "";
+			for(int i=0;i<tmp.getAllowedValues().size();i++) {
+				values_statement=values_statement+"?";
+				if(i!=tmp.getAllowedValues().size()-1) {
+					values_statement=values_statement+",";
+				}
+			}
+			PreparedStatement stmt = conn.prepareStatement(
+			"select * from "+account.getActive_project()+".project_values where value_id in ("+values_statement+")");
+			for(int i=0;i<tmp.getAllowedValues().size();i++) {
+				stmt.setString(i+1, tmp.getAllowedValues().get(i));
+			}
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next()) {
+				CharacteristicValue val = new CharacteristicValue();
+				val.setValue_id(rs.getString("value_id"));
+				val.setText_values(rs.getString("text_values"));
+				val.setNominal_value(rs.getString("nominal_value"));
+				val.setMin_value(rs.getString("min_value"));
+				val.setMax_value(rs.getString("max_value"));
+				val.setNote(rs.getString("note"));
+				val.setUom_id(rs.getString("uom_id"));
+				val.addThisValuetoKnownValues(tmp);
+			}
+			
+			
+		}
+	}
 	private void fetchTableItems(String active_class, List<String> classItems) throws ClassNotFoundException, SQLException {
 		Connection conn = Tools.spawn_connection();
 		PreparedStatement stmt;
@@ -1078,6 +1120,9 @@ public class TablePane_CharClassif {
 	
 	private void assignValuesToItemsByClass(String target_class_id, String target_class_name, List<String> target_items) throws ClassNotFoundException, SQLException {
 		System.out.println("assigning values to items by class, no items "+target_items.size());
+		
+				
+		
 		Connection conn = Tools.spawn_connection();
 		PreparedStatement stmt;
 		ResultSet rs;
@@ -1115,9 +1160,6 @@ public class TablePane_CharClassif {
 				}
 			}
 		}
-		//Set the static variable for CharacteristicValue
-		CharacteristicValue.dataLanguage=this.Parent.data_language;
-		CharacteristicValue.userLanguage=this.Parent.user_language;
 		
 		rs.close();
 		stmt.close();

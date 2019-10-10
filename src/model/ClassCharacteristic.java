@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class ClassCharacteristic {
@@ -63,6 +64,13 @@ public class ClassCharacteristic {
 	}
 	public ArrayList<String> getAllowedValues() {
 		return allowedValues;
+	}
+	public HashSet<CharacteristicValue> getKnownValues(){
+		HashSet<CharacteristicValue> ret = CharacteristicValue.loadedValues.get(this.getCharacteristic_id());
+		if(ret!=null) {
+			return ret;
+		}
+		return new HashSet<CharacteristicValue>();
 	}
 	public void setAllowedValues(ArrayList<String> allowedValues) {
 		this.allowedValues = allowedValues;

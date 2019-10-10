@@ -233,4 +233,10 @@ public class WordUtils {
 			
 			return ret;*/
 		}
+
+
+		public static String CORRECT(String selected_text) {
+			// TODO Implement the correction procedure, more parameters may be needed
+			return selected_text;
+		}
 }

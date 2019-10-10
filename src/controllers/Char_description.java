@@ -65,6 +65,7 @@ import model.AutoCompleteBox_CharClassification;
 import model.AutoCompleteBox_UnitOfMeasure;
 import model.CharDescClassComboRow;
 import model.CharDescriptionRow;
+import model.CharacteristicValue;
 import model.ClassCharacteristic;
 import model.UnitOfMeasure;
 import model.UserAccount;
@@ -572,7 +573,7 @@ public class Char_description {
 		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
 			int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
-			CharPatternServices.scanSelectionForRuleCreation(this,
+			CharPatternServices.scanSelectionForPatternDetection(this,
 					this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
 					.get(active_char_index));
 		}
@@ -1301,6 +1302,13 @@ public class Char_description {
 		value_field.setText("");
 		translated_value_field.setText("");
 		
+	}
+	public void sendPatternValue(CharacteristicValue known_value) {
+		value_field.setText(known_value.getDataLanguageValue());
+		
+	}
+	public void sendPatternRule(String string) {
+		rule_field.setText(string);
 	}
 	
 }

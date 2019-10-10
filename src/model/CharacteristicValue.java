@@ -1,9 +1,14 @@
 package model;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import transversal.language_toolbox.Unidecode;
+
 public class CharacteristicValue {
 	
 	public static String userLanguage;
 	public static String dataLanguage;
+	public static HashMap<String,HashSet<CharacteristicValue>> loadedValues;
 	
 	private String value_id;
 	private String nominal_value;
@@ -15,6 +20,15 @@ public class CharacteristicValue {
 	private ClassCharacteristic parentChar;
 	
 	
+	@Override
+	public int hashCode() {
+		Unidecode unidecode = Unidecode.toAscii();
+		try{
+			return unidecode.decode(getDisplayValue().toUpperCase()).hashCode() ;
+		}catch(Exception V) {
+			return 0;
+		}
+	}
 	
 	public String getText_values() {
 		return text_values;
@@ -127,5 +141,47 @@ public class CharacteristicValue {
 	}
 	public void setParentChar(ClassCharacteristic classCharacteristic) {
 		this.parentChar=classCharacteristic;
+		addThisValuetoKnownValues(parentChar);
 	}
+
+	public void addThisValuetoKnownValues(ClassCharacteristic classCharacteristic) {
+		try {
+			if(loadedValues.containsKey(classCharacteristic.getCharacteristic_id())) {
+				HashSet<CharacteristicValue> tmp = loadedValues.get(classCharacteristic.getCharacteristic_id());
+				tmp.add(this);
+				loadedValues.put(classCharacteristic.getCharacteristic_id(), tmp);
+			}else {
+				HashSet<CharacteristicValue> tmp = new HashSet<CharacteristicValue>();
+				tmp.add(this);
+				loadedValues.put(classCharacteristic.getCharacteristic_id(), tmp);
+			}
+			
+		}catch(Exception V) {
+			loadedValues = new HashMap<String,HashSet<CharacteristicValue>>();
+			if(loadedValues.containsKey(classCharacteristic.getCharacteristic_id())) {
+				HashSet<CharacteristicValue> tmp = loadedValues.get(classCharacteristic.getCharacteristic_id());
+				tmp.add(this);
+				loadedValues.put(classCharacteristic.getCharacteristic_id(), tmp);
+			}else {
+				HashSet<CharacteristicValue> tmp = new HashSet<CharacteristicValue>();
+				tmp.add(this);
+				loadedValues.put(classCharacteristic.getCharacteristic_id(), tmp);
+			}
+		}
+	}
+	
+	
+	@Override
+	public boolean equals(Object o)
+	{
+	     if (this == o) {
+	         return true;
+	     }
+	     if (o instanceof CharacteristicValue) {
+	    	 CharacteristicValue p = (CharacteristicValue) o;
+	         return p.hashCode()==this.hashCode();
+	     }
+	     return false;
+	}
+	
 }
