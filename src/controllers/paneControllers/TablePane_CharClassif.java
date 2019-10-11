@@ -638,6 +638,11 @@ public class TablePane_CharClassif {
 	}
 	
 	public String translate2UserLanguage(String description) throws IOException {
+		if(description!=null) {
+			
+		}else {
+			return null;
+		}
 		if(description.replace(" ", "").length()==0) {
 			return "";
 		}
@@ -1107,6 +1112,7 @@ public class TablePane_CharClassif {
 			CharDescriptionRow tmp = new CharDescriptionRow(active_class,active_characteristics.get(active_class).size());
 			tmp.setItem_id(rs.getString("item_id"));
 			tmp.setClient_item_number(rs.getString("client_item_number"));
+			System.out.println(rs.getString("client_item_number"));
 			tmp.setShort_desc(rs.getString("short_description"));
 			tmp.setShort_desc_translated(rs.getString("short_description_translated"));
 			tmp.setLong_desc(rs.getString("long_description"));
@@ -1155,7 +1161,11 @@ public class TablePane_CharClassif {
 					row.getData(target_class_id)[charIdArray.indexOf(characteristic_id)]=val;
 					row.setAuthor(user_id);
 					row.setSource(description_method);
-					row.setRule_id(description_rule_id);
+					row.setRule_id(description_rule_id);		
+				}
+				if(row.getClass_segment()!=null) {
+					
+				}else {
 					row.setClass_segment(target_class_id+"&&&"+target_class_name);
 				}
 			}

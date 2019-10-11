@@ -1305,7 +1305,11 @@ public class Char_description {
 	}
 	public void sendPatternValue(CharacteristicValue known_value) {
 		value_field.setText(known_value.getDataLanguageValue());
-		
+		try {
+			translated_value_field.setText(known_value.getUserLanguageValue());
+		}catch(Exception V) {
+			translated_value_field.setText("");
+		}
 	}
 	public void sendPatternRule(String string) {
 		rule_field.setText(string);

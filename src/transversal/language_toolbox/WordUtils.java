@@ -237,6 +237,26 @@ public class WordUtils {
 
 		public static String CORRECT(String selected_text) {
 			// TODO Implement the correction procedure, more parameters may be needed
-			return selected_text;
+			Unidecode unidecode = Unidecode.toAscii();
+			
+			return unidecode.decode( selected_text );
+		}
+
+
+		public static String TRIM_LEADING_SEPARATORS(String string) {
+			String ret="";
+			boolean firstAlphaNumEncountred=false;
+			for(char c:string.toCharArray()) {
+				if(firstAlphaNumEncountred) {
+					ret=ret+c;
+					continue;
+				}
+				if(Character.isAlphabetic(c)||Character.isDigit(c)) {
+					ret=ret+c;
+					firstAlphaNumEncountred=true;
+					continue;
+				}
+			}
+			return ret;
 		}
 }
