@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import controllers.Char_description;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
+import model.GlobalConstants;
 import model.UserAccount;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
@@ -36,9 +37,22 @@ public class CharPatternServices {
 			}
 		}
 		System.out.println("Processing selected text ::: "+selected_text);
+		/*TRIM THE SELECTED TEXT IF TOO SHORT , PRECEDE AND FOLLOW WITH SPACE*/
+		selected_text = selected_text.trim();
+		if(selected_text.length()<GlobalConstants.CHAR_DESC_PATTERN_SELECTION_PHRASE_THRES) {
+			selected_text= " "+selected_text+" ";
+			System.out.println(":::SEPARATED SELECTION:::");
+		}
+		/*Put in double quotes rule portions that indicate a text value and
+		 * store accordingly*/
+		selected_text = selected_text.replace("\"", "~\"");
+		
+		
 		//The correction of the selection without separator is equal to one of the values ("VAL") already listed for this characteristic without separator?
 		//#Let's correct the selection
+		System.out.println(":::"+selected_text+":::");
 		String corrected_text = WordUtils.CORRECT(selected_text);
+		System.out.println(":::"+corrected_text+":::");
 		//Let's clean the selection from all separators and do the same thing for the known values
 		String[] SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 		System.out.println("Trying to match the selection with known values");
@@ -55,7 +69,7 @@ public class CharPatternServices {
 //					Value = "VAL"														
 //					Rule = [Selection]
 					parent.sendPatternValue(known_value);
-					parent.sendPatternRule("["+selected_text+"]");
+					parent.sendPatternRule("["+WordUtils.QUOTE_NON_SEP_TEXT(corrected_text)+"]");
 					System.out.println("=====>Match !");
 					return;
 				}
@@ -102,7 +116,7 @@ public class CharPatternServices {
 //								Value (Pivot language) = PIVOTtranslation (VAL)						
 //								Rule = "material"(|+1)["iron steel"]	
 								parent.sendPatternValue(known_value);
-								parent.sendPatternRule("\""+part_before_identifier+"\"(|+1)["+part_after_identifier+"]");
+								parent.sendPatternRule("\""+part_before_identifier+"\"(|+1)[\""+part_after_identifier+"\"]");
 								System.out.println("=====>Match !");
 								return;
 							}
@@ -115,6 +129,7 @@ public class CharPatternServices {
 							HashSet<CharacteristicValue> VALUES_CONTAINING_AFTER_IDENTIFIER = new HashSet<CharacteristicValue>();
 							for(CharacteristicValue known_value:active_char.getKnownValues()) {
 								System.out.println("We know value "+known_value.getDataLanguageValue());
+								/*
 								String separator_free_known = known_value.getDataLanguageValue();
 								String separator_free_selected = corrected_part_after_identifier;
 								for(String sep:SEPARATORS) {
@@ -124,7 +139,14 @@ public class CharPatternServices {
 											unidecode.decode(separator_free_selected).toUpperCase()) ){
 										VALUES_CONTAINING_AFTER_IDENTIFIER.add(known_value);
 										System.out.println("Potential Match !");
-									}}}
+									}}*/
+								if(WordUtils.TermWiseInclusion(corrected_part_after_identifier,known_value.getDataLanguageValue(),true)) {
+									VALUES_CONTAINING_AFTER_IDENTIFIER.add(known_value);
+									System.out.println("Potential Match !");
+								}	
+							
+							}
+							
 							if(VALUES_CONTAINING_AFTER_IDENTIFIER.size()==1) {
 								System.out.println("We only have one potential match !");
 //								If YES					
@@ -132,7 +154,7 @@ public class CharPatternServices {
 								parent.sendPatternValue(VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next());
 //								Value (Pivot language) = PIVOTtranslation (VAL)				
 //								Rule = Selection<"VAL">				
-								parent.sendPatternRule(selected_text+"<\""+VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next().getDataLanguageValue()+"\">");
+								parent.sendPatternRule("\""+selected_text+"\""+"<\""+VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next().getDataLanguageValue()+"\">");
 								System.out.println("=====> Match!");
 								return;
 							}else {
@@ -145,7 +167,7 @@ public class CharPatternServices {
 								VALUES_CONTAINING_AFTER_IDENTIFIER = new HashSet<CharacteristicValue>();
 								for(CharacteristicValue known_value:active_char.getKnownValues()) {
 									System.out.println("We know value "+known_value.getUserLanguageValue());
-									String separator_free_known = known_value.getUserLanguageValue();
+									/*String separator_free_known = known_value.getUserLanguageValue();
 									String separator_free_selected = corrected_part_after_identifier;
 									for(String sep:SEPARATORS) {
 										separator_free_known = separator_free_known.replaceAll(sep, "");
@@ -154,7 +176,12 @@ public class CharPatternServices {
 												unidecode.decode(separator_free_selected).toUpperCase()) ){
 											VALUES_CONTAINING_AFTER_IDENTIFIER.add(known_value);
 											System.out.println("Potential Match !");
-										}}}
+										}}*/
+									if(WordUtils.TermWiseInclusion(corrected_part_after_identifier,known_value.getUserLanguageValue(),true)) {
+										VALUES_CONTAINING_AFTER_IDENTIFIER.add(known_value);
+										System.out.println("Potential Match !");
+									}	
+								}
 								if(VALUES_CONTAINING_AFTER_IDENTIFIER.size()==1) {
 									System.out.println("We only have one potential match !");
 //									If YES
@@ -163,7 +190,7 @@ public class CharPatternServices {
 									parent.sendPatternValue(VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next());
 //									
 //											Rule = Selection<LOCALtranslation("ENVAL")>	
-									parent.sendPatternRule(selected_text+"<\""+VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next().getDataLanguageValue()+"\">");
+									parent.sendPatternRule("\""+selected_text+"\""+"<\""+VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next().getDataLanguageValue()+"\">");
 									System.out.println("=====>Match !");
 									return;
 									
@@ -175,7 +202,7 @@ public class CharPatternServices {
 									new_value.setText_values(corrected_part_after_identifier+CharacteristicValue.dataLanguage);
 									new_value.setParentChar(active_char);
 									parent.sendPatternValue(new_value);
-									parent.sendPatternRule("\""+part_before_identifier+"\"(|+1)["+part_after_identifier+"]");
+									parent.sendPatternRule("\""+part_before_identifier+"\"(|+1)[\""+part_after_identifier+"\"]");
 									System.out.println("DEFAULT: The value is the corrected selection");
 									return;
 									
@@ -207,7 +234,7 @@ public class CharPatternServices {
 //								Value (Pivot language) = PIVOTtranslation (VAL)
 					parent.sendPatternValue(VALUES_CONTAINING_SELECTION.iterator().next());
 //								Rule = [Selection]
-					parent.sendPatternRule("["+selected_text+"]");
+					parent.sendPatternRule("["+WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"]");
 					System.out.println("=====> Match!");
 					return;
 				}else {
@@ -240,7 +267,7 @@ public class CharPatternServices {
 //							Value = LOCALtranslation (ENVAL)
 						parent.sendPatternValue(VALUES_CONTAINING_SELECTION.iterator().next());
 //							Rule = Selection<LOCALtranslation("ENVAL")>
-						parent.sendPatternRule(selected_text+"<"+VALUES_CONTAINING_SELECTION.iterator().next().getUserLanguageValue()+">");
+						parent.sendPatternRule("\""+selected_text+"\""+"<"+VALUES_CONTAINING_SELECTION.iterator().next().getUserLanguageValue()+">");
 						System.out.println("====> Match");
 						return;
 					}else {
@@ -252,7 +279,7 @@ public class CharPatternServices {
 						tmp.setParentChar(active_char);
 						parent.sendPatternValue(tmp);
 //						Rule = [Selection]
-						parent.sendPatternRule("["+selected_text+"]");
+						parent.sendPatternRule("["+WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"]");
 						System.out.println("DEFAULT Value : correction of selection");
 						return;
 					}
@@ -279,9 +306,16 @@ public class CharPatternServices {
 					tmp.setParentChar(active_char);
 					parent.sendPatternValue(tmp);
 //					Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]		
+					/*
 					parent.sendPatternRule("\""+selected_text.split(":")[0]+
 					"\"(|+1)["+String.join("", WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]).chars().mapToObj((c -> (char) c)).
 					map(c->Character.isAlphabetic(c)?"@":(Character.isDigit(c)?"#":"(|-1)")).collect(Collectors.toList()))+"]");
+					*/
+					parent.sendPatternRule("\""+selected_text.split(":")[0]+
+							"\"(|+1)["+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+"]");
+							
+					
 					System.out.println("Match!");
 					return;
 								
@@ -294,9 +328,15 @@ public class CharPatternServices {
 					tmp.setParentChar(active_char);
 					parent.sendPatternValue(tmp);
 //					Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]		
-					parent.sendPatternRule("\""+selected_text.split("=")[0]+
+					/*parent.sendPatternRule("\""+selected_text.split("=")[0]+
 					"\"(|+1)["+String.join("", WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]).chars().mapToObj((c -> (char) c)).
 					map(c->Character.isAlphabetic(c)?"@":(Character.isDigit(c)?"#":"(|-1)")).collect(Collectors.toList()))+"]");
+					*/
+					parent.sendPatternRule("\""+selected_text.split("=")[0]+
+							"\"(|+1)["+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+"]");
+							
+					
 					System.out.println("Match!");
 					return;
 	
@@ -314,9 +354,14 @@ public class CharPatternServices {
 						tmp.setParentChar(active_char);
 						parent.sendPatternValue(tmp);
 //							Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]
-						parent.sendPatternRule("\""+sw_splitter+
+						/*parent.sendPatternRule("\""+sw_splitter+
 								"\"(|+1)["+String.join("", WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]).chars().mapToObj((c -> (char) c)).
 								map(c->Character.isAlphabetic(c)?"@":(Character.isDigit(c)?"#":"(|-1)")).collect(Collectors.toList()))+"]");
+						*/
+						parent.sendPatternRule("\""+sw_splitter+
+								"\"(|+1)["+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+										WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+"]");
+						
 						System.out.println("Match!");
 						return;
 					}else {
@@ -329,23 +374,10 @@ public class CharPatternServices {
 						parent.sendPatternValue(tmp);
 //						
 //							Rule = ["ab"#"cd"#(|-1)@@##(|-1)@@##]
-						String rule="[";
-						boolean firstSepPassed=false;
-						boolean last_is_alpha=true;
-						for(int i=0;i<selected_text.length();i++) {
-							char c = selected_text.charAt(i);
-							if(Character.isAlphabetic(c)) {
-								rule=rule+(firstSepPassed?"@":(last_is_alpha?(i==0?"\""+c:c):"\"@"));
-								last_is_alpha = true;
-							}else if (Character.isDigit(c)) {
-								rule=rule+(firstSepPassed?"#":(last_is_alpha?"\"#":"#"));
-								last_is_alpha = false;
-							}else {
-								rule=rule+("(|-1)");
-								firstSepPassed=true;
-							}
-						}
-						parent.sendPatternRule(rule+"]");
+						
+						parent.sendPatternRule("["+
+						WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true)
+						+"]");
 						System.out.println("Match!");
 //						
 					}
@@ -360,6 +392,7 @@ public class CharPatternServices {
 				HashSet<CharacteristicValue> VALUES_CONTAINING_SELECTION = new HashSet<CharacteristicValue>();
 				for(CharacteristicValue known_value:active_char.getKnownValues()) {
 					System.out.println("We known value "+known_value.getDataLanguageValue());
+					/*
 					String separator_free_known = known_value.getDataLanguageValue();
 					String separator_free_selected = corrected_text;
 					for(String sep:SEPARATORS) {
@@ -369,14 +402,19 @@ public class CharPatternServices {
 								unidecode.decode(separator_free_selected).toUpperCase()) ){
 							System.out.println("Potential Match!");
 							VALUES_CONTAINING_SELECTION.add(known_value);
-						}}}
+						}}*/
+					if(WordUtils.TermWiseInclusion(corrected_text,known_value.getDataLanguageValue(),true)) {
+						VALUES_CONTAINING_SELECTION.add(known_value);
+						System.out.println("Potential Match !");
+					}		
+				}
 				if(VALUES_CONTAINING_SELECTION.size()==1) {
 					System.out.println("We have only one potential match");
 //						If YES							
 //							Value = VAL		
 					parent.sendPatternValue(VALUES_CONTAINING_SELECTION.iterator().next());
 //							Rule = Selection<"VAL">	
-					parent.sendPatternRule(selected_text+"<"+VALUES_CONTAINING_SELECTION.iterator().next().getDisplayValue()+">");
+					parent.sendPatternRule("\""+selected_text+"\""+"<\""+VALUES_CONTAINING_SELECTION.iterator().next().getDisplayValue()+"\">");
 					System.out.println("=====> Match!");
 					return;
 				}
@@ -389,6 +427,7 @@ public class CharPatternServices {
 						HashSet<CharacteristicValue> VALUES_CONTAINED_IN_SELECTION = new HashSet<CharacteristicValue>();
 						for(CharacteristicValue known_value:active_char.getKnownValues()) {
 							System.out.println("We know value "+known_value.getDataLanguageValue());
+							/*
 							String separator_free_known = known_value.getDataLanguageValue();
 							String separator_free_selected = corrected_text;
 							for(String sep:SEPARATORS) {
@@ -398,14 +437,19 @@ public class CharPatternServices {
 										unidecode.decode(separator_free_known).toUpperCase()) ){
 									System.out.println("Potential Match !");
 									VALUES_CONTAINED_IN_SELECTION.add(known_value);
-								}}}
+								}}*/
+							if(WordUtils.TermWiseInclusion(known_value.getDataLanguageValue(),corrected_text,true)) {
+								VALUES_CONTAINED_IN_SELECTION.add(known_value);
+								System.out.println("Potential Match !");
+							}
+							}
 						if(VALUES_CONTAINED_IN_SELECTION.size()==1) {
 							System.out.println("We have only one potential match");
 //						If YES							
 //							Value = VAL		
 						parent.sendPatternValue(VALUES_CONTAINED_IN_SELECTION.iterator().next());
 //							Rule = Selection<"VAL">	
-						parent.sendPatternRule(selected_text+"<"+VALUES_CONTAINED_IN_SELECTION.iterator().next().getDisplayValue()+">");
+						parent.sendPatternRule(selected_text+"<\""+VALUES_CONTAINED_IN_SELECTION.iterator().next().getDisplayValue()+"\">");
 						System.out.println("====> Match!");
 						return;
 						}else {	
@@ -459,7 +503,7 @@ public class CharPatternServices {
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 //												Rule = [Selection]
-											parent.sendPatternRule("["+selected_text+"]");
+											parent.sendPatternRule("["+WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"]");
 											System.out.println("Default match");
 											return;
 										}

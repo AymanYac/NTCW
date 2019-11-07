@@ -779,7 +779,7 @@ public class TablePane_CharClassif {
 		
 		Set<CharDescriptionRow> itemList = itemPreviousClasses.keySet();
 		assignCharacteristicsToClass(target_class_id);
-		assignValuesToItemsByClass(target_class_id,target_class_name,itemList.stream().
+		assignValuesToItemsByClass_V2(target_class_id,target_class_name,itemList.stream().
 												map(i -> i.getItem_id()).collect(Collectors.toList()));
 		allignEmptyNewValuesOnOldOnes(itemPreviousClasses);
 	}
@@ -993,7 +993,7 @@ public class TablePane_CharClassif {
 		
 		fetchTableItems(active_class,classItems);
 		
-		assignValuesToItemsByClass(active_class,this.Parent.classCombo.getSelectionModel().getSelectedItem().getclassName(),classItems);
+		assignValuesToItemsByClass_V2(active_class,this.Parent.classCombo.getSelectionModel().getSelectedItem().getclassName(),classItems);
 		
 		//Set the static variable for CharacteristicValue
 		CharacteristicValue.dataLanguage=this.Parent.data_language;
@@ -1047,7 +1047,6 @@ public class TablePane_CharClassif {
 			loadAllowedValuesAsKnownValues(tmp);
 			
 		}
-		
 		rs.close();
 		stmt.close();
 		conn.close();
@@ -1062,6 +1061,7 @@ public class TablePane_CharClassif {
 		}
 		
 	}
+	
 	
 	
 	private void loadAllowedValuesAsKnownValues(ClassCharacteristic tmp) throws ClassNotFoundException, SQLException {
@@ -1124,7 +1124,8 @@ public class TablePane_CharClassif {
 		conn.close();
 	}
 	
-	private void assignValuesToItemsByClass(String target_class_id, String target_class_name, List<String> target_items) throws ClassNotFoundException, SQLException {
+	@SuppressWarnings("unused")
+	private void assignValuesToItemsByClass_V1(String target_class_id, String target_class_name, List<String> target_items) throws ClassNotFoundException, SQLException {
 		System.out.println("assigning values to items by class, no items "+target_items.size());
 		
 				
@@ -1175,6 +1176,62 @@ public class TablePane_CharClassif {
 		stmt.close();
 		conn.close();
 	}
+	
+	//Version 2 loads all values associated to the class and if item in table, loads the data
+	//in the item
+	private void assignValuesToItemsByClass_V2(String target_class_id, String target_class_name, List<String> target_items) throws ClassNotFoundException, SQLException {
+		System.out.println("assigning values to items by class, no items "+target_items.size());
+		
+				
+		
+		Connection conn = Tools.spawn_connection();
+		PreparedStatement stmt;
+		ResultSet rs;
+		
+		stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,project_values.value_id,text_values,nominal_value,min_value,max_value,note,uom_id from "
+				+ "(select * from "+account.getActive_project()+".project_items_x_values where characteristic_id in ('"+String.join("','", this.active_characteristics.get(target_class_id).stream().map(c->c.getCharacteristic_id()).collect(Collectors.toSet()))+"')"
+								+ ") data left join "+account.getActive_project()+".project_values "
+										+ "on data.value_id = project_values.value_id");
+		System.out.println(stmt.toString());
+		rs = stmt.executeQuery();
+		List<String> charIdArray = this.active_characteristics.get(target_class_id).stream().map(c->c.getCharacteristic_id()).collect(Collectors.toList());
+		while(rs.next()) {
+			String item_id = rs.getString("item_id");
+			String characteristic_id = rs.getString("characteristic_id");
+			String user_id = rs.getString("user_id");
+			String description_method = rs.getString("description_method");
+			String description_rule_id = rs.getString("description_rule_id");
+			CharacteristicValue val = new CharacteristicValue();
+			val.setValue_id(rs.getString("value_id"));
+			val.setText_values(rs.getString("text_values"));
+			val.setNominal_value(rs.getString("nominal_value"));
+			val.setMin_value(rs.getString("min_value"));
+			val.setMax_value(rs.getString("max_value"));
+			val.setNote(rs.getString("note"));
+			val.setUom_id(rs.getString("uom_id"));
+			val.setParentChar(this.active_characteristics.get(target_class_id).get(charIdArray.indexOf(characteristic_id)));
+			for(CharDescriptionRow row:this.itemArray) {
+				if(row.getItem_id().equals(item_id)) {
+					row.getData(target_class_id)[charIdArray.indexOf(characteristic_id)]=val;
+					row.setAuthor(user_id);
+					row.setSource(description_method);
+					row.setRule_id(description_rule_id);		
+				}
+				if(row.getClass_segment()!=null) {
+					
+				}else {
+					row.setClass_segment(target_class_id+"&&&"+target_class_name);
+				}
+			}
+		}
+		
+		rs.close();
+		stmt.close();
+		conn.close();
+	}
+	
+	
+	
 	public void nextChar() {
 		this.selected_col+=1;
 		selectChartAtIndex(selected_col,this.Parent.charButton.isSelected());

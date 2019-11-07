@@ -45,7 +45,7 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
 	public static final boolean MANUAL_CLASSIF_PERSIST = false;
-	public static final String TOOL_VERSION = "3.1.0_DEV";
+	public static final String TOOL_VERSION = "3.1.0_RECETTE";
 	
 	
 	public static final Integer RULE_DISPLAY_FONT_SIZE = 12;
@@ -98,6 +98,7 @@ public class GlobalConstants {
 	
 	
 	public static final boolean MANUAL_CLASSIF_LOAD_LATEST_WITH_UPLOAD_PRIORITY = true;
+	public static final int CHAR_DESC_PATTERN_SELECTION_PHRASE_THRES = 4;
 	
 	
 }

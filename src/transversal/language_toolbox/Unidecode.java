@@ -89,7 +89,7 @@ public class Unidecode {
      * @see <a href="http://search.cpan.org/~sburke/Text-Unidecode/lib/Text/Unidecode.pm">
      *     Description of the used transliterization method</a>
      */
-    public String decode(String str) {
+    public String decodeAndTrim(String str) {
         if (str == null) {
             return "";
         }
@@ -112,7 +112,31 @@ public class Unidecode {
         }
         return sb.toString().trim();
     }
+    
+    
+    public String decode(String str) {
+        if (str == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
 
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            int codePoint = str.codePointAt(i);
+
+            // basic ASCII, don't change
+            if (codePoint < 0x80) {
+                sb.append(c);
+                continue;
+            }
+            // characters in the Private Use Area and above are ignored
+            if (codePoint > 0xffff) {
+                continue;
+            }
+            sb.append(substituteChar(codePoint));
+        }
+        return sb.toString();
+    }
     /**
      * Transliterate Unicode string to an initials.
      *
@@ -127,7 +151,7 @@ public class Unidecode {
         StringBuilder sb = new StringBuilder();
 
         Pattern p = Pattern.compile("^\\w|\\s+\\w");
-        Matcher m = p.matcher(decode(str));
+        Matcher m = p.matcher(decodeAndTrim(str));
 
         while (m.find()) {
             sb.append(m.group().replaceAll(" ", ""));

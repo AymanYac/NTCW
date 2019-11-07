@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -753,6 +754,17 @@ public class Char_description {
 		}else {
 			
 		}
+		
+		classCombo.getItems().sort(new Comparator<CharDescClassComboRow>(){
+
+			@Override
+			public int compare(CharDescClassComboRow o1, CharDescClassComboRow o2) {
+				// TODO Auto-generated method stub
+				return o1.getclassName().compareTo( o2.getclassName());
+			}
+			
+		});
+		
 		classCombo.setOnAction(e -> {
 			try {
 				tableController.refresh_table_with_segment(classCombo.getValue().getClassSegment());
@@ -761,6 +773,7 @@ public class Char_description {
 				e1.printStackTrace();
 			}
 		});
+		
 	}
 	@SuppressWarnings("static-access")
 	private void load_table_pane() throws IOException, ClassNotFoundException, SQLException {

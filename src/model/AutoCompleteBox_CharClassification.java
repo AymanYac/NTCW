@@ -126,7 +126,7 @@ public class AutoCompleteBox_CharClassification extends TextField
         } else
         {
           LinkedList<String> searchResult = new LinkedList<>();
-          final List<String> filteredEntries = entries.stream().filter(e -> unidecode.decode(e).toLowerCase().contains(unidecode.decode(getText()).toLowerCase())).collect(Collectors.toList());
+          final List<String> filteredEntries = entries.stream().filter(e -> unidecode.decodeAndTrim(e).toLowerCase().contains(unidecode.decodeAndTrim(getText()).toLowerCase())).collect(Collectors.toList());
           searchResult.addAll(filteredEntries);
           //searchResult.addAll(entries.subSet(getText(), getText() + Character.MAX_VALUE));
           if (entries.size() > 0)
@@ -140,8 +140,8 @@ public class AutoCompleteBox_CharClassification extends TextField
 							((String)o1).split("&&&")[1].compareTo(
 							((String)o2).split("&&&")[1])
 							));
-					int av_1 =  unidecode.decode(((String)o1).split("&&&")[1]).toUpperCase().startsWith(unidecode.decode(getText()).toUpperCase())?1000000:0;
-        	  		int av_2 =  unidecode.decode(((String)o2).split("&&&")[1]).toUpperCase().startsWith(unidecode.decode(getText()).toUpperCase())?1000000:0;
+					int av_1 =  unidecode.decodeAndTrim(((String)o1).split("&&&")[1]).toUpperCase().startsWith(unidecode.decodeAndTrim(getText()).toUpperCase())?1000000:0;
+        	  		int av_2 =  unidecode.decodeAndTrim(((String)o2).split("&&&")[1]).toUpperCase().startsWith(unidecode.decodeAndTrim(getText()).toUpperCase())?1000000:0;
         	  		
         	  		return ret - av_1 + av_2;
 				}

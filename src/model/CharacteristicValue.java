@@ -24,7 +24,7 @@ public class CharacteristicValue {
 	public int hashCode() {
 		Unidecode unidecode = Unidecode.toAscii();
 		try{
-			return unidecode.decode(getDisplayValue().toUpperCase()).hashCode() ;
+			return unidecode.decodeAndTrim(getDisplayValue().toUpperCase()).hashCode() ;
 		}catch(Exception V) {
 			return 0;
 		}

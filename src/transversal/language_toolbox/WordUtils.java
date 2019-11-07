@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import model.BinaryClassificationParameters;
 import model.DescriptionType;
@@ -97,7 +98,7 @@ public class WordUtils {
 		public static String keepalpha(String input,boolean AlphabetOnly,boolean decode) {
 			if(decode) {
 				Unidecode unidecode = Unidecode.toAscii();
-				input = unidecode.decode(input).toUpperCase();
+				input = unidecode.decodeAndTrim(input).toUpperCase();
 				
 			}else {
 				input = input.toUpperCase();
@@ -258,5 +259,81 @@ public class WordUtils {
 				}
 			}
 			return ret;
+		}
+
+
+		public static String ALPHANUM_PATTERN_RULE_INREPLACE(String selected_text, boolean keepAlphaBeforeFirstSep) {
+			//e.g. "abcd ef12-gh34-ij56"
+			//Rule = ["ab"#"cd"#(|-1)@@##(|-1)@@##]
+			String rule="";
+			boolean firstSepPassed=!keepAlphaBeforeFirstSep;
+			boolean last_is_alpha=false;
+			for(int i=0;i<selected_text.length();i++) {
+				char c = selected_text.charAt(i);
+				if(Character.isAlphabetic(c)) {
+					rule=rule+(firstSepPassed?"@":(last_is_alpha?c:(i==0?"\""+c:c)));
+					last_is_alpha = true;
+				}else if (Character.isDigit(c)) {
+					rule=rule+(firstSepPassed?"#":(last_is_alpha?"\"#":"#"));
+					last_is_alpha = false;
+				}else {
+					rule=rule+(last_is_alpha&&!firstSepPassed?"\"(|-1)":"(|-1)");
+					if(i!=0) {
+						firstSepPassed=true;
+					}
+				}
+			}
+			
+			return rule;
+		}
+
+
+		public static String QUOTE_NON_SEP_TEXT(String input) {
+			String output = "";
+			boolean inQuote = false;
+			for(int i=0;i<input.length();i++) {
+				char c = input.charAt(i);
+				if(Character.isAlphabetic(c) || Character.isDigit(c)) {
+					if(inQuote) {
+						output=output+c;
+					}else {
+						output=output+"\""+c;
+					}
+					inQuote=true;
+				}else{
+					if(inQuote) {
+						output=output+"\"(|-1)";
+					}else {
+						if(i==0) {
+							output="(|-1)";
+						}
+					}
+					inQuote = false;
+				}
+				}
+			if(inQuote) {
+				output=output+"\"";
+			}
+			return output;
+		}
+
+
+		public static boolean TermWiseInclusion(String toSearch, String searchIn,
+				boolean splitbySeparators) {
+			
+			Unidecode unidecode = Unidecode.toAscii();
+			toSearch = unidecode.decodeAndTrim(toSearch).toUpperCase();
+			searchIn = unidecode.decodeAndTrim(searchIn).toUpperCase();
+			if(splitbySeparators) {
+				toSearch = String.join("",toSearch.chars().mapToObj((c -> (char) c)).map(
+						c->Character.isAlphabetic(c)||Character.isDigit(c)?String.valueOf(c):" ").collect(Collectors.toList()));
+				toSearch=" "+toSearch+" ";
+				
+				searchIn = String.join("",searchIn.chars().mapToObj((c -> (char) c)).map(
+						c->Character.isAlphabetic(c)||Character.isDigit(c)?String.valueOf(c):" ").collect(Collectors.toList()));
+				searchIn=" "+searchIn+" ";
+			}
+			
+			return searchIn.contains(toSearch);
 		}
 }
