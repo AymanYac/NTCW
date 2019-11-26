@@ -90,18 +90,18 @@ public class CharPaneRow {
 		String base_uom_family=null;
 		for(String uom:this.getAllowed_uom()) {
 			if(base_uom_family!=null) {
-				UnitOfMeasure loopUom = parent.parent.UOMS.get(uom);
+				UnitOfMeasure loopUom = UnitOfMeasure.RunTimeUOMS.get(uom);
 				if(!loopUom.getUom_base_id().equals(base_uom_family)) {
 					same_uom_family = false;
 					break;
 				}
 			}else {
-				UnitOfMeasure loopUom = parent.parent.UOMS.get(uom);
+				UnitOfMeasure loopUom = UnitOfMeasure.RunTimeUOMS.get(uom);
 				base_uom_family = loopUom.getUom_base_id();
 			}
 		}
 		for(int i=0;i<this.getAllowed_uom().size();i++) {
-			Text tmp = new Text(parent.parent.UOMS.get(this.getAllowed_uom().get(i)).getUom_symbol());
+			Text tmp = new Text(UnitOfMeasure.RunTimeUOMS.get(this.getAllowed_uom().get(i)).getUom_symbol());
 			tmp.setFill(GlobalConstants.CHAR_UOM_COLOR);
 			tmp.setFont(Font.font(GlobalConstants.CHAR_UOM_FONT,GlobalConstants.CHAR_UOM_WEIGHT,GlobalConstants.CHAR_UOM_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
 			textes.add(tmp);
@@ -144,7 +144,7 @@ public class CharPaneRow {
 			String local_Max_value=null;
 			try{
 				
-				UnitOfMeasure current_uom = CharPaneRow.parent.parent.UOMS.get(this.getValue().getUom_id());
+				UnitOfMeasure current_uom = UnitOfMeasure.RunTimeUOMS.get(this.getValue().getUom_id());
 				if((!(current_uom!=null)) || carac.getAllowedUoms().contains(current_uom.getUom_id())) {
 					//Either there's no uom or the uom is included in the allowed uoms
 					//No conversion and show the input value
@@ -158,7 +158,7 @@ public class CharPaneRow {
 					local_Min_value = this.value.getMin_value();
 				}else {
 					//Converting to base uom
-					UnitOfMeasure base_uom = CharPaneRow.parent.parent.UOMS.get(current_uom.getUom_base_id());
+					UnitOfMeasure base_uom = UnitOfMeasure.RunTimeUOMS.get(current_uom.getUom_base_id());
 					try{
 						local_uom = base_uom.getUom_symbol();
 					}catch(Exception V) {
@@ -180,7 +180,7 @@ public class CharPaneRow {
 						
 					}
 					for(String uom:this.getAllowed_uom()) {
-						UnitOfMeasure loopUom = parent.parent.UOMS.get(uom);
+						UnitOfMeasure loopUom = UnitOfMeasure.RunTimeUOMS.get(uom);
 						if(loopUom.getUom_base_id().equals(base_uom.getUom_id())) {
 							
 							try{

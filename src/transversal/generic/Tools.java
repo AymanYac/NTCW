@@ -58,9 +58,7 @@ import model.CharDescriptionRow;
 import model.ClassificationMethods;
 import model.GenericRule;
 import model.ItemFetcherRow;
-import model.UnitOfMeasure;
 import model.UserAccount;
-import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.dialog_toolbox.ExceptionDialog;
 
 
@@ -1006,7 +1004,101 @@ public class Tools {
 			
 		}
 
+	public static void StoreAutoRules(UserAccount account, ArrayList<GenericRule> grs, ArrayList<String[]> itemRuleMap, boolean ISCLASSIF, String METHOD) {
+		/*
+		 * Set classif rule to active if conflict
+		 * Do nothing for preclassif rule if conflict
+		 */
+		Task<Void> task = new Task<Void>() {
+		    
+			@Override
+		    protected Void call() throws Exception {
+				
+				Connection conn = Tools.spawn_connection();
+				PreparedStatement ps = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_rules(" + 
+						"            rule_id, main, application, complement, material_group," + 
+						"            pre_classification, drawing, class_id, rule_source, rule_type," + 
+						"            user_id, rule_date, active_status)" + 
+						"    VALUES (?, ?, ?, ?, ?," + 
+						"            ?, ?, ?, ?, ?," + 
+						"            ?, clock_timestamp() ,?) on conflict(rule_id) do "
+						+ (ISCLASSIF?"update set active_status = EXCLUDED.active_status, class_id = EXCLUDED.class_id;":"nothing"));
+				
+				for(GenericRule gr:grs) {
+					ps.setString(1, gr.toString());
+					ps.setString(2, gr.getMain());
+					ps.setString(3, gr.getApp());
+					ps.setString(4, gr.getComp());
+					ps.setString(5, gr.getMg());
+					
+					ps.setString(6, gr.getPc());
+					ps.setBoolean(7, gr.getDwg());
+					ps.setString(8, String.join("&&&", gr.classif));
+					ps.setString(9, METHOD);
+					ps.setString(10, gr.getType());
+					
+					ps.setString(11, account.getUser_id());
+					//ps.setDate(12, x);
+					ps.setBoolean(12, ISCLASSIF);
+					ps.addBatch();
+				}
+					ps.executeBatch();
+					ps.clearBatch();
+					ps.close();
+				
+				final PreparedStatement ps2 = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_items_x_rules(" + 
+						"            item_id, rule_id,rule_application_description_form)" + 
+						"    VALUES (?,?,?) on conflict(item_id,rule_id) do update set rule_application_description_form = EXCLUDED.rule_application_description_form;");
+				itemRuleMap.forEach((A)->{
+					String item_id = A[0];
+					String rule_id = A[1];
+					try {
+						ps2.setString(1, item_id);
+						ps2.setString(2, rule_id);
+						ps2.setString(3, "["+METHOD+"] "+rule_id);
+						ps2.addBatch();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				
+				ps2.executeBatch();
+				ps2.clearBatch();
+				ps2.close();
+				
+				conn.close();
+				
+				
+	    		return null;
+		    	}
+			};
+		task.setOnSucceeded(e -> {
+			;
 
+			
+			});
+
+		task.setOnFailed(e -> {
+		    Throwable problem = task.getException();
+		    /* code to execute if task throws exception */
+		    System.err.println("failed to sync rules ");
+		    //System.err.println(ExceptionUtils.getRootCauseMessage( problem ))	;
+		    problem.printStackTrace(System.err);
+		    
+		    
+		});
+
+		task.setOnCancelled(e -> {
+		    /* task was cancelled */
+			;
+		});
+			
+			Thread thread = new Thread(task);; thread.setDaemon(true);
+			thread.setName("Sync db for rules ");
+			thread.start();
+			
+		}
 
 	public static String[] get_desc_classes(UserAccount account, MenuBar menubar) throws ClassNotFoundException, SQLException {
 		Connection conn = Tools.spawn_connection();
@@ -1078,29 +1170,6 @@ public class Tools {
 		return CNAME_CID;
 	}
 
-
-
-	public static  HashMap<String, UnitOfMeasure> get_units_of_measures(String language_code) throws ClassNotFoundException, SQLException {
-		HashMap<String,UnitOfMeasure> ret = new HashMap<String,UnitOfMeasure>();
-		Connection conn = Tools.spawn_connection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("select uom_id, uom_symbols, "+QueryFormater.UOM_MULTIPLIER_DOUBLE2CHAR_QUERY("uom_multiplier")+", uom_base_id, uom_name_"+language_code.toLowerCase()+" from public_ressources.units_of_measure");
-		while(rs.next()) {
-			UnitOfMeasure tmp = new UnitOfMeasure();
-			tmp.setUom_id(rs.getString("uom_id"));
-			tmp.setUom_name(rs.getString("uom_name_"+language_code.toLowerCase()));
-			tmp.setUom_symbols(rs.getArray("uom_symbols"));
-			tmp.setUom_multiplier(rs.getString("uom_multiplier"));
-			tmp.setUom_base_id(rs.getString("uom_base_id"));
-			ret.put(tmp.getUom_id(), tmp);
-			
-		}
-		rs.close();
-		stmt.close();
-		conn.close();
-		
-		return ret;
-	}
 
 
 	//Method is always manual

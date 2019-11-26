@@ -11,7 +11,7 @@
 	
 	-fx-text-fill:#445469;
 	-fx-font-weight:bold;
-	-fx-wrap-text:true;
+	/*-fx-wrap-text:true;*/
 	
 }
 

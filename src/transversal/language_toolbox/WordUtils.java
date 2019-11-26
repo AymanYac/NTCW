@@ -8,11 +8,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import model.BinaryClassificationParameters;
+import model.ClassCharacteristic;
 import model.DescriptionType;
 import model.GlobalConstants;
+import model.UnitOfMeasure;
 import transversal.generic.Tools;
 
 public class WordUtils {
@@ -335,5 +339,74 @@ public class WordUtils {
 			}
 			
 			return searchIn.contains(toSearch);
+		}
+
+
+		public static ArrayList<Double> parseNumericalValues(String selected_text) {
+			//(including decimals with "." or "," or negative values
+			
+			Pattern p = Pattern.compile("(-?\\d+(\\.\\d+)?)");
+			Matcher m = p.matcher(selected_text.replace(",", "."));
+			
+			ArrayList<Double> ret = new ArrayList<Double>();
+			while (m.find()) {
+				  ret.add(Double.valueOf( m.group(0)) );
+				}
+			return ret;
+		}
+
+
+		public static ArrayList<UnitOfMeasure> parseCompatibleUoMs(String selected_text, ClassCharacteristic active_char) {
+			
+			String pattern = "(-?\\d+(\\.\\d+)?)";
+		    String patternPlusOverLaps = pattern+"(?=(" + "(.*)" + ")).";
+		    Pattern p = Pattern.compile(patternPlusOverLaps);
+		    
+		    Matcher m = p.matcher(selected_text.replace(",", "."));
+			
+			ArrayList<UnitOfMeasure> ret = new ArrayList<UnitOfMeasure>();
+			while (m.find()) {
+				UnitOfMeasure tmp = UnitOfMeasure.lookUpUomInText_V2(m.group(3),active_char.getAllowedUoms());
+				ret.add(tmp);
+				}
+			return ret;
+		}
+
+		
+		public static ArrayList<UnitOfMeasure> parseKnownUoMs(String selected_text) {
+			
+			String pattern = "(-?\\d+(\\.\\d+)?)";
+		    String patternPlusOverLaps = pattern+"(?=(" + "(.*)" + ")).";
+		    Pattern p = Pattern.compile(patternPlusOverLaps);
+		    
+		    Matcher m = p.matcher(selected_text.replace(",", "."));
+			
+			ArrayList<UnitOfMeasure> ret = new ArrayList<UnitOfMeasure>();
+			while (m.find()) {
+				UnitOfMeasure tmp = UnitOfMeasure.lookUpUomInText_V2(m.group(3),null);
+				ret.add(tmp);
+				}
+			return ret;
+		}
+
+		
+		
+		
+		public static String replacePunctuationSplit(String text, boolean split) {
+			//Replace any char in !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+			//by spaces
+			text = text.replaceAll("\\p{Punct}", " ");
+			if(split) {
+				return text.split(" ")[0];
+			}
+			return text;
+		}
+
+
+		public static String DoubleToString(double d) {
+			if(d == (long) d)
+		        return String.format("%d",(long)d);
+		    else
+		        return String.format("%s",d);
 		}
 }

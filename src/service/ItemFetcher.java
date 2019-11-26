@@ -168,7 +168,9 @@ public class ItemFetcher {
 					tmp.setAuthor_Upload(userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
 					
 				}
-				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(ClassificationMethods.USER_RULE)){
+				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(ClassificationMethods.USER_RULE)
+						||
+						classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(ClassificationMethods.BINARY_CLASSIFICATION)){
 					tmp.setRule_Segment_number( classifiedItems.get(tmp.getItem_id()).split("&&&")[0] );
 					tmp.setRule_Segment_id( classifiedItems.get(tmp.getItem_id()).split("&&&")[4] );
 					tmp.setRule_Segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );

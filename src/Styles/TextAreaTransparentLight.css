@@ -12,7 +12,7 @@
 	-fx-text-fill:#737572;
 	-fx-font-weight:normal;
 	-fx-font-style:italic;
-	-fx-wrap-text:true;
+	/*-fx-wrap-text:true;*/
 	
 }
 

@@ -121,6 +121,9 @@ public class Bigram
 	        b.train();
 	        
 	       
+		}else {
+			System.out.println("skiping corpus build");
+			
 		}
         
 		

@@ -2,10 +2,19 @@ package model;
 
 import java.math.BigDecimal;
 import java.sql.Array;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.stream.Collectors;
+
+import transversal.data_exchange_toolbox.QueryFormater;
+import transversal.generic.Tools;
+import transversal.language_toolbox.Unidecode;
+import transversal.language_toolbox.WordUtils;
 
 public class UnitOfMeasure {
 	private String uom_id;
@@ -13,6 +22,9 @@ public class UnitOfMeasure {
 	private String uom_multiplier;
 	private String uom_base_id;
 	private String uom_name;
+	public static HashMap<String, UnitOfMeasure> RunTimeUOMS;
+	private static int uom_lookup_max_found_length;
+	private static UnitOfMeasure uom_lookup_best_candidate;
 	
 	
 	public String getUom_id() {
@@ -32,7 +44,7 @@ public class UnitOfMeasure {
 		}
 		
 	}
-	public void setUom_symbols(Array uom_symbols) throws SQLException {
+	public void setUom_symbols(Array uom_symbols) {
 		try{
 			this.uom_symbols = new ArrayList<String> (Arrays.asList((String[])uom_symbols.getArray()));
 		}catch(Exception V) {
@@ -40,6 +52,15 @@ public class UnitOfMeasure {
 			this.uom_symbols=null;
 		}
 	}
+	public void setUom_symbols(String[] uom_symbols) {
+		try{
+			this.uom_symbols = new ArrayList<String> (Arrays.asList((String[])uom_symbols));
+		}catch(Exception V) {
+			V.printStackTrace(System.err);
+			this.uom_symbols=null;
+		}
+	}
+	
 	public BigDecimal getUom_multiplier() {
 		return new BigDecimal(uom_multiplier);
 	}
@@ -72,5 +93,141 @@ public class UnitOfMeasure {
 	public String toString() {
 		return this.getUom_name()+" ("+this.getUom_symbol()+") ";
 		
+	}
+	public static  HashMap<String, UnitOfMeasure> get_units_of_measures(String language_code) throws ClassNotFoundException, SQLException {
+		HashMap<String,UnitOfMeasure> ret = new HashMap<String,UnitOfMeasure>();
+		Connection conn = Tools.spawn_connection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("select uom_id, uom_symbols, "+QueryFormater.UOM_MULTIPLIER_DOUBLE2CHAR_QUERY("uom_multiplier")+", uom_base_id, uom_name_"+language_code.toLowerCase()+" from public_ressources.units_of_measure");
+		while(rs.next()) {
+			UnitOfMeasure tmp = new UnitOfMeasure();
+			tmp.setUom_id(rs.getString("uom_id"));
+			tmp.setUom_name(rs.getString("uom_name_"+language_code.toLowerCase()));
+			tmp.setUom_symbols(rs.getArray("uom_symbols"));
+			tmp.setUom_multiplier(rs.getString("uom_multiplier"));
+			tmp.setUom_base_id(rs.getString("uom_base_id"));
+			ret.put(tmp.getUom_id(), tmp);
+			
+		}
+		rs.close();
+		stmt.close();
+		conn.close();
+		
+		return ret;
+	}
+	public static UnitOfMeasure lookUpUomInTextStart(String text) {
+		if(text!=null) {
+			text=WordUtils.replacePunctuationSplit(text,true);
+			if(text.length()==0) {
+				return null;
+			}
+			Unidecode unidecode = Unidecode.toAscii();
+			for(String uom_id:RunTimeUOMS.keySet()) {
+				UnitOfMeasure uom = RunTimeUOMS.get(uom_id);
+				if(text.startsWith(uom.getUom_name())){
+					return uom;
+				}
+				if(unidecode.decodeAndTrim(text).startsWith(unidecode.decodeAndTrim(uom.getUom_name()))) {
+					return uom;
+				}
+				if(unidecode.decodeAndTrim(text).toLowerCase().startsWith(unidecode.decodeAndTrim(uom.getUom_name()).toLowerCase())) {
+					return uom;
+				}
+				
+				if(text.startsWith(uom.getUom_symbol())){
+					return uom;
+				}
+				if(unidecode.decodeAndTrim(text).startsWith(unidecode.decodeAndTrim(uom.getUom_symbol()))) {
+					return uom;
+				}
+				if(unidecode.decodeAndTrim(text).toLowerCase().startsWith(unidecode.decodeAndTrim(uom.getUom_symbol()).toLowerCase())) {
+					return uom;
+				}
+				
+				
+			}
+		}
+		return null;
+	}
+	
+	public static UnitOfMeasure lookUpUomInText_V2(String text, ArrayList<String> allowedUoms) {
+		if(text!=null) {
+			
+			Unidecode unidecode = Unidecode.toAscii();
+			uom_lookup_max_found_length = 0;
+			uom_lookup_best_candidate=null;
+			
+			UnitOfMeasure.RunTimeUOMS.entrySet().stream().filter(
+					e->(!(allowedUoms!=null))||ConversionPathExists(e.getValue(),allowedUoms))
+					.forEach(e -> {
+						String searchedName = unidecode.decodeAndTrim(e.getValue().getUom_name()).toLowerCase();
+						if(searchedName.length()>uom_lookup_max_found_length) {
+							if(unidecode.decodeAndTrim(text).toLowerCase().startsWith(searchedName)) {
+								uom_lookup_max_found_length = searchedName.length();
+								uom_lookup_best_candidate = e.getValue();
+							}
+						}
+						for(String symbol:e.getValue().getUom_symbols()) {
+							String searchedSymbol = unidecode.decodeAndTrim(symbol).toLowerCase();
+							if(searchedSymbol.length()>uom_lookup_max_found_length) {
+								if(unidecode.decodeAndTrim(text).toLowerCase().startsWith(searchedSymbol)) {
+									uom_lookup_max_found_length = searchedSymbol.length();
+									uom_lookup_best_candidate = e.getValue();
+								}
+							}
+						}
+						
+					});
+			
+			return uom_lookup_best_candidate;
+					
+		}
+		return null;
+	}
+	
+	public static UnitOfMeasure lookUpUomInText(String text, ArrayList<String> arrayList) {
+		if(text!=null) {
+			text=WordUtils.replacePunctuationSplit(text,true);
+			if(text.length()==0) {
+				return null;
+			}
+			Unidecode unidecode = Unidecode.toAscii();
+			for(String uom_id:RunTimeUOMS.keySet()) {
+				UnitOfMeasure uom = RunTimeUOMS.get(uom_id);
+				if(text.equals(uom.getUom_name())){
+					return uom;
+				}
+				if(unidecode.decodeAndTrim(text).equals(unidecode.decodeAndTrim(uom.getUom_name()))) {
+					return uom;
+				}
+				if(unidecode.decodeAndTrim(text).toLowerCase().equals(unidecode.decodeAndTrim(uom.getUom_name()).toLowerCase())) {
+					return uom;
+				}
+				
+				if(text.equals(uom.getUom_symbol())){
+					return uom;
+				}
+				if(unidecode.decodeAndTrim(text).equals(unidecode.decodeAndTrim(uom.getUom_symbol()))) {
+					return uom;
+				}
+				if(unidecode.decodeAndTrim(text).toLowerCase().equals(unidecode.decodeAndTrim(uom.getUom_symbol()).toLowerCase())) {
+					return uom;
+				}
+				
+				
+			}
+		}
+		return null;
+	}
+	
+	
+	
+	public static boolean ConversionPathExists(UnitOfMeasure following_uom, ArrayList<String> allowedUoms) {
+		for(String allowed:allowedUoms) {
+			if(UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_base_id().equals(following_uom.getUom_base_id())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

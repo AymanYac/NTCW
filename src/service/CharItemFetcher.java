@@ -20,7 +20,6 @@ import model.ItemFetcherRow;
 import model.ObservableDeque;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.generic.Tools;
-import transversal.language_toolbox.WordUtils;
 
 public class CharItemFetcher {
 	
@@ -37,8 +36,6 @@ public class CharItemFetcher {
 	public HashMap<String, String> classifiedItems;
 	private HashMap<String, String> userID2Author;
 	public HashMap<String, String> ONLINE_LABELS = new HashMap<String,String>();
-	private List<String> dw_words;
-	private List<String> for_words;
 	private HashMap<String, ArrayList<String>> items_x_rules;
 	private Char_description parent;
 	
@@ -87,11 +84,6 @@ public class CharItemFetcher {
 	
 	private void fill_array(ArrayList<ItemFetcherRow> targetList) throws ClassNotFoundException, SQLException {
 		
-		for_words = Tools.get_project_for_words(active_project);
-		dw_words = Tools.get_project_dw_words(active_project);
-		
-		parent.proposer.for_words = for_words;
-		parent.proposer.dw_words = dw_words;
 		
 		Connection conn = Tools.spawn_connection();
 		Statement stmt = conn.createStatement();
@@ -179,23 +171,6 @@ public class CharItemFetcher {
 				}
 				
 				
-				String key;
-				if(tmp.getLong_description()!=null) {
-					key = tmp.getLong_description().split(" ")[0];
-				}else {
-					key = tmp.getShort_description().split(" ")[0];
-				}
-				String val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
-				parent.proposer.addClassifiedFW(key,val);
-				
-				
-				if(tmp.getMaterial_group()!=null) {
-					key = tmp.getMaterial_group();
-					val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
-					parent.proposer.addClassifiedMG(key,val);
-				}
-				
-				
 				
 				
 			}catch(Exception V) {
@@ -207,45 +182,6 @@ public class CharItemFetcher {
 			}
 			
 			
-			
-			String desc;
-			String key;
-			String val;
-			if(tmp.getLong_description()!=null) {
-				desc = tmp.getLong_description();
-				
-			}else {
-				desc = tmp.getShort_description();
-			}
-			
-			for(String fw:for_words) {
-				try {
-					key = desc.toUpperCase().split(fw.toUpperCase()+" ")[1];
-					key = WordUtils.getSearchWords(key);
-					tmp.addF1(key.split(" ")[0].toUpperCase());//#
-					tmp.addF1F2(key.toUpperCase());//#
-					val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
-					parent.proposer.addClassifiedFor(key,val);
-					
-				}catch(Exception V) {
-					continue;
-				}
-			}
-			
-			for(String dw:dw_words) {
-				try {
-						if(desc.toUpperCase().contains(dw.toUpperCase())){
-							tmp.setDWG(true);//#
-							val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
-							parent.proposer.addClassifiedDW(dw,val);
-							
-						}else {
-							continue;
-						}
-					}catch(Exception V) {
-					continue;
-				}
-			}
 			
 			
 			

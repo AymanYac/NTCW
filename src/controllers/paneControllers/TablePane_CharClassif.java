@@ -38,7 +38,6 @@ import model.ClassCharacteristic;
 import model.ClassificationMethods;
 import model.UserAccount;
 import service.CharAdvancementUpdater;
-import service.CharClassifProposer;
 import service.TableViewExtra;
 import service.Translator;
 import transversal.data_exchange_toolbox.QueryFormater;
@@ -662,12 +661,9 @@ public class TablePane_CharClassif {
 		this.user_language_gcode = user_language_gcode;
 	}
 
-	public void setParent(Char_description char_description,CharClassifProposer proposer) {
-		;
+	public void setParent(Char_description char_description) {
 		this.Parent=char_description;
-		;
-		proposer.setParent(char_description);
-		Parent.propose(proposer.propositions,null,null,null,null);
+		
 	}
 	/*
 	public List<ItemFetcherRow> fireRuleClassBlank(ArrayList<String> itemsToBlank) {
@@ -1432,7 +1428,6 @@ public class TablePane_CharClassif {
 		    	
 		    	int max_selected = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
 		    	CharDescriptionRow tmp = (CharDescriptionRow) tableGrid.getItems().get(max_selected);
-		    	Parent.proposer.loadPropositionsFor(tmp);
 		    	
 		    	
 		    	Parent.aidLabel.setText("Article ID: "+tmp.getClient_item_number());

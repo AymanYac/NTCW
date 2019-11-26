@@ -1799,25 +1799,18 @@ public class Auto_classification_progress {
 		    	Connection conn1 = Tools.spawn_connection();
 		    	Connection conn2 = Tools.spawn_connection();
 		    	//Connection conn2W = Tools.spawn_connection();
-		    	Connection conn3 = Tools.spawn_connection();
+		    	
 		    	
 		    	PreparedStatement ps1 = conn1.prepareStatement("update "+pid+".project_items set pre_classification = ? where item_id = ?");
 		    	PreparedStatement ps2 = conn2.prepareStatement("insert into "+pid+".project_classification_event(classification_event_id,item_id,segment_id,classification_method,rule_id,user_id,classification_date,classification_time) values (?,?,?,'"+ClassificationMethods.BINARY_CLASSIFICATION+"',?,'"+account.getUser_id()+"',?,clock_timestamp())");
 		    	//PreparedStatement ps2W = conn2W.prepareStatement("insert into administration.wal values (?, clock_timestamp())");
 		    	
-		    	PreparedStatement ps3 = conn3.prepareStatement("insert into "+pid+".project_items_x_rules values(?,?,?) on conflict(item_id,rule_id) do nothing");
 		    	ArrayList<DescriptionFetchRow> rws = DESCS.get(pid);
 	    		
-		    	HashMap<String, String> RULE2UUID = new HashMap<String,String>();
 		    	HashMap<String,String> CID2UUID = new HashMap<String,String>();
 		    	Connection conn4 = Tools.spawn_connection();
 		    	Statement st4 = conn4.createStatement();
-		    	ResultSet rs4 = st4.executeQuery("select distinct rule_id, rule_application_description_form from "+pid+".project_items_x_rules");
-		    	while(rs4.next()) {
-		    		RULE2UUID.put(rs4.getString("rule_id"), rs4.getString("rule_application_description_form"));
-		    	}
-		    	rs4.close();
-		    	rs4 = st4.executeQuery("select segment_id,level_"+binaryClassificationParameters.getClassif_granularity().toString()+"_number from "+pid+".project_segments");
+		    	ResultSet rs4 = st4.executeQuery("select segment_id,level_"+binaryClassificationParameters.getClassif_granularity().toString()+"_number from "+pid+".project_segments");
 		    	while(rs4.next()) {
 		    		CID2UUID.put(rs4.getString(2), rs4.getString("segment_id"));
 		    	}
@@ -1825,49 +1818,66 @@ public class Auto_classification_progress {
 		    	st4.close();
 		    	conn4.close();
 		    	
+		    	ArrayList<GenericRule> CLASSIFICATION_GRS = new ArrayList<GenericRule>();
+		    	ArrayList<GenericRule> PRECLASSIFICATION_GRS = new ArrayList<GenericRule>();
+		    	ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
+		    	
 		    	
 	    		for(DescriptionFetchRow rw:rws) {
 	    			
 	    			String aid = rw.getAid();
 	    			String classif_cid;
+	    			String classif_cname;
 	    			String classif_rule;
-	    			String classif_rule_id;
 	    			//String classif_acc;
 	    			//String classif_base;
 	    			
-	    			//String preclassif_cid;
+	    			String preclassif_cid;
 	    			String preclassif_cname;
-	    			//String preclassif_rule;
+	    			String preclassif_rule;
 	    			//String preclassif_acc;
 	    			//String preclassif_base;
 	    			
 	    			
 	    			if(ITEMS_DICO.containsKey(aid)) {
 	    				classif_cid= ITEMS_DICO.get(aid).get(1);  
-	    				//classif_cname= ITEMS_DICO.get(aid).get(2);  
+	    				classif_cname= ITEMS_DICO.get(aid).get(2);  
 	    				classif_rule= ITEMS_DICO.get(aid).get(3);
-	    				if(RULE2UUID.containsKey(classif_rule)) {
-	    					classif_rule_id = RULE2UUID.get(classif_rule);
-	    				}else {
-	    					classif_rule_id = Tools.generate_uuid();
-	    					RULE2UUID.put(classif_rule, classif_rule_id);
+	    				if(Math.random()>0.01) {
+	    					System.out.println(classif_rule);
 	    				}
+	    				GenericRule gr = new GenericRule();
+	    				try {
+	    					gr.setMain(classif_rule.split("MAIN=")[1].split("\\|")[0]);
+	    				}catch(Exception V) {
+	    					
+	    				}
+	    				try {
+	    					gr.setComp(classif_rule.split("\\|COMP=")[1].split("\\|")[0]);
+	    				}catch(Exception V) {
+	    					
+	    				}
+	    				gr.classif.set(0, CID2UUID.get(classif_cid));
+	    				gr.classif.set(1, classif_cid);
+	    				gr.classif.set(2, classif_cname);
+	    				CLASSIFICATION_GRS.add(gr);
+	    				String[] itemRule = new String [] {null,null};
+	    				itemRule[0] = rw.getAuid();
+	    				itemRule[1] = gr.toString();
+	    				itemRuleMap.add(itemRule);
+	    				
 	    				//classification_event_id,item_id,segment_id,rule_id,classification_date
 	    				String event_id = Tools.generate_uuid();
 	    				ps2.setString(1, event_id);
 	    				//ps2W.setString(1,event_id);
 	    				ps2.setString(2, rw.getAuid());
 	    				ps2.setString(3, CID2UUID.get(classif_cid) );
-	    				ps2.setString(4, classif_rule_id);
+	    				ps2.setString(4, gr.toString());
 	    				ps2.setDate(5, java.sql.Date.valueOf(LocalDate.now()));
 	    				ps2.addBatch();
 	    				//ps2W.addBatch();
 	    				
 	    				
-	    				ps3.setString(1, rw.getAuid());
-	    				ps3.setString(2, classif_rule_id);
-	    				ps3.setString(3, classif_rule);
-	    				ps3.addBatch();
 	    				
 	    				//ps2.setObject(5, new java.sql.Date(Calendar.geti));
 	    				//classif_acc= ITEMS_DICO.get(aid).get(4);  
@@ -1878,49 +1888,64 @@ public class Auto_classification_progress {
 	    			
 	    			
 	    			if(preclass_ITEMS_DICO.containsKey(aid)) {
-	    				//preclassif_cid= preclass_ITEMS_DICO.get(aid).get(1);  
+	    				preclassif_cid= preclass_ITEMS_DICO.get(aid).get(1);  
 	    				preclassif_cname= preclass_ITEMS_DICO.get(aid).get(2);
+	    				preclassif_rule = preclass_ITEMS_DICO.get(aid).get(3);
 	    				
 	    				ps1.setString(1, preclassif_cname);
 	    				ps1.setString(2, rw.getAuid());
-	    				if(Math.random()>0.999) {
-	    					;
-	    				}
 	    				ps1.addBatch();
 	    				
 	    				//preclassif_rule= preclass_ITEMS_DICO.get(aid).get(3);  
 	    				//preclassif_acc= preclass_ITEMS_DICO.get(aid).get(4);  
-	    				//preclassif_base= preclass_ITEMS_DICO.get(aid).get(5);  
+	    				//preclassif_base= preclass_ITEMS_DICO.get(aid).get(5);
+	    				
+	    				
+	    				GenericRule gr = new GenericRule();
+	    				try {
+	    					gr.setMain(preclassif_rule.split("MAIN=")[1].split("\\|")[0]);
+	    				}catch(Exception V) {
+	    					
+	    				}
+	    				try {
+	    					gr.setComp(preclassif_rule.split("\\|COMP=")[1].split("\\|")[0]);
+	    				}catch(Exception V) {
+	    					
+	    				}
+	    				gr.classif.set(0, CID2UUID.get(preclassif_cid));
+	    				gr.classif.set(1, preclassif_cid);
+	    				gr.classif.set(2, preclassif_cname);
+	    				PRECLASSIFICATION_GRS.add(gr);
+	    				String[] itemRule = new String [] {null,null};
+	    				itemRule[0] = rw.getAuid();
+	    				itemRule[1] = gr.toString();
+	    				itemRuleMap.add(itemRule);
 	    			}
-	    			
-	    			
 	    			
 	    			
 	    			
 	    		}
 	    		
+	    		Tools.StoreAutoRules(account,CLASSIFICATION_GRS,itemRuleMap,true,ClassificationMethods.BINARY_CLASSIFICATION);
+    			Tools.StoreAutoRules(account,PRECLASSIFICATION_GRS,itemRuleMap,false,ClassificationMethods.BINARY_CLASSIFICATION);
+    			
 	    		ps2.executeBatch();
 	    		//ps2W.executeBatch();
-	    		ps3.executeBatch();
 	    		ps1.executeBatch();
 		    	;
 		    	ps1.clearBatch();
 		    	ps2.clearBatch();
 		    	//ps2W.clearBatch();
-		    	ps3.clearBatch();
 		    	
 		    	ps1.close();
 		    	ps2.close();
 		    	//ps2W.close();
-		    	ps3.close();
 		    	
 		    	conn1.close();
 		    	conn2.close();
 		    	//conn2W.close();
-		    	conn3.close();
 		    	  	
 		    	CID2UUID = null;
-		    	RULE2UUID = null;
 		    	
 		    	return null;
 		    }
@@ -3167,7 +3192,10 @@ public class Auto_classification_progress {
 					MF = cid;
 					MFNAME = preclass_CLASSIFICATION_RULES.get(rule).get(cid).get(1);
 				}
-				
+				if(Math.random()<0.0001) {
+					System.out.println(rule);
+					System.out.println(preclass_CLASSIFICATION_RULES.get(rule));
+				}
 			}
 			if(rule.contains("|COMP=")) {
 				tmp.put("Type",String.valueOf(this.binaryClassificationParameters.getPreclassif_typeFactor()));
@@ -3178,18 +3206,24 @@ public class Auto_classification_progress {
 			tmp.put("MF",MF);
 			tmp.put("Accuracy", String.valueOf((1.0*max)/total));
 			tmp.put("MFNAME",MFNAME);
-			TMP.put(rule, tmp);
+			if(total>=this.binaryClassificationParameters.getPreclassif_Tb()
+					&& ((1.0*max)/total)*100.0>=this.binaryClassificationParameters.getPreclassif_Ta()) {
+				TMP.put(rule, tmp);
+			}else {
+				//The rule failed the required minimum
+			}
 			update_preclassif_progress();
 			preclass_rule_set_progress.setProgress(preclass_rule_set_progress.getProgress()+(1.0)/preclass_CLASSIFICATION_RULES.size());
 			preclass_rule_gen_progress.setProgress(preclass_rule_gen_progress.getProgress()+( 1.0/ (0.2 * preclass_ref_desc_cardinality * preclass_CLASSIFICATION_RULES.size() )));
 			}
+		preclass_CLASSIFICATION_RULES.clear();
 		preclass_CLASSIFICATION_RULES = null;
 		preclass_CLASSIFICATION_RULES_AGGREGATED = TMP;
 		TMP = null;
 		
 		tm.stopRow(23);
 		tm.stopRow(21);
-		
+		System.out.println(preclass_CLASSIFICATION_RULES_AGGREGATED.size());
 		
 	}
 
@@ -3293,18 +3327,23 @@ public class Auto_classification_progress {
 			tmp.put("MF",MF);
 			tmp.put("MFNAME",MFNAME);
 			tmp.put("Accuracy", String.valueOf((1.0*max)/total));
-			
-			TMP.put(rule, tmp);
+			if(total>=this.binaryClassificationParameters.getClassif_Tb()
+					&& ((1.0*max)/total)*100.0>=this.binaryClassificationParameters.getClassif_Ta()) {
+				TMP.put(rule, tmp);
+			}else {
+				//The rule failed the required minimum
+			}
 			update_classif_progress();
 			rule_set_progress.setProgress(rule_set_progress.getProgress()+(1.0)/CLASSIFICATION_RULES.size());
 			rule_gen_progress.setProgress(rule_gen_progress.getProgress()+( 1.0 / (0.2 * ref_desc_cardinality * CLASSIFICATION_RULES.size() )));
 		}
+		CLASSIFICATION_RULES.clear();
 		CLASSIFICATION_RULES = null;
 		CLASSIFICATION_RULES_AGGREGATED = TMP;
 		TMP = null;
 		tm.stopRow(9);
 		tm.stopRow(7);
-		
+		System.out.println(CLASSIFICATION_RULES_AGGREGATED.size());
 		
 	}
 	
@@ -3751,18 +3790,7 @@ public class Auto_classification_progress {
 				tmp.add(score.toString());
 				tmp.add(preclass_CLASSIFICATION_RULES_AGGREGATED.get(rule).get("MF"));
 				tmp.add(preclass_CLASSIFICATION_RULES_AGGREGATED.get(rule).get("MFNAME"));
-				GenericRule temp = new GenericRule();
-				try {
-					temp.setMain(rule.split("MAIN=")[1].split("\\|")[0]);
-				}catch(Exception V) {
-					
-				}
-				try {
-					temp.setComp(rule.split("\\|COMP=")[1].split("\\|")[0]);
-				}catch(Exception V) {
-					
-				}
-				tmp.add(temp.toString());
+				tmp.add(rule);
 				tmp.add(preclass_CLASSIFICATION_RULES_AGGREGATED.get(rule).get("Accuracy"));
 				tmp.add(preclass_CLASSIFICATION_RULES_AGGREGATED.get(rule).get("Total"));
 				
@@ -3773,18 +3801,7 @@ public class Auto_classification_progress {
 			tmp.add(score.toString());
 			tmp.add(preclass_CLASSIFICATION_RULES_AGGREGATED.get(rule).get("MF"));
 			tmp.add(preclass_CLASSIFICATION_RULES_AGGREGATED.get(rule).get("MFNAME"));
-			GenericRule temp = new GenericRule();
-			try {
-				temp.setMain(rule.split("MAIN=")[1].split("\\|")[0]);
-			}catch(Exception V) {
-				
-			}
-			try {
-				temp.setComp(rule.split("\\|COMP=")[1].split("\\|")[0]);
-			}catch(Exception V) {
-				
-			}
-			tmp.add(temp.toString());
+			tmp.add(rule);
 			tmp.add(preclass_CLASSIFICATION_RULES_AGGREGATED.get(rule).get("Accuracy"));
 			tmp.add(preclass_CLASSIFICATION_RULES_AGGREGATED.get(rule).get("Total"));
 			
@@ -3809,18 +3826,7 @@ public class Auto_classification_progress {
 				tmp.add(score.toString());
 				tmp.add(CLASSIFICATION_RULES_AGGREGATED.get(rule).get("MF"));
 				tmp.add(CLASSIFICATION_RULES_AGGREGATED.get(rule).get("MFNAME"));
-				GenericRule temp = new GenericRule();
-				try {
-					temp.setMain(rule.split("MAIN=")[1].split("\\|")[0]);
-				}catch(Exception V) {
-					
-				}
-				try {
-					temp.setComp(rule.split("\\|COMP=")[1].split("\\|")[0]);
-				}catch(Exception V) {
-					
-				}
-				tmp.add(temp.toString());
+				tmp.add(rule);
 				tmp.add(CLASSIFICATION_RULES_AGGREGATED.get(rule).get("Accuracy"));
 				tmp.add(CLASSIFICATION_RULES_AGGREGATED.get(rule).get("Total"));
 				
@@ -3831,18 +3837,7 @@ public class Auto_classification_progress {
 			tmp.add(score.toString());
 			tmp.add(CLASSIFICATION_RULES_AGGREGATED.get(rule).get("MF"));
 			tmp.add(CLASSIFICATION_RULES_AGGREGATED.get(rule).get("MFNAME"));
-			GenericRule temp = new GenericRule();
-			try {
-				temp.setMain(rule.split("MAIN=")[1].split("\\|")[0]);
-			}catch(Exception V) {
-				
-			}
-			try {
-				temp.setComp(rule.split("\\|COMP=")[1].split("\\|")[0]);
-			}catch(Exception V) {
-				
-			}
-			tmp.add(temp.toString());
+			tmp.add(rule);
 			tmp.add(CLASSIFICATION_RULES_AGGREGATED.get(rule).get("Accuracy"));
 			tmp.add(CLASSIFICATION_RULES_AGGREGATED.get(rule).get("Total"));
 			ITEMS_DICO.put(aid, tmp);

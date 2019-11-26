@@ -19,7 +19,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -61,19 +60,17 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import model.GlobalConstants;
-import model.CharClassProposition;
+import model.UnitOfMeasure;
 import model.AutoCompleteBox_CharClassification;
 import model.AutoCompleteBox_UnitOfMeasure;
 import model.CharDescClassComboRow;
 import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
-import model.UnitOfMeasure;
 import model.UserAccount;
-import service.CharClassifContext;
-import service.CharClassifProposer;
 import service.CharPatternServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
+import transversal.dialog_toolbox.UoMDeclarationDialog;
 import transversal.generic.Tools;
 
 public class Char_description {
@@ -161,19 +158,6 @@ public class Char_description {
 	
 	public ArrayList<Button> propButtons;
 	
-	
-	
-
-	public CharClassifProposer proposer;
-
-
-	public CharClassProposition lcProp;
-
-
-	public CharClassProposition pcProp;
-
-
-	public CharClassifContext context;
 
 
 	private String lastRightPane="";
@@ -183,7 +167,6 @@ public class Char_description {
 
 
 	public ArrayList<String> CNAME_CID;
-	public HashMap<String, UnitOfMeasure> UOMS;
 	private CharPane_CharClassif charPaneController;
 
 
@@ -448,8 +431,6 @@ public class Char_description {
 		
 		toolBarButtonListener();
 		initializePropButtons();
-		this.context = new CharClassifContext();
-		context.setParent(this);
 		
 	}
 	
@@ -705,9 +686,8 @@ public class Char_description {
 		
 		
 		//this.UOMS = Tools.get_units_of_measures(user_language_gcode);
-		this.UOMS = Tools.get_units_of_measures("en");
+		UnitOfMeasure.RunTimeUOMS = UnitOfMeasure.get_units_of_measures("en");
 		
-		this.proposer = new CharClassifProposer(account.getActive_project());
 		//classification tmp.setNew_segment_name( CID2NAME,j,parent_controller);
 		classification = new AutoCompleteBox_CharClassification(this,classification_style.getStyle(),account);
 		for( String entry : CNAME_CID) {
@@ -718,7 +698,6 @@ public class Char_description {
 		classification_style.setVisible(false);
 		grid.add(classification, 1, 9);
 		grid.add(uom_field, 5, 9);
-		this.context.CID2NAME = CNAME_CID;
 		
 		
 		load_table_pane();
@@ -790,7 +769,7 @@ public class Char_description {
 		leftAnchor.setLeftAnchor(tableGrid, 0.0);
 		leftAnchor.setRightAnchor(tableGrid, 0.0);
 		
-		tableController.setParent(this,proposer);
+		tableController.setParent(this);
 		tableController.setUserAccount(account);
 		
 		tableController.setUserLanguageGcode(user_language_gcode);
@@ -959,98 +938,21 @@ public class Char_description {
 
 	
 	@FXML void context1() throws IOException {
-		this.context.showContext(prop1,0);
+		
 	}
 	@FXML void context2() throws IOException {
-		this.context.showContext(prop2,1);
+		
 		}
 	@FXML void context3() throws IOException {
-		this.context.showContext(prop3,2);
+		
 	}
 	@FXML void context4() throws IOException {
-		this.context.showContext(prop4,3);
+		
 	}
 	@FXML void context5() throws IOException {
-		this.context.showContext(prop5,4);
-	}
-	public void propose(ArrayList<CharClassProposition> propositions, CharClassProposition pc, CharClassProposition lc, CharClassProposition mg, CharClassProposition f5) {
-		
-		this.pcProp = pc;
-		this.lcProp = lc;
-		
-		if(pcProp!=null) {
-			//pcLabel.setText("Pre-classification (Ctrl+Q)");
-		}else {
-			//pcLabel.setText("Pre-classification");
-		}
-		if(lcProp!=null) {
-			//lcLabel.setText("Classification suggestions [ (Ctrl+W) for last used class ] :");
-		}else {
-			//lcLabel.setText("Classification suggestions");
-		}
-		
-		try {
-			Iterator<CharClassProposition> itr = propositions.iterator();
-			for(int i=0;i<GlobalConstants.NUMBER_OF_MANUAL_PROPOSITIONS_OLD;i++) {
-				Button button = propButtons.get(i);
-				button.setVisible(true);
-				if(itr.hasNext()) {
-					CharClassProposition prop = itr.next();
-					context.assignRecommendation(button,prop);
-				}else {
-					context.disableButton(button);
-				}
-			}
-		}catch(Exception V) {
-			for(int i=0;i<GlobalConstants.NUMBER_OF_MANUAL_PROPOSITIONS_OLD;i++) {
-				Button button = propButtons.get(i);
-				context.disableButton(button);
-			}
-		}
-		
-		try {
-			int i=3;
-			Button button = propButtons.get(i);
-			button.setVisible(true);
-			if(mg!=null) {
-				CharClassProposition prop = mg;
-				button.setText(prop.getSegment_name());
-				button.setOpacity(1.0);
-				button.setOnAction((event) -> {
-					  fireClassChange(prop.getSegment_id()+"&&&"+prop.getSegment_name());
-				});
-			}else {
-				context.disableButton(button);
-			}
-			
-		}catch(Exception V) {
-			V.printStackTrace(System.err);
-			propButtons.get(3).setVisible(false);
-			context.disableButton(propButtons.get(3));
-		}
-		
-		try {
-			int i=4;
-			Button button = propButtons.get(i);
-			button.setVisible(true);
-			if(f5!=null) {
-				CharClassProposition prop = f5;
-				button.setText(prop.getSegment_name());
-				button.setOpacity(1.0);
-				button.setOnAction((event) -> {
-					  fireClassChange(prop.getSegment_id()+"&&&"+prop.getSegment_name());
-				});
-			}else {
-				context.disableButton(button);
-			}
-			
-		}catch(Exception V) {
-			V.printStackTrace(System.err);
-			context.disableButton(propButtons.get(4));
-		}
-		
 		
 	}
+
 	public void fireProposition(int i) {
 		;
 		try {
@@ -1079,7 +981,7 @@ public class Char_description {
 				if( (active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0)) {
 					//Add the allowed uoms to the autocomplete box
 					for(String uom_id:active_char.getAllowedUoms()) {
-						this.uom_field.getEntries().add(UOMS.get(uom_id));
+						this.uom_field.getEntries().add(UnitOfMeasure.RunTimeUOMS.get(uom_id));
 					}
 					
 					
@@ -1096,7 +998,7 @@ public class Char_description {
 					custom_label_11.setText("Measure unit");
 					custom_label_11.setVisible(true);
 					try{
-						uom_field.setText(UOMS.get( row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUom_id() ).getUom_symbol());
+						uom_field.setText(UnitOfMeasure.RunTimeUOMS.get( row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUom_id() ).getUom_symbol());
 					}catch(Exception V) {
 						
 					}
@@ -1316,16 +1218,64 @@ public class Char_description {
 		translated_value_field.setText("");
 		
 	}
-	public void sendPatternValue(CharacteristicValue known_value) {
-		value_field.setText(known_value.getDataLanguageValue());
-		try {
-			translated_value_field.setText(known_value.getUserLanguageValue());
-		}catch(Exception V) {
-			translated_value_field.setText("");
+	public void sendPatternValue(CharacteristicValue pattern_value) {
+		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+		ClassCharacteristic active_char = this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
+		.get(active_char_index);
+		
+		if(active_char.getIsNumeric()) {
+			if(active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0) {
+				try {
+					uom_field.setText(UnitOfMeasure.RunTimeUOMS.get(pattern_value.getUom_id()).getUom_symbol());
+				}catch(Exception V) {
+					
+				}
+				try {
+					min_field_uom.setText(pattern_value.getMin_value());
+				}catch(Exception V) {
+					
+				}
+				try {
+					max_field_uom.setText(pattern_value.getMax_value());
+				}catch(Exception V) {
+					
+				}
+				try {
+					value_field.setText(pattern_value.getNominal_value());
+				}catch(Exception V) {
+					
+				}
+			}
+			
+		}else {
+			value_field.setText(pattern_value.getDataLanguageValue());
+			try {
+				translated_value_field.setText(pattern_value.getUserLanguageValue());
+			}catch(Exception V) {
+				translated_value_field.setText("");
+			}
 		}
+		
 	}
 	public void sendPatternRule(String string) {
 		rule_field.setText(string);
+	}
+	public void preparePatternProposition(int i, String buttonText, CharacteristicValue preparedValue,
+			String preparedRule, ClassCharacteristic active_char) {
+		Button btn = this.propButtons.get(i);
+		btn.setText(buttonText);
+		btn.setOpacity(1.0);
+		btn.setOnAction((event) -> {
+			if(preparedValue.getUom_id()!=null && !UnitOfMeasure.RunTimeUOMS.containsKey(preparedValue.getUom_id())) {
+				//Launch UoM Declaration box
+				UoMDeclarationDialog.UomDeclarationPopUp(this,buttonText, preparedValue,preparedRule,active_char);
+				
+			}else {
+				this.sendPatternRule(preparedRule);
+				this.sendPatternValue(preparedValue);
+			}
+			
+		});
 	}
 	
 }

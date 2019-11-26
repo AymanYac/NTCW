@@ -914,6 +914,7 @@ public class Manual_classif {
 	private void load_browser_pane() throws IOException {
 		googleButton.setSelected(true);
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/Browser_ManualClassif.fxml"));
+		loader.load();
 		browserController = loader.getController();
 		browserController.setParent(this);
 	}

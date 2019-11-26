@@ -154,8 +154,10 @@ public class QueryFormater {
 		methods = new ArrayList<String>();
 		methods.add(ClassificationMethods.PROJECT_SETUP_UPLOAD);
 		methods.add(ClassificationMethods.USER_RULE);
+		methods.add(ClassificationMethods.BINARY_CLASSIFICATION);
 		acceptBlanks = new ArrayList<Boolean>();
 		acceptBlanks.add(true);
+		acceptBlanks.add(false);
 		acceptBlanks.add(false);
 		
 		rs =st.executeQuery(QueryFormater.ManualFetchLatestClassifiedItems(projectGranularity, active_project,methods,acceptBlanks)
