@@ -328,12 +328,18 @@ public class ItemFetcherRow {
 		return rule_id_Rules;
 	}
 	public void setRule_id_Rules(String rule_id_Rules) {
+		if(rule_id_Rules!=null && rule_id_Rules.equals("null")) {
+			return;
+		}
 		this.rule_id_Rules = rule_id_Rules;
 	}
 	public String getRule_description_Rules() {
 		return rule_description_Rules;
 	}
 	public void setRule_description_Rules(String rule_description_Rules) {
+		if(rule_description_Rules!=null && rule_description_Rules.equals("null")) {
+			return;
+		}
 		this.rule_description_Rules = rule_description_Rules;
 	}
 	public String getAuthor_Rules() {

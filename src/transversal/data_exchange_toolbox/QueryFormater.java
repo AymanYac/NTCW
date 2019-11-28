@@ -31,16 +31,16 @@ public class QueryFormater {
 		}
 		System.out.println("!!");
 		System.out.println("select EVENTS.item_id,level_"+projectGranularity+"_number,level_"+projectGranularity+"_name_translated,"
-				+ " EVENTS.classification_method,EVENTS.user_id,EVENTS.segment_id from ( "
-				+ "SELECT item_id,classification_method,user_id,segment_id FROM ( "
+				+ " EVENTS.classification_method,EVENTS.user_id,EVENTS.segment_id,EVENTS.rule_id from ( "
+				+ "SELECT item_id,classification_method,user_id,segment_id,rule_id FROM ( "
 				+ "SELECT DISTINCT ON (item_id) * FROM "+projectID+".project_classification_event"
 				+ " "+conditionStatement+" ORDER BY item_id, classification_time DESC ) tmp ORDER BY classification_time DESC) "
 				+ " as EVENTS inner join "+projectID+".project_segments on"
 						+ " project_segments.segment_id = EVENTS.segment_id");
 		
 		return "select EVENTS.item_id,level_"+projectGranularity+"_number,level_"+projectGranularity+"_name_translated,"
-				+ " EVENTS.classification_method,EVENTS.user_id,EVENTS.segment_id from ( "
-				+ "SELECT item_id,classification_method,user_id,segment_id FROM ( "
+				+ " EVENTS.classification_method,EVENTS.user_id,EVENTS.segment_id,EVENTS.rule_id from ( "
+				+ "SELECT item_id,classification_method,user_id,segment_id,rule_id FROM ( "
 				+ "SELECT DISTINCT ON (item_id) * FROM "+projectID+".project_classification_event"
 				+ " "+conditionStatement+" ORDER BY item_id, classification_time DESC ) tmp ORDER BY classification_time DESC) "
 				+ " as EVENTS inner join "+projectID+".project_segments on"
@@ -168,7 +168,7 @@ public class QueryFormater {
 				if(rs.getString(2)!=null && !classifiedItems.containsKey( rs.getString("item_id") )) {
 					//2 : level_granularity_number
 					//3 : level_granularity_name_translated
-					classifiedItems.put(rs.getString("item_id"), rs.getString(2)+"&&&"+rs.getString(3)+"&&&"+rs.getString("classification_method")+"&&&"+rs.getString("user_id")+"&&&"+rs.getString("segment_id"));
+					classifiedItems.put(rs.getString("item_id"), rs.getString(2)+"&&&"+rs.getString(3)+"&&&"+rs.getString("classification_method")+"&&&"+rs.getString("user_id")+"&&&"+rs.getString("segment_id")+"&&&"+rs.getString("rule_id"));
 				}
 				
 		}

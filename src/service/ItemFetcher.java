@@ -176,6 +176,8 @@ public class ItemFetcher {
 					tmp.setRule_Segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
 					tmp.setSource_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
 					tmp.setAuthor_Rules(userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
+					tmp.setRule_id_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[5]);
+					tmp.setRule_description_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[5]);
 					QueryFormater.ADD_UPLOAD_ITEM_CLASS(tmp, projectGranularity, active_project);
 				}
 				

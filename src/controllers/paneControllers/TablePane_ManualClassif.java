@@ -679,6 +679,7 @@ public class TablePane_ManualClassif {
 		for( Object row : tableGrid.getItems() ) {
 			
 			if( itemsToBlank.contains( ((ItemFetcherRow)row).getItem_id()) ) {
+				System.out.println("blanking "+((ItemFetcherRow)row).getClient_item_number());
 					((ItemFetcherRow)row).setReviewer_Rules(null);
 					//((ItemFetcherRow)row).setNew_segment_id(null);
 					//((ItemFetcherRow)row).setNew_segment_name(null);
@@ -719,7 +720,8 @@ public class TablePane_ManualClassif {
 						UUID2CID = Tools.UUID2CID(account.getActive_project());
 					}
 					((ItemFetcherRow)row).setRule_Segment_number(UUID2CID.get(gr.classif.get(1)));
-					
+					((ItemFetcherRow)row).setRule_description_Rules(gr.toString());
+					((ItemFetcherRow)row).setRule_id_Rules((gr.toString()));
 				}catch(Exception V) {
 					V.printStackTrace(System.err);
 					//((ItemFetcherRow)row).setNew_segment_id(null);
@@ -727,9 +729,12 @@ public class TablePane_ManualClassif {
 					((ItemFetcherRow)row).setRule_Segment_id(null);
 					((ItemFetcherRow)row).setRule_Segment_name(null);
 					((ItemFetcherRow)row).setRule_Segment_number(null);
+					((ItemFetcherRow)row).setRule_description_Rules(null);
+					((ItemFetcherRow)row).setRule_id_Rules(null);
+					
 				}
 				((ItemFetcherRow)row).setSource_Rules(ClassificationMethods.USER_RULE);
-				((ItemFetcherRow)row).setRule_description_Rules(gr.toString());
+				
 				
 				//Add items to the list to be pushed in the database
 				
