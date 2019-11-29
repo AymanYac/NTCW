@@ -1007,7 +1007,7 @@ public class TablePane_CharClassif {
 	private  List<String> getActiveItemsID(String active_class) throws ClassNotFoundException, SQLException {
 		String joinStatement = "";
 		HashMap<String, String> classifiedItems = QueryFormater.FETCH_ITEM_CLASSES_WITH_UPLOAD_PRIORITY(joinStatement,Tools.get_project_granularity(account.getActive_project()),account.getActive_project());
-		List<String> classItems = classifiedItems.entrySet().stream().filter(m->m.getValue().endsWith(active_class)).map(Entry::getKey).collect(Collectors.toList());
+		List<String> classItems = classifiedItems.entrySet().stream().filter(m->m.getValue().contains(active_class)).map(Entry::getKey).collect(Collectors.toList());
 		return classItems;
 	}
 	

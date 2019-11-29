@@ -7,10 +7,9 @@ import java.util.stream.Collectors;
 
 import controllers.Char_description;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -26,23 +25,14 @@ import transversal.generic.Tools;
 public class UoMDeclarationDialog {
 	
 	
-	public static void show(String title, String header, String ok) {
-		Alert alert = null;
-		if(title.contains("failed")) {
-			alert =new Alert(AlertType.ERROR);
-		}else {
-			alert =new Alert(AlertType.INFORMATION);
-		}
-		alert.setTitle(title);
-		alert.setHeaderText(header);
-		
-		ButtonType yesButton = new ButtonType(ok);
-		
-        alert.getButtonTypes().setAll(yesButton);
 	
-		alert.showAndWait();
-		
-	}
+	private static TextField uomName;
+	private static TextField uomSymbol;
+	private static TextField uomAlt;
+	private static TextField uomMultiplier;
+	private static ComboBox<UomClassComboRow> uomChoice;
+	private static GridPane grid;
+	private static Node validationButton;
 
 	public static void UomConversionPopUp(UnitOfMeasure following_uom, ArrayList<String> allowedUoms,
 			Char_description parent) {
@@ -76,90 +66,29 @@ public class UoMDeclarationDialog {
 		dialog.getDialogPane().getButtonTypes().addAll(validateButtonType, ButtonType.CANCEL);
 
 		// Create the  uom labels and fields.
-		GridPane grid = new GridPane();
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(20, 150, 10, 10));
 
-		TextField uomName = new TextField();
-		uomName.setPromptText("");
-		TextField uomSymbol = new TextField();
-		uomSymbol.setText(proposedUomSymbol);
-		TextField uomAlt = new TextField();
-		TextField uomMultiplier = new TextField();
-		uomMultiplier.setPromptText("");
-		ComboBox<UomClassComboRow> uomChoice = new ComboBox<UomClassComboRow>();
-		uomChoice.getItems().addAll(UnitOfMeasure.RunTimeUOMS.values().stream()
-				.filter(u -> UnitOfMeasure.ConversionPathExists(u, active_char.getAllowedUoms()))
-				.map(u->new UomClassComboRow(u)).collect(Collectors.toList()));
-		
-		grid.add(new Label("Unit's name (in english):"), 0, 0);
-		grid.add(uomName, 1, 0);
-		grid.add(new Label("Unit's display symbol"), 0, 1);
-		grid.add(uomSymbol, 1, 1);
-		grid.add(new Label("Unit's alternative writings, separate with \",\":"), 0, 2);
-		grid.add(uomAlt, 1, 2);
-		grid.add(new Label("Unit's multiplier: "), 0, 3);
-		grid.add(uomMultiplier, 1, 3);
-		grid.add(new Label("Unit's base"), 0, 4);
-		grid.add(uomChoice, 1, 4);
-		uomChoice.getSelectionModel().select(0);
-		
-		
-		// Enable/Disable validation button depending on whether all fields were entered.
-		Node validationButton = dialog.getDialogPane().lookupButton(validateButtonType);
-		validationButton.setDisable(true);
+		grid = new GridPane();
+		uomName = new TextField();
+		uomSymbol = new TextField();
+		uomAlt = new TextField();
+		uomMultiplier = new TextField();
+		uomChoice = new ComboBox<UomClassComboRow>();
 
-		// Do some validation (using the Java 8 lambda syntax).
-		uomName.textProperty().addListener((observable, oldValue, newValue) -> {
-			try {
-				Double.valueOf(uomMultiplier.getText().replace(",", "."));
-			}catch(Exception V) {
-			    validationButton.setDisable(true);
-			    return;
-			}
-			validationButton.setDisable(uomName.getText().trim().isEmpty() || uomSymbol.getText().split(",")[0].trim().isEmpty());
-		});
-		uomSymbol.textProperty().addListener((observable, oldValue, newValue) -> {
-			try {
-				Double.valueOf(uomMultiplier.getText().replace(",", "."));
-			}catch(Exception V) {
-			    validationButton.setDisable(true);
-			    return;
-			}
-			validationButton.setDisable(uomName.getText().trim().isEmpty() || uomSymbol.getText().split(",")[0].trim().isEmpty());
-		});
-		uomMultiplier.textProperty().addListener((observable, oldValue, newValue) -> {
-			try {
-				Double.valueOf(uomMultiplier.getText().replace(",", "."));
-			}catch(Exception V) {
-			    validationButton.setDisable(true);
-			    return;
-			}
-			validationButton.setDisable(uomName.getText().trim().isEmpty() || uomSymbol.getText().split(",")[0].trim().isEmpty());
-		});
+		clear_fields(proposedUomSymbol, active_char);
+		
+		setFieldListeners(dialog,validateButtonType, proposedUomSymbol, active_char);
 		
 		
-		
-		
-
 		dialog.getDialogPane().setContent(grid);
 
-		// Request focus on the username field by default.
-		Platform.runLater(() -> uomName.requestFocus());
-
-		// Convert the result to a username-password-pair when the login button is clicked.
+		// Request focus on the multiplier field by default.
+		Platform.runLater(() -> uomMultiplier.requestFocus());
+		
+		
+		// Convert the result to a uom when the store button is clicked.
 		dialog.setResultConverter(dialogButton -> {
 		    if (dialogButton == validateButtonType) {
-		    	UnitOfMeasure newUom = new UnitOfMeasure();
-		    	newUom.setUom_id(Tools.generate_uuid());
-		    	newUom.setUom_name(uomName.getText());
-		    	newUom.setUom_symbols(uomSymbol.getText().split(","));
-		    	newUom.setUom_base_id(uomChoice.getSelectionModel().getSelectedItem().getUnitOfMeasure().getUom_base_id());
-		    	newUom.setUom_multiplier(uomChoice.getSelectionModel().getSelectedItem().getUnitOfMeasure()
-		    			.getUom_multiplier().multiply(
-		    			new BigDecimal(Double.valueOf(uomMultiplier.getText().replace(",", ".")))).toString());
-		        return newUom;
+		    	return createUomfromField();
 		    }
 		    return null;
 		});
@@ -175,6 +104,148 @@ public class UoMDeclarationDialog {
 		});
 		
 		
+	}
+
+	private static void setFieldListeners(Dialog<UnitOfMeasure> dialog, ButtonType validateButtonType,String proposedUomSymbol,ClassCharacteristic active_char) {
+		// Enable/Disable validation button depending on whether all fields were entered.
+		validationButton = dialog.getDialogPane().lookupButton(validateButtonType);
+		validationButton.setDisable(true);
+
+		// Do some validation (using the Java 8 lambda syntax).
+		uomName.textProperty().addListener((observable, oldValue, newValue) -> {
+			check_validation_disable();
+			});
+		uomSymbol.textProperty().addListener((observable, oldValue, newValue) -> {
+			check_validation_disable();
+			});
+		uomMultiplier.textProperty().addListener((observable, oldValue, newValue) -> {
+			check_validation_disable();
+			});
+		
+		uomMultiplier.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+		    focusState(newValue, proposedUomSymbol, active_char, dialog, validateButtonType);
+		});
+
+		
+	}
+
+	private static void focusState(Boolean uomMultiplierInFocus, String proposedUomSymbol, ClassCharacteristic active_char, Dialog<UnitOfMeasure> dialog, ButtonType validateButtonType) {
+		if (uomMultiplierInFocus) {
+	        System.out.println("Focus Gained");
+	    }
+	    else {
+	        System.out.println("Focus Lost");
+	        try {
+				double inputMultiplier = Double.valueOf(uomMultiplier.getText().replace(",", "."));
+				UnitOfMeasure inputBaseUom = uomChoice.getValue().getUnitOfMeasure();
+				double inputMultiplierToBase = inputMultiplier * inputBaseUom.getUom_multiplier().doubleValue();
+				UnitOfMeasure matchedUom = UnitOfMeasure.CheckIfMultiplierIsKnown(inputMultiplierToBase,inputBaseUom.getUom_base_id());
+				if(matchedUom!=null) {
+					//Matched uom
+					fill_fields(matchedUom,proposedUomSymbol);
+				}else {
+					//No uom match
+					clear_fields(proposedUomSymbol, active_char);
+				}
+			}catch(Exception V) {
+				try {
+					double inputMultiplier = Double.valueOf(uomMultiplier.getText().replace(",", ".").split("/")[0])/
+					Double.valueOf(uomMultiplier.getText().replace(",", ".").split("/")[1]);
+					UnitOfMeasure inputBaseUom = uomChoice.getValue().getUnitOfMeasure();
+					double inputMultiplierToBase = inputMultiplier * inputBaseUom.getUom_multiplier().doubleValue();
+					UnitOfMeasure matchedUom = UnitOfMeasure.CheckIfMultiplierIsKnown(inputMultiplierToBase,inputBaseUom.getUom_base_id());
+					if(matchedUom!=null) {
+						//Matched uom
+						fill_fields(matchedUom,proposedUomSymbol);
+					}else {
+						//No uom match
+						clear_fields(proposedUomSymbol, active_char);
+					}
+				}catch(Exception G) {
+					
+				}
+			}
+	    }
+	}
+
+	private static void fill_fields(UnitOfMeasure matchedUom,String proposedUomSymbol) {
+		uomName.setText(matchedUom.getUom_name());
+		uomSymbol.setText(matchedUom.getUom_symbol());
+		uomAlt.setText(matchedUom.getUom_name()+","+String.join(",", matchedUom.getUom_symbols())+","+proposedUomSymbol);
+		//uomMultiplier.setText(String.valueOf( matchedUom.getUom_multiplier().doubleValue() ));
+		uomMultiplier.setText("1.0");
+		for(int i=0;i<uomChoice.getItems().size();i++) {
+			if( uomChoice.getItems().get(i).getUnitOfMeasure().getUom_id().equals(matchedUom.getUom_id()) ) {
+				uomChoice.getSelectionModel().select(i);
+				return;
+			}
+		}
+	}
+
+	private static void clear_fields(String proposedUomSymbol,ClassCharacteristic active_char) {
+		System.out.println("clearing fields");
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(20, 150, 10, 10));
+		
+		uomName.setText("");
+		uomSymbol.setText(proposedUomSymbol);
+		uomMultiplier.setText("");
+		uomChoice.getItems().addAll(UnitOfMeasure.RunTimeUOMS.values().stream()
+				.filter(u -> UnitOfMeasure.ConversionPathExists(u, active_char.getAllowedUoms()))
+				.map(u->new UomClassComboRow(u)).collect(Collectors.toList()));
+		uomAlt.setText("");
+		
+		grid.getChildren().clear();
+		grid.add(new Label("1 "+proposedUomSymbol+" ="), 0, 0);
+		grid.add(uomMultiplier, 1, 0);
+		grid.add(uomChoice, 2, 0);
+		
+		grid.add(new Label("Unit's symbol"), 0, 1);
+		grid.add(uomSymbol, 1, 1);
+		GridPane.setColumnSpan(uomSymbol, 3);
+		
+		grid.add(new Label("Unit's name (in english):"), 0, 2);
+		grid.add(uomName, 1, 2);
+		GridPane.setColumnSpan(uomName, 3);
+		
+		grid.add(new Label("Unit's alternative forms, separate with \",\":"), 0, 3);
+		grid.add(uomAlt, 1, 3);
+		GridPane.setColumnSpan(uomAlt, 3);
+		
+		uomChoice.getSelectionModel().select(0);
+		
+	}
+
+	private static UnitOfMeasure createUomfromField() {
+		UnitOfMeasure newUom = new UnitOfMeasure();
+    	newUom.setUom_id(Tools.generate_uuid());
+    	newUom.setUom_name(uomName.getText());
+    	newUom.setUom_symbols(uomSymbol.getText().split(","));
+    	newUom.setUom_base_id(uomChoice.getSelectionModel().getSelectedItem().getUnitOfMeasure().getUom_base_id());
+    	newUom.setUom_multiplier(uomChoice.getSelectionModel().getSelectedItem().getUnitOfMeasure()
+    			.getUom_multiplier().multiply(
+    			new BigDecimal(Double.valueOf(uomMultiplier.getText().replace(",", ".")))).toString());
+    	
+        return newUom;
+	}
+
+	private static void check_validation_disable() {
+		Boolean falseNumberFormat=false;
+		try {
+			Double.valueOf(uomMultiplier.getText().replace(",", "."));
+		}catch(Exception V) {
+			try {
+				@SuppressWarnings("unused")
+				double tmp = Double.valueOf(uomMultiplier.getText().replace(",", ".").split("/")[0])/
+				Double.valueOf(uomMultiplier.getText().replace(",", ".").split("/")[1]);
+			}catch(Exception G) {
+				falseNumberFormat=true;
+			}
+			
+		}
+		validationButton.setDisable(falseNumberFormat || uomName.getText().trim().isEmpty() || uomSymbol.getText().split(",")[0].trim().isEmpty());
+	
 	}
 
 	
