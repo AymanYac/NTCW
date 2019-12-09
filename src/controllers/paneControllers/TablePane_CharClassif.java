@@ -1239,7 +1239,6 @@ public class TablePane_CharClassif {
 
 	@SuppressWarnings("rawtypes")
 	private void selectChartAtIndex(int i,boolean collapsedView) {
-		
 		int selected_col = Math.floorMod(i,this.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size());
 		List<String> char_headers = this.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
 		for( Object col:this.tableGrid.getColumns()) {

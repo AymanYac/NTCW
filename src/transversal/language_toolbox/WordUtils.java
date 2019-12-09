@@ -358,6 +358,8 @@ public class WordUtils {
 
 		public static ArrayList<UnitOfMeasure> parseCompatibleUoMs(String selected_text, ClassCharacteristic active_char) {
 			
+			//~ is used to escape intext quotes so as not to be mistaken with rule syntax quotes
+			selected_text = selected_text.replace("~\"","\"");
 			String pattern = "(-?\\d+(\\.\\d+)?)";
 		    String patternPlusOverLaps = pattern+"(?=(" + "(.*)" + ")).";
 		    Pattern p = Pattern.compile(patternPlusOverLaps);
@@ -369,6 +371,11 @@ public class WordUtils {
 				UnitOfMeasure tmp = UnitOfMeasure.lookUpUomInText_V2(m.group(3),active_char.getAllowedUoms());
 				ret.add(tmp);
 				}
+			//Add nulls to avoid IndexOutOfBoundsException when checking more uoms
+			ret.add(null);
+			ret.add(null);
+			ret.add(null);
+			ret.add(null);
 			return ret;
 		}
 
@@ -408,5 +415,14 @@ public class WordUtils {
 		        return String.format("%d",(long)d);
 		    else
 		        return String.format("%s",d);
+		}
+
+
+		public static boolean RuleSyntaxContainsSep(String searchText, String sep) {
+			searchText = searchText.replace("~\"","\"");
+			return searchText.contains("(|+0)"+sep+"(|+0)")
+					||searchText.equals("(|+0)"+sep+"")
+					||searchText.equals(""+sep+"(|+0)")
+					||searchText.equals(""+sep+"");
 		}
 }

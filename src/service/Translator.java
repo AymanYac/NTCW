@@ -16,7 +16,7 @@ public class Translator {
     public static String translate(String langFrom, String langTo, String text) throws IOException {
         
     	try{
-    		int script_url_choice =  Math.random()>0.5?0:1;
+    		int script_url_choice =  Math.random()>0.5?0:0;
     		String urlStr = GlobalConstants.GOOGLE_TRANSLATE_SCRIPTS[script_url_choice] +
                     "?q=" + URLEncoder.encode(text, "UTF-8") +
                     "&target=" + langTo +

@@ -21,6 +21,7 @@ import model.CharacteristicValue;
 import model.ClassCharacteristic;
 import model.UnitOfMeasure;
 import model.UomClassComboRow;
+import service.CharClassifProposer;
 import transversal.generic.Tools;
 public class UoMDeclarationDialog {
 	
@@ -54,8 +55,12 @@ public class UoMDeclarationDialog {
 		*/
 	}
 
-	public static void UomDeclarationPopUp(Char_description parent, String proposedUomSymbol, CharacteristicValue preparedValue, String preparedRule,
+	public static void UomDeclarationPopUp(Char_description parent, String proposedUomSymbol, int activeButtonIndex,
 			ClassCharacteristic active_char) {
+		//Get the corresponding rule and value
+		CharacteristicValue preparedValue=CharClassifProposer.getValueForButton(activeButtonIndex);
+		String preparedRule=CharClassifProposer.getRuleForButton(activeButtonIndex);
+		
 		// Create the custom dialog.
 		Dialog<UnitOfMeasure> dialog = new Dialog<>();
 		dialog.setTitle("New unit of measure declaration");
@@ -247,6 +252,7 @@ public class UoMDeclarationDialog {
 		validationButton.setDisable(falseNumberFormat || uomName.getText().trim().isEmpty() || uomSymbol.getText().split(",")[0].trim().isEmpty());
 	
 	}
+
 
 	
 		

@@ -58,12 +58,30 @@ public class CharacteristicValue {
 		return min_value;
 	}
 	public void setMin_value(String min_value) {
+		try {
+			if(Double.valueOf(min_value)>Double.valueOf(max_value)) {
+				this.min_value=this.max_value;
+				this.max_value=min_value;
+				return;
+			}
+		}catch(Exception V) {
+			//min_value or max_value is null
+		}
 		this.min_value = min_value;
 	}
 	public String getMax_value() {
 		return max_value;
 	}
 	public void setMax_value(String max_value) {
+		try {
+			if(Double.valueOf(this.min_value)>Double.valueOf(max_value)) {
+				this.max_value=this.min_value;
+				this.min_value=max_value;
+				return;
+			}
+		}catch(Exception V) {
+			//min_value or max_value is null
+		}
 		this.max_value = max_value;
 	}
 	public String getNote() {

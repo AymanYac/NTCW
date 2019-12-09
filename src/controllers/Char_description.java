@@ -68,9 +68,9 @@ import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
 import model.UserAccount;
+import service.CharClassifProposer;
 import service.CharPatternServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
-import transversal.dialog_toolbox.UoMDeclarationDialog;
 import transversal.generic.Tools;
 
 public class Char_description {
@@ -172,6 +172,10 @@ public class Char_description {
 
 
 	public Set<CharDescriptionRow> ROW_SYNC_POOL = new HashSet<CharDescriptionRow>();
+
+
+
+	public CharClassifProposer proposer;
 
 
 
@@ -434,6 +438,8 @@ public class Char_description {
 		
 	}
 	
+	
+	
 	private void initializePropButtons() {
 		propButtons = new ArrayList<Button> (GlobalConstants.NUMBER_OF_MANUAL_PROPOSITIONS_OLD);
 		propButtons.add(prop1);
@@ -664,6 +670,8 @@ public class Char_description {
 		this.account = account;
 		this.account.setUser_desc_classes(  Tools.get_desc_classes(account,menubar) );
 		this.account.setUser_desc_class(Tools.get_desc_class(account));
+		this.proposer = new CharClassifProposer(this);
+		
 		CNAME_CID = Tools.SET_PROJECT_CLASSES_ARRAY(account);
 		if(!(this.account.getUser_desc_class()!=null)) {
 			try {
@@ -967,7 +975,7 @@ public class Char_description {
 	
 	@SuppressWarnings("static-access")
 	public void refresh_ui_display() {
-		
+		proposer.clearPropButtons();
 		double RIGHT_TRANSLATE = 0.0*rule_field.getWidth();
 		clear_data_fields();
 		if(this.charButton.isSelected()) {
@@ -1262,20 +1270,8 @@ public class Char_description {
 	}
 	public void preparePatternProposition(int i, String buttonText, CharacteristicValue preparedValue,
 			String preparedRule, ClassCharacteristic active_char) {
-		Button btn = this.propButtons.get(i);
-		btn.setText(buttonText);
-		btn.setOpacity(1.0);
-		btn.setOnAction((event) -> {
-			if(preparedValue.getUom_id()!=null && !UnitOfMeasure.RunTimeUOMS.containsKey(preparedValue.getUom_id())) {
-				//Launch UoM Declaration box
-				UoMDeclarationDialog.UomDeclarationPopUp(this,buttonText, preparedValue,preparedRule,active_char);
-				
-			}else {
-				this.sendPatternRule(preparedRule);
-				this.sendPatternValue(preparedValue);
-			}
-			
-		});
+		proposer.addProposition(buttonText,preparedValue,preparedRule,active_char);
+		
 	}
 	
 }

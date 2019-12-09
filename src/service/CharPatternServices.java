@@ -26,7 +26,7 @@ public class CharPatternServices {
 	private static HashMap<String,LinkedHashSet<String>> specialwords;
 
 	public static void scanSelectionForPatternDetection(Char_description parent, ClassCharacteristic active_char) {
-		
+		parent.refresh_ui_display();
 		Unidecode unidecode = Unidecode.toAscii();
 		String selected_text = "";
 		selected_text = parent.ld.getSelectedText();
@@ -47,7 +47,9 @@ public class CharPatternServices {
 			System.out.println(":::SEPARATED SELECTION:::");
 		}
 		/*Put in double quotes rule portions that indicate a text value and
-		 * store accordingly*/
+		 * store accordingly
+		 * ~ is used to escape intext quotes so as not to be mistaken with rule syntax quotes
+		 * */
 		selected_text = selected_text.replace("\"", "~\"");
 		
 		
@@ -553,7 +555,7 @@ public class CharPatternServices {
 									+"\"(|+1)[MAX%](|+0)[UOM\""+following_uom.getUom_symbol()+"\"]");
 									return;
 								}
-								if(selected_text.toLowerCase().contains("min")&&!following_uom.getUom_name().contains("minute")) {
+								if(selected_text.toLowerCase().contains("min")&&!following_uom.getUom_name().contains("min")) {
 /*									The selection contains "MIN" before the numerical value? (e.g. "Minimum voltage=12V")
  * 									Satyam:
 									Before the value only to avoid "MIN" =Minute in the unit of measure
@@ -598,7 +600,7 @@ public class CharPatternServices {
 									+"\"(|+1)[MAX%](|+0)[UOM\""+following_uom.getUom_symbol()+"\"]");
 									return;
 								}
-								if(selected_text.toLowerCase().contains("min")&&!following_uom.getUom_name().contains("minute")) {
+								if(selected_text.toLowerCase().contains("min")&&!following_uom.getUom_name().contains("min")) {
 /*									The selection contains "MIN" before the numerical value? (e.g. "Minimum voltage=100mV")
  * 									Satyam:
 									Before the value only to avoid "MIN" =Minute in the unit of measure
@@ -648,7 +650,7 @@ public class CharPatternServices {
 										+"\"(|+1)[MAX%](|+0)[UOM\""+following_uom.getUom_symbol()+"\"]");
 										return;
 									}
-									if(selected_text.toLowerCase().contains("min")&&!following_uom.getUom_name().contains("minute")) {
+									if(selected_text.toLowerCase().contains("min")&&!following_uom.getUom_name().contains("min")) {
 	/*									The selection contains "MIN" before the numerical value? (e.g. "Minimum flow=1 cfm")
 	 * 									Satyam:
 										Before the value only to avoid "MIN" =Minute in the unit of measure
@@ -701,7 +703,7 @@ public class CharPatternServices {
 										+"\"(|+1)[MAX%](|+0)<UOM\""+infered_uom.getUom_symbol()+"\">");
 										return;
 									}
-									if(selected_text.toLowerCase().contains("min")&&!infered_uom.getUom_name().contains("minute")) {
+									if(selected_text.toLowerCase().contains("min")&&!infered_uom.getUom_name().contains("min")) {
 	/*									The selection contains "MIN" before the numerical value? (e.g. "Minimum voltage=12")
 	 * 									Satyam:
 										Before the value only to avoid "MIN" =Minute in the unit of measure
@@ -750,7 +752,7 @@ public class CharPatternServices {
 										parent.preparePatternProposition(i,loop_uom.getUom_name(),preparedValue,preparedRule,active_char);
 										continue;
 									}
-									if(selected_text.toLowerCase().contains("min")&&!loop_uom.getUom_name().contains("minute")) {
+									if(selected_text.toLowerCase().contains("min")&&!loop_uom.getUom_name().contains("min")) {
 	/*									The selection contains "MIN" before the numerical value?  (e.g. "Long. Mini=1160")
 	 * 									Satyam:
 										Before the value only to avoid "MIN" =Minute in the unit of measure
@@ -811,7 +813,7 @@ public class CharPatternServices {
 									parent.preparePatternProposition(i,loop_uom.getUom_name(),preparedValue,preparedRule, active_char);
 									continue;
 								}
-								if(selected_text.toLowerCase().contains("min")&&!loop_uom.getUom_name().contains("minute")) {
+								if(selected_text.toLowerCase().contains("min")&&!loop_uom.getUom_name().contains("min")) {
 /*									The selection contains "MIN" before the numerical value?  (e.g. "Long. Mini=1160")
  * 									Satyam:
 									Before the value only to avoid "MIN" =Minute in the unit of measure
@@ -845,7 +847,7 @@ public class CharPatternServices {
 								}
 								
 								String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
-										+WordUtils.DoubleToString(numValuesInSelection.get(0)).length()).split(" ")[0];
+										+WordUtils.DoubleToString(numValuesInSelection.get(0)).length()).trim();
 								if(selected_text.toLowerCase().contains("max")) {
 //									The selection contains "MAX"?  (e.g. "Long. Max=1160")
 									System.out.println("The selection contains \"MAX\"  (e.g. \"Long. Max=1160\")");
@@ -860,7 +862,7 @@ public class CharPatternServices {
 									parent.preparePatternProposition(i,UOM_INFERED_NAME,preparedValue,preparedRule, active_char);
 									return;
 								}
-								if(selected_text.toLowerCase().contains("min")&&!UOM_INFERED_NAME.contains("minute")) {
+								if(selected_text.toLowerCase().contains("min")&&!UOM_INFERED_NAME.contains("min")) {
 /*									The selection contains "MIN" before the numerical value?  (e.g. "Long. Mini=1160")
  * 									Satyam:
 									Before the value only to avoid "MIN" =Minute in the unit of measure
@@ -938,13 +940,19 @@ public class CharPatternServices {
 //						The selection includes 2 and only 2 numerical values (including decimals with "." or "," or negative values)
 						System.out.println("The selection includes 2 and only 2 numerical values (including decimals with \".\" or \",\" or negative values)");
 						String inbetweenNumbersText = selected_text.substring(
-							selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))),
+							selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(
+									numValuesInSelection.get(0)))+
+									WordUtils.DoubleToString(numValuesInSelection.get(0)).length(),
 							selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
 							);
-						inbetweenNumbersText = String.join("",(CharSequence) inbetweenNumbersText.chars().mapToObj((c -> (char) c)).
-						map(c->(Character.isAlphabetic(c)||Character.isDigit(c)||c.equals('/')||c.equals(':'))?c:"(|+0)").
+						inbetweenNumbersText = String.join("",  inbetweenNumbersText.chars().mapToObj((c -> (char) c)).
+						map(c->(Character.isAlphabetic(c)||Character.isDigit(c)||c.equals('/')||c.equals(':'))?String.valueOf(c):"(|+0)").
 						collect(Collectors.toList()));
-						if(inbetweenNumbersText.contains("(|+0)/(|+0))")||inbetweenNumbersText.contains("(|+0):(|+0))")) {
+						System.out.println("inbetweenNumbersText");
+						System.out.println(inbetweenNumbersText);
+						if(WordUtils.RuleSyntaxContainsSep(inbetweenNumbersText, "/")
+								||WordUtils.RuleSyntaxContainsSep(inbetweenNumbersText, ":")
+								) {
 							//The 2 numerical values are separated by "/" or ":"? More precisely: the selection follows the pattern (X+0)%(|+0)"/"(|+0)%(X+0) where "/" can also be replaced by ":" (e.g.  "Size 1/2"")
 							System.out.println("The 2 numerical values are separated by \"/\" or \":\"");
 							ArrayList<UnitOfMeasure> uomsInSelection = WordUtils.parseCompatibleUoMs(selected_text,active_char);
@@ -977,7 +985,7 @@ public class CharPatternServices {
 											selected_text.substring(selected_text.replace(",", ".").indexOf(
 													WordUtils.DoubleToString(numValuesInSelection.get(1))))
 											+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-									parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+									parent.preparePatternProposition(1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
 									return;
 								}else {
 									if(UnitOfMeasure.ConversionPathExists(uomsInSelection.get(1),active_char.getAllowedUoms())) {
@@ -1006,7 +1014,7 @@ public class CharPatternServices {
 												selected_text.substring(selected_text.replace(",", ".").indexOf(
 														WordUtils.DoubleToString(numValuesInSelection.get(1))))
 												+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
 										return;
 									}else {
 										
@@ -1035,7 +1043,7 @@ public class CharPatternServices {
 												selected_text.substring(selected_text.replace(",", ".").indexOf(
 														WordUtils.DoubleToString(numValuesInSelection.get(1))))
 												+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
 										return;
 									}
 								}
@@ -1070,7 +1078,7 @@ public class CharPatternServices {
 												selected_text.substring(selected_text.replace(",", ".").indexOf(
 														WordUtils.DoubleToString(numValuesInSelection.get(1))))
 												+"\""+"<MIN %1><MAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
 										return;
 									}else {
 										int i;
@@ -1137,7 +1145,7 @@ public class CharPatternServices {
 										continue;
 									}
 									String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-											+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).split(" ")[0];
+											+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).trim();
 									CharacteristicValue preparedValue1 = new CharacteristicValue();
 									preparedValue1.setUom_id("$$$UOM_ID$$$");
 									preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
@@ -1168,91 +1176,220 @@ public class CharPatternServices {
 								}
 							}
 						}else {
-							
-							inbetweenNumbersText = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))),
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-									);
-							inbetweenNumbersText = String.join("",(CharSequence) inbetweenNumbersText.chars().mapToObj((c -> (char) c)).
-							map(c->(Character.isAlphabetic(c)||Character.isDigit(c)||c.equals('-'))?c:"(|+0)").
-							collect(Collectors.toList()));
-								
-							if(inbetweenNumbersText.contains("(|+0)-(|+0))")) {
-							//The 2 numerical values are separated by "-"?
-								System.out.println("The 2 numerical values are separated by \"-\"");
+							if(Math.random()>0) {
+								System.out.println("The 2 numerical values are separated by \"+\"");
 								ArrayList<UnitOfMeasure> uomsInSelection = WordUtils.parseCompatibleUoMs(selected_text,active_char);
 								if(uomsInSelection.get(1)!=null) {
 								//The 2nd numerical value is followed by a known unit of measure?
 									System.out.println("The 2nd numerical value is followed by a known unit of measure");
-									if(active_char.getAllowedUoms().contains(uomsInSelection.get(1).getUom_id())) {
-										//The unit of measure in the selection is one of the declared UoM for the characteristic?
-										System.out.println("The unit of measure in the selection is one of the declared UoM for the characteristic");
-											
-										CharacteristicValue preparedValue2 = new CharacteristicValue();
-										preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
-										preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-										preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-										
-										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\":\"(|+0)%2(|+0)"
+									
+									CharacteristicValue preparedValue1 = new CharacteristicValue();
+										preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
+										preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
 												+"\""+
 												selected_text.substring(selected_text.replace(",", ".").indexOf(
 														WordUtils.DoubleToString(numValuesInSelection.get(1))))
-												+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+												+"\""+"<NOM %1><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+										parent.preparePatternProposition(0, preparedValue1.getNominal_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+										
+										
+										CharacteristicValue preparedValue2 = new CharacteristicValue();
+										preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
+										preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+												+"\""+
+												selected_text.substring(selected_text.replace(",", ".").indexOf(
+														WordUtils.DoubleToString(numValuesInSelection.get(1))))
+												+"\""+"<NOM %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+										
+										
+										
+
+										CharacteristicValue preparedValue3 = new CharacteristicValue();
+										preparedValue3.setUom_id(uomsInSelection.get(1).getUom_id());
+										preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
+										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+												+"\""+
+												selected_text.substring(selected_text.replace(",", ".").indexOf(
+														WordUtils.DoubleToString(numValuesInSelection.get(1))))
+												+"\""+"<NOM %1+%2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+										parent.preparePatternProposition(3, preparedValue3.getNominal_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+										
+										
 										return;
-									}else {
-										if(UnitOfMeasure.ConversionPathExists(uomsInSelection.get(1),active_char.getAllowedUoms())) {
-										//The unit of measure in the selection can be converted to the declared UoM for the characteristic
-											System.out.println("The unit of measure in the selection can be converted to the declared UoM for the characteristic");
-												
-											
-											CharacteristicValue preparedValue2 = new CharacteristicValue();
-											preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
-											preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-											preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-											
-											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\":\"(|+0)%2(|+0)"
-													+"\""+
-													selected_text.substring(selected_text.replace(",", ".").indexOf(
-															WordUtils.DoubleToString(numValuesInSelection.get(1))))
-													+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-											parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
-											return;
-										}else {
-											
-											//Display a pop-up asking to enter conversion rate towards the declared UoM (mandatory)
-											UoMDeclarationDialog.UomConversionPopUp(uomsInSelection.get(1),active_char.getAllowedUoms(),parent);
-											
-											
-											CharacteristicValue preparedValue2 = new CharacteristicValue();
-											preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
-											preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-											preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-											
-											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\":\"(|+0)%2(|+0)"
-													+"\""+
-													selected_text.substring(selected_text.replace(",", ".").indexOf(
-															WordUtils.DoubleToString(numValuesInSelection.get(1))))
-													+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-											parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
-											return;
-										}
-									}
 								}else {
 									if(selected_text.replace(",", ".").endsWith(WordUtils.DoubleToString(numValuesInSelection.get(1)))) {
 										//The 2nd numerical value is at the end of the selection?
 										System.out.println("The 2nd numerical value is at the end of the selection");
-										if(active_char.getAllowedUoms().size()==1) {
-										//Only 1 UoM is declared for the characteristic? (e.g. "Tension 12:24")
-											System.out.println("Only 1 UoM is declared for the characteristic");
-											UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0));
-												
+										int i;
+										for(i=0;i<active_char.getAllowedUoms().size();i++) {
+											String infered_uom_id = active_char.getAllowedUoms().get(i);
+											UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
+											CharacteristicValue preparedValue1 = new CharacteristicValue();
+											preparedValue1.setUom_id(infered_uom.getUom_id());
+											preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+													+"\""+
+													selected_text.substring(selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(1))))
+													+"\""+"<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">";
+											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+											
 											
 											CharacteristicValue preparedValue2 = new CharacteristicValue();
 											preparedValue2.setUom_id(infered_uom.getUom_id());
+											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+													+"\""+
+													selected_text.substring(selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(1))))
+													+"\""+"<NOM %2><UOM \""+infered_uom.getUom_symbol()+"\">";
+											parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+											
+											
+											
+
+											CharacteristicValue preparedValue3 = new CharacteristicValue();
+											preparedValue3.setUom_id(infered_uom.getUom_id());
+											preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
+											String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+													+"\""+
+													selected_text.substring(selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(1))))
+													+"\""+"<NOM %1+%2><UOM \""+infered_uom.getUom_symbol()+"\">";
+											parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+											
+											
+											continue;
+										}
+										return;
+									}else {
+										int i;
+										for(i=0;i<active_char.getAllowedUoms().size();i++) {
+											String infered_uom_id = active_char.getAllowedUoms().get(i);
+											UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
+											CharacteristicValue preparedValue1 = new CharacteristicValue();
+											preparedValue1.setUom_id(infered_uom.getUom_id());
+											preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+													+"\""+
+													selected_text.substring(selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(1))))
+													+"\""+"<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">";
+											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+											
+											
+											CharacteristicValue preparedValue2 = new CharacteristicValue();
+											preparedValue2.setUom_id(infered_uom.getUom_id());
+											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+													+"\""+
+													selected_text.substring(selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(1))))
+													+"\""+"<NOM %2><UOM \""+infered_uom.getUom_symbol()+"\">";
+											parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+											
+											
+											
+
+											CharacteristicValue preparedValue3 = new CharacteristicValue();
+											preparedValue3.setUom_id(infered_uom.getUom_id());
+											preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
+											String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+													+"\""+
+													selected_text.substring(selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(1))))
+													+"\""+"<NOM %1+%2><UOM \""+infered_uom.getUom_symbol()+"\">";
+											parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+											
+											
+											continue;
+										}
+										
+										
+										String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+												+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).trim();
+										CharacteristicValue preparedValue1 = new CharacteristicValue();
+										preparedValue1.setUom_id("$$$UOM_ID$$$");
+										preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+												+"\""+
+												selected_text.substring(selected_text.replace(",", ".").indexOf(
+														WordUtils.DoubleToString(numValuesInSelection.get(1))))
+												+"\""+"<NOM %1><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
+										parent.preparePatternProposition(3*i, preparedValue1.getNominal_value()+"\""+UOM_INFERED_NAME, preparedValue1, preparedRule1, active_char);
+										
+										
+										CharacteristicValue preparedValue2 = new CharacteristicValue();
+										preparedValue2.setUom_id("$$$UOM_ID$$$");
+										preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+												+"\""+
+												selected_text.substring(selected_text.replace(",", ".").indexOf(
+														WordUtils.DoubleToString(numValuesInSelection.get(1))))
+												+"\""+"<NOM %2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
+										parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+"\""+UOM_INFERED_NAME, preparedValue2, preparedRule2, active_char);
+										
+										
+										
+
+										CharacteristicValue preparedValue3 = new CharacteristicValue();
+										preparedValue3.setUom_id("$$$UOM_ID$$$");
+										preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
+										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+												+"\""+
+												selected_text.substring(selected_text.replace(",", ".").indexOf(
+														WordUtils.DoubleToString(numValuesInSelection.get(1))))
+												+"\""+"<NOM %1+%2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
+										parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+"\""+UOM_INFERED_NAME, preparedValue3, preparedRule3, active_char);
+										
+										
+										
+										
+										return;
+									}
+								}
+							
+							}else{
+								
+								inbetweenNumbersText = selected_text.substring(
+										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(
+												numValuesInSelection.get(0)))+
+												WordUtils.DoubleToString(numValuesInSelection.get(0)).length(),
+										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+										);
+									
+								inbetweenNumbersText = String.join("", inbetweenNumbersText.chars().mapToObj((c -> (char) c)).
+								map(c->(Character.isAlphabetic(c)||Character.isDigit(c)||c.equals('-')||c.equals('+'))?String.valueOf(c):"(|+0)").
+								collect(Collectors.toList()));
+								if(WordUtils.RuleSyntaxContainsSep(inbetweenNumbersText, "-")
+										){
+								//The 2 numerical values are separated by "-"?
+									System.out.println("The 2 numerical values are separated by \"-\"");
+									ArrayList<UnitOfMeasure> uomsInSelection = WordUtils.parseCompatibleUoMs(selected_text,active_char);
+									if(uomsInSelection.get(1)!=null) {
+									//The 2nd numerical value is followed by a known unit of measure?
+										System.out.println("The 2nd numerical value is followed by a known unit of measure");
+										if(active_char.getAllowedUoms().contains(uomsInSelection.get(1).getUom_id())) {
+											//The unit of measure in the selection is one of the declared UoM for the characteristic?
+											System.out.println("The unit of measure in the selection is one of the declared UoM for the characteristic");
+												
+											CharacteristicValue preparedValue2 = new CharacteristicValue();
+											preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
 											preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 											
@@ -1261,9 +1398,101 @@ public class CharPatternServices {
 													+"\""+
 													selected_text.substring(selected_text.replace(",", ".").indexOf(
 															WordUtils.DoubleToString(numValuesInSelection.get(1))))
-													+"\""+"<MIN %1><MAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+													+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+											parent.sendPatternRule(preparedRule2);
+											parent.sendPatternValue(preparedValue2);
+											//parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
 											return;
+										}else {
+											if(UnitOfMeasure.ConversionPathExists(uomsInSelection.get(1),active_char.getAllowedUoms())) {
+											//The unit of measure in the selection can be converted to the declared UoM for the characteristic
+												System.out.println("The unit of measure in the selection can be converted to the declared UoM for the characteristic");
+													
+												
+												CharacteristicValue preparedValue2 = new CharacteristicValue();
+												preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
+												preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+												preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+												
+												String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\":\"(|+0)%2(|+0)"
+														+"\""+
+														selected_text.substring(selected_text.replace(",", ".").indexOf(
+																WordUtils.DoubleToString(numValuesInSelection.get(1))))
+														+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+												parent.sendPatternRule(preparedRule2);
+												parent.sendPatternValue(preparedValue2);
+												//parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+												return;
+											}else {
+												
+												//Display a pop-up asking to enter conversion rate towards the declared UoM (mandatory)
+												UoMDeclarationDialog.UomConversionPopUp(uomsInSelection.get(1),active_char.getAllowedUoms(),parent);
+												
+												
+												CharacteristicValue preparedValue2 = new CharacteristicValue();
+												preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
+												preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+												preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+												
+												String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\":\"(|+0)%2(|+0)"
+														+"\""+
+														selected_text.substring(selected_text.replace(",", ".").indexOf(
+																WordUtils.DoubleToString(numValuesInSelection.get(1))))
+														+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+												parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+												return;
+											}
+										}
+									}else {
+										if(selected_text.replace(",", ".").endsWith(WordUtils.DoubleToString(numValuesInSelection.get(1)))) {
+											//The 2nd numerical value is at the end of the selection?
+											System.out.println("The 2nd numerical value is at the end of the selection");
+											if(active_char.getAllowedUoms().size()==1) {
+											//Only 1 UoM is declared for the characteristic? (e.g. "Tension 12:24")
+												System.out.println("Only 1 UoM is declared for the characteristic");
+												UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0));
+													
+												
+												CharacteristicValue preparedValue2 = new CharacteristicValue();
+												preparedValue2.setUom_id(infered_uom.getUom_id());
+												preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+												preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+												
+												String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\":\"(|+0)%2(|+0)"
+														+"\""+
+														selected_text.substring(selected_text.replace(",", ".").indexOf(
+																WordUtils.DoubleToString(numValuesInSelection.get(1))))
+														+"\""+"<MIN %1><MAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
+												parent.sendPatternRule(preparedRule2);
+												parent.sendPatternValue(preparedValue2);
+												//parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+												return;
+											}else {
+												int i;
+												for(i=0;i<active_char.getAllowedUoms().size();i++) {
+													String infered_uom_id = active_char.getAllowedUoms().get(i);
+													UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
+														
+													
+													CharacteristicValue preparedValue2 = new CharacteristicValue();
+													preparedValue2.setUom_id(infered_uom.getUom_id());
+													preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+													preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+													
+													String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\":\"(|+0)%2(|+0)"
+															+"\""+
+															selected_text.substring(selected_text.replace(",", ".").indexOf(
+																	WordUtils.DoubleToString(numValuesInSelection.get(1))))
+															+"\""+"<MIN %1><MAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
+													parent.preparePatternProposition(i, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+													continue;
+												}
+												return;
+											}
 										}else {
 											int i;
 											for(i=0;i<active_char.getAllowedUoms().size();i++) {
@@ -1285,17 +1514,12 @@ public class CharPatternServices {
 												parent.preparePatternProposition(i, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
 												continue;
 											}
-											return;
-										}
-									}else {
-										int i;
-										for(i=0;i<active_char.getAllowedUoms().size();i++) {
-											String infered_uom_id = active_char.getAllowedUoms().get(i);
-											UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
-												
+											String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+													+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).trim();
+											
 											
 											CharacteristicValue preparedValue2 = new CharacteristicValue();
-											preparedValue2.setUom_id(infered_uom.getUom_id());
+											preparedValue2.setUom_id("$$$UOM_ID$$$");
 											preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 											
@@ -1304,122 +1528,89 @@ public class CharPatternServices {
 													+"\""+
 													selected_text.substring(selected_text.replace(",", ".").indexOf(
 															WordUtils.DoubleToString(numValuesInSelection.get(1))))
-													+"\""+"<MIN %1><MAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(i, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
-											continue;
+													+"\""+"<MIN %1><MAX %2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
+											parent.preparePatternProposition(i, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue2, preparedRule2, active_char);
+											
+											
+											return;
 										}
-										String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-												+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).split(" ")[0];
-										
-										
-										CharacteristicValue preparedValue2 = new CharacteristicValue();
-										preparedValue2.setUom_id("$$$UOM_ID$$$");
-										preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-										preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-										
-										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+0)\":\"(|+0)%2(|+0)"
-												+"\""+
-												selected_text.substring(selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(1))))
-												+"\""+"<MIN %1><MAX %2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
-										parent.preparePatternProposition(i, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue2, preparedRule2, active_char);
-										
-										
-										return;
 									}
-								}
-								
-								
-								
-							}else {
-								inbetweenNumbersText = selected_text.substring(
-										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))),
-										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-										);
 									
-								ArrayList<UnitOfMeasure> uomsInSelection = WordUtils.parseCompatibleUoMs(selected_text,active_char);
-								if(uomsInSelection.get(1)!=null) {
-								//The 2nd numerical value is followed by a known unit of measure
-									System.out.println("The 2nd numerical value is followed by a known unit of measure");
-									if(active_char.getAllowedUoms().contains(uomsInSelection.get(1).getUom_id())) {
-										//The unit of measure in the selection is one of the declared UoM for the characteristic
-										System.out.println("The unit of measure in the selection is one of the declared UoM for the characteristic");
-										CharacteristicValue preparedValue1 = new CharacteristicValue();
-										preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-										preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-										preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
-										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
-												+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
-												selected_text.substring(selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(1))))
-												+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+									
+									
+								}else {
+									inbetweenNumbersText = selected_text.substring(
+											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
+											+WordUtils.DoubleToString(numValuesInSelection.get(0)).length(),
+											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+											);
 										
-										
-										CharacteristicValue preparedValue2 = new CharacteristicValue();
-										preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-										preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
-										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%(|+1)\""
-												+inbetweenNumbersText+"\""+"(|+1)[%](|+1)\""+
-												selected_text.substring(selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(1))))
-												+"\""+"<UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
-										return;
-									}else {
-										if(UnitOfMeasure.ConversionPathExists(uomsInSelection.get(1),active_char.getAllowedUoms())) {
-//										The unit of measure in the selection can be converted to the declared UoM for the characteristic?
-										System.out.println("The unit of measure in the selection can be converted to the declared UoM for the characteristic");
-										CharacteristicValue preparedValue1 = new CharacteristicValue();
-										preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-										preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-										preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
-										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
-												+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
-												selected_text.substring(selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(1))))
-												+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
-										
-										
-										CharacteristicValue preparedValue2 = new CharacteristicValue();
-										preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-										preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
-										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%(|+1)\""
-												+inbetweenNumbersText+"\""+"(|+1)[%](|+1)\""+
-												selected_text.substring(selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(1))))
-												+"\""+"<UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
-										return;
+									ArrayList<UnitOfMeasure> uomsInSelection = WordUtils.parseCompatibleUoMs(selected_text,active_char);
+									if(uomsInSelection.get(1)!=null) {
+									//The 2nd numerical value is followed by a known unit of measure
+										System.out.println("The 2nd numerical value is followed by a known unit of measure");
+										if(active_char.getAllowedUoms().contains(uomsInSelection.get(1).getUom_id())) {
+											//The unit of measure in the selection is one of the declared UoM for the characteristic
+											System.out.println("The unit of measure in the selection is one of the declared UoM for the characteristic");
+											CharacteristicValue preparedValue1 = new CharacteristicValue();
+											preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+											preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+											preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
+											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
+													+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
+													selected_text.substring(selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(1))))
+													+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+											parent.preparePatternProposition(0, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+											
+											
+											CharacteristicValue preparedValue2 = new CharacteristicValue();
+											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+											preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
+											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%(|+1)\""
+													+inbetweenNumbersText+"\""+"(|+1)[%](|+1)\""+
+													selected_text.substring(selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(1))))
+													+"\""+"<UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+											parent.preparePatternProposition(1, preparedValue2.getNominal_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+											return;
 										}else {
-											if(uomsInSelection.get(0)!=null) {
-												//The 1st numerical value is followed by a known unit of measure?
-												System.out.println("The 1st numerical value is followed by a known unit of measure");
-												if(active_char.getAllowedUoms().contains(uomsInSelection.get(0).getUom_id())) {
-													//The unit of measure following the 1st value in the selection is one of the declared UoM for the characteristic?
-													System.out.println("The unit of measure following the 1st value in the selection is one of the declared UoM for the characteristic");
-													CharacteristicValue preparedValue2 = new CharacteristicValue();
-													preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-													preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
-													String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-															WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)[%](|+1)\""
-															+inbetweenNumbersText+"\""+"(|+1)%(|+1)\""+
-															selected_text.substring(selected_text.replace(",", ".").indexOf(
-																	WordUtils.DoubleToString(numValuesInSelection.get(1))))
-															+"\""+"<UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-													parent.sendPatternValue(preparedValue2);
-													parent.sendPatternRule(preparedRule2);
-													return;
-												}else {
-													if(UnitOfMeasure.ConversionPathExists(uomsInSelection.get(0),active_char.getAllowedUoms())) {
-														//The unit of measure following the 1st value in the selection can be converted to the declared UoM for the characteristic? (e.g. "Pression 100 psi à 100°C" with psi already having a known conversion rate towards bar)
-														System.out.println("The unit of measure following the 1st value in the selection can be converted to the declared UoM for the characteristic");
+											if(UnitOfMeasure.ConversionPathExists(uomsInSelection.get(1),active_char.getAllowedUoms())) {
+	//										The unit of measure in the selection can be converted to the declared UoM for the characteristic?
+											System.out.println("The unit of measure in the selection can be converted to the declared UoM for the characteristic");
+											CharacteristicValue preparedValue1 = new CharacteristicValue();
+											preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+											preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+											preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
+											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
+													+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
+													selected_text.substring(selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(1))))
+													+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+											parent.preparePatternProposition(0, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+											
+											
+											CharacteristicValue preparedValue2 = new CharacteristicValue();
+											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+											preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
+											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%(|+1)\""
+													+inbetweenNumbersText+"\""+"(|+1)[%](|+1)\""+
+													selected_text.substring(selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(1))))
+													+"\""+"<UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+											parent.preparePatternProposition(1, preparedValue2.getNominal_value()+"\""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+											return;
+											}else {
+												if(uomsInSelection.get(0)!=null) {
+													//The 1st numerical value is followed by a known unit of measure?
+													System.out.println("The 1st numerical value is followed by a known unit of measure");
+													if(active_char.getAllowedUoms().contains(uomsInSelection.get(0).getUom_id())) {
+														//The unit of measure following the 1st value in the selection is one of the declared UoM for the characteristic?
+														System.out.println("The unit of measure following the 1st value in the selection is one of the declared UoM for the characteristic");
 														CharacteristicValue preparedValue2 = new CharacteristicValue();
 														preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 														preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
@@ -1433,127 +1624,127 @@ public class CharPatternServices {
 														parent.sendPatternRule(preparedRule2);
 														return;
 													}else {
-														if(uomsInSelection.get(0)!=null && uomsInSelection.get(1)!=null && uomsInSelection.get(0).getUom_id().equals(uomsInSelection.get(1).getUom_id())) {
-															//The unit of measure following the 1st value is the same as the one following the 2nd value? (e.g. "Pression 10 psi à 100 psi" with psi not having a known conversion rate towards bar yet)
-															System.out.println("The unit of measure following the 1st value is the same as the one following the 2nd value");
-															UoMDeclarationDialog.UomConversionPopUp(uomsInSelection.get(0),active_char.getAllowedUoms(),parent);
-															CharacteristicValue preparedValue1 = new CharacteristicValue();
-															preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-															preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-															preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
-															String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-																	WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
-																	+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
-																	selected_text.substring(selected_text.replace(",", ".").indexOf(
-																			WordUtils.DoubleToString(numValuesInSelection.get(1))))
-																	+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-															parent.sendPatternRule(preparedRule1);
-															parent.sendPatternValue(preparedValue1);
-															return;
-														}else {
-															String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
-																	+WordUtils.DoubleToString(numValuesInSelection.get(0)).length()).split(" ")[0];
-															CharacteristicValue preparedValue1 = new CharacteristicValue();
-															preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-															preparedValue1.setUom_id("$$$UOM_ID$$$");
-															String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+														if(UnitOfMeasure.ConversionPathExists(uomsInSelection.get(0),active_char.getAllowedUoms())) {
+															//The unit of measure following the 1st value in the selection can be converted to the declared UoM for the characteristic? (e.g. "Pression 100 psi à 100°C" with psi already having a known conversion rate towards bar)
+															System.out.println("The unit of measure following the 1st value in the selection can be converted to the declared UoM for the characteristic");
+															CharacteristicValue preparedValue2 = new CharacteristicValue();
+															preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+															preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
+															String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 																	WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)[%](|+1)\""
 																	+inbetweenNumbersText+"\""+"(|+1)%(|+1)\""+
 																	selected_text.substring(selected_text.replace(",", ".").indexOf(
 																			WordUtils.DoubleToString(numValuesInSelection.get(1))))
-																	+"\""+"<UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
-															parent.preparePatternProposition(0, preparedValue1.getNominal_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue1, preparedRule1, active_char);
-															
-															UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-																	+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).split(" ")[0];
-															CharacteristicValue preparedValue2 = new CharacteristicValue();
-															preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-															preparedValue2.setUom_id("$$$UOM_ID$$$");
-															String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-																	WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%(|+1)\""
-																	+inbetweenNumbersText+"\""+"(|+1)[%](|+1)\""+
-																	selected_text.substring(selected_text.replace(",", ".").indexOf(
-																			WordUtils.DoubleToString(numValuesInSelection.get(1))))
-																	+"\""+"<UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
-															parent.preparePatternProposition(1, preparedValue2.getNominal_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue2, preparedRule2, active_char);
+																	+"\""+"<UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+															parent.sendPatternValue(preparedValue2);
+															parent.sendPatternRule(preparedRule2);
 															return;
+														}else {
+															if(uomsInSelection.get(0)!=null && uomsInSelection.get(1)!=null && uomsInSelection.get(0).getUom_id().equals(uomsInSelection.get(1).getUom_id())) {
+																//The unit of measure following the 1st value is the same as the one following the 2nd value? (e.g. "Pression 10 psi à 100 psi" with psi not having a known conversion rate towards bar yet)
+																System.out.println("The unit of measure following the 1st value is the same as the one following the 2nd value");
+																UoMDeclarationDialog.UomConversionPopUp(uomsInSelection.get(0),active_char.getAllowedUoms(),parent);
+																CharacteristicValue preparedValue1 = new CharacteristicValue();
+																preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+																preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+																preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
+																String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+																		WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
+																		+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
+																		selected_text.substring(selected_text.replace(",", ".").indexOf(
+																				WordUtils.DoubleToString(numValuesInSelection.get(1))))
+																		+"\""+"<MIN %1><MAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+																parent.sendPatternRule(preparedRule1);
+																parent.sendPatternValue(preparedValue1);
+																return;
+															}else {
+																String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
+																		+WordUtils.DoubleToString(numValuesInSelection.get(0)).length()).trim();
+																CharacteristicValue preparedValue1 = new CharacteristicValue();
+																preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+																preparedValue1.setUom_id("$$$UOM_ID$$$");
+																String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+																		WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)[%](|+1)\""
+																		+inbetweenNumbersText+"\""+"(|+1)%(|+1)\""+
+																		selected_text.substring(selected_text.replace(",", ".").indexOf(
+																				WordUtils.DoubleToString(numValuesInSelection.get(1))))
+																		+"\""+"<UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
+																parent.preparePatternProposition(0, preparedValue1.getNominal_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue1, preparedRule1, active_char);
+																
+																UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+																		+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).trim();
+																CharacteristicValue preparedValue2 = new CharacteristicValue();
+																preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+																preparedValue2.setUom_id("$$$UOM_ID$$$");
+																String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+																		WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%(|+1)\""
+																		+inbetweenNumbersText+"\""+"(|+1)[%](|+1)\""+
+																		selected_text.substring(selected_text.replace(",", ".").indexOf(
+																				WordUtils.DoubleToString(numValuesInSelection.get(1))))
+																		+"\""+"<UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
+																parent.preparePatternProposition(1, preparedValue2.getNominal_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue2, preparedRule2, active_char);
+																return;
+															}
 														}
 													}
+	
+												}else {
+													// (e.g "Pression 10 XX 100YY" with YY a known UoM not having a known conversion rate towards bar yet)
+													System.out.println(" (e.g \"Pression 10 XX 100YY\" with YY a known UoM not having a known conversion rate towards bar yet)");
+													String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+															+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).trim();
+													CharacteristicValue preparedValue2 = new CharacteristicValue();
+													preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+													preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+													preparedValue2.setUom_id("$$$UOM_ID$$$");
+													String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
+															+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
+															selected_text.substring(selected_text.replace(",", ".").indexOf(
+																	WordUtils.DoubleToString(numValuesInSelection.get(1))))
+															+"\""+"<MIN %1><MAX %2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
+													parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue2, preparedRule2, active_char);
+													
+													
+													UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
+															+WordUtils.DoubleToString(numValuesInSelection.get(0)).length()).trim();
+													CharacteristicValue preparedValue1 = new CharacteristicValue();
+													preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+													preparedValue1.setUom_id("$$$UOM_ID$$$");
+													String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)[%](|+1)\""
+															+inbetweenNumbersText+"\""+"(|+1)%(|+1)\""+
+															selected_text.substring(selected_text.replace(",", ".").indexOf(
+																	WordUtils.DoubleToString(numValuesInSelection.get(1))))
+															+"\""+"<UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
+													parent.preparePatternProposition(1, preparedValue1.getNominal_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue1, preparedRule1, active_char);
+													
+													UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+															+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).trim();
+													CharacteristicValue preparedValue3 = new CharacteristicValue();
+													preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+													preparedValue3.setUom_id("$$$UOM_ID$$$");
+													String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%(|+1)\""
+															+inbetweenNumbersText+"\""+"(|+1)[%](|+1)\""+
+															selected_text.substring(selected_text.replace(",", ".").indexOf(
+																	WordUtils.DoubleToString(numValuesInSelection.get(1))))
+															+"\""+"<UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
+													parent.preparePatternProposition(2, preparedValue3.getNominal_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue3, preparedRule3, active_char);
+													return;
+													
+													
+													
 												}
-
-											}else {
-												// (e.g "Pression 10 XX 100YY" with YY a known UoM not having a known conversion rate towards bar yet)
-												System.out.println(" (e.g \"Pression 10 XX 100YY\" with YY a known UoM not having a known conversion rate towards bar yet)");
-												String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-														+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).split(" ")[0];
-												CharacteristicValue preparedValue2 = new CharacteristicValue();
-												preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-												preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-												preparedValue2.setUom_id("$$$UOM_ID$$$");
-												String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
-														+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
-														selected_text.substring(selected_text.replace(",", ".").indexOf(
-																WordUtils.DoubleToString(numValuesInSelection.get(1))))
-														+"\""+"<MIN %1><MAX %2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
-												parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue2, preparedRule2, active_char);
-												
-												
-												UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
-														+WordUtils.DoubleToString(numValuesInSelection.get(0)).length()).split(" ")[0];
-												CharacteristicValue preparedValue1 = new CharacteristicValue();
-												preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-												preparedValue1.setUom_id("$$$UOM_ID$$$");
-												String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)[%](|+1)\""
-														+inbetweenNumbersText+"\""+"(|+1)%(|+1)\""+
-														selected_text.substring(selected_text.replace(",", ".").indexOf(
-																WordUtils.DoubleToString(numValuesInSelection.get(1))))
-														+"\""+"<UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
-												parent.preparePatternProposition(1, preparedValue1.getNominal_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue1, preparedRule1, active_char);
-												
-												UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-														+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).split(" ")[0];
-												CharacteristicValue preparedValue3 = new CharacteristicValue();
-												preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-												preparedValue3.setUom_id("$$$UOM_ID$$$");
-												String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%(|+1)\""
-														+inbetweenNumbersText+"\""+"(|+1)[%](|+1)\""+
-														selected_text.substring(selected_text.replace(",", ".").indexOf(
-																WordUtils.DoubleToString(numValuesInSelection.get(1))))
-														+"\""+"<UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
-												parent.preparePatternProposition(2, preparedValue3.getNominal_value()+"\""+UOM_INFERED_NAME+"\"", preparedValue3, preparedRule3, active_char);
-												return;
-												
-												
-												
 											}
 										}
-									}
-								}else {
-									if(uomsInSelection.get(0)!=null) {
-										//The 1st numerical value is followed by a known unit of measure
-										System.out.println("The 1st numerical value is followed by a known unit of measure");
-										if(active_char.getAllowedUoms().contains(uomsInSelection.get(0).getUom_id())) {
-											//The unit of measure following the 1st value in the selection is one of the declared UoM for the characteristic? (e.g. "Pression 2 bar aux 2 sorties")
-											System.out.println("The unit of measure following the 1st value in the selection is one of the declared UoM for the characteristic");
-											CharacteristicValue preparedValue2 = new CharacteristicValue();
-											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-											preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
-											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)[%](|+1)\""
-													+inbetweenNumbersText+"\""+"(|+1)%(|+1)\""+
-													selected_text.substring(selected_text.replace(",", ".").indexOf(
-															WordUtils.DoubleToString(numValuesInSelection.get(1))))
-													+"\""+"<UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-											parent.sendPatternValue(preparedValue2);
-											parent.sendPatternRule(preparedRule2);
-											return;
-										}else {
-											if(UnitOfMeasure.ConversionPathExists(uomsInSelection.get(1),active_char.getAllowedUoms())) {
-												//The unit of measure in the selection can be converted to the declared UoM for the characteristic
-												System.out.println("The unit of measure in the selection can be converted to the declared UoM for the characteristic");	
+									}else {
+										if(uomsInSelection.get(0)!=null) {
+											//The 1st numerical value is followed by a known unit of measure
+											System.out.println("The 1st numerical value is followed by a known unit of measure");
+											if(active_char.getAllowedUoms().contains(uomsInSelection.get(0).getUom_id())) {
+												//The unit of measure following the 1st value in the selection is one of the declared UoM for the characteristic? (e.g. "Pression 2 bar aux 2 sorties")
+												System.out.println("The unit of measure following the 1st value in the selection is one of the declared UoM for the characteristic");
 												CharacteristicValue preparedValue2 = new CharacteristicValue();
 												preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 												preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
@@ -1567,69 +1758,86 @@ public class CharPatternServices {
 												parent.sendPatternRule(preparedRule2);
 												return;
 											}else {
-												//Display a pop-up asking to enter conversion rate towards the declared UoM (mandatory)
-												UnitOfMeasure following_uom = uomsInSelection.get(1);
-												UoMDeclarationDialog.UomConversionPopUp(following_uom,active_char.getAllowedUoms(),parent);
-												CharacteristicValue tmp = new CharacteristicValue();
-												tmp.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-												tmp.setUom_id(following_uom.getUom_id());
-												parent.sendPatternValue(tmp);
-												parent.sendPatternRule("\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)[%](|+1)\""
-														+inbetweenNumbersText+"\""+"(|+1)%(|+1)\""+
+												if(UnitOfMeasure.ConversionPathExists(uomsInSelection.get(1),active_char.getAllowedUoms())) {
+													//The unit of measure in the selection can be converted to the declared UoM for the characteristic
+													System.out.println("The unit of measure in the selection can be converted to the declared UoM for the characteristic");	
+													CharacteristicValue preparedValue2 = new CharacteristicValue();
+													preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+													preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
+													String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)[%](|+1)\""
+															+inbetweenNumbersText+"\""+"(|+1)%(|+1)\""+
+															selected_text.substring(selected_text.replace(",", ".").indexOf(
+																	WordUtils.DoubleToString(numValuesInSelection.get(1))))
+															+"\""+"<UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+													parent.sendPatternValue(preparedValue2);
+													parent.sendPatternRule(preparedRule2);
+													return;
+												}else {
+													//Display a pop-up asking to enter conversion rate towards the declared UoM (mandatory)
+													UnitOfMeasure following_uom = uomsInSelection.get(1);
+													UoMDeclarationDialog.UomConversionPopUp(following_uom,active_char.getAllowedUoms(),parent);
+													CharacteristicValue tmp = new CharacteristicValue();
+													tmp.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+													tmp.setUom_id(following_uom.getUom_id());
+													parent.sendPatternValue(tmp);
+													parent.sendPatternRule("\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+															WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)[%](|+1)\""
+															+inbetweenNumbersText+"\""+"(|+1)%(|+1)\""+
+															selected_text.substring(selected_text.replace(",", ".").indexOf(
+																	WordUtils.DoubleToString(numValuesInSelection.get(1))))
+															+"\""+"<UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">");
+													return;
+													
+												}
+											}
+										}else {
+											// (e.g. "Pression = 10 @T=100") with "bar" and "psi" as declared UoM
+											int i;
+											for(i=0;i<active_char.getAllowedUoms().size();i++) {
+												String infered_uom_id = active_char.getAllowedUoms().get(i);
+												UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
+												CharacteristicValue preparedValue1 = new CharacteristicValue();
+												preparedValue1.setUom_id(infered_uom.getUom_id());
+												preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+												preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+												
+												String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
+														+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
 														selected_text.substring(selected_text.replace(",", ".").indexOf(
 																WordUtils.DoubleToString(numValuesInSelection.get(1))))
-														+"\""+"<UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">");
-												return;
+														+"\""+"<MIN %1><MAX %2><UOM \""+infered_uom+"\">";
+												parent.preparePatternProposition(3*i, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
 												
+												
+												CharacteristicValue preparedValue2 = new CharacteristicValue();
+												preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+												preparedValue2.setUom_id(infered_uom.getUom_id());
+												String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)[%1](|+1)\""
+														+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
+														selected_text.substring(selected_text.replace(",", ".").indexOf(
+																WordUtils.DoubleToString(numValuesInSelection.get(1))))
+														+"\""+"<UOM \""+infered_uom+"\">";
+												parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+												
+												CharacteristicValue preparedValue3 = new CharacteristicValue();
+												preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+												preparedValue3.setUom_id(infered_uom.getUom_id());
+												String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
+														+inbetweenNumbersText+"\""+"(|+1)[%2](|+1)\""+
+														selected_text.substring(selected_text.replace(",", ".").indexOf(
+																WordUtils.DoubleToString(numValuesInSelection.get(1))))
+														+"\""+"<UOM \""+infered_uom+"\">";
+												parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+												
+												
+												continue;
 											}
+											return;
 										}
-									}else {
-										// (e.g. "Pression = 10 @T=100") with "bar" and "psi" as declared UoM
-										int i;
-										for(i=0;i<active_char.getAllowedUoms().size();i++) {
-											String infered_uom_id = active_char.getAllowedUoms().get(i);
-											UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
-											CharacteristicValue preparedValue1 = new CharacteristicValue();
-											preparedValue1.setUom_id(infered_uom.getUom_id());
-											preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-											preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-											
-											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
-													+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
-													selected_text.substring(selected_text.replace(",", ".").indexOf(
-															WordUtils.DoubleToString(numValuesInSelection.get(1))))
-													+"\""+"<MIN %1><MAX %2><UOM \""+infered_uom+"\">";
-											parent.preparePatternProposition(3*i, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
-											
-											
-											CharacteristicValue preparedValue2 = new CharacteristicValue();
-											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-											preparedValue2.setUom_id(infered_uom.getUom_id());
-											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)[%1](|+1)\""
-													+inbetweenNumbersText+"\""+"(|+1)%2(|+1)\""+
-													selected_text.substring(selected_text.replace(",", ".").indexOf(
-															WordUtils.DoubleToString(numValuesInSelection.get(1))))
-													+"\""+"<UOM \""+infered_uom+"\">";
-											parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
-											
-											CharacteristicValue preparedValue3 = new CharacteristicValue();
-											preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-											preparedValue3.setUom_id(infered_uom.getUom_id());
-											String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"(|+1)%1(|+1)\""
-													+inbetweenNumbersText+"\""+"(|+1)[%2](|+1)\""+
-													selected_text.substring(selected_text.replace(",", ".").indexOf(
-															WordUtils.DoubleToString(numValuesInSelection.get(1))))
-													+"\""+"<UOM \""+infered_uom+"\">";
-											parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
-											
-											
-											continue;
-										}
-										return;
 									}
 								}
 							}
@@ -1641,11 +1849,13 @@ public class CharPatternServices {
 							System.out.println("The selection includes 3 and only 3 numerical values (including decimals with \".\" or \",\" or negative values)");
 							ArrayList<UnitOfMeasure> uomsInSelection = WordUtils.parseCompatibleUoMs(selected_text,active_char);
 							String inbetweenNumbersText1 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))),
+									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
+									+WordUtils.DoubleToString(numValuesInSelection.get(0)).length(),
 									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
 									);
 							String inbetweenNumbersText2 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1))),
+									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+									+WordUtils.DoubleToString(numValuesInSelection.get(1)).length(),
 									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))
 									);
 								
@@ -1670,7 +1880,7 @@ public class CharPatternServices {
 								
 								CharacteristicValue preparedValue2 = new CharacteristicValue();
 								preparedValue2.setUom_id(infered_uom.getUom_id());
-								preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+								preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 								preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 								
 								String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1735,9 +1945,9 @@ public class CharPatternServices {
 									if(uomsInSelection.get(0)!=null) {
 										//The 1st numerical value is followed by a known unit of measure
 										System.out.println("The 1st numerical value is followed by a known unit of measure");
-										if(String.join("",(CharSequence) inbetweenNumbersText2.chars().mapToObj((c -> (char) c)).
-												map(c->(Character.isAlphabetic(c)||Character.isDigit(c)||c.equals('/'))?c:"(|+0)").
-												collect(Collectors.toList())).contains("(|+0)/(|+0)")) {
+										if(WordUtils.RuleSyntaxContainsSep(String.join("",inbetweenNumbersText2.chars().mapToObj((c -> (char) c)).
+												map(c->(Character.isAlphabetic(c)||Character.isDigit(c)||c.equals('/'))?String.valueOf(c):"(|+0)").
+												collect(Collectors.toList())),"/")) {
 											//The values 2 and 3 are separated by "(|+0)/(|+0)"
 											System.out.println("The values 2 and 3 are separated by \"(|+0)/(|+0)\"");
 											
@@ -1842,15 +2052,18 @@ public class CharPatternServices {
 							System.out.println("4 digits in selection");
 
 							String inbetweenNumbersText1 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))),
+									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
+									+WordUtils.DoubleToString(numValuesInSelection.get(0)).length(),
 									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
 									);
 							String inbetweenNumbersText2 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1))),
+									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+									+WordUtils.DoubleToString(numValuesInSelection.get(1)).length(),
 									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))
 									);
 							String inbetweenNumbersText3 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2))),
+									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))
+									+WordUtils.DoubleToString(numValuesInSelection.get(2)).length(),
 									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(3)))
 									);
 							
@@ -1926,7 +2139,7 @@ public class CharPatternServices {
 											WordUtils.DoubleToString(numValuesInSelection.get(2))))
 									+"\""+"<UOM \""+infered_uom+"\">";
 							
-							parent.preparePatternProposition(2, preparedValue4.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue4, preparedRule4, active_char);
+							parent.preparePatternProposition(3, preparedValue4.getNominal_value()+"\""+infered_uom.getUom_symbol()+"\"", preparedValue4, preparedRule4, active_char);
 
 						}
 					}
