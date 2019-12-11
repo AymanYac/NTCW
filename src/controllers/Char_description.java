@@ -1003,25 +1003,25 @@ public class Char_description {
 					}
 					value_field.setVisible(true);
 					//Setting the uom
-					custom_label_11.setText("Measure unit");
+					custom_label_11.setText("Unit of measure");
 					custom_label_11.setVisible(true);
 					try{
 						uom_field.setText(UnitOfMeasure.RunTimeUOMS.get( row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUom_id() ).getUom_symbol());
 					}catch(Exception V) {
 						
 					}
-					uom_field.setMaxWidth(0.49*rule_field.getWidth());
+					uom_field.setMaxWidth(0.5*(rule_field.getWidth()-(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					uom_field.setVisible(true);
 					//Setting the minimum value
 					custom_label_12.setText("Minimum value");
-					custom_label_12.setTranslateX(rule_field.getWidth()*0.51);
+					custom_label_12.setTranslateX(0.5*(rule_field.getWidth()+(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					custom_label_12.setVisible(true);
 					try{
 						min_field_uom.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getMin_value());
 					}catch(Exception V) {
 						
 					}
-					min_field_uom.setMaxWidth(0.49*rule_field.getWidth());
+					min_field_uom.setMaxWidth(0.5*(rule_field.getWidth()-(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					min_field_uom.setVisible(true);
 					//Setting the maximum value
 					custom_label_21.setText("Maximum value");
@@ -1031,18 +1031,18 @@ public class Char_description {
 					}catch(Exception V) {
 						
 					}
-					max_field_uom.setMaxWidth(0.49*rule_field.getWidth());
+					max_field_uom.setMaxWidth(0.5*(rule_field.getWidth()-(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					max_field_uom.setVisible(true);
 					//Setting the note
 					custom_label_22.setText("Note");
-					custom_label_22.setTranslateX(rule_field.getWidth()*0.51);
+					custom_label_22.setTranslateX(0.5*(rule_field.getWidth()+(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					custom_label_22.setVisible(true);
 					try {
 						note_field_uom.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNote());
 					}catch(Exception V) {
 						
 					}
-					note_field_uom.setMaxWidth(0.49*rule_field.getWidth());
+					note_field_uom.setMaxWidth(0.5*(rule_field.getWidth()-(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					note_field_uom.setVisible(true);
 					//Setting the rule
 					rule_label.setText("Rule");
@@ -1073,18 +1073,18 @@ public class Char_description {
 						
 					}
 					min_field.setVisible(true);
-					min_field.setMaxWidth(0.49*rule_field.getWidth());
+					min_field.setMaxWidth(0.5*(rule_field.getWidth()-(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					
 					//Setting the maximum value
 					custom_label_12.setText("Maximum value");
-					custom_label_12.setTranslateX(rule_field.getWidth()*0.51);
+					custom_label_12.setTranslateX(0.5*(rule_field.getWidth()+(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					custom_label_12.setVisible(true);
 					try{
 						max_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getMax_value());
 					}catch(Exception V) {
 						
 					}
-					max_field.setMaxWidth(0.49*rule_field.getWidth());
+					max_field.setMaxWidth(0.5*(rule_field.getWidth()-(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					max_field.setVisible(true);
 					//Setting the note
 					note_label.setText("Note");
@@ -1266,10 +1266,35 @@ public class Char_description {
 		
 	}
 	public void sendPatternRule(String string) {
+		//Removed : + - and / from separators to account for "sep" cases
+		String[] SEPARATORS = new String[] {",","\\."," ","="};
+		for(String sep:SEPARATORS) {
+			string = string.replaceAll("(?!~)\""+sep+"+", "\"")
+				      .replaceAll(sep+"+(?!~)\"", "\"")
+				      .replace("\"\"", "");
+		}
+		string = string.replaceAll("(\\(\\|\\+0\\))+","(|+0)")
+				.replaceAll("(\\(\\|\\+1\\))+","(|+1)")
+				.replaceAll("(\\(\\|\\+0\\))+\\(\\|\\+1\\)","(|+1)")
+				.replaceAll("\\(\\|\\+1\\)(\\(\\|\\+0\\))+","(|+1)");
+		
 		rule_field.setText(string);
 	}
 	public void preparePatternProposition(int i, String buttonText, CharacteristicValue preparedValue,
 			String preparedRule, ClassCharacteristic active_char) {
+		//Removed : + - and / from separators to account for "sep" cases
+		String[] SEPARATORS = new String[] {",","\\."," ","="};
+		for(String sep:SEPARATORS) {
+			preparedRule = preparedRule.replaceAll("(?!~)\""+sep+"+", "\"")
+				      .replaceAll(sep+"+(?!~)\"", "\"")
+				      .replace("\"\"", "");
+		}
+		preparedRule = preparedRule.replaceAll("(\\(\\|\\+0\\))+","(|+0)")
+					.replaceAll("(\\(\\|\\+1\\))+","(|+1)")
+					.replaceAll("(\\(\\|\\+0\\))+\\(\\|\\+1\\)","(|+1)")
+					.replaceAll("\\(\\|\\+1\\)(\\(\\|\\+0\\))+","(|+1)");
+		
+		
 		proposer.addProposition(buttonText,preparedValue,preparedRule,active_char);
 		
 	}
