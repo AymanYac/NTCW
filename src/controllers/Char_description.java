@@ -1266,27 +1266,37 @@ public class Char_description {
 		
 	}
 	public void sendPatternRule(String string) {
-		//Removed : + - and / from separators to account for "sep" cases
-		String[] SEPARATORS = new String[] {",","\\."," ","="};
-		for(String sep:SEPARATORS) {
-			string = string.replaceAll("(?!~)\""+sep+"+", "\"")
-				      .replaceAll(sep+"+(?!~)\"", "\"")
-				      .replace("\"\"", "");
+		try {
+			//Removed : + - and / from separators to account for "sep" cases
+			String[] SEPARATORS = new String[] {",","\\."," ","="};
+			for(String sep:SEPARATORS) {
+				string = string.replaceAll("(?!~)\""+sep+"+", "(|+1)\"")
+					      .replaceAll(sep+"+(?!~)\"", "\"(|+1)")
+					      .replace("\"\"", "");
+			}
+			string = string.replaceAll("(\\(\\|\\+0\\))+","(|+0)")
+					.replaceAll("(\\(\\|\\+1\\))+","(|+1)")
+					.replaceAll("(\\(\\|\\+0\\))+\\(\\|\\+1\\)","(|+1)")
+					.replaceAll("\\(\\|\\+1\\)(\\(\\|\\+0\\))+","(|+1)");
+			if(string.endsWith("(|+1)")){
+				string= string.substring(0,string.length()-"(|+1)".length());
+			}
+			if(string.startsWith("(|+1)")){
+				string= string.substring("(|+1)".length());
+			}
+			rule_field.setText(string);
+		}catch(Exception V) {
+			
 		}
-		string = string.replaceAll("(\\(\\|\\+0\\))+","(|+0)")
-				.replaceAll("(\\(\\|\\+1\\))+","(|+1)")
-				.replaceAll("(\\(\\|\\+0\\))+\\(\\|\\+1\\)","(|+1)")
-				.replaceAll("\\(\\|\\+1\\)(\\(\\|\\+0\\))+","(|+1)");
 		
-		rule_field.setText(string);
 	}
 	public void preparePatternProposition(int i, String buttonText, CharacteristicValue preparedValue,
 			String preparedRule, ClassCharacteristic active_char) {
 		//Removed : + - and / from separators to account for "sep" cases
 		String[] SEPARATORS = new String[] {",","\\."," ","="};
 		for(String sep:SEPARATORS) {
-			preparedRule = preparedRule.replaceAll("(?!~)\""+sep+"+", "\"")
-				      .replaceAll(sep+"+(?!~)\"", "\"")
+			preparedRule = preparedRule.replaceAll("(?!~)\""+sep+"+", "(|+1)\"")
+				      .replaceAll(sep+"+(?!~)\"", "\"(|+1)")
 				      .replace("\"\"", "");
 		}
 		preparedRule = preparedRule.replaceAll("(\\(\\|\\+0\\))+","(|+0)")
@@ -1294,7 +1304,12 @@ public class Char_description {
 					.replaceAll("(\\(\\|\\+0\\))+\\(\\|\\+1\\)","(|+1)")
 					.replaceAll("\\(\\|\\+1\\)(\\(\\|\\+0\\))+","(|+1)");
 		
-		
+		if(preparedRule.endsWith("(|+1)")){
+			preparedRule= preparedRule.substring(0,preparedRule.length()-"(|+1)".length());
+		}
+		if(preparedRule.startsWith("(|+1)")){
+			preparedRule= preparedRule.substring("(|+1)".length());
+		}
 		proposer.addProposition(buttonText,preparedValue,preparedRule,active_char);
 		
 	}
