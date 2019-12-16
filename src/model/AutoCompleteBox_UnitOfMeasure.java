@@ -192,4 +192,11 @@ protected void send_uom_to_parent(UnitOfMeasure unitOfMeasure) {
 }
 
 
+
+
+public void setUom(UnitOfMeasure unitOfMeasure) {
+	setText(unitOfMeasure.getUom_symbol()+" ("+unitOfMeasure.getUom_name()+")");
+}
+
+
 }

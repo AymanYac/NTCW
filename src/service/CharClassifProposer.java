@@ -51,7 +51,7 @@ public class CharClassifProposer {
 		btn.setOnAction((event) -> {
 			if(preparedValue.getUom_id()!=null && !UnitOfMeasure.RunTimeUOMS.containsKey(preparedValue.getUom_id())) {
 				//Launch UoM Declaration box
-				UoMDeclarationDialog.UomDeclarationPopUp(parent,buttonText,currentLoopButtonIndex,active_char);
+				UoMDeclarationDialog.UomDeclarationPopUp(parent,buttonText.split("\"")[1],currentLoopButtonIndex,active_char);
 				
 			}else {
 				parent.sendPatternRule(getRuleForButton(currentLoopButtonIndex));

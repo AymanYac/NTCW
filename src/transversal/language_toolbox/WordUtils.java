@@ -345,7 +345,7 @@ public class WordUtils {
 		public static ArrayList<Double> parseNumericalValues(String selected_text) {
 			//(including decimals with "." or "," or negative values
 			
-			Pattern p = Pattern.compile("(-?\\d+(\\.\\d+)?)");
+			Pattern p = Pattern.compile("(-?\\+?\\d+(\\.\\d+)?)");
 			Matcher m = p.matcher(selected_text.replace(",", "."));
 			
 			ArrayList<Double> ret = new ArrayList<Double>();
@@ -424,5 +424,106 @@ public class WordUtils {
 					||searchText.equals("(|+0)"+sep+"")
 					||searchText.equals(""+sep+"(|+0)")
 					||searchText.equals(""+sep+"");
+		}
+
+
+		public static String textWithoutParsedNumericalValues(String selected_text) {
+			System.out.println("selected text::"+selected_text);
+			//(including decimals with "." or "," or negative values
+			
+			Pattern p = Pattern.compile("(-?\\+?\\d+(\\.\\d+)?)");
+			Matcher m = p.matcher(selected_text.replace(",", "."));
+			
+			int i=0;
+			while (m.find()) {
+				i+=1;
+				selected_text = selected_text.replaceFirst(Pattern.quote(m.group(0)), "%"+String.valueOf(i));
+				//ret.add(Double.valueOf( m.group(0)) );
+				  
+				}
+			System.out.println("escaped text::"+selected_text);
+			return selected_text;
+		}
+
+
+		public static String reducePatternRuleSeparators(String preparedRule) {
+			try {
+				//Removed : + - and / from separators to account for "sep" cases
+				String[] SEPARATORS = new String[] {",","\\."," ","=",":","+","-","/","|","\\"};
+				ArrayList<String> exceptions = WordUtils.parsePatternRuleSeparatorExceptions(SEPARATORS,preparedRule);
+				
+				String loopRule = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+				while(true) {
+					loopRule = reduceExtremetiesPatternRuleSeparators(preparedRule,SEPARATORS,exceptions);
+					if(preparedRule.equals(loopRule)) {
+						break;
+					}
+					preparedRule = loopRule;
+				}
+				
+				
+				
+				return preparedRule;
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
+				return preparedRule;
+			}
+		}
+
+
+		private static ArrayList<String> parsePatternRuleSeparatorExceptions(String[] SEPARATORS, String preparedRule) {
+			ArrayList<String> ret = new ArrayList<String>();
+			String ruleClause = preparedRule.split("<")[1];
+			for(String sepField:ruleClause.split("%")) {
+				sepField = sepField.split(">")[0];
+				for(String sep:SEPARATORS) {
+					if(sepField.contains(sep)) {
+						ret.add(sep);
+					}
+				}
+			}
+			return ret;
+		}
+
+
+		private static String reduceExtremetiesPatternRuleSeparators(String preparedRule,
+				String[] SEPARATORS, ArrayList<String> exceptions) {
+			
+			String uomClause="";
+			try {
+				uomClause = preparedRule.split("<UOM")[1];
+				preparedRule = preparedRule.split("<UOM")[0];
+			}catch(Exception V) {
+				
+			}
+			for(String sep:SEPARATORS) {
+				if(exceptions.contains(sep)&&!sep.equals(" ")) {
+					continue;
+				}
+				preparedRule = preparedRule.replaceAll("(?!~)\""+Pattern.quote(sep)+"+", "(|+1)\"")
+					      .replaceAll(Pattern.quote(sep)+"+(?!~)\"", "\"(|+1)")
+					      .replace("\"\"", "");
+			}
+			preparedRule = preparedRule.replaceAll("(\\(\\|\\+0\\))+","(|+0)")
+						.replaceAll("(\\(\\|\\+1\\))+","(|+1)")
+						.replaceAll("(\\(\\|\\+0\\))+\\(\\|\\+1\\)","(|+1)")
+						.replaceAll("\\(\\|\\+1\\)(\\(\\|\\+0\\))+","(|+1)");
+			
+			if(preparedRule.endsWith("(|+1)")){
+				preparedRule= preparedRule.substring(0,preparedRule.length()-"(|+1)".length());
+			}
+			if(preparedRule.startsWith("(|+1)")){
+				preparedRule= preparedRule.substring("(|+1)".length());
+			}
+			if(preparedRule.endsWith("(|+0)")){
+				preparedRule= preparedRule.substring(0,preparedRule.length()-"(|+0)".length());
+			}
+			if(preparedRule.startsWith("(|+0)")){
+				preparedRule= preparedRule.substring("(|+0)".length());
+			}
+			
+			
+			return preparedRule+"<UOM"+uomClause;
+			
 		}
 }

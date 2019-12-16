@@ -52,8 +52,7 @@ public class CharPatternServices {
 		selected_text = selected_text.replace("\"", "~\"");
 		ArrayList<UnitOfMeasure> uomsInSelection = WordUtils.parseCompatibleUoMs(selected_text,active_char);
 		ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(selected_text);
-
-
+		
 		
 		//The correction of the selection without separator is equal to one of the values ("VAL") already listed for this characteristic without separator?
 		//#Let's correct the selection
@@ -521,6 +520,9 @@ public class CharPatternServices {
 //
 			}
 		}else if (active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0) {
+			
+			selected_text = WordUtils.textWithoutParsedNumericalValues(selected_text);
+
 //			The characteristic is a characteristic with Unit(s) of Measure?
 			System.out.println("The characteristic is a characteristic with Unit(s) of Measure");
 //					If YES
@@ -550,11 +552,11 @@ public class CharPatternServices {
 								tmp.setUom_id(following_uom.getUom_id());
 								parent.sendPatternValue(tmp);
 								parent.sendPatternRule("\""+selected_text.substring(0,
-										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-								+"\"(|+1)[MAX%](|+0)"+"\""+selected_text.substring(
-										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))+
-												WordUtils.DoubleToString(numValuesInSelection.get(0)).length())+"\""
-										+"<UOM\""+following_uom.getUom_symbol()+"\">");
+										selected_text.replace(",", ".").indexOf("%1"))
+								+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+										selected_text.replace(",", ".").indexOf("%1")+
+												"%1".length())+"\""
+										+"<MAX %1><UOM\""+following_uom.getUom_symbol()+"\">");
 								return;
 							}
 							if(selected_text.toLowerCase().contains("min")&&!following_uom.getUom_name().contains("min")) {
@@ -570,11 +572,11 @@ public class CharPatternServices {
 								tmp.setUom_id(following_uom.getUom_id());
 								parent.sendPatternValue(tmp);
 								parent.sendPatternRule("\""+selected_text.substring(0,
-										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-								+"\"(|+1)[MIN%](|+0)"+"\""+selected_text.substring(
-										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))+
-												WordUtils.DoubleToString(numValuesInSelection.get(0)).length())+"\""
-										+"<UOM\""+following_uom.getUom_symbol()+"\">");
+										selected_text.replace(",", ".").indexOf("%1"))
+								+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+										selected_text.replace(",", ".").indexOf("%1")+
+												"%1".length())+"\""
+										+"<MIN %1><UOM\""+following_uom.getUom_symbol()+"\">");
 								return;
 							}else {
 								System.out.println("The selection does not contain \"MIN\" nor \"MAX\"  (e.g. \"LZ= 1160 MM\")");
@@ -583,18 +585,18 @@ public class CharPatternServices {
 								tmp.setUom_id(following_uom.getUom_id());
 								parent.sendPatternValue(tmp);
 								parent.sendPatternRule("\""+selected_text.substring(0,
-										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-								+"\"(|+1)[NOM%](|+0)"+"\""+selected_text.substring(
-										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))+
-												WordUtils.DoubleToString(numValuesInSelection.get(0)).length())+"\""
-										+"<UOM\""+following_uom.getUom_symbol()+"\">");
+										selected_text.replace(",", ".").indexOf("%1"))
+								+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+										selected_text.replace(",", ".").indexOf("%1")+
+												"%1".length())+"\""
+										+"<NOM %1><UOM\""+following_uom.getUom_symbol()+"\">");
 								return;
 							}
 							
 						}else {
 							// The numerical value is not followed by a known unit of measure
 							System.out.println("The numerical value is not followed by a known unit of measure");
-							if(selected_text.endsWith(WordUtils.DoubleToString(numValuesInSelection.get(0)))) {
+							if(selected_text.endsWith("%1")) {
 								//The numerical value is at the end of the selection
 								System.out.println("The numerical value is at the end of the selection");
 								if(active_char.getAllowedUoms().size()==1) {
@@ -609,8 +611,8 @@ public class CharPatternServices {
 										tmp.setUom_id(infered_uom.getUom_id());
 										parent.sendPatternValue(tmp);
 										parent.sendPatternRule("\""+selected_text.substring(0,
-												selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-										+"\"(|+1)[MAX%]<UOM\""+infered_uom.getUom_symbol()+"\">");
+												selected_text.replace(",", ".").indexOf("%1"))
+										+"\"(|+0)%1<MAX %1><UOM\""+infered_uom.getUom_symbol()+"\">");
 										return;
 									}
 									if(selected_text.toLowerCase().contains("min")&&!infered_uom.getUom_name().contains("min")) {
@@ -626,8 +628,8 @@ public class CharPatternServices {
 										tmp.setUom_id(infered_uom.getUom_id());
 										parent.sendPatternValue(tmp);
 										parent.sendPatternRule("\""+selected_text.substring(0,
-												selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-										+"\"(|+1)[MIN%]<UOM\""+infered_uom.getUom_symbol()+"\">");
+												selected_text.replace(",", ".").indexOf("%1"))
+										+"\"(|+0)%1<MIN %1><UOM\""+infered_uom.getUom_symbol()+"\">");
 										return;
 									}else {
 										System.out.println("The selection does not contain \"MIN\" nor \"MAX\"  (e.g. \"LZ= 1160\")");
@@ -636,8 +638,8 @@ public class CharPatternServices {
 										tmp.setUom_id(infered_uom.getUom_id());
 										parent.sendPatternValue(tmp);
 										parent.sendPatternRule("\""+selected_text.substring(0,
-												selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-										+"\"(|+0)[NOM%]<UOM\""+infered_uom.getUom_symbol()+"\">");
+												selected_text.replace(",", ".").indexOf("%1"))
+										+"\"(|+0)%1<NOM %1><UOM\""+infered_uom.getUom_symbol()+"\">");
 										return;
 									}
 
@@ -656,10 +658,10 @@ public class CharPatternServices {
 										preparedValue.setUom_id(loop_uom.getUom_id());
 										
 										String preparedRule = "\""+selected_text.substring(0,
-												selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-										+"\"(|+1)[MAX%]<UOM\""+loop_uom.getUom_symbol()+"\">";
+												selected_text.replace(",", ".").indexOf("%1"))
+										+"\"(|+0)%1<MAX %1><UOM\""+loop_uom.getUom_symbol()+"\">";
 										
-										parent.preparePatternProposition(i,"Max= "+preparedValue.getMax_value()+" \""+loop_uom.getUom_name()+"\"",preparedValue,preparedRule,active_char);
+										parent.preparePatternProposition(i,"Max= "+preparedValue.getMax_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule,active_char);
 										continue;
 									}
 									if(selected_text.toLowerCase().contains("min")&&!loop_uom.getUom_name().contains("min")) {
@@ -675,10 +677,10 @@ public class CharPatternServices {
 										preparedValue.setUom_id(loop_uom.getUom_id());
 										
 										String preparedRule = "\""+selected_text.substring(0,
-												selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-										+"\"(|+1)[MIN%]<UOM\""+loop_uom.getUom_symbol()+"\">";
+												selected_text.replace(",", ".").indexOf("%1"))
+										+"\"(|+0)%1<MIN %1><UOM\""+loop_uom.getUom_symbol()+"\">";
 										
-										parent.preparePatternProposition(i,"Min= "+preparedValue.getMin_value()+" \""+loop_uom.getUom_name()+"\"",preparedValue,preparedRule, active_char);
+										parent.preparePatternProposition(i,"Min= "+preparedValue.getMin_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 										continue;
 									}else {
 										System.out.println("The selection does not contain \"MIN\" nor \"MAX\"  (e.g. \"LZ=1160\")");
@@ -687,10 +689,10 @@ public class CharPatternServices {
 										preparedValue.setUom_id(loop_uom.getUom_id());
 	
 										String preparedRule ="\""+selected_text.substring(0,
-												selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-										+"\"(|+1)[NOM%]<UOM\""+loop_uom.getUom_symbol()+"\">";
+												selected_text.replace(",", ".").indexOf("%1"))
+										+"\"(|+0)%1<NOM %1><UOM\""+loop_uom.getUom_symbol()+"\">";
 										
-										parent.preparePatternProposition(i,preparedValue.getNominal_value()+" \""+loop_uom.getUom_name()+"\"",preparedValue,preparedRule, active_char);
+										parent.preparePatternProposition(i,preparedValue.getNominal_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 										continue;
 									}
 									}return;
@@ -717,13 +719,13 @@ public class CharPatternServices {
 									System.out.println(selected_text);
 									System.out.println(numValuesInSelection.get(0));
 									String preparedRule = "\""+selected_text.substring(0,
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-									+"\"(|+1)[MAX%](|+0)"+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))+
-													WordUtils.DoubleToString(numValuesInSelection.get(0)).length())+"\""
-											+"<UOM\""+loop_uom.getUom_symbol()+"\">";
+											selected_text.replace(",", ".").indexOf("%1"))
+									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+											selected_text.replace(",", ".").indexOf("%1")+
+													"%1".length())+"\""
+											+"<MAX %1><UOM\""+loop_uom.getUom_symbol()+"\">";
 									
-									parent.preparePatternProposition(i,"Max= "+preparedValue.getMax_value()+" \""+loop_uom.getUom_name()+"\"",preparedValue,preparedRule, active_char);
+									parent.preparePatternProposition(i,"Max= "+preparedValue.getMax_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 									continue;
 								}
 								if(selected_text.toLowerCase().contains("min")&&!loop_uom.getUom_name().contains("min")) {
@@ -739,13 +741,13 @@ public class CharPatternServices {
 									preparedValue.setUom_id(loop_uom.getUom_id());
 									
 									String preparedRule = "\""+selected_text.substring(0,
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-									+"\"(|+1)[MIN%](|+0)"+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))+
-													WordUtils.DoubleToString(numValuesInSelection.get(0)).length())+"\""
-											+"<UOM\""+loop_uom.getUom_symbol()+"\">";
+											selected_text.replace(",", ".").indexOf("%1"))
+									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+											selected_text.replace(",", ".").indexOf("%1")+
+													"%1".length())+"\""
+											+"<MIN %1><UOM\""+loop_uom.getUom_symbol()+"\">";
 									
-									parent.preparePatternProposition(i,"Min= "+preparedValue.getMin_value()+" \""+loop_uom.getUom_name()+"\"",preparedValue,preparedRule, active_char);
+									parent.preparePatternProposition(i,"Min= "+preparedValue.getMin_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 									continue;
 								}else {
 									System.out.println("The selection does not contain \"MIN\" nor \"MAX\"  (e.g. \"LZ=1160\")");
@@ -754,19 +756,19 @@ public class CharPatternServices {
 									preparedValue.setUom_id(loop_uom.getUom_id());
 
 									String preparedRule ="\""+selected_text.substring(0,
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-									+"\"(|+1)[NOM%](|+0)"+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))+
-													WordUtils.DoubleToString(numValuesInSelection.get(0)).length())+"\""
-											+"<UOM\""+loop_uom.getUom_symbol()+"\">";
+											selected_text.replace(",", ".").indexOf("%1"))
+									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+											selected_text.replace(",", ".").indexOf("%1")+
+													"%1".length())+"\""
+											+"<NOM %1><UOM\""+loop_uom.getUom_symbol()+"\">";
 									
-									parent.preparePatternProposition(i,preparedValue.getNominal_value()+" \""+loop_uom.getUom_name()+"\"",preparedValue,preparedRule, active_char);
+									parent.preparePatternProposition(i,preparedValue.getNominal_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 									continue;
 								}
 								}
 								
-								String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
-										+WordUtils.DoubleToString(numValuesInSelection.get(0)).length()).trim();
+								String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf("%1")
+										+"%1".length()).trim();
 								if(selected_text.toLowerCase().contains("max")) {
 //									The selection contains "MAX"?  (e.g. "Long. Max=1160")
 									System.out.println("The selection contains \"MAX\"  (e.g. \"Long. Max=1160\")");
@@ -775,11 +777,11 @@ public class CharPatternServices {
 									preparedValue.setUom_id("$$$UOM_ID$$$");
 									
 									String preparedRule = "\""+selected_text.substring(0,
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-									+"\"(|+1)[MAX%](|+0)"+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))+
-													WordUtils.DoubleToString(numValuesInSelection.get(0)).length())+"\""
-											+"<UOM\""+"$$$UOM_SYMBOL$$$"+"\">";
+											selected_text.replace(",", ".").indexOf("%1"))
+									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+											selected_text.replace(",", ".").indexOf("%1")+
+													"%1".length())+"\""
+											+"<MAX %1><UOM\""+"$$$UOM_SYMBOL$$$"+"\">";
 									
 									parent.preparePatternProposition(i,"Max= "+preparedValue.getMax_value()+" \""+UOM_INFERED_NAME+"\"",preparedValue,preparedRule, active_char);
 									return;
@@ -797,11 +799,11 @@ public class CharPatternServices {
 									preparedValue.setUom_id("$$$UOM_ID$$$");
 									
 									String preparedRule = "\""+selected_text.substring(0,
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-									+"\"(|+1)[MIN%](|+0)"+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))+
-													WordUtils.DoubleToString(numValuesInSelection.get(0)).length())+"\""
-											+"<UOM\""+"$$$UOM_SYMBOL$$$"+"\">";
+											selected_text.replace(",", ".").indexOf("%1"))
+									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+											selected_text.replace(",", ".").indexOf("%1")+
+													"%1".length())+"\""
+											+"<MIN %1><UOM\""+"$$$UOM_SYMBOL$$$"+"\">";
 									
 									parent.preparePatternProposition(i,"Min= "+preparedValue.getMin_value()+" \""+UOM_INFERED_NAME+"\"",preparedValue,preparedRule, active_char);
 									return;
@@ -812,11 +814,11 @@ public class CharPatternServices {
 									preparedValue.setUom_id("$$$UOM_ID$$$");
 
 									String preparedRule ="\""+selected_text.substring(0,
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-									+"\"(|+1)[NOM%](|+0)"+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))+
-													WordUtils.DoubleToString(numValuesInSelection.get(0)).length())+"\""
-											+"<UOM\""+"$$$UOM_SYMBOL$$$"+"\">";
+											selected_text.replace(",", ".").indexOf("%1"))
+									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+											selected_text.replace(",", ".").indexOf("%1")+
+													"%1".length())+"\""
+											+"<NOM %1><UOM\""+"$$$UOM_SYMBOL$$$"+"\">";
 									
 									parent.preparePatternProposition(i,preparedValue.getNominal_value()+" \""+UOM_INFERED_NAME+"\"",preparedValue,preparedRule, active_char);
 									return;
@@ -839,8 +841,8 @@ public class CharPatternServices {
 								parent.sendPatternValue(tmp);
 								/*
 								parent.sendPatternRule("\""+selected_text.substring(0,
-										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-								+"\"(|+1)[NOM%]<UOM\""+infered_uom.getUom_symbol()+"\">");
+										selected_text.replace(",", ".").indexOf("%1"))
+								+"\"(|+0)%1<NOM %1><UOM\""+infered_uom.getUom_symbol()+"\">");
 								*/
 								parent.sendPatternRule(null);
 								
@@ -854,11 +856,11 @@ public class CharPatternServices {
 									preparedValue.setUom_id(loop_uom.getUom_id());
 									/*
 									String preparedRule ="\""+selected_text.substring(0,
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0))))
-									+"\"(|+1)[NOM%]<UOM\""+loop_uom.getUom_symbol()+"\">";
+											selected_text.replace(",", ".").indexOf("%1"))
+									+"\"(|+0)%1<NOM %1><UOM\""+loop_uom.getUom_symbol()+"\">";
 									*/
 									String preparedRule=null;
-									parent.preparePatternProposition(i,preparedValue.getNominal_value()+" \""+loop_uom.getUom_name()+"\"",preparedValue,preparedRule, active_char);
+									parent.preparePatternProposition(i,preparedValue.getNominal_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 									
 
 								}return;
@@ -873,10 +875,9 @@ public class CharPatternServices {
 //						The selection includes 2 and only 2 numerical values (including decimals with "." or "," or negative values)
 						System.out.println("The selection includes 2 and only 2 numerical values (including decimals with \".\" or \",\" or negative values)");
 						String inbetweenNumbersText = selected_text.substring(
-							selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(
-									numValuesInSelection.get(0)))+
-									WordUtils.DoubleToString(numValuesInSelection.get(0)).length(),
-							selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+							selected_text.replace(",", ".").indexOf("%1")+
+									"%1".length(),
+							selected_text.replace(",", ".").indexOf("%2")
 							);
 						inbetweenNumbersText = String.join("",  inbetweenNumbersText.chars().mapToObj((c -> (char) c)).
 						map(c->(Character.isAlphabetic(c)||Character.isDigit(c)||c.equals('/')||c.equals(':'))?String.valueOf(c):"(|+0)").
@@ -896,12 +897,12 @@ public class CharPatternServices {
 								preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
 								preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 								String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-										WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2(|+0)"
+										"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2(|+0)"
 										+"\""+selected_text.substring(
-												selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-														WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+												selected_text.replace(",", ".").indexOf("%2")+
+														"%2".length())
 										+"\""+"<NOM %1/%2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-								parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" \""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+								parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue1, preparedRule1, active_char);
 								
 								
 								CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -910,15 +911,15 @@ public class CharPatternServices {
 								preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 								
 								String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-										WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2(|+0)"
+										"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2(|+0)"
 										+"\""+selected_text.substring(
-												selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-														WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+												selected_text.replace(",", ".").indexOf("%2")+
+														"%2".length())
 										+"\""+"<MINMAX %1><MINMAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-								parent.preparePatternProposition(1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" \""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+								parent.preparePatternProposition(1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue2, preparedRule2, active_char);
 								return;
 							}else {
-								if(selected_text.replace(",", ".").endsWith(WordUtils.DoubleToString(numValuesInSelection.get(1)))) {
+								if(selected_text.replace(",", ".").endsWith("%2")) {
 									//The 2nd numerical value is at the end of the selection?
 									System.out.println("The 2nd numerical value is at the end of the selection");
 									if(active_char.getAllowedUoms().size()==1) {
@@ -929,9 +930,9 @@ public class CharPatternServices {
 										preparedValue1.setUom_id(infered_uom.getUom_id());
 										preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2"
+												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 												+"<NOM %1/%2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+										parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
 										CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -940,26 +941,26 @@ public class CharPatternServices {
 										preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										
 										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2"
+												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 												+"<MINMAX %1><MINMAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										
 										
 										CharacteristicValue preparedValue3 = new CharacteristicValue();
 										preparedValue3.setUom_id(infered_uom.getUom_id());
 										preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2"
+												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 												+"<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+										parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 										
 										CharacteristicValue preparedValue4 = new CharacteristicValue();
 										preparedValue4.setUom_id(infered_uom.getUom_id());
 										preparedValue4.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										String preparedRule4 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2"
+												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 												+"<NOM %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(3, preparedValue4.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue4, preparedRule4, active_char);
+										parent.preparePatternProposition(3, preparedValue4.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue4, preparedRule4, active_char);
 										
 										
 										
@@ -974,9 +975,9 @@ public class CharPatternServices {
 											preparedValue1.setUom_id(infered_uom.getUom_id());
 											preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2"
+													"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 													+"<NOM %1/%2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(2*i, preparedValue1.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+											parent.preparePatternProposition(2*i, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 											
 											
 											CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -985,9 +986,9 @@ public class CharPatternServices {
 											preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 											
 											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2"
+													"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 													+"<MINMAX %1><MINMAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(2*i+1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+											parent.preparePatternProposition(2*i+1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 											continue;
 										}
 										return;
@@ -1001,12 +1002,12 @@ public class CharPatternServices {
 										preparedValue1.setUom_id(infered_uom.getUom_id());
 										preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2(|+0)"
+												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2(|+0)"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+														selected_text.replace(",", ".").indexOf("%2")+
+																"%2".length())
 												+"\""+"<NOM %1/%2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(2*i, preparedValue1.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+										parent.preparePatternProposition(2*i, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
 										CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1015,24 +1016,24 @@ public class CharPatternServices {
 										preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										
 										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2(|+0)"
+												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2(|+0)"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+														selected_text.replace(",", ".").indexOf("%2")+
+																"%2".length())
 												+"\""+"<MINMAX %1><MINMAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(2*i+1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(2*i+1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										continue;
 									}
-									String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-											+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).trim();
+									String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf("%2")
+											+"%2".length()).trim();
 									CharacteristicValue preparedValue1 = new CharacteristicValue();
 									preparedValue1.setUom_id("$$$UOM_ID$$$");
 									preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 									String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-											WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2(|+0)"
+											"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2(|+0)"
 											+"\""+selected_text.substring(
-													selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-															WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+													selected_text.replace(",", ".").indexOf("%2")+
+															"%2".length())
 											+"\""+"<NOM %1/%2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
 									parent.preparePatternProposition(2*i, preparedValue1.getNominal_value()+" \""+UOM_INFERED_NAME+"\"", preparedValue1, preparedRule1, active_char);
 									
@@ -1043,10 +1044,10 @@ public class CharPatternServices {
 									preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 									
 									String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-											WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"/\"(|+0)%2(|+0)"
+											"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2(|+0)"
 											+"\""+selected_text.substring(
-													selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-															WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+													selected_text.replace(",", ".").indexOf("%2")+
+															"%2".length())
 											+"\""+"<MINMAX %1><MINMAX %2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
 									parent.preparePatternProposition(2*i+1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" \""+UOM_INFERED_NAME+"\"", preparedValue2, preparedRule2, active_char);
 									
@@ -1056,10 +1057,9 @@ public class CharPatternServices {
 							}
 						}else {
 							inbetweenNumbersText = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(
-											numValuesInSelection.get(0)))+
-											WordUtils.DoubleToString(numValuesInSelection.get(0)).length(),
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+									selected_text.replace(",", ".").indexOf("%1")+
+											"%1".length(),
+									selected_text.replace(",", ".").indexOf("%2")
 									);
 								
 							inbetweenNumbersText = String.join("", inbetweenNumbersText.chars().mapToObj((c -> (char) c)).
@@ -1076,24 +1076,24 @@ public class CharPatternServices {
 										preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
 										preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+												"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2(|+0)"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+														selected_text.replace(",", ".").indexOf("%2")+
+																"%2".length())
 												+"\""+"<NOM %1><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" \""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+										parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
 										CharacteristicValue preparedValue2 = new CharacteristicValue();
 										preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
 										preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+												"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2(|+0)"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+														selected_text.replace(",", ".").indexOf("%2")+
+																"%2".length())
 												+"\""+"<NOM %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" \""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										
 										
 										
@@ -1102,17 +1102,17 @@ public class CharPatternServices {
 										preparedValue3.setUom_id(uomsInSelection.get(1).getUom_id());
 										preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+												"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2(|+0)"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+														selected_text.replace(",", ".").indexOf("%2")+
+																"%2".length())
 												+"\""+"<NOM %1+%2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" \""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+										parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue3, preparedRule3, active_char);
 										
 										
 										return;
 								}else {
-									if(selected_text.replace(",", ".").endsWith(WordUtils.DoubleToString(numValuesInSelection.get(1)))) {
+									if(selected_text.replace(",", ".").endsWith("%2")) {
 										//The 2nd numerical value is at the end of the selection?
 										System.out.println("The 2nd numerical value is at the end of the selection");
 										int i;
@@ -1123,18 +1123,18 @@ public class CharPatternServices {
 											preparedValue1.setUom_id(infered_uom.getUom_id());
 											preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2"
+													"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2"
 													+"<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 											
 											
 											CharacteristicValue preparedValue2 = new CharacteristicValue();
 											preparedValue2.setUom_id(infered_uom.getUom_id());
 											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2"
+													"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2"
 													+"<NOM %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+											parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 											
 											
 											
@@ -1143,9 +1143,9 @@ public class CharPatternServices {
 											preparedValue3.setUom_id(infered_uom.getUom_id());
 											preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 											String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2"
+													"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2"
 													+"<NOM %1+%2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+											parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 											
 											
 											continue;
@@ -1160,24 +1160,24 @@ public class CharPatternServices {
 											preparedValue1.setUom_id(infered_uom.getUom_id());
 											preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+													"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2(|+0)"
 													+"\""+selected_text.substring(
-															selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																	WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+															selected_text.replace(",", ".").indexOf("%2")+
+																	"%2".length())
 													+"\""+"<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 											
 											
 											CharacteristicValue preparedValue2 = new CharacteristicValue();
 											preparedValue2.setUom_id(infered_uom.getUom_id());
 											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+													"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2(|+0)"
 													+"\""+selected_text.substring(
-															selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																	WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+															selected_text.replace(",", ".").indexOf("%2")+
+																	"%2".length())
 													+"\""+"<NOM %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+											parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 											
 											
 											
@@ -1186,28 +1186,28 @@ public class CharPatternServices {
 											preparedValue3.setUom_id(infered_uom.getUom_id());
 											preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 											String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+													"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2(|+0)"
 													+"\""+selected_text.substring(
-															selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																	WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+															selected_text.replace(",", ".").indexOf("%2")+
+																	"%2".length())
 													+"\""+"<NOM %1+%2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+											parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 											
 											
 											continue;
 										}
 										
 										
-										String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-												+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).trim();
+										String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf("%2")
+												+"%2".length()).trim();
 										CharacteristicValue preparedValue1 = new CharacteristicValue();
 										preparedValue1.setUom_id("$$$UOM_ID$$$");
 										preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+												"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2(|+0)"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+														selected_text.replace(",", ".").indexOf("%2")+
+																"%2".length())
 												+"\""+"<NOM %1><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
 										parent.preparePatternProposition(3*i, preparedValue1.getNominal_value()+" \""+UOM_INFERED_NAME, preparedValue1, preparedRule1, active_char);
 										
@@ -1216,10 +1216,10 @@ public class CharPatternServices {
 										preparedValue2.setUom_id("$$$UOM_ID$$$");
 										preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+												"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2(|+0)"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+														selected_text.replace(",", ".").indexOf("%2")+
+																"%2".length())
 												+"\""+"<NOM %2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
 										parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+" \""+UOM_INFERED_NAME, preparedValue2, preparedRule2, active_char);
 										
@@ -1230,10 +1230,10 @@ public class CharPatternServices {
 										preparedValue3.setUom_id("$$$UOM_ID$$$");
 										preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\"+\"(|+0)%2(|+0)"
+												"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2(|+0)"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+														selected_text.replace(",", ".").indexOf("%2")+
+																"%2".length())
 												+"\""+"<NOM %1+%2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
 										parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+" \""+UOM_INFERED_NAME, preparedValue3, preparedRule3, active_char);
 										
@@ -1246,10 +1246,9 @@ public class CharPatternServices {
 							}else{
 								
 								inbetweenNumbersText = selected_text.substring(
-										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(
-												numValuesInSelection.get(0)))+
-												WordUtils.DoubleToString(numValuesInSelection.get(0)).length(),
-										selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+										selected_text.replace(",", ".").indexOf("%1")+
+												"%1".length(),
+										selected_text.replace(",", ".").indexOf("%2")
 										);
 									
 								inbetweenNumbersText = String.join("", inbetweenNumbersText.chars().mapToObj((c -> (char) c)).
@@ -1270,17 +1269,17 @@ public class CharPatternServices {
 										preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										
 										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\":\"(|+0)%2(|+0)"
+												"%1"))+"\"(|+0)%1(|+0)\":\"(|+0)%2(|+0)"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+														selected_text.replace(",", ".").indexOf("%2")+
+																"%2".length())
 												+"\""+"<MINMAX %1><MINMAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
 										parent.sendPatternRule(preparedRule2);
 										parent.sendPatternValue(preparedValue2);
-										//parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" \""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+										//parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										return;
 									}else {
-										if(selected_text.replace(",", ".").endsWith(WordUtils.DoubleToString(numValuesInSelection.get(1)))) {
+										if(selected_text.replace(",", ".").endsWith("%2")) {
 											//The 2nd numerical value is at the end of the selection?
 											System.out.println("The 2nd numerical value is at the end of the selection");
 											if(active_char.getAllowedUoms().size()==1) {
@@ -1295,11 +1294,11 @@ public class CharPatternServices {
 												preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 												
 												String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\":\"(|+0)%2"
+														"%1"))+"\"(|+0)%1(|+0)\":\"(|+0)%2"
 														+"<MINMAX %1><MINMAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
 												parent.sendPatternRule(preparedRule2);
 												parent.sendPatternValue(preparedValue2);
-												//parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+												//parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 												return;
 											}else {
 												int i;
@@ -1314,9 +1313,9 @@ public class CharPatternServices {
 													preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 													
 													String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-															WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\":\"(|+0)%2"
+															"%1"))+"\"(|+0)%1(|+0)\":\"(|+0)%2"
 															+"<MINMAX %1><MINMAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-													parent.preparePatternProposition(i, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+													parent.preparePatternProposition(i, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 													continue;
 												}
 												return;
@@ -1334,16 +1333,16 @@ public class CharPatternServices {
 												preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 												
 												String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\":\"(|+0)%2(|+0)"
+														"%1"))+"\"(|+0)%1(|+0)\":\"(|+0)%2(|+0)"
 														+"\""+selected_text.substring(
-																selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																		WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+																selected_text.replace(",", ".").indexOf("%2")+
+																		"%2".length())
 														+"\""+"<MINMAX %1><MINMAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-												parent.preparePatternProposition(i, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+												parent.preparePatternProposition(i, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 												continue;
 											}
-											String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-													+WordUtils.DoubleToString(numValuesInSelection.get(1)).length()).trim();
+											String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf("%2")
+													+"%2".length()).trim();
 											
 											
 											CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1352,10 +1351,10 @@ public class CharPatternServices {
 											preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 											
 											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+0)\":\"(|+0)%2(|+0)"
+													"%1"))+"\"(|+0)%1(|+0)\":\"(|+0)%2(|+0)"
 													+"\""+selected_text.substring(
-															selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																	WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+															selected_text.replace(",", ".").indexOf("%2")+
+																	"%2".length())
 													+"\""+"<MINMAX %1><MINMAX %2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
 											parent.preparePatternProposition(i, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" \""+UOM_INFERED_NAME+"\"", preparedValue2, preparedRule2, active_char);
 											
@@ -1368,9 +1367,9 @@ public class CharPatternServices {
 									
 								}else {
 									inbetweenNumbersText = selected_text.substring(
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
-											+WordUtils.DoubleToString(numValuesInSelection.get(0)).length(),
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+											selected_text.replace(",", ".").indexOf("%1")
+											+"%1".length(),
+											selected_text.replace(",", ".").indexOf("%2")
 											);
 										
 									
@@ -1382,26 +1381,26 @@ public class CharPatternServices {
 										preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-												+inbetweenNumbersText+"\""+"(|+1)%2(|+0)"
+												"%1"))+"\"(|+0)%1(|+0)\""
+												+inbetweenNumbersText+"\""+"(|+0)%2(|+0)"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+														selected_text.replace(",", ".").indexOf("%2")+
+																"%2".length())
 												+"\""+"<MINMAX %1><MINMAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" \""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+										parent.preparePatternProposition(0, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
 										CharacteristicValue preparedValue2 = new CharacteristicValue();
 										preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
 										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-												+inbetweenNumbersText+"\""+"(|+1)%2(|+0)"
+												"%1"))+"\"(|+0)%1(|+0)\""
+												+inbetweenNumbersText+"\""+"(|+0)%2(|+0)"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+														selected_text.replace(",", ".").indexOf("%2")+
+																"%2".length())
 												+"\""+"<NOM %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" \""+uomsInSelection.get(1).getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										return;
 									}else {
 										if(uomsInSelection.get(0)!=null) {
@@ -1411,11 +1410,11 @@ public class CharPatternServices {
 											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
 											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-													+inbetweenNumbersText+"\""+"(|+1)%2(|+1)"
+													"%1"))+"\"(|+0)%1(|+0)\""
+													+inbetweenNumbersText+"\""+"(|+0)%2(|+0)"
 													+"\""+selected_text.substring(
-															selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																	WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+															selected_text.replace(",", ".").indexOf("%2")+
+																	"%2".length())
 													+"\""+"<NOM %1><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
 											parent.sendPatternValue(preparedValue2);
 											parent.sendPatternRule(preparedRule2);
@@ -1432,38 +1431,38 @@ public class CharPatternServices {
 												preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 												
 												String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-														+inbetweenNumbersText+"\""+"(|+1)%2"
+														"%1"))+"\"(|+0)%1(|+0)\""
+														+inbetweenNumbersText+"\""+"(|+0)%2"
 														+"\""+selected_text.substring(
-																selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																		WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+																selected_text.replace(",", ".").indexOf("%2")+
+																		"%2".length())
 														+"\""+"<MINMAX %1><MINMAX %2><UOM \""+infered_uom+"\">";
-												parent.preparePatternProposition(3*i, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+												parent.preparePatternProposition(3*i, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 												
 												
 												CharacteristicValue preparedValue2 = new CharacteristicValue();
 												preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 												preparedValue2.setUom_id(infered_uom.getUom_id());
 												String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-														+inbetweenNumbersText+"\""+"(|+1)%2"
+														"%1"))+"\"(|+0)%1(|+0)\""
+														+inbetweenNumbersText+"\""+"(|+0)%2"
 														+"\""+selected_text.substring(
-																selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																		WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+																selected_text.replace(",", ".").indexOf("%2")+
+																		"%2".length())
 														+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
-												parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+												parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 												
 												CharacteristicValue preparedValue3 = new CharacteristicValue();
 												preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 												preparedValue3.setUom_id(infered_uom.getUom_id());
 												String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-														WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-														+inbetweenNumbersText+"\""+"(|+1)%2"
+														"%1"))+"\"(|+0)%1(|+0)\""
+														+inbetweenNumbersText+"\""+"(|+0)%2"
 														+"\""+selected_text.substring(
-																selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))+
-																		WordUtils.DoubleToString(numValuesInSelection.get(1)).length())
+																selected_text.replace(",", ".").indexOf("%2")+
+																		"%2".length())
 														+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
-												parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+												parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 												
 												
 												continue;
@@ -1481,9 +1480,9 @@ public class CharPatternServices {
 							System.out.println("The selection includes 3 and only 3 numerical values (including decimals with \".\" or \",\" or negative values)");
 							
 							String inbetweenNumbersText1 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
-									+WordUtils.DoubleToString(numValuesInSelection.get(0)).length(),
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+									selected_text.replace(",", ".").indexOf("%1")
+									+"%1".length(),
+									selected_text.replace(",", ".").indexOf("%2")
 									);
 							
 							System.out.println(WordUtils.DoubleToString(numValuesInSelection.get(0)));
@@ -1494,9 +1493,9 @@ public class CharPatternServices {
 							System.out.println(numValuesInSelection.get(2));
 							
 							String inbetweenNumbersText2 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-									+WordUtils.DoubleToString(numValuesInSelection.get(1)).length(),
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))
+									selected_text.replace(",", ".").indexOf("%2")
+									+"%2".length(),
+									selected_text.replace(",", ".").indexOf("%3")
 									);
 								
 							if(uomsInSelection.get(2)!=null) {
@@ -1504,20 +1503,68 @@ public class CharPatternServices {
 								System.out.println("The 3rd numerical value is followed by a known unit of measure");
 								
 								UnitOfMeasure infered_uom = uomsInSelection.get(2);
+								
+
+								CharacteristicValue preparedValueA = new CharacteristicValue();
+								preparedValueA.setUom_id(infered_uom.getUom_id());
+								preparedValueA.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+								
+								String preparedRuleA = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+										"%1"))+"\"(|+0)%1(|+0)\""
+										+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+										+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)"
+										+"\""+selected_text.substring(
+												selected_text.replace(",", ".").indexOf("%3")+
+														"%3".length())
+										+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
+								parent.preparePatternProposition(0, preparedValueA.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValueA, preparedRuleA, active_char);
+								
+								
+								CharacteristicValue preparedValueB = new CharacteristicValue();
+								preparedValueB.setUom_id(infered_uom.getUom_id());
+								preparedValueB.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+								
+								String preparedRuleB = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+										"%1"))+"\"(|+0)%1(|+0)\""
+										+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+										+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)"
+										+"\""+selected_text.substring(
+												selected_text.replace(",", ".").indexOf("%3")+
+														"%3".length())
+										+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
+								parent.preparePatternProposition(1, preparedValueB.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValueB, preparedRuleB, active_char);
+								
+								CharacteristicValue preparedValue3 = new CharacteristicValue();
+								preparedValue3.setUom_id(infered_uom.getUom_id());
+								preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
+								
+								String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+										"%1"))+"\"(|+0)%1(|+0)\""
+										+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+										+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)"
+										+"\""+selected_text.substring(
+												selected_text.replace(",", ".").indexOf("%3")+
+														"%3".length())
+										+"\""+"<NOM %3><UOM \""+infered_uom+"\">";
+								parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
+								
+								
+								
+								
 								CharacteristicValue preparedValue1 = new CharacteristicValue();
 								preparedValue1.setUom_id(infered_uom.getUom_id());
 								preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 								preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 								
 								String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-										WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-										+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-										+inbetweenNumbersText2+"\""+"(|+1)%3(|+0)"
+										"%1"))+"\"(|+0)%1(|+0)\""
+										+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+										+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)"
 										+"\""+selected_text.substring(
-												selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))+
-														WordUtils.DoubleToString(numValuesInSelection.get(2)).length())
+												selected_text.replace(",", ".").indexOf("%3")+
+														"%3".length())
 										+"\""+"<MINMAX %1><MINMAX %3><UOM \""+infered_uom+"\">";
-								parent.preparePatternProposition(0, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+								parent.preparePatternProposition(3, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 								
 								CharacteristicValue preparedValue2 = new CharacteristicValue();
 								preparedValue2.setUom_id(infered_uom.getUom_id());
@@ -1525,29 +1572,17 @@ public class CharPatternServices {
 								preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 								
 								String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-										WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-										+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-										+inbetweenNumbersText2+"\""+"(|+1)%3(|+0)"
+										"%1"))+"\"(|+0)%1(|+0)\""
+										+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+										+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)"
 										+"\""+selected_text.substring(
-												selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))+
-														WordUtils.DoubleToString(numValuesInSelection.get(2)).length())
+												selected_text.replace(",", ".").indexOf("%3")+
+														"%3".length())
 										+"\""+"<MINMAX %2><MINMAX %3><UOM \""+infered_uom+"\">";
-								parent.preparePatternProposition(1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+								parent.preparePatternProposition(4, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 								
 								
-								CharacteristicValue preparedValue3 = new CharacteristicValue();
-								preparedValue3.setUom_id(infered_uom.getUom_id());
-								preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 								
-								String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-										WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-										+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-										+inbetweenNumbersText2+"\""+"(|+1)%3(|+0)"
-										+"\""+selected_text.substring(
-												selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))+
-														WordUtils.DoubleToString(numValuesInSelection.get(2)).length())
-										+"\""+"<NOM %3><UOM \""+infered_uom+"\">";
-								parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
 								
 							}else {
 								if(uomsInSelection.get(1)!=null) {
@@ -1562,14 +1597,14 @@ public class CharPatternServices {
 									preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 									
 									String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-											WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-											+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-											+inbetweenNumbersText2+"\""+"(|+1)%3(|+0)"
+											"%1"))+"\"(|+0)%1(|+0)\""
+											+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+											+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)"
 											+"\""+selected_text.substring(
-													selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))+
-															WordUtils.DoubleToString(numValuesInSelection.get(2)).length())
+													selected_text.replace(",", ".").indexOf("%3")+
+															"%3".length())
 											+"\""+"<MINMAX %1><MINMAX %2><UOM \""+infered_uom+"\">";
-									parent.preparePatternProposition(0, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+									parent.preparePatternProposition(0, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 									
 									
 									CharacteristicValue preparedValue3 = new CharacteristicValue();
@@ -1577,14 +1612,14 @@ public class CharPatternServices {
 									preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 									
 									String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-											WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-											+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-											+inbetweenNumbersText2+"\""+"(|+1)%3(|+0)"
+											"%1"))+"\"(|+0)%1(|+0)\""
+											+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+											+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)"
 											+"\""+selected_text.substring(
-													selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))+
-															WordUtils.DoubleToString(numValuesInSelection.get(2)).length())
+													selected_text.replace(",", ".").indexOf("%3")+
+															"%3".length())
 											+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
-									parent.preparePatternProposition(1, preparedValue3.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+									parent.preparePatternProposition(1, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 									
 								}else {
 									if(uomsInSelection.get(0)!=null) {
@@ -1605,12 +1640,12 @@ public class CharPatternServices {
 													));
 											
 											String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-													+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-													+inbetweenNumbersText2+"\""+"(|+1)%3(|+0)"
+													"%1"))+"\"(|+0)%1(|+0)\""
+													+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+													+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)"
 													+"\""+selected_text.substring(
-															selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))+
-																	WordUtils.DoubleToString(numValuesInSelection.get(2)).length())
+															selected_text.replace(",", ".").indexOf("%3")+
+																	"%3".length())
 													+"\""+"<%1+%2/%3><UOM \""+infered_uom+"\">";
 											
 											parent.sendPatternRule(preparedRule3);
@@ -1625,12 +1660,12 @@ public class CharPatternServices {
 													));
 											
 											String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-													WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-													+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-													+inbetweenNumbersText2+"\""+"(|+1)%3(|+0)"
+													"%1"))+"\"(|+0)%1(|+0)\""
+													+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+													+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)"
 													+"\""+selected_text.substring(
-															selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))+
-																	WordUtils.DoubleToString(numValuesInSelection.get(2)).length())
+															selected_text.replace(",", ".").indexOf("%3")+
+																	"%3".length())
 													+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
 											
 											parent.sendPatternRule(preparedRule3);
@@ -1647,15 +1682,15 @@ public class CharPatternServices {
 												));
 										
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-												+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-												+inbetweenNumbersText2+"\""+"(|+1)%3"
+												"%1"))+"\"(|+0)%1(|+0)\""
+												+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+												+inbetweenNumbersText2+"\""+"(|+0)%3"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(2)).length())
+														selected_text.replace(",", ".").indexOf("%3")+
+																"%3".length())
 												+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
 										
-										parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+										parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
 										CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1665,15 +1700,15 @@ public class CharPatternServices {
 												));
 										
 										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-												+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-												+inbetweenNumbersText2+"\""+"(|+1)%3"
+												"%1"))+"\"(|+0)%1(|+0)\""
+												+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+												+inbetweenNumbersText2+"\""+"(|+0)%3"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(2)).length())
+														selected_text.replace(",", ".").indexOf("%3")+
+																"%3".length())
 												+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
 										
-										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										
 										
 										CharacteristicValue preparedValue3 = new CharacteristicValue();
@@ -1683,15 +1718,15 @@ public class CharPatternServices {
 												));
 										
 										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-												+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-												+inbetweenNumbersText2+"\""+"(|+1)%3"
+												"%1"))+"\"(|+0)%1(|+0)\""
+												+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+												+inbetweenNumbersText2+"\""+"(|+0)%3"
 												+"\""+selected_text.substring(
-														selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))+
-																WordUtils.DoubleToString(numValuesInSelection.get(2)).length())
+														selected_text.replace(",", ".").indexOf("%3")+
+																"%3".length())
 												+"\""+"<NOM %3><UOM \""+infered_uom+"\">";
 										
-										parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+										parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 										
 									}
 								}
@@ -1702,19 +1737,19 @@ public class CharPatternServices {
 							System.out.println("4 digits in selection");
 
 							String inbetweenNumbersText1 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(0)))
-									+WordUtils.DoubleToString(numValuesInSelection.get(0)).length(),
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
+									selected_text.replace(",", ".").indexOf("%1")
+									+"%1".length(),
+									selected_text.replace(",", ".").indexOf("%2")
 									);
 							String inbetweenNumbersText2 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(1)))
-									+WordUtils.DoubleToString(numValuesInSelection.get(1)).length(),
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))
+									selected_text.replace(",", ".").indexOf("%2")
+									+"%2".length(),
+									selected_text.replace(",", ".").indexOf("%3")
 									);
 							String inbetweenNumbersText3 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(2)))
-									+WordUtils.DoubleToString(numValuesInSelection.get(2)).length(),
-									selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(3)))
+									selected_text.replace(",", ".").indexOf("%3")
+									+"%3".length(),
+									selected_text.replace(",", ".").indexOf("%4")
 									);
 							
 							
@@ -1727,16 +1762,16 @@ public class CharPatternServices {
 									));
 
 							String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-									WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-									+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-									+inbetweenNumbersText2+"\""+"(|+1)%3(|+1)\""
-									+inbetweenNumbersText3+"\""+"(|+1)%4"
+									"%1"))+"\"(|+0)%1(|+0)\""
+									+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+									+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)\""
+									+inbetweenNumbersText3+"\""+"(|+0)%4"
 									+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(3)))+
-													WordUtils.DoubleToString(numValuesInSelection.get(3)).length())
+											selected_text.replace(",", ".").indexOf("%4")+
+													"%4".length())
 									+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
 							
-							parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue1, preparedRule1, active_char);
+							parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 							
 							
 							CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1746,16 +1781,16 @@ public class CharPatternServices {
 									));
 							
 							String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-									WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-									+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-									+inbetweenNumbersText2+"\""+"(|+1)%3(|+1)\""
-									+inbetweenNumbersText3+"\""+"(|+1)%4"
+									"%1"))+"\"(|+0)%1(|+0)\""
+									+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+									+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)\""
+									+inbetweenNumbersText3+"\""+"(|+0)%4"
 									+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(3)))+
-													WordUtils.DoubleToString(numValuesInSelection.get(3)).length())
+											selected_text.replace(",", ".").indexOf("%4")+
+													"%4".length())
 									+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
 							
-							parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue2, preparedRule2, active_char);
+							parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 							
 							
 							CharacteristicValue preparedValue3 = new CharacteristicValue();
@@ -1765,16 +1800,16 @@ public class CharPatternServices {
 									));
 							
 							String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-									WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-									+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-									+inbetweenNumbersText2+"\""+"(|+1)%3(|+1)\""
-									+inbetweenNumbersText3+"\""+"(|+1)%4"
+									"%1"))+"\"(|+0)%1(|+0)\""
+									+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+									+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)\""
+									+inbetweenNumbersText3+"\""+"(|+0)%4"
 									+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(3)))+
-													WordUtils.DoubleToString(numValuesInSelection.get(3)).length())
+											selected_text.replace(",", ".").indexOf("%4")+
+													"%4".length())
 									+"\""+"<NOM %3><UOM \""+infered_uom+"\">";
 							
-							parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue3, preparedRule3, active_char);
+							parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 							
 							
 							CharacteristicValue preparedValue4 = new CharacteristicValue();
@@ -1784,16 +1819,16 @@ public class CharPatternServices {
 									));
 							
 							String preparedRule4 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-									WordUtils.DoubleToString(numValuesInSelection.get(0))))+"\"(|+1)%1(|+1)\""
-									+inbetweenNumbersText1+"\""+"(|+1)%2(|+1)\""
-									+inbetweenNumbersText2+"\""+"(|+1)%3(|+1)\""
-									+inbetweenNumbersText3+"\""+"(|+1)%4"
+									"%1"))+"\"(|+0)%1(|+0)\""
+									+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
+									+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)\""
+									+inbetweenNumbersText3+"\""+"(|+0)%4"
 									+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf(WordUtils.DoubleToString(numValuesInSelection.get(3)))+
-													WordUtils.DoubleToString(numValuesInSelection.get(3)).length())
+											selected_text.replace(",", ".").indexOf("%4")+
+													"%4".length())
 									+"\""+"<NOM %4><UOM \""+infered_uom+"\">";
 							
-							parent.preparePatternProposition(3, preparedValue4.getNominal_value()+" \""+infered_uom.getUom_symbol()+"\"", preparedValue4, preparedRule4, active_char);
+							parent.preparePatternProposition(3, preparedValue4.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue4, preparedRule4, active_char);
 
 						}
 					}

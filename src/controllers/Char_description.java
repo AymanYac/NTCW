@@ -72,6 +72,7 @@ import service.CharClassifProposer;
 import service.CharPatternServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
+import transversal.language_toolbox.WordUtils;
 
 public class Char_description {
 
@@ -1006,7 +1007,8 @@ public class Char_description {
 					custom_label_11.setText("Unit of measure");
 					custom_label_11.setVisible(true);
 					try{
-						uom_field.setText(UnitOfMeasure.RunTimeUOMS.get( row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUom_id() ).getUom_symbol());
+						uom_field.setUom(UnitOfMeasure.RunTimeUOMS.get( row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUom_id() ));
+						//uom_field.setText(UnitOfMeasure.RunTimeUOMS.get( row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUom_id() ).getUom_symbol());
 					}catch(Exception V) {
 						
 					}
@@ -1234,7 +1236,8 @@ public class Char_description {
 		if(active_char.getIsNumeric()) {
 			if(active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0) {
 				try {
-					uom_field.setText(UnitOfMeasure.RunTimeUOMS.get(pattern_value.getUom_id()).getUom_symbol());
+					uom_field.setUom(UnitOfMeasure.RunTimeUOMS.get(pattern_value.getUom_id()));
+					//uom_field.setText(UnitOfMeasure.RunTimeUOMS.get(pattern_value.getUom_id()).getUom_symbol());
 				}catch(Exception V) {
 					
 				}
@@ -1265,51 +1268,15 @@ public class Char_description {
 		}
 		
 	}
-	public void sendPatternRule(String string) {
-		try {
-			//Removed : + - and / from separators to account for "sep" cases
-			String[] SEPARATORS = new String[] {",","\\."," ","="};
-			for(String sep:SEPARATORS) {
-				string = string.replaceAll("(?!~)\""+sep+"+", "(|+1)\"")
-					      .replaceAll(sep+"+(?!~)\"", "\"(|+1)")
-					      .replace("\"\"", "");
-			}
-			string = string.replaceAll("(\\(\\|\\+0\\))+","(|+0)")
-					.replaceAll("(\\(\\|\\+1\\))+","(|+1)")
-					.replaceAll("(\\(\\|\\+0\\))+\\(\\|\\+1\\)","(|+1)")
-					.replaceAll("\\(\\|\\+1\\)(\\(\\|\\+0\\))+","(|+1)");
-			if(string.endsWith("(|+1)")){
-				string= string.substring(0,string.length()-"(|+1)".length());
-			}
-			if(string.startsWith("(|+1)")){
-				string= string.substring("(|+1)".length());
-			}
-			rule_field.setText(string);
-		}catch(Exception V) {
-			
-		}
+	public void sendPatternRule(String ruleString) {
+		ruleString=WordUtils.reducePatternRuleSeparators(ruleString);
+		rule_field.setText(ruleString);
 		
 	}
 	public void preparePatternProposition(int i, String buttonText, CharacteristicValue preparedValue,
 			String preparedRule, ClassCharacteristic active_char) {
-		//Removed : + - and / from separators to account for "sep" cases
-		String[] SEPARATORS = new String[] {",","\\."," ","="};
-		for(String sep:SEPARATORS) {
-			preparedRule = preparedRule.replaceAll("(?!~)\""+sep+"+", "(|+1)\"")
-				      .replaceAll(sep+"+(?!~)\"", "\"(|+1)")
-				      .replace("\"\"", "");
-		}
-		preparedRule = preparedRule.replaceAll("(\\(\\|\\+0\\))+","(|+0)")
-					.replaceAll("(\\(\\|\\+1\\))+","(|+1)")
-					.replaceAll("(\\(\\|\\+0\\))+\\(\\|\\+1\\)","(|+1)")
-					.replaceAll("\\(\\|\\+1\\)(\\(\\|\\+0\\))+","(|+1)");
 		
-		if(preparedRule.endsWith("(|+1)")){
-			preparedRule= preparedRule.substring(0,preparedRule.length()-"(|+1)".length());
-		}
-		if(preparedRule.startsWith("(|+1)")){
-			preparedRule= preparedRule.substring("(|+1)".length());
-		}
+		preparedRule=WordUtils.reducePatternRuleSeparators(preparedRule);
 		proposer.addProposition(buttonText,preparedValue,preparedRule,active_char);
 		
 	}

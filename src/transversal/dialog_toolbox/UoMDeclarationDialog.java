@@ -1,7 +1,6 @@
 package transversal.dialog_toolbox;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,25 +34,7 @@ public class UoMDeclarationDialog {
 	private static GridPane grid;
 	private static Node validationButton;
 
-	public static void UomConversionPopUp(UnitOfMeasure following_uom, ArrayList<String> allowedUoms,
-			Char_description parent) {
-		System.out.println(":::: Display a pop-up asking to enter conversion rate towards the declared UoM (mandatory)\r\n" + 
-				" ::::");
-		
-		
-		/*
-		TextInputDialog dialog = new TextInputDialog("");
-		dialog.setTitle("Unknown conversion rate");
-		dialog.setHeaderText("Conversion formula from "+following_uom.getUom_name()+"("+following_uom.getUom_symbol()+") to "+UnitOfMeasure.RunTimeUOMS.get(allowedUoms.get(0)).getUom_name()+"("+UnitOfMeasure.RunTimeUOMS.get(allowedUoms.get(0)).getUom_symbol()+")");
-		dialog.setContentText("1 "+following_uom.getUom_symbol()+"= X * "+UnitOfMeasure.RunTimeUOMS.get(allowedUoms.get(0)).getUom_symbol()+"; X=");
-
-		// Traditional way to get the response value.
-		Optional<String> result = dialog.showAndWait();
-		if (result.isPresent()){
-		    System.out.println("Conversion multiplier: " + result.get());
-		}
-		*/
-	}
+	
 
 	public static void UomDeclarationPopUp(Char_description parent, String proposedUomSymbol, int activeButtonIndex,
 			ClassCharacteristic active_char) {
@@ -195,7 +176,7 @@ public class UoMDeclarationDialog {
 		
 		uomName.setText("");
 		uomSymbol.setText(proposedUomSymbol);
-		uomMultiplier.setText("");
+		//uomMultiplier.setText("");
 		uomChoice.getItems().addAll(UnitOfMeasure.RunTimeUOMS.values().stream()
 				.filter(u -> UnitOfMeasure.ConversionPathExists(u, active_char.getAllowedUoms()))
 				.map(u->new UomClassComboRow(u)).collect(Collectors.toList()));

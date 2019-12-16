@@ -209,8 +209,8 @@ public class Tools {
 
 	public static String load_ip() {
 		//return "localhost";
-		//return "88.190.148.154";
-		return "192.168.0.25";
+		return "88.190.148.154";
+		//return "192.168.0.25";
 	}
 	public static String load_port() {
 		return "5432";
