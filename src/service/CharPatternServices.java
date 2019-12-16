@@ -926,13 +926,31 @@ public class CharPatternServices {
 									//Only 1 UoM is declared for the characteristic? (e.g. "Tension 12/24")
 										System.out.println("Only 1 UoM is declared for the characteristic");
 										UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0));
+
+										CharacteristicValue preparedValue3 = new CharacteristicValue();
+										preparedValue3.setUom_id(infered_uom.getUom_id());
+										preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
+												+"<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">";
+										parent.preparePatternProposition(0, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
+										
+										CharacteristicValue preparedValue4 = new CharacteristicValue();
+										preparedValue4.setUom_id(infered_uom.getUom_id());
+										preparedValue4.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+										String preparedRule4 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
+												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
+												+"<NOM %2><UOM \""+infered_uom.getUom_symbol()+"\">";
+										parent.preparePatternProposition(1, preparedValue4.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue4, preparedRule4, active_char);
+
+										
 										CharacteristicValue preparedValue1 = new CharacteristicValue();
 										preparedValue1.setUom_id(infered_uom.getUom_id());
 										preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 												+"<NOM %1/%2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
+										parent.preparePatternProposition(2, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
 										CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -943,25 +961,7 @@ public class CharPatternServices {
 										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 												+"<MINMAX %1><MINMAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
-										
-										
-										CharacteristicValue preparedValue3 = new CharacteristicValue();
-										preparedValue3.setUom_id(infered_uom.getUom_id());
-										preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
-												+"<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
-										
-										CharacteristicValue preparedValue4 = new CharacteristicValue();
-										preparedValue4.setUom_id(infered_uom.getUom_id());
-										preparedValue4.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
-										String preparedRule4 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
-												+"<NOM %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(3, preparedValue4.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue4, preparedRule4, active_char);
-										
+										parent.preparePatternProposition(3, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										
 										
 										return;
