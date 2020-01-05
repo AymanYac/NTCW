@@ -1,6 +1,9 @@
 package transversal.dialog_toolbox;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,11 +36,13 @@ public class UoMDeclarationDialog {
 	private static ComboBox<UomClassComboRow> uomChoice;
 	private static GridPane grid;
 	private static Node validationButton;
-
+	private static String CharUomFamily = "";
 	
 
 	public static void UomDeclarationPopUp(Char_description parent, String proposedUomSymbol, int activeButtonIndex,
 			ClassCharacteristic active_char) {
+		CharUomFamily = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0)).getUom_base_id();
+		
 		//Get the corresponding rule and value
 		CharacteristicValue preparedValue=CharClassifProposer.getValueForButton(activeButtonIndex);
 		String preparedRule=CharClassifProposer.getRuleForButton(activeButtonIndex);
@@ -100,9 +105,11 @@ public class UoMDeclarationDialog {
 		// Do some validation (using the Java 8 lambda syntax).
 		uomName.textProperty().addListener((observable, oldValue, newValue) -> {
 			check_validation_disable();
+			
 			});
 		uomSymbol.textProperty().addListener((observable, oldValue, newValue) -> {
 			check_validation_disable();
+			
 			});
 		uomMultiplier.textProperty().addListener((observable, oldValue, newValue) -> {
 			check_validation_disable();
@@ -111,7 +118,36 @@ public class UoMDeclarationDialog {
 		uomMultiplier.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
 		    focusState(newValue, proposedUomSymbol, active_char, dialog, validateButtonType);
 		});
+		
+		uomAlt.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+			check_name_and_symbol_in_alts();
+		});
+		
+		uomAlt.textProperty().addListener((observable, oldValue, newValue) -> {
+			remove_dupp_alts();
+			});
+		
+	}
 
+	private static void remove_dupp_alts() {
+		uomAlt.setText(  String.join(",", Arrays.stream( uomAlt.getText().split(",") ).collect(Collectors.toCollection(LinkedHashSet::new))));
+		
+	}
+
+	private static void check_name_and_symbol_in_alts() {
+		if(uomName.isFocused()||uomSymbol.isFocused()) {
+			return;
+		}
+		String name = uomName.getText();
+		String symb = uomSymbol.getText();
+		name = name.length()>0?name:null;
+		symb = symb.length()>0?symb:null;
+		
+		if(uomAlt.getText().startsWith((name!=null?name+",":"")+(symb!=null?symb+",":""))) {
+			
+		}else {
+			uomAlt.setText((name!=null?name+",":"")+(symb!=null?symb+",":"")+uomAlt.getText());
+		}
 		
 	}
 
@@ -160,8 +196,13 @@ public class UoMDeclarationDialog {
 		uomAlt.setText(matchedUom.getUom_name()+","+String.join(",", matchedUom.getUom_symbols())+","+proposedUomSymbol);
 		//uomMultiplier.setText(String.valueOf( matchedUom.getUom_multiplier().doubleValue() ));
 		uomMultiplier.setText("1.0");
+		selectUomInComboBoxByUomId(matchedUom.getUom_id());
+		check_name_and_symbol_in_alts();
+	}
+
+	private static void selectUomInComboBoxByUomId(String targetID) {
 		for(int i=0;i<uomChoice.getItems().size();i++) {
-			if( uomChoice.getItems().get(i).getUnitOfMeasure().getUom_id().equals(matchedUom.getUom_id()) ) {
+			if( uomChoice.getItems().get(i).getUnitOfMeasure().getUom_id().equals(targetID) ) {
 				uomChoice.getSelectionModel().select(i);
 				return;
 			}
@@ -179,7 +220,7 @@ public class UoMDeclarationDialog {
 		//uomMultiplier.setText("");
 		uomChoice.getItems().addAll(UnitOfMeasure.RunTimeUOMS.values().stream()
 				.filter(u -> UnitOfMeasure.ConversionPathExists(u, active_char.getAllowedUoms()))
-				.map(u->new UomClassComboRow(u)).collect(Collectors.toList()));
+				.map(u->new UomClassComboRow(u)).collect(Collectors.toSet()));
 		uomAlt.setText("");
 		
 		grid.getChildren().clear();
@@ -199,8 +240,26 @@ public class UoMDeclarationDialog {
 		grid.add(uomAlt, 1, 3);
 		GridPane.setColumnSpan(uomAlt, 3);
 		
-		uomChoice.getSelectionModel().select(0);
-		
+		sortUomChoiceList();
+		selectUomInComboBoxByUomId(active_char.getAllowedUoms().get(0));
+		check_name_and_symbol_in_alts();
+	}
+
+	private static void sortUomChoiceList() {
+		uomChoice.getItems().sorted(new Comparator<UomClassComboRow>(){
+
+			@Override
+			public int compare(UomClassComboRow arg0, UomClassComboRow arg1) {
+				// TODO Auto-generated method stub
+				return arg1.getUnitOfMeasure().getUom_name().compareToIgnoreCase(
+						arg0.getUnitOfMeasure().getUom_name())
+						+ (
+							(arg0.getUnitOfMeasure().getUom_base_id().equals(CharUomFamily)
+							&& arg1.getUnitOfMeasure().getUom_base_id().equals(CharUomFamily)
+							)?500:0);
+			}
+			
+		});
 	}
 
 	private static UnitOfMeasure createUomfromField() {

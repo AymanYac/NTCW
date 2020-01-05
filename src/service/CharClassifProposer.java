@@ -36,11 +36,16 @@ public class CharClassifProposer {
 	public void addProposition(String buttonText, CharacteristicValue preparedValue, String preparedRule,
 			ClassCharacteristic active_char) {
 		
-		for(int i=0;i<lastestActiveButtonIndex;i++) {
+		for(int i=0;i<=lastestActiveButtonIndex;i++) {
 			Button loopBtn = parent.propButtons.get(i);
+			System.out.println("Checking for button "+loopBtn.getText());
 			if(loopBtn.getText().equals(buttonText)) {
+				System.out.println("Matched previous button");
 				clearRulefromButton(i);
 				return;
+			}else {
+				System.out.println("No Match for previous button");
+				System.out.println(buttonText+" != "+loopBtn.getText());
 			}
 		}
 		lastestActiveButtonIndex = lastestActiveButtonIndex+1;
@@ -68,6 +73,7 @@ public class CharClassifProposer {
 	}
 
 	private static void clearRulefromButton(int i) {
+		System.out.println("Disabling rule on button "+String.valueOf(i));
 		buttonToData.put(i, new Pair<CharacteristicValue,String>(buttonToData.get(i).getKey(),null));
 	}
 

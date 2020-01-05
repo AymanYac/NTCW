@@ -692,7 +692,7 @@ public class CharPatternServices {
 												selected_text.replace(",", ".").indexOf("%1"))
 										+"\"(|+0)%1<NOM %1><UOM\""+loop_uom.getUom_symbol()+"\">";
 										
-										parent.preparePatternProposition(i,preparedValue.getNominal_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
+										parent.preparePatternProposition(i,preparedValue.getNominal_value_truncated()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 										continue;
 									}
 									}return;
@@ -762,7 +762,7 @@ public class CharPatternServices {
 													"%1".length())+"\""
 											+"<NOM %1><UOM\""+loop_uom.getUom_symbol()+"\">";
 									
-									parent.preparePatternProposition(i,preparedValue.getNominal_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
+									parent.preparePatternProposition(i,preparedValue.getNominal_value_truncated()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 									continue;
 								}
 								}
@@ -820,7 +820,7 @@ public class CharPatternServices {
 													"%1".length())+"\""
 											+"<NOM %1><UOM\""+"$$$UOM_SYMBOL$$$"+"\">";
 									
-									parent.preparePatternProposition(i,preparedValue.getNominal_value()+" \""+UOM_INFERED_NAME+"\"",preparedValue,preparedRule, active_char);
+									parent.preparePatternProposition(i,preparedValue.getNominal_value_truncated()+" \""+UOM_INFERED_NAME+"\"",preparedValue,preparedRule, active_char);
 									return;
 								}
 								
@@ -860,7 +860,7 @@ public class CharPatternServices {
 									+"\"(|+0)%1<NOM %1><UOM\""+loop_uom.getUom_symbol()+"\">";
 									*/
 									String preparedRule=null;
-									parent.preparePatternProposition(i,preparedValue.getNominal_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
+									parent.preparePatternProposition(i,preparedValue.getNominal_value_truncated()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 									
 
 								}return;
@@ -902,7 +902,7 @@ public class CharPatternServices {
 												selected_text.replace(",", ".").indexOf("%2")+
 														"%2".length())
 										+"\""+"<NOM %1/%2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-								parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue1, preparedRule1, active_char);
+								parent.preparePatternProposition(0, preparedValue1.getNominal_value_truncated()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue1, preparedRule1, active_char);
 								
 								
 								CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -933,7 +933,7 @@ public class CharPatternServices {
 										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 												+"<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
+										parent.preparePatternProposition(0, preparedValue3.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 										
 										CharacteristicValue preparedValue4 = new CharacteristicValue();
 										preparedValue4.setUom_id(infered_uom.getUom_id());
@@ -941,7 +941,7 @@ public class CharPatternServices {
 										String preparedRule4 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 												+"<NOM %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(1, preparedValue4.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue4, preparedRule4, active_char);
+										parent.preparePatternProposition(1, preparedValue4.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue4, preparedRule4, active_char);
 
 										
 										CharacteristicValue preparedValue1 = new CharacteristicValue();
@@ -950,7 +950,7 @@ public class CharPatternServices {
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 												"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 												+"<NOM %1/%2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(2, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
+										parent.preparePatternProposition(2, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
 										CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -977,7 +977,7 @@ public class CharPatternServices {
 											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 													"%1"))+"\"(|+0)%1(|+0)\"/\"(|+0)%2"
 													+"<NOM %1/%2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(2*i, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
+											parent.preparePatternProposition(2*i, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 											
 											
 											CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1007,7 +1007,7 @@ public class CharPatternServices {
 														selected_text.replace(",", ".").indexOf("%2")+
 																"%2".length())
 												+"\""+"<NOM %1/%2><UOM \""+infered_uom.getUom_symbol()+"\">";
-										parent.preparePatternProposition(2*i, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
+										parent.preparePatternProposition(2*i, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
 										CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1035,7 +1035,7 @@ public class CharPatternServices {
 													selected_text.replace(",", ".").indexOf("%2")+
 															"%2".length())
 											+"\""+"<NOM %1/%2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
-									parent.preparePatternProposition(2*i, preparedValue1.getNominal_value()+" \""+UOM_INFERED_NAME+"\"", preparedValue1, preparedRule1, active_char);
+									parent.preparePatternProposition(2*i, preparedValue1.getNominal_value_truncated()+" \""+UOM_INFERED_NAME+"\"", preparedValue1, preparedRule1, active_char);
 									
 									
 									CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1081,7 +1081,7 @@ public class CharPatternServices {
 														selected_text.replace(",", ".").indexOf("%2")+
 																"%2".length())
 												+"\""+"<NOM %1><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue1, preparedRule1, active_char);
+										parent.preparePatternProposition(0, preparedValue1.getNominal_value_truncated()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
 										CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1093,7 +1093,7 @@ public class CharPatternServices {
 														selected_text.replace(",", ".").indexOf("%2")+
 																"%2".length())
 												+"\""+"<NOM %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(1, preparedValue2.getNominal_value_truncated()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										
 										
 										
@@ -1107,7 +1107,7 @@ public class CharPatternServices {
 														selected_text.replace(",", ".").indexOf("%2")+
 																"%2".length())
 												+"\""+"<NOM %1+%2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue3, preparedRule3, active_char);
+										parent.preparePatternProposition(2, preparedValue3.getNominal_value_truncated()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue3, preparedRule3, active_char);
 										
 										
 										return;
@@ -1125,7 +1125,7 @@ public class CharPatternServices {
 											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 													"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2"
 													+"<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
+											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 											
 											
 											CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1134,7 +1134,7 @@ public class CharPatternServices {
 											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 													"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2"
 													+"<NOM %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
+											parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 											
 											
 											
@@ -1145,7 +1145,7 @@ public class CharPatternServices {
 											String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 													"%1"))+"\"(|+0)%1(|+0)\"+\"(|+0)%2"
 													+"<NOM %1+%2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
+											parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 											
 											
 											continue;
@@ -1165,7 +1165,7 @@ public class CharPatternServices {
 															selected_text.replace(",", ".").indexOf("%2")+
 																	"%2".length())
 													+"\""+"<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
+											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 											
 											
 											CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1177,7 +1177,7 @@ public class CharPatternServices {
 															selected_text.replace(",", ".").indexOf("%2")+
 																	"%2".length())
 													+"\""+"<NOM %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
+											parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 											
 											
 											
@@ -1191,7 +1191,7 @@ public class CharPatternServices {
 															selected_text.replace(",", ".").indexOf("%2")+
 																	"%2".length())
 													+"\""+"<NOM %1+%2><UOM \""+infered_uom.getUom_symbol()+"\">";
-											parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
+											parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 											
 											
 											continue;
@@ -1209,7 +1209,7 @@ public class CharPatternServices {
 														selected_text.replace(",", ".").indexOf("%2")+
 																"%2".length())
 												+"\""+"<NOM %1><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
-										parent.preparePatternProposition(3*i, preparedValue1.getNominal_value()+" \""+UOM_INFERED_NAME, preparedValue1, preparedRule1, active_char);
+										parent.preparePatternProposition(3*i, preparedValue1.getNominal_value_truncated()+" \""+UOM_INFERED_NAME, preparedValue1, preparedRule1, active_char);
 										
 										
 										CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1221,7 +1221,7 @@ public class CharPatternServices {
 														selected_text.replace(",", ".").indexOf("%2")+
 																"%2".length())
 												+"\""+"<NOM %2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
-										parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+" \""+UOM_INFERED_NAME, preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value_truncated()+" \""+UOM_INFERED_NAME, preparedValue2, preparedRule2, active_char);
 										
 										
 										
@@ -1235,7 +1235,7 @@ public class CharPatternServices {
 														selected_text.replace(",", ".").indexOf("%2")+
 																"%2".length())
 												+"\""+"<NOM %1+%2><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
-										parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+" \""+UOM_INFERED_NAME, preparedValue3, preparedRule3, active_char);
+										parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value_truncated()+" \""+UOM_INFERED_NAME, preparedValue3, preparedRule3, active_char);
 										
 										
 										
@@ -1400,7 +1400,7 @@ public class CharPatternServices {
 														selected_text.replace(",", ".").indexOf("%2")+
 																"%2".length())
 												+"\""+"<NOM %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(1, preparedValue2.getNominal_value_truncated()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										return;
 									}else {
 										if(uomsInSelection.get(0)!=null) {
@@ -1450,7 +1450,7 @@ public class CharPatternServices {
 																selected_text.replace(",", ".").indexOf("%2")+
 																		"%2".length())
 														+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
-												parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
+												parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 												
 												CharacteristicValue preparedValue3 = new CharacteristicValue();
 												preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1462,7 +1462,7 @@ public class CharPatternServices {
 																selected_text.replace(",", ".").indexOf("%2")+
 																		"%2".length())
 														+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
-												parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
+												parent.preparePatternProposition(3*i+2, preparedValue3.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 												
 												
 												continue;
@@ -1517,7 +1517,7 @@ public class CharPatternServices {
 												selected_text.replace(",", ".").indexOf("%3")+
 														"%3".length())
 										+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
-								parent.preparePatternProposition(0, preparedValueA.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValueA, preparedRuleA, active_char);
+								parent.preparePatternProposition(0, preparedValueA.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValueA, preparedRuleA, active_char);
 								
 								
 								CharacteristicValue preparedValueB = new CharacteristicValue();
@@ -1532,7 +1532,7 @@ public class CharPatternServices {
 												selected_text.replace(",", ".").indexOf("%3")+
 														"%3".length())
 										+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
-								parent.preparePatternProposition(1, preparedValueB.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValueB, preparedRuleB, active_char);
+								parent.preparePatternProposition(1, preparedValueB.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValueB, preparedRuleB, active_char);
 								
 								CharacteristicValue preparedValue3 = new CharacteristicValue();
 								preparedValue3.setUom_id(infered_uom.getUom_id());
@@ -1546,7 +1546,7 @@ public class CharPatternServices {
 												selected_text.replace(",", ".").indexOf("%3")+
 														"%3".length())
 										+"\""+"<NOM %3><UOM \""+infered_uom+"\">";
-								parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
+								parent.preparePatternProposition(2, preparedValue3.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 								
 								
 								
@@ -1619,7 +1619,7 @@ public class CharPatternServices {
 													selected_text.replace(",", ".").indexOf("%3")+
 															"%3".length())
 											+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
-									parent.preparePatternProposition(1, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
+									parent.preparePatternProposition(1, preparedValue3.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 									
 								}else {
 									if(uomsInSelection.get(0)!=null) {
@@ -1690,7 +1690,7 @@ public class CharPatternServices {
 																"%3".length())
 												+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
 										
-										parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
+										parent.preparePatternProposition(0, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
 										CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1708,7 +1708,7 @@ public class CharPatternServices {
 																"%3".length())
 												+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
 										
-										parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
+										parent.preparePatternProposition(1, preparedValue2.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										
 										
 										CharacteristicValue preparedValue3 = new CharacteristicValue();
@@ -1726,7 +1726,7 @@ public class CharPatternServices {
 																"%3".length())
 												+"\""+"<NOM %3><UOM \""+infered_uom+"\">";
 										
-										parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
+										parent.preparePatternProposition(2, preparedValue3.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 										
 									}
 								}
@@ -1771,7 +1771,7 @@ public class CharPatternServices {
 													"%4".length())
 									+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
 							
-							parent.preparePatternProposition(0, preparedValue1.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
+							parent.preparePatternProposition(0, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 							
 							
 							CharacteristicValue preparedValue2 = new CharacteristicValue();
@@ -1790,7 +1790,7 @@ public class CharPatternServices {
 													"%4".length())
 									+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
 							
-							parent.preparePatternProposition(1, preparedValue2.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
+							parent.preparePatternProposition(1, preparedValue2.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 							
 							
 							CharacteristicValue preparedValue3 = new CharacteristicValue();
@@ -1809,7 +1809,7 @@ public class CharPatternServices {
 													"%4".length())
 									+"\""+"<NOM %3><UOM \""+infered_uom+"\">";
 							
-							parent.preparePatternProposition(2, preparedValue3.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
+							parent.preparePatternProposition(2, preparedValue3.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 							
 							
 							CharacteristicValue preparedValue4 = new CharacteristicValue();
@@ -1828,7 +1828,7 @@ public class CharPatternServices {
 													"%4".length())
 									+"\""+"<NOM %4><UOM \""+infered_uom+"\">";
 							
-							parent.preparePatternProposition(3, preparedValue4.getNominal_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue4, preparedRule4, active_char);
+							parent.preparePatternProposition(3, preparedValue4.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue4, preparedRule4, active_char);
 
 						}
 					}

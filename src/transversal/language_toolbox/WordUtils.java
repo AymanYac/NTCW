@@ -431,13 +431,15 @@ public class WordUtils {
 			System.out.println("selected text::"+selected_text);
 			//(including decimals with "." or "," or negative values
 			
-			Pattern p = Pattern.compile("(-?\\+?\\d+(\\.\\d+)?)");
+			Pattern p = Pattern.compile("(?<!%)(-?\\+?\\d+(\\.\\d+)?)");
 			Matcher m = p.matcher(selected_text.replace(",", "."));
 			
 			int i=0;
 			while (m.find()) {
 				i+=1;
-				selected_text = selected_text.replaceFirst(Pattern.quote(m.group(0)), "%"+String.valueOf(i));
+				System.out.print(selected_text+"->");
+				selected_text = selected_text.replace(",", ".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
+				System.out.println(selected_text);
 				//ret.add(Double.valueOf( m.group(0)) );
 				  
 				}
@@ -449,7 +451,7 @@ public class WordUtils {
 		public static String reducePatternRuleSeparators(String preparedRule) {
 			try {
 				//Removed : + - and / from separators to account for "sep" cases
-				String[] SEPARATORS = new String[] {",","\\."," ","=",":","+","-","/","|","\\"};
+				String[] SEPARATORS = new String[] {",","."," ","=",":","+","-","/","|","\\"};
 				ArrayList<String> exceptions = WordUtils.parsePatternRuleSeparatorExceptions(SEPARATORS,preparedRule);
 				
 				String loopRule = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
@@ -465,7 +467,7 @@ public class WordUtils {
 				
 				return preparedRule;
 			}catch(Exception V) {
-				V.printStackTrace(System.err);
+				//V.printStackTrace(System.err);
 				return preparedRule;
 			}
 		}
@@ -500,9 +502,9 @@ public class WordUtils {
 				if(exceptions.contains(sep)&&!sep.equals(" ")) {
 					continue;
 				}
-				preparedRule = preparedRule.replaceAll("(?!~)\""+Pattern.quote(sep)+"+", "(|+1)\"")
-					      .replaceAll(Pattern.quote(sep)+"+(?!~)\"", "\"(|+1)")
-					      .replace("\"\"", "");
+				preparedRule = preparedRule.replaceAll("(?<!~)\""+Pattern.quote(sep)+"+", "(|+1)\"")
+					      .replaceAll(Pattern.quote(sep)+"+(?<!~)\"", "\"(|+1)")
+					      .replaceAll("(?<!~)\"\"", "");
 			}
 			preparedRule = preparedRule.replaceAll("(\\(\\|\\+0\\))+","(|+0)")
 						.replaceAll("(\\(\\|\\+1\\))+","(|+1)")

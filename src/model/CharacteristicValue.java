@@ -201,5 +201,18 @@ public class CharacteristicValue {
 	     }
 	     return false;
 	}
+
+	public String getNominal_value_truncated() {
+		try {
+			double val = Double.valueOf(getNominal_value());
+			if(val == (long) val) {
+				return getNominal_value();
+			}
+			return String.format("%.2f", Double.valueOf(getNominal_value()));
+		}catch(Exception V) {
+			V.printStackTrace();
+			return "";
+		}
+	}
 	
 }

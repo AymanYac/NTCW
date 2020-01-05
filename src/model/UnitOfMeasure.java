@@ -91,7 +91,7 @@ public class UnitOfMeasure {
 	}
 	
 	public String toString() {
-		return this.getUom_name()+" ("+this.getUom_symbol()+") ";
+		return this.getUom_symbol()+" ("+this.getUom_name()+") ";
 		
 	}
 	public static  HashMap<String, UnitOfMeasure> get_units_of_measures(String language_code) throws ClassNotFoundException, SQLException {
@@ -251,4 +251,25 @@ public class UnitOfMeasure {
 		}
 		return candidate;
 	}
+	
+	@Override
+    public boolean equals(Object o) { 
+  
+        // If the object is compared with itself then return true   
+        if (o == this) { 
+            return true; 
+        } 
+  
+        /* Check if o is an instance of UnitOfMeasure or not 
+          "null instanceof [type]" also returns false */
+        if (!(o instanceof UnitOfMeasure)) { 
+            return false; 
+        } 
+          
+        // typecast o to UnitOfMeasure so that we can compare data members  
+        UnitOfMeasure c = (UnitOfMeasure) o; 
+          
+        // Compare the data members and return accordingly  
+        return this.getUom_id().equals(c.getUom_id());
+    } 	
 }
