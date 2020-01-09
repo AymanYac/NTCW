@@ -41,10 +41,14 @@ public class CharDescriptionRow {
 		public void setRule_id(String rule_id) {
 			this.rule_id = rule_id;
 		}
+		/*
 		public CharDescriptionRow(String segment_id, int data_length) {
 			this.data.put(segment_id, new CharacteristicValue[data_length]);
 		}
-		public void addDataField(String target_class, int data_length) {
+		public CharDescriptionRow() {
+			// TODO Auto-generated constructor stub
+		}*/
+		public void allocateDataField(String target_class, int data_length) {
 			if(this.data.containsKey(target_class)) {
 				//This item class has already been initalized with the target class
 			}else {

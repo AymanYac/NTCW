@@ -1277,7 +1277,11 @@ public class Char_description {
 			String preparedRule, ClassCharacteristic active_char) {
 		
 		preparedRule=WordUtils.reducePatternRuleSeparators(preparedRule);
-		proposer.addProposition(buttonText,preparedValue,preparedRule,active_char);
+		try{
+			proposer.addProposition(buttonText,preparedValue,preparedRule,active_char);
+		}catch(Exception V) {
+			
+		}
 		
 	}
 	

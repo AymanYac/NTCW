@@ -20,15 +20,7 @@ public class CharacteristicValue {
 	private ClassCharacteristic parentChar;
 	
 	
-	@Override
-	public int hashCode() {
-		Unidecode unidecode = Unidecode.toAscii();
-		try{
-			return unidecode.decodeAndTrim(getDisplayValue().toUpperCase()).hashCode() ;
-		}catch(Exception V) {
-			return 0;
-		}
-	}
+	
 	
 	public String getText_values() {
 		return text_values;
@@ -159,10 +151,13 @@ public class CharacteristicValue {
 	}
 	public void setParentChar(ClassCharacteristic classCharacteristic) {
 		this.parentChar=classCharacteristic;
-		addThisValuetoKnownValues(parentChar);
+		addThisValuetoKnownValuesForCharacteristic(parentChar);
 	}
 
-	public void addThisValuetoKnownValues(ClassCharacteristic classCharacteristic) {
+	public void addThisValuetoKnownValuesForCharacteristic(ClassCharacteristic classCharacteristic) {
+		if(classCharacteristic.getIsNumeric()) {
+			return;
+		}
 		try {
 			if(loadedValues.containsKey(classCharacteristic.getCharacteristic_id())) {
 				HashSet<CharacteristicValue> tmp = loadedValues.get(classCharacteristic.getCharacteristic_id());
@@ -189,6 +184,21 @@ public class CharacteristicValue {
 	}
 	
 	
+	
+	
+	public String getNominal_value_truncated() {
+		try {
+			double val = Double.valueOf(getNominal_value());
+			if(val == (long) val) {
+				return getNominal_value();
+			}
+			return String.format("%.2f", Double.valueOf(getNominal_value()));
+		}catch(Exception V) {
+			V.printStackTrace();
+			return "";
+		}
+	}
+	
 	@Override
 	public boolean equals(Object o)
 	{
@@ -201,17 +211,13 @@ public class CharacteristicValue {
 	     }
 	     return false;
 	}
-
-	public String getNominal_value_truncated() {
-		try {
-			double val = Double.valueOf(getNominal_value());
-			if(val == (long) val) {
-				return getNominal_value();
-			}
-			return String.format("%.2f", Double.valueOf(getNominal_value()));
+	@Override
+	public int hashCode() {
+		Unidecode unidecode = Unidecode.toAscii();
+		try{
+			return unidecode.decodeAndTrim(getDisplayValue().toUpperCase()).hashCode() ;
 		}catch(Exception V) {
-			V.printStackTrace();
-			return "";
+			return 0;
 		}
 	}
 	

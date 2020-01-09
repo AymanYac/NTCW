@@ -29,14 +29,6 @@ public class QueryFormater {
 			}
 			conditionStatement+=")";
 		}
-		System.out.println("!!");
-		System.out.println("select EVENTS.item_id,level_"+projectGranularity+"_number,level_"+projectGranularity+"_name_translated,"
-				+ " EVENTS.classification_method,EVENTS.user_id,EVENTS.segment_id,EVENTS.rule_id from ( "
-				+ "SELECT item_id,classification_method,user_id,segment_id,rule_id FROM ( "
-				+ "SELECT DISTINCT ON (item_id) * FROM "+projectID+".project_classification_event"
-				+ " "+conditionStatement+" ORDER BY item_id, classification_time DESC ) tmp ORDER BY classification_time DESC) "
-				+ " as EVENTS inner join "+projectID+".project_segments on"
-						+ " project_segments.segment_id = EVENTS.segment_id");
 		
 		return "select EVENTS.item_id,level_"+projectGranularity+"_number,level_"+projectGranularity+"_name_translated,"
 				+ " EVENTS.classification_method,EVENTS.user_id,EVENTS.segment_id,EVENTS.rule_id from ( "

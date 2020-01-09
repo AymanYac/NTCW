@@ -406,6 +406,8 @@ private void duplicateKeyEvent(KeyCode key) {
 protected void send_classification_to_parent(String result)  {
 	if(result!=null) {
 		parent_controller.fireClassChange(result);
+		System.out.print("Class change result string ::");
+		System.out.println(result);
 		//setText(result);
 		entriesPopup.hide();
 		parent_controller.tableController.tableGrid.requestFocus();

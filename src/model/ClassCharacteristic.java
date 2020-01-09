@@ -99,4 +99,21 @@ public class ClassCharacteristic {
 	}
 	
 	
+	
+	@Override
+	public boolean equals(Object o)
+	{
+	     if (this == o) {
+	         return true;
+	     }
+	     if (o instanceof ClassCharacteristic) {
+	    	 ClassCharacteristic p = (ClassCharacteristic) o;
+	         return p.hashCode()==this.hashCode();
+	     }
+	     return false;
+	}
+	@Override
+	public int hashCode() {
+		return getCharacteristic_id().hashCode();
+	}
 }
