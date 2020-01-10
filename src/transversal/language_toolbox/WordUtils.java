@@ -21,6 +21,10 @@ import transversal.generic.Tools;
 
 public class WordUtils {
 	
+	private static String ruleString;
+	private static int textIdx;
+
+
 	public static String getSearchWords(String description) {
 		
 		List<String> tmp = Arrays.asList( getRawCut(description).split(" "));
@@ -418,13 +422,7 @@ public class WordUtils {
 		}
 
 
-		public static boolean RuleSyntaxContainsSep(String searchText, String sep) {
-			searchText = searchText.replace("~\"","\"");
-			return searchText.contains("(|+0)"+sep+"(|+0)")
-					||searchText.equals("(|+0)"+sep+"")
-					||searchText.equals(""+sep+"(|+0)")
-					||searchText.equals(""+sep+"");
-		}
+		
 
 
 		public static String textWithoutParsedNumericalValues(String selected_text) {
@@ -460,6 +458,7 @@ public class WordUtils {
 					if(preparedRule.equals(loopRule)) {
 						break;
 					}
+					System.out.println(preparedRule+"->"+loopRule);
 					preparedRule = loopRule;
 				}
 				
@@ -491,7 +490,7 @@ public class WordUtils {
 		private static String reduceExtremetiesPatternRuleSeparators(String preparedRule,
 				String[] SEPARATORS, ArrayList<String> exceptions) {
 			
-			String uomClause="";
+			String uomClause = null;
 			try {
 				uomClause = preparedRule.split("<UOM")[1];
 				preparedRule = preparedRule.split("<UOM")[0];
@@ -525,7 +524,55 @@ public class WordUtils {
 			}
 			
 			
-			return preparedRule+"<UOM"+uomClause;
+			return preparedRule+((uomClause!=null)?"<UOM"+uomClause:"");
 			
+		}
+
+
+		public static String generateRuleSyntax(ArrayList<String> textBetweenNumbers, String[] roles, String[] players, UnitOfMeasure uom) {
+			ruleString="";
+			textIdx = 0;
+			textBetweenNumbers.forEach(t->{
+				System.out.println("**"+t);
+				if(textIdx>0) {
+					ruleString = ruleString+"(|+0)%"+String.valueOf(textIdx)+"(|+0)";
+				}
+				ruleString = ruleString+t;
+				textIdx+=1;
+			});
+			
+			if(ruleString.endsWith(" \"")) {
+				ruleString= ruleString.substring(0,ruleString.length()-2)+"\"";
+			}
+			
+			
+			if(roles!=null) {
+				for(int i=0;i<roles.length;i++) {
+					ruleString = ruleString+"<"+roles[i]+" "+players[i]+">";
+				}
+			}
+			if(uom!=null) {
+				ruleString = ruleString+"<UOM \""+uom.getUom_symbol()+"\">";
+			}
+			
+			return String.valueOf(ruleString);
+			
+		}
+
+
+		public static boolean FreeRuleSyntaxContainsSep(String freeRule, String sep) {
+			System.out.println("<<<<<<<<<<<<<<"+freeRule);
+			return WordUtils.RuleSyntaxContainsSep(String.join("",freeRule.chars().mapToObj((c -> (char) c)).
+					map(c->(Character.isAlphabetic(c)||Character.isDigit(c)||String.valueOf(c).equals(sep))?String.valueOf(c):"(|+0)").
+					collect(Collectors.toList())),sep);
+		}
+		
+		public static boolean RuleSyntaxContainsSep(String searchText, String sep) {
+			System.out.println(">>>>>>>>>>>>>"+searchText);
+			searchText = searchText.replace("~\"","\"");
+			return searchText.contains("(|+0)"+sep+"(|+0)")
+					||searchText.equals("(|+0)"+sep+"")
+					||searchText.equals(""+sep+"(|+0)")
+					||searchText.equals(""+sep+"");
 		}
 }

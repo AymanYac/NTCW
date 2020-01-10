@@ -1241,21 +1241,21 @@ public class Char_description {
 				}catch(Exception V) {
 					
 				}
-				try {
-					min_field_uom.setText(pattern_value.getMin_value());
-				}catch(Exception V) {
-					
-				}
-				try {
-					max_field_uom.setText(pattern_value.getMax_value());
-				}catch(Exception V) {
-					
-				}
-				try {
-					value_field.setText(pattern_value.getNominal_value());
-				}catch(Exception V) {
-					
-				}
+			}
+			try {
+				min_field_uom.setText(pattern_value.getMin_value());
+			}catch(Exception V) {
+				
+			}
+			try {
+				max_field_uom.setText(pattern_value.getMax_value());
+			}catch(Exception V) {
+				
+			}
+			try {
+				value_field.setText(pattern_value.getNominal_value());
+			}catch(Exception V) {
+				
 			}
 			
 		}else {
@@ -1269,7 +1269,13 @@ public class Char_description {
 		
 	}
 	public void sendPatternRule(String ruleString) {
-		ruleString=WordUtils.reducePatternRuleSeparators(ruleString);
+		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+		ClassCharacteristic active_char = this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
+		.get(active_char_index);
+		
+		if(active_char.getIsNumeric()) {
+			ruleString=WordUtils.reducePatternRuleSeparators(ruleString);
+		}
 		rule_field.setText(ruleString);
 		
 	}
@@ -1284,5 +1290,16 @@ public class Char_description {
 		}
 		
 	}
-	
+	public void preparePatternProposition(String buttonText, CharacteristicValue preparedValue,
+			String preparedRule, ClassCharacteristic active_char) {
+		if(active_char.getIsNumeric()) {
+			preparedRule=WordUtils.reducePatternRuleSeparators(preparedRule);
+		}
+		try{
+			proposer.addProposition(buttonText,preparedValue,preparedRule,active_char);
+		}catch(Exception V) {
+			
+		}
+		
+	}
 }

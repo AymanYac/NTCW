@@ -297,7 +297,7 @@ public class CharPatternServices {
 			}
 //			If NO (the char is not translatable)
 			System.out.println("The char is not translatable");
-//			The selection contains at list 1 figure?
+//			The selection contains at least 1 figure?
 			int number_of_digits = selected_text.chars().mapToObj((c -> (char) c)).filter(c->Character.isDigit(c)).collect(Collectors.toList()).size();
 //				If YES
 			if(number_of_digits>0) {
@@ -1734,8 +1734,8 @@ public class CharPatternServices {
 							}
 						}else {
 							//The selection contains 4+ digits
-							System.out.println("4 digits in selection");
-
+							System.out.println("4+ digits in selection");
+							/*
 							String inbetweenNumbersText1 = selected_text.substring(
 									selected_text.replace(",", ".").indexOf("%1")
 									+"%1".length(),
@@ -1829,7 +1829,25 @@ public class CharPatternServices {
 									+"\""+"<NOM %4><UOM \""+infered_uom+"\">";
 							
 							parent.preparePatternProposition(3, preparedValue4.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue4, preparedRule4, active_char);
-
+							*/
+							
+							ArrayList<String> textBetweenNumbers = new ArrayList<String>();
+							String[] textBetweenNumberstmp = (selected_text+" ").split("%\\d");
+							for(int i=0;i<textBetweenNumberstmp.length;i++) {
+								textBetweenNumbers.add("\""+textBetweenNumberstmp[i]+"\"");
+							}
+							UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0));
+							
+							for(int i=0;i<numValuesInSelection.size();i++) {
+								CharacteristicValue preparedValue = new CharacteristicValue();
+								preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(i)));
+								preparedValue.setUom_id(infered_uom.getUom_id());
+								String preparedRule = WordUtils.generateRuleSyntax(
+										textBetweenNumbers, new String[] {"NOM"}, new String [] {"%"+String.valueOf(i+1)}, null);
+								parent.preparePatternProposition(
+										preparedValue.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue, preparedRule, active_char);
+								
+							}
 						}
 					}
 					
@@ -1844,6 +1862,626 @@ public class CharPatternServices {
 			
 		}else {
 			System.out.println("The char is numeric w/o UoM");
+			int number_of_digits = selected_text.chars().mapToObj((c -> (char) c)).filter(c->Character.isDigit(c)).collect(Collectors.toList()).size();
+			int number_of_chars = selected_text.chars().mapToObj((c -> (char) c)).filter(c->Character.isAlphabetic(c)).collect(Collectors.toList()).size();
+			selected_text = WordUtils.textWithoutParsedNumericalValues(selected_text);
+
+			ArrayList<String> textBetweenNumbers = new ArrayList<String>();
+			String[] textBetweenNumberstmp = (selected_text+" ").split("%\\d");
+			for(int i=0;i<textBetweenNumberstmp.length;i++) {
+				textBetweenNumbers.add("\""+textBetweenNumberstmp[i]+"\"");
+			}
+			
+			CharacteristicValue preparedValue;
+			String preparedRule;
+			
+			if(number_of_digits>0) {
+				System.out.println("The selection contains at least 1 digit");
+				if(numValuesInSelection.size()==1) {
+					System.out.println("The selection includes no more than one numeric value");
+					if(number_of_chars>0) {
+						System.out.println("The selection includes at least one alphabetic char");
+						CharacteristicValue tmp = new CharacteristicValue();
+						tmp.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+						parent.sendPatternValue(tmp);
+						parent.sendPatternRule(WordUtils.generateRuleSyntax(
+								textBetweenNumbers,new String[] {"NOM"},new String[] {"%1"},null
+								));
+					}else {
+						System.out.println("No letter in selection");
+						CharacteristicValue tmp = new CharacteristicValue();
+						tmp.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+						parent.sendPatternValue(tmp);
+						
+					}
+				}else {
+					if(numValuesInSelection.size()==2) {
+						System.out.println("The selection contains exactly 2 nums");
+						if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "x")
+								||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "X")
+								||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "*")){
+							
+							System.out.println("The 2 numerical values are separated by \"X\" or \"*\"? More precisely: the selection follows the pattern (X+0)%(|+0)\"X\"(|+0)%(X+0) where \"X\" can also be replaced by \"*\" (e.g.  \"CONDUCTORS: 5x1.50 SQMM\")");
+							
+							preparedValue = new CharacteristicValue();
+							preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+							preparedRule = WordUtils.generateRuleSyntax(
+									textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+							parent.preparePatternProposition(
+									preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+							
+							preparedValue = new CharacteristicValue();
+							preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+							preparedRule = WordUtils.generateRuleSyntax(
+									textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+							parent.preparePatternProposition(
+									preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+							
+							preparedValue = new CharacteristicValue();
+							preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)));
+							preparedRule = WordUtils.generateRuleSyntax(
+									textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2"}, null);
+							parent.preparePatternProposition(
+									preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+						}else {
+							if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "+")){
+								
+								System.out.println("The 2 numerical values are separated by \"+\" ?");
+								
+								preparedValue = new CharacteristicValue();
+								preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+								preparedRule = WordUtils.generateRuleSyntax(
+										textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+								parent.preparePatternProposition(
+										preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+								
+								preparedValue = new CharacteristicValue();
+								preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+								preparedRule = WordUtils.generateRuleSyntax(
+										textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+								parent.preparePatternProposition(
+										preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+								
+								preparedValue = new CharacteristicValue();
+								preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
+								preparedRule = WordUtils.generateRuleSyntax(
+										textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2"}, null);
+								parent.preparePatternProposition(
+										preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+							}else {
+								if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "/")
+										||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), ":")){
+									
+									System.out.println("The 2 numerical values are separated by \"/\" ?");
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1/%2"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+								}else {
+									System.out.println("The 2 numerical values are not separated by + or / or *");
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1/%2"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+								}
+							}
+						}
+					}else {
+						if(numValuesInSelection.size()==3) {
+							System.out.println("The selection includes exactly 3 numerical values");
+							if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "x")
+									||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "X")
+									||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "*")) {
+								System.out.println("The numerical values 1 and 2 are separated by *");
+								
+								if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "x")
+									||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "X")
+									||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "*")) {
+									System.out.println("The numerical values 2 and 3 are separated by *");
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)*numValuesInSelection.get(2)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2*%3"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									
+								}else {
+									if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "+")){
+										System.out.println("Num 2 and 3 are separated by +");
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(2)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%3"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)+numValuesInSelection.get(2)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2+%3"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)+numValuesInSelection.get(2)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2+%3"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+									}else {
+										System.out.println("Num 2 and 3 are not separated by +");
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)+numValuesInSelection.get(2)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2+%3"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									}
+								}
+							}else {
+								if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "+")){
+									System.out.println("Num 1 and 2 are separated by +");
+									if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "x")
+											||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "X")
+											||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "*")) {
+										System.out.println("The numerical values 2 and 3 are separated by *");
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(2)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%3"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)*numValuesInSelection.get(2)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2*%3"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+									}else {
+										if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "+")){
+											System.out.println("Num 2 and 3 are separated with +");
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)+numValuesInSelection.get(2)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2+%3"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+										}else {
+											System.out.println("Num val 2 and 3 not separted by +");
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)+numValuesInSelection.get(2)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2+%3"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+										}
+									}
+								}else {
+									if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "/")
+											||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), ":")){
+										System.out.println("Num values 1 and 2 separated by /");
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1/%2"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										
+										preparedValue = new CharacteristicValue();
+										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)+numValuesInSelection.get(2)));
+										preparedRule = WordUtils.generateRuleSyntax(
+												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1/%2+%3"}, null);
+										parent.preparePatternProposition(
+												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+										
+										
+									}else {
+										if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "x")
+												||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "X")
+												||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "*")) {
+											System.out.println("The numerical values 2 and 3 are separated by *");
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)*numValuesInSelection.get(2)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2*%3"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											
+											preparedValue = new CharacteristicValue();
+											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)*numValuesInSelection.get(2)));
+											preparedRule = WordUtils.generateRuleSyntax(
+													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2*%3"}, null);
+											parent.preparePatternProposition(
+													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+											
+											
+										}else {
+											if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), ":")
+													||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "/")){
+												System.out.println("Num values 2 and 3 are separated by /");
+												
+												preparedValue = new CharacteristicValue();
+												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+												preparedRule = WordUtils.generateRuleSyntax(
+														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+												parent.preparePatternProposition(
+														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+												
+												preparedValue = new CharacteristicValue();
+												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+												preparedRule = WordUtils.generateRuleSyntax(
+														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+												parent.preparePatternProposition(
+														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+												
+												preparedValue = new CharacteristicValue();
+												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
+												preparedRule = WordUtils.generateRuleSyntax(
+														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
+												parent.preparePatternProposition(
+														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+												
+												preparedValue = new CharacteristicValue();
+												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)/numValuesInSelection.get(2)));
+												preparedRule = WordUtils.generateRuleSyntax(
+														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2/%3"}, null);
+												parent.preparePatternProposition(
+														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+												
+												
+												preparedValue = new CharacteristicValue();
+												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)/numValuesInSelection.get(2)));
+												preparedRule = WordUtils.generateRuleSyntax(
+														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2/%3"}, null);
+												parent.preparePatternProposition(
+														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+												
+											}else {
+												preparedValue = new CharacteristicValue();
+												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+												preparedRule = WordUtils.generateRuleSyntax(
+														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+												parent.preparePatternProposition(
+														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+												
+												preparedValue = new CharacteristicValue();
+												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+												preparedRule = WordUtils.generateRuleSyntax(
+														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+												parent.preparePatternProposition(
+														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+												
+												preparedValue = new CharacteristicValue();
+												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
+												preparedRule = WordUtils.generateRuleSyntax(
+														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
+												parent.preparePatternProposition(
+														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+												
+												preparedValue = new CharacteristicValue();
+												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)+numValuesInSelection.get(2)));
+												preparedRule = WordUtils.generateRuleSyntax(
+														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2+%3"}, null);
+												parent.preparePatternProposition(
+														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+												
+												preparedValue = new CharacteristicValue();
+												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)*numValuesInSelection.get(2)));
+												preparedRule = WordUtils.generateRuleSyntax(
+														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2*%3"}, null);
+												parent.preparePatternProposition(
+														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+												
+												
+											}
+										}
+									}
+								}
+								
+							}
+						}else {
+							if(numValuesInSelection.size()==4) {
+								System.out.println("There are exactly 4 numeric values in selection");
+								if(
+										(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "x")
+												||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "X")
+												||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "*"))
+										
+									&&  (WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "+"))
+									
+									&&	(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(3), "x")
+											||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(3), "X")
+											||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(3), "*"))
+									
+										) {
+									System.out.println("The values are separated respectively by \"X\" or \"*\", \"+\" and \"X\" or \"*\"");
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(2)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%3"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)+numValuesInSelection.get(2)*numValuesInSelection.get(3)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2+%3*%4"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									
+								}else {
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(3)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%4"}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+								}
+							}else {
+								System.out.println("There are more than 4 numerical values");
+								
+								for(int i=0;i<numValuesInSelection.size();i++) {
+									preparedValue = new CharacteristicValue();
+									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(i)));
+									preparedRule = WordUtils.generateRuleSyntax(
+											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%"+String.valueOf(i+1)}, null);
+									parent.preparePatternProposition(
+											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+									
+								}
+								
+								
+							}
+						}
+							
+					}
+				}
+			}else {
+				System.out.println("There are no numeric values in selection");
+				for(int i=0;i<5;i++) {
+					preparedValue = new CharacteristicValue();
+					preparedValue.setNominal_value(String.valueOf(i+1));
+					preparedRule = WordUtils.generateRuleSyntax(
+							textBetweenNumbers, new String[] {""}, new String [] {String.valueOf(i+1)+" "}, null);
+					parent.preparePatternProposition(
+							preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
+					
+				}
+			}
+			
 		}
 	}
 
