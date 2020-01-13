@@ -1,37 +1,18 @@
 package controllers;
 
 import java.awt.Desktop;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.json.simple.parser.ParseException;
 
 import controllers.paneControllers.Browser_CharClassif;
@@ -41,7 +22,6 @@ import controllers.paneControllers.TablePane_CharClassif;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -58,7 +38,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.stage.FileChooser;
 import model.GlobalConstants;
 import model.UnitOfMeasure;
 import model.AutoCompleteBox_CharClassification;
@@ -70,6 +49,7 @@ import model.ClassCharacteristic;
 import model.UserAccount;
 import service.CharClassifProposer;
 import service.CharPatternServices;
+import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
@@ -103,7 +83,8 @@ public class Char_description {
 	@FXML ToolBar toolBar;
 	@FXML Button paneToggle;
 	@FXML Button classDDButton;
-	@FXML Button exportButton;
+	@FXML
+	public Button exportButton;
 	@FXML ToggleButton googleButton;
 	@FXML ToggleButton tableButton;
 	@FXML ToggleButton taxoButton;
@@ -168,7 +149,7 @@ public class Char_description {
 
 
 	public ArrayList<String> CNAME_CID;
-	private CharPane_CharClassif charPaneController;
+	public CharPane_CharClassif charPaneController;
 
 
 
@@ -210,221 +191,14 @@ public class Char_description {
 	
 	@SuppressWarnings({ "resource", "unused" })
 	@FXML void export() throws SQLException, ClassNotFoundException {
-		FileChooser fileChooser = new FileChooser();
 		
+		try {
+			CharDescriptionExportServices.ExportItemDataForClass(null,this);
+		} catch (IOException e) {
+			e.printStackTrace(System.err);
+    		ConfirmationDialog.show("File saving failed", "Results could not be saved.\nMake sure you have the rights to create files in this folder and that the file is not open by another application", "OK");
+		}
 		
-		
-		Date instant = new Date();
-	    SimpleDateFormat sdf = new SimpleDateFormat( "MMMMM_dd" );
-	    String time = sdf.format( instant );
-	    
-	    String PROJECT_NAME;
-	    Connection conn = Tools.spawn_connection();
-	    Statement stmt = conn.createStatement();
-	    ResultSet rs = stmt.executeQuery("select project_name from projects where project_id='"+account.getActive_project()+"'");
-	    rs.next();
-	    PROJECT_NAME = rs.getString("project_name");
-	    rs.close();
-	    
-	    rs = stmt.executeQuery("select segment_id,level_"+Tools.get_project_granularity(account.getActive_project())+"_number from "+account.getActive_project()+".project_segments");
-	    HashMap<String, String> UUID2CID = new HashMap<String,String>();
-	    while(rs.next()) {
-	    	UUID2CID.put(rs.getString("segment_id"),rs.getString(2));
-	    }
-	    UUID2CID.put("","");
-	    rs.close();
-	    stmt.close();
-	    conn.close();
-	    
-		fileChooser.setInitialFileName(PROJECT_NAME+"_"+time);
-        //Set extension filter
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XLSX files (*.xlsx)", "*.xlsx");
-        fileChooser.getExtensionFilters().add(extFilter);
-        
-        //Show save file dialog
-        File file = fileChooser.showSaveDialog(exportButton.getScene().getWindow());
-        
-        if(file != null){
-        	
-        	try {
-        		
-        		
-        		
-        	SXSSFWorkbook wb = new SXSSFWorkbook(5000); // keep 5000 rows in memory, exceeding rows will be flushed to disk
-            Sheet sh = wb.createSheet("Project Items");
-            
-    		
-    		int i =0;
-    		Row row = sh.createRow(i);
-    		
-    		Cell cell = row.createCell(0);
-    		cell.setCellValue("Client item number");
-    		XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
-    		 style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
-    		 style.setFillPattern(FillPatternType.SOLID_FOREGROUND); Font font = wb.createFont(); font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex()); font.setBold(true); style.setFont(font);
-    		 row.getCell(0).setCellStyle(style);
-    		 
-    		 XSSFCellStyle general_header_style = (XSSFCellStyle) wb.createCellStyle();
-    		 general_header_style.setFillForegroundColor(IndexedColors.GREY_80_PERCENT.getIndex());
-    		 general_header_style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-    		 general_header_style.setFont(font);
-    		 
-    		 XSSFCellStyle general_content_style = (XSSFCellStyle) wb.createCellStyle();
-    		 general_content_style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-    		 general_content_style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-    		 general_content_style.setFont(font);
-    		 Font general_content_font = wb.createFont();
-    		 general_content_font.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
-    		 general_content_font.setBold(false);
-    		 general_content_style.setFont(general_content_font);
-    		 
-    		 
-    		 
-    		cell = row.createCell(1);
-    		cell.setCellValue("Short description");
-    		style = (XSSFCellStyle) wb.createCellStyle();
-    		 style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
-    		 style.setFillPattern(FillPatternType.SOLID_FOREGROUND); font = wb.createFont(); font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex()); font.setBold(true); style.setFont(font);
-    		 row.getCell(1).setCellStyle(style);
-    		 
-    		 
-    		 
-    		cell = row.createCell(2);
-    		cell.setCellValue("Long description");
-    		style = (XSSFCellStyle) wb.createCellStyle();
-    		 style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
-    		 style.setFillPattern(FillPatternType.SOLID_FOREGROUND); font = wb.createFont(); font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex()); font.setBold(true); style.setFont(font);
-    		 row.getCell(2).setCellStyle(style);
-    		 
-    		 
-    		 
-    		 
-    		cell = row.createCell(3);
-    		cell.setCellValue("Material Group");
-    		style = (XSSFCellStyle) wb.createCellStyle();
-    		 style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
-    		 style.setFillPattern(FillPatternType.SOLID_FOREGROUND); font = wb.createFont(); font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex()); font.setBold(true); style.setFont(font);
-    		 row.getCell(3).setCellStyle(style);
-    		 
-    		 
-    		 cell = row.createCell(4);
-     		cell.setCellValue("Preclassification");
-     		style = (XSSFCellStyle) wb.createCellStyle();
-     		 style.setFillForegroundColor(IndexedColors.LIME.getIndex());
-     		 style.setFillPattern(FillPatternType.SOLID_FOREGROUND); font = wb.createFont(); font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex()); font.setBold(true); style.setFont(font);
-     		 row.getCell(4).setCellStyle(style);
-     		
-    		 
-    		cell = row.createCell(5);
-    		cell.setCellValue("Classification number");
-    		style = (XSSFCellStyle) wb.createCellStyle();
-    		 style.setFillForegroundColor(IndexedColors.SEA_GREEN.getIndex());
-    		 style.setFillPattern(FillPatternType.SOLID_FOREGROUND); font = wb.createFont(); font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex()); font.setBold(true); style.setFont(font);
-    		 row.getCell(5).setCellStyle(style);
-    		 
-    		 
-    		 cell = row.createCell(6);
-     		cell.setCellValue("Classification name");
-     		style = (XSSFCellStyle) wb.createCellStyle();
-     		 style.setFillForegroundColor(IndexedColors.SEA_GREEN.getIndex());
-     		 style.setFillPattern(FillPatternType.SOLID_FOREGROUND); font = wb.createFont(); font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex()); font.setBold(true); style.setFont(font);
-     		 row.getCell(6).setCellStyle(style);
-     		 
-     		 
-     		cell = row.createCell(7);
-    		cell.setCellValue("Source");
-    		style = (XSSFCellStyle) wb.createCellStyle();
-    		style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
-   		 	style.setFillPattern(FillPatternType.SOLID_FOREGROUND); font = wb.createFont(); font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex()); font.setBold(true); style.setFont(font);
-   		 	row.getCell(7).setCellStyle(style);
-    		 
-    		 
-    		 
-    		cell = row.createCell(8);
-    		cell.setCellValue("Rule");
-    		style = (XSSFCellStyle) wb.createCellStyle();
-    		style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
-   		 	style.setFillPattern(FillPatternType.SOLID_FOREGROUND); font = wb.createFont(); font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex()); font.setBold(true); style.setFont(font);
-   		 	row.getCell(8).setCellStyle(style);
-    		 
-    		 
-    		 
-    		cell = row.createCell(9);
-    		cell.setCellValue("Author");
-    		style = (XSSFCellStyle) wb.createCellStyle();
-    		style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
-   		 	style.setFillPattern(FillPatternType.SOLID_FOREGROUND); font = wb.createFont(); font.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex()); font.setBold(true); style.setFont(font);
-   		 	row.getCell(9).setCellStyle(style);
-    		 
-    		 XSSFCellStyle classif_style = (XSSFCellStyle) wb.createCellStyle();
-    		 classif_style.setFillForegroundColor(IndexedColors.SEA_GREEN.getIndex());
-    		 classif_style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-    		 classif_style.setFont(font);
-    		 
-    		  
-    		ObservableList<CharDescriptionRow> rws = tableController.tableGrid.getItems();
-    		
-    		CellStyle percentStyle = wb.createCellStyle();
-    		percentStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0%"));
-    		
-    		
-    		
-    		for(CharDescriptionRow rw:rws) {
-    			i=i+1;
-    			ArrayList<String> result_row = new ArrayList<String>(10);
-    			/*
-    			result_row.add(rw.getClient_item_number());
-    			result_row.add(rw.getShort_description());
-    			result_row.add(rw.getLong_description());
-    			result_row.add(rw.getMaterial_group());
-    			result_row.add(rw.getPreclassifiation());
-    			result_row.add( rw.getDisplay_segment_number() );
-    			result_row.add(rw.getDisplay_segment_name());
-    			result_row.add(rw.getSource_Display());
-    			result_row.add(rw.getRule_description_Display());
-    			result_row.add(rw.getAuthor_Display());
-    			
-    			*/
-    			
-    			row = sh.createRow(i);
-    	        for(int cellnum = 0; cellnum < 10; cellnum++){
-    	            cell = row.createCell(cellnum);
-    	            cell.setCellValue(result_row.get(cellnum));
-    	            
-    	        }
-    			
-    			
-    			
-    		}
-    		sh.setColumnWidth(0,256*15);
-    		sh.setColumnWidth(1,256*50);
-    		sh.setColumnWidth(2,256*50);
-    		sh.setColumnWidth(3,256*15);
-    		sh.setColumnWidth(4,256*34);
-    		sh.setColumnWidth(5,256*25);
-    		sh.setColumnWidth(6,256*34);
-    		sh.setColumnWidth(7,256*9);
-    		sh.setColumnWidth(8,256*50);
-    		sh.setColumnWidth(9,256*9);
-
-    		
-    		sh.setZoom(70);
-    	
-    		FileOutputStream out = new FileOutputStream(file.getAbsolutePath());
-            wb.write(out);
-            out.close();
-
-            // dispose of temporary files backing this workbook on disk
-            wb.dispose();
-    		
-            
-    		ConfirmationDialog.show("File saved", "Results successfully saved in\n"+file.getAbsolutePath(), "OK");
-    		
-        	}catch(Exception V) {
-        		V.printStackTrace(System.err);
-        		ConfirmationDialog.show("File saving failed", "Results could not be saved in\n"+file.getAbsolutePath()+"\nMake sure you have the rights to create files in this folder and that the file is not open by another application", "OK");
-        	}
-        }
 	}
 	@FXML void initialize(){
 		sd.setText("");

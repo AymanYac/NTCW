@@ -23,6 +23,7 @@ public class CharDescriptionRow {
 		String long_desc;
 		String long_desc_translated;
 		String long_desc_corrected;
+		String material_group;
 		
 		String url;
 		String source;
@@ -98,6 +99,15 @@ public class CharDescriptionRow {
 		public void setLong_desc_corrected(String long_desc_corrected) {
 			this.long_desc_corrected = long_desc_corrected;
 		}
+		
+		public String getMaterial_group() {
+			return material_group;
+		}
+		public void setMaterial_group(String material_group) {
+			this.material_group = material_group;
+		}
+		
+		
 		public Boolean getCompletionStatus() {
 			return completionStatus;
 		}

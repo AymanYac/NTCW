@@ -36,7 +36,7 @@ public class CharPane_CharClassif {
 		if(this.selected_row!=null) {
 			for(int i=0;i<this.parent.tableController.active_characteristics.get(selected_row.getClass_segment().split("&&&")[0]).size();i++) {
 				ClassCharacteristic carac = this.parent.tableController.active_characteristics.get(selected_row.getClass_segment().split("&&&")[0]).get(i);
-				CharPaneRow tmp = new CharPaneRow(this);
+				CharPaneRow tmp = new CharPaneRow(this.parent);
 				tmp.setChar_index(i);
 				tmp.setCarac(carac);
 				tmp.setValue(selected_row.getData(selected_row.getClass_segment().split("&&&")[0])[i]);

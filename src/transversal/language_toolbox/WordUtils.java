@@ -12,6 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import model.BinaryClassificationParameters;
 import model.ClassCharacteristic;
 import model.DescriptionType;
@@ -574,5 +576,14 @@ public class WordUtils {
 					||searchText.equals("(|+0)"+sep+"")
 					||searchText.equals(""+sep+"(|+0)")
 					||searchText.equals(""+sep+"");
+		}
+
+
+		public static String textFlowToString(TextFlow tf) {
+		    StringBuilder sb = new StringBuilder();
+		    tf.getChildren().stream()
+		            .filter(t -> Text.class.equals(t.getClass()))
+		            .forEach(t -> sb.append(((Text) t).getText()));
+		    return sb.toString();
 		}
 }

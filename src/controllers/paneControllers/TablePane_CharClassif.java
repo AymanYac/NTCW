@@ -412,7 +412,7 @@ public class TablePane_CharClassif {
 	}
 	
 	
-	private  List<String> getActiveItemsID(String active_class) throws ClassNotFoundException, SQLException {
+	public  List<String> getActiveItemsID(String active_class) throws ClassNotFoundException, SQLException {
 		String joinStatement = "";
 		if(CharItemFetcher.classifiedItems!=null) {
 			

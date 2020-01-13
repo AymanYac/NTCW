@@ -3,7 +3,7 @@ package model;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import controllers.paneControllers.CharPane_CharClassif;
+import controllers.Char_description;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -20,7 +20,7 @@ public class CharPaneRow {
 	private int char_index;
 	private CharacteristicValue value;
 	private ClassCharacteristic carac;
-	private static CharPane_CharClassif parent;
+	private static Char_description parent;
 	
 	public StackPane getCriticality() {
 		Circle tmp = new Circle(8,8,8);
@@ -46,8 +46,8 @@ public class CharPaneRow {
 		
 		return stack;
 	}
-	public CharPaneRow(CharPane_CharClassif charPane_CharClassif) {
-		CharPaneRow.parent = charPane_CharClassif;
+	public CharPaneRow(Char_description parent) {
+		CharPaneRow.parent = parent;
 	}
 	public ClassCharacteristic getCarac() {
 		return carac;
@@ -128,7 +128,7 @@ public class CharPaneRow {
 			tmp.setFill(GlobalConstants.CHAR_TXT_COLOR);
 			tmp.setFont(Font.font(GlobalConstants.CHAR_TXT_FONT,GlobalConstants.CHAR_TXT_WEIGHT,GlobalConstants.CHAR_TXT_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
 			textes.add(tmp);
-			if(this.carac.getIsTranslatable() && !parent.parent.user_language.equals(parent.parent.data_language)) {
+			if(this.carac.getIsTranslatable() && !parent.user_language.equals(parent.data_language)) {
 				//tmp = new Text(" ("+translateValue(this.getValue()).getNominal_value()+")");
 				tmp = new Text(" ("+this.getValue().getUserLanguageValue()+")");
 				tmp.setFill(GlobalConstants.RULE_DISPLAY_SYNTAX_COLOR);

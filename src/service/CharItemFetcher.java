@@ -31,7 +31,7 @@ public class CharItemFetcher {
 			PreparedStatement stmt;
 			ResultSet rs;
 			
-			stmt = conn.prepareStatement("select item_id, client_item_number, short_description,short_description_translated, long_description,long_description_translated from "+active_project+".project_items");
+			stmt = conn.prepareStatement("select item_id, client_item_number, short_description,short_description_translated, long_description,long_description_translated,material_group from "+active_project+".project_items");
 			rs = stmt.executeQuery();
 			
 			int i=-1;
@@ -48,10 +48,13 @@ public class CharItemFetcher {
 				tmp.setShort_desc_translated(rs.getString("short_description_translated"));
 				tmp.setLong_desc(rs.getString("long_description"));
 				tmp.setLong_desc_translated(rs.getString("long_description_translated"));
+				tmp.setMaterial_group(rs.getString("material_group"));
 				
-				String loop_class_id = CharItemFetcher.classifiedItems.get(rs.getString("item_id")).split("&&&")[4];
-				String loop_class_name = CharItemFetcher.classifiedItems.get(rs.getString("item_id")).split("&&&")[1];
-				tmp.setClass_segment(loop_class_id+"&&&"+loop_class_name);
+				String loop_class_segment = CharItemFetcher.classifiedItems.get(rs.getString("item_id"));
+				String loop_class_id = loop_class_segment.split("&&&")[4];
+				String loop_class_name = loop_class_segment.split("&&&")[1];
+				String loop_class_number = loop_class_segment.split("&&&")[0];
+				tmp.setClass_segment(loop_class_id+"&&&"+loop_class_name+"&&&"+loop_class_number);
 				
 				allRowItems.add(tmp);
 			}
