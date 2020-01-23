@@ -14,7 +14,7 @@ public class UomClassComboRow {
 
 	@Override
     public String toString() {
-        return this.uom.getUom_name()+" ("+this.uom.getUom_symbol()+")";
+        return this.uom.getUom_symbol()+" ("+this.uom.getUom_name()+")";
     }
 	
 }

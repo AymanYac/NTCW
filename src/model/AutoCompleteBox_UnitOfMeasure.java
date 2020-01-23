@@ -30,6 +30,7 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
   private ContextMenu entriesPopup;
   private Map<Integer, UnitOfMeasure> RESULTMAP;
   protected boolean PopupIsVisible=false;
+private Char_description parent;
   /** Construct a new AutoCompleteTextField. 
  * @param char_description 
  * @param style 
@@ -39,7 +40,7 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
     super();
     entries = new ArrayList<UnitOfMeasure>();
     entriesPopup = new ContextMenu();
-    
+    parent = char_description;
     
     focusedProperty().addListener(new ChangeListener<Boolean>()
     {
@@ -184,10 +185,14 @@ protected void check_revert_value_in_allowed_uoms() {
   }
 
 
-
-
-protected void send_uom_to_parent(UnitOfMeasure unitOfMeasure) {
-	// TODO Auto-generated method stub
+public void send_uom_to_parent(UnitOfMeasure unitOfMeasure) {
+	CharDescriptionRow row = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+	String selectedRowClass = row.getClass_segment().split("&&&")[0];
+	int active_char_index = Math.floorMod(parent.tableController.selected_col,parent.tableController.active_characteristics.get(selectedRowClass).size());
+	CharacteristicValue currentValue = row.getData(selectedRowClass)[active_char_index];
+	currentValue=(currentValue!=null)?currentValue:new CharacteristicValue();
+	currentValue.setUom_id(unitOfMeasure.getUom_id());
+	parent.sendPatternValue(currentValue);
 	
 }
 

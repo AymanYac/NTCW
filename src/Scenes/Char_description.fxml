@@ -199,26 +199,26 @@
             <AnchorPane fx:id="rightAnchor" style="-fx-background-color: transparent; -fx-border-color: white;" GridPane.columnIndex="7" GridPane.columnSpan="3" GridPane.rowIndex="14" />
             <AnchorPane fx:id="leftAnchor" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white;" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="14" />
          	<TextArea fx:id="sd" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-            <TextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparentLight.css" text="Support de fixation" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <TextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparentLight.css" text="Support" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             <TextArea fx:id="ld" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5" />
             <TextArea fx:id="ld_translated" prefHeight="300.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparentLight.css" text="Support de montage pour le type buzzer Werma 110¶Orderref.975 109 01 (support de capuchon de protection)" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="6" />
-            <TextField fx:id="value_field" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="9" />
             <Label fx:id="value_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="8" />
             <Label fx:id="rule_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Rule" visible="false" GridPane.columnIndex="9" GridPane.rowIndex="8" />
-            <TextField fx:id="rule_field" visible="false" GridPane.columnIndex="9" GridPane.rowIndex="9" />
             <Label fx:id="custom_label_21" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Note" visible="false" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
-            <TextField fx:id="note_field" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="9" />
+            <TextField fx:id="value_field" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="9" />
             <TextField fx:id="min_field" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="9" />
-            <TextField fx:id="max_field" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
             <TextField fx:id="min_field_uom" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
+            <TextField fx:id="max_field" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
+            <TextField fx:id="translated_value_field" visible="false" GridPane.columnIndex="5" GridPane.rowIndex="9" />
+            <TextField fx:id="note_field" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="9" />
             <TextField fx:id="max_field_uom" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="9" />
             <TextField fx:id="note_field_uom" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="7" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
+            <TextField fx:id="rule_field" visible="false" GridPane.columnIndex="9" GridPane.rowIndex="9" />
             <Label fx:id="custom_label_11" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
             <Label fx:id="custom_label_22" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Note" visible="false" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
             <Label fx:id="custom_label_12" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
             <Label fx:id="note_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="8" />
             <Label fx:id="custom_label_value" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
-            <TextField fx:id="translated_value_field" visible="false" GridPane.columnIndex="5" GridPane.rowIndex="9" />
             <ComboBox fx:id="classCombo" maxWidth="1.7976931348623157E308" scaleX="0.8" scaleY="0.8" stylesheets="@../Styles/ComboBoxBlue.css" GridPane.columnIndex="9" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
          </children>
       </GridPane>

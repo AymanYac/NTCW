@@ -44,7 +44,7 @@ import model.ImageResult;
 import model.ItemDispatcherRow;
 import model.UserAccount;
 import service.ItemDispatcher;
-import service.Translator;
+import service.TranslationServices;
 import transversal.generic.Tools;
 
 public class Rule_definition {
@@ -162,7 +162,7 @@ public class Rule_definition {
 		if(description.replace(" ", "").length()==0) {
 			return "";
 		}
-		return Translator.translate("", this.user_language_gcode, description);
+		return TranslationServices.webTranslate("", this.user_language_gcode, description);
 	}
 
 	@FXML void search_google() throws MalformedURLException, UnsupportedEncodingException, IOException, URISyntaxException {

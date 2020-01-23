@@ -45,7 +45,7 @@ import service.ManualClassifContext;
 import service.ManualClassifProposer;
 import service.ManualRuleServices;
 import service.TableViewExtra;
-import service.Translator;
+import service.TranslationServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -649,7 +649,7 @@ public class TablePane_ManualClassif {
 		if(description.replace(" ", "").length()==0) {
 			return "";
 		}
-		return Translator.translate("", this.user_language_gcode, description);
+		return TranslationServices.webTranslate("", this.user_language_gcode, description);
 	}
 	void scrolled(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
         newValue.doubleValue();

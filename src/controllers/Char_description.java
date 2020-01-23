@@ -9,9 +9,14 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.json.simple.parser.ParseException;
 
@@ -22,9 +27,12 @@ import controllers.paneControllers.TablePane_CharClassif;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -48,9 +56,12 @@ import model.CharacteristicValue;
 import model.ClassCharacteristic;
 import model.UserAccount;
 import service.CharClassifProposer;
+import service.CharItemFetcher;
 import service.CharPatternServices;
+import service.CharValuesLoader;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
+import transversal.dialog_toolbox.UoMDeclarationDialog;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -106,7 +117,7 @@ public class Char_description {
 	@FXML TextField rule_field;
 	private AutoCompleteBox_UnitOfMeasure uom_field;
 	//@FXML TextField uom_field;
-	@FXML TextField value_field;
+	@FXML public TextField value_field;
 	@FXML TextField translated_value_field;
 	
 	@FXML Label custom_label_11;
@@ -158,6 +169,10 @@ public class Char_description {
 
 
 	public CharClassifProposer proposer;
+
+
+
+	private TextField[] uiDataFields;
 
 
 
@@ -260,7 +275,12 @@ public class Char_description {
 		account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
 		account.PRESSED_KEYBOARD.put(KeyCode.I, false);
 		account.PRESSED_KEYBOARD.put(KeyCode.P, false);
+		account.PRESSED_KEYBOARD.put(KeyCode.DOWN, false);
+		account.PRESSED_KEYBOARD.put(KeyCode.UP, false);
+		account.PRESSED_KEYBOARD.put(KeyCode.K, false);
+		account.PRESSED_KEYBOARD.put(KeyCode.L, false);
 		
+		uiDataFields = new TextField[] {value_field,uom_field,min_field_uom,max_field_uom,note_field_uom,rule_field,min_field,max_field,note_field,translated_value_field};
 		
 		sd.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() 
         {
@@ -288,9 +308,31 @@ public class Char_description {
             }
         });
 		
+		Arrays.asList(uiDataFields).forEach(n->{
+			n.setOnKeyPressed(new EventHandler<KeyEvent>() 
+	        {
+	            public void handle(final KeyEvent keyEvent) 
+	            {
+	                try {
+						handleKeyBoardEvent(keyEvent,true);
+					} catch (IOException | ParseException | ClassNotFoundException | SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	            }
+	        });
+		});
 	}
 
 	protected void handleKeyBoardEvent(KeyEvent keyEvent, boolean pressed) throws IOException, ParseException, ClassNotFoundException, SQLException {
+		
+		if(keyEvent.getCode().equals(KeyCode.ENTER)&&!pressed) {
+			System.out.println("*consumed*");
+			keyEvent.consume();
+			return;
+		}
+		System.out.println(keyEvent.getCode()+" "+String.valueOf(pressed));
+		
 		if(keyEvent.getCode().equals(KeyCode.CONTROL)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.CONTROL, pressed);
 		}
@@ -309,6 +351,19 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.P)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.P, pressed);
 		}
+		if(keyEvent.getCode().equals(KeyCode.DOWN)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.DOWN, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.UP)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.UP, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.K)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.K, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.L)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.L, pressed);
+		}
+		
 		
 		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.SHIFT) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
@@ -335,9 +390,9 @@ public class Char_description {
 		
 		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
-			int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+			int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0]).size());
 			CharPatternServices.scanSelectionForPatternDetection(this,
-					this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
+					this.tableController.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0])
 					.get(active_char_index));
 		}
 		
@@ -404,11 +459,234 @@ public class Char_description {
 			}
 		}
 		
+		Optional<TextField> focusedDataField = Arrays.asList(uiDataFields).stream().filter(e->e.isFocused()).findAny();
+		if(focusedDataField.isPresent()) {
+			if(keyEvent.getCode().equals(KeyCode.TAB) && pressed) {
+				System.out.println("TAB "+String.valueOf(pressed));
+				Node pbNode = validateDataFields();
+				if(!(pbNode!=null)) {
+					//Do nothing all items so far are valid
+				}else {
+					int pbIdx = Arrays.asList(uiDataFields).indexOf(pbNode);
+					int fcsIdx = Arrays.asList(uiDataFields).indexOf(focusedDataField.get());
+					System.out.println("Pb at index "+String.valueOf(pbIdx)+" fcs at index "+String.valueOf(fcsIdx));
+					//If pbNode is at or before focusedDataField, return to pbNode
+					if(pbIdx<=fcsIdx) {
+						System.out.println("=>Pb before focus, going back");
+						Platform.runLater(new Runnable() {
+
+							@Override
+							public void run() {
+								uiDataFields[pbIdx].requestFocus();
+							}
+							
+						});
+						
+					}else {
+						System.out.println("=>Pb beyond or at focus,staying");
+						//The pbNode is at the current focused field or after, do nothing
+					}
+				}
+			}
+			if(keyEvent.getCode().equals(KeyCode.ENTER) && !pressed && !account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)
+					&& !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
+				System.out.println("ENTER "+String.valueOf(pressed));
+				Node pbNode = validateDataFields();
+				if(pbNode!=null) {
+					//Do nothing the item is not valid
+				}else {
+					//Skip to next item
+					try{
+						System.out.println(":::Skipping to next item");
+						tableController.tableGrid.requestFocus();
+						classification.duplicateKeyEvent(KeyCode.DOWN);
+					}catch(Exception V) {
+						
+					}
+				}
+				
+			}
+			
+			if(account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
+				tableController.tableGrid.requestFocus();
+				classification.duplicateKeyEvent(KeyCode.DOWN);
+			}
+			if(account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
+				tableController.tableGrid.requestFocus();
+				classification.duplicateKeyEvent(KeyCode.UP);
+			}
+			if(account.PRESSED_KEYBOARD.get(KeyCode.K) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
+				tableController.nextChar();
+			}
+			if(account.PRESSED_KEYBOARD.get(KeyCode.L) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
+				tableController.previousChar();
+			}
+						
+		}
+		return;
 		
 	}
 
 		
 
+	private Node validateDataFields() {
+		CharDescriptionRow row = tableController.tableGrid.getSelectionModel().getSelectedItem();
+		String selectedRowClass = row.getClass_segment().split("&&&")[0];
+		int active_char_index = Math.floorMod(tableController.selected_col,tableController.active_characteristics.get(selectedRowClass).size());
+		ClassCharacteristic active_char = tableController.active_characteristics.get(selectedRowClass).get(active_char_index);
+		
+		if(validateValueField(active_char) && value_field.isVisible()) {
+			return value_field;
+		};
+		if(validateUomField(row,selectedRowClass,active_char_index) && uom_field.isVisible()) {
+			return uom_field;
+		}
+		if(min_field.getText()!=null && min_field.getText().length()>0 && min_field.isVisible()) {
+			try {
+				Double.valueOf(min_field.getText().trim().replace(",", "."));
+			}catch(Exception V) {
+				min_field.setText(null);
+				return min_field;
+			}
+		}
+		if(max_field.getText()!=null && max_field.getText().length()>0 && max_field.isVisible()) {
+			try {
+				Double.valueOf(max_field.getText().trim().replace(",", "."));
+			}catch(Exception V) {
+				max_field.setText(null);
+				return max_field;
+			}
+		}
+		
+		if(min_field_uom.getText()!=null && min_field_uom.getText().length()>0 && min_field_uom.isVisible()) {
+			try {
+				Double.valueOf(min_field_uom.getText().trim().replace(",", "."));
+			}catch(Exception V) {
+				min_field_uom.setText(null);
+				return min_field_uom;
+			}
+		}
+		if(max_field_uom.getText()!=null && max_field_uom.getText().length()>0 && max_field_uom.isVisible()) {
+			try {
+				Double.valueOf(max_field_uom.getText().trim().replace(",", "."));
+			}catch(Exception V) {
+				max_field_uom.setText(null);
+				return max_field_uom;
+			}
+		}
+		
+		return null;
+	}
+	private boolean validateUomField(CharDescriptionRow row, String selectedRowClass, int active_char_index) {
+		String uomFieldText = uom_field.getText();
+		if(uomFieldText!=null && uomFieldText.length()>0) {
+			String row_class_id = row.getClass_segment().split("&&&")[0];
+			Optional<UnitOfMeasure> matchinguom = UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->u.toString().equals(uomFieldText)).findAny();
+			if(matchinguom.isPresent()) {
+				
+				if(UnitOfMeasure.ConversionPathExists(matchinguom.get(), tableController.active_characteristics.get(row_class_id).get(active_char_index).getAllowedUoms())) {
+					return false;
+				}else {
+					System.out.println("No conversion path");
+					uom_field.setText("");
+					return true;
+				}
+			}else {
+				System.out.println("No matching uom "+uomFieldText);
+				uom_field.setText("");
+				return true;
+			}
+			
+		}
+		return false;
+	}
+	private boolean validateValueField(ClassCharacteristic active_char) {
+		String originalValue = value_field.getText();
+		if(!(originalValue!=null) || originalValue.length()==0) {
+			return false;
+		}
+		if(active_char.getIsNumeric()) {
+			if(active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0) {
+				//Numeric with uom
+				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(originalValue);
+				UnitOfMeasure finishingUom = null;
+				boolean hasFinishingText=false;
+				
+				String selected_text = WordUtils.textWithoutParsedNumericalValues(originalValue);
+				ArrayList<String> textBetweenNumbers = new ArrayList<String>();
+				String[] textBetweenNumberstmp = (selected_text).split("%\\d");
+				for(int i=0;i<textBetweenNumberstmp.length;i++) {
+					textBetweenNumbers.add(textBetweenNumberstmp[i]);
+				}
+				
+				String finishingText = null;
+				try{
+					finishingText = textBetweenNumbers.get(textBetweenNumbers.size()-1);
+					hasFinishingText=true;
+				}catch(Exception V) {
+					hasFinishingText=false;
+				}
+				//String finishingValue = WordUtils.DoubleToString(numValuesInSelection.get(numValuesInSelection.size()-1));
+				ArrayList<UnitOfMeasure> uomsInSelection = WordUtils.parseCompatibleUoMs("%9"+finishingText,active_char);
+				if(uomsInSelection.size()>0) {
+					finishingUom = uomsInSelection.get(0);
+					if(finishingUom!=null) {
+						System.out.println("found uom "+finishingUom.getUom_name());
+					}
+					
+					
+				}else {
+					finishingUom = null;
+				}
+				if(numValuesInSelection.size()==0) {
+					value_field.setText(null);
+					return true;
+				}
+				if(numValuesInSelection.size()==1) {
+					value_field.setText(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+					if(finishingUom!=null) {
+						uom_field.setText(finishingUom.toString());
+						return false;
+					}
+					if(hasFinishingText) {
+						UoMDeclarationDialog.UomDeclarationPopUp(this, finishingText, uom_field, active_char);
+					}
+					return false;
+				}
+				
+				if(numValuesInSelection.size()==2) {
+					min_field.setText(WordUtils.DoubleToString(Collections.min(numValuesInSelection)));
+					max_field.setText(WordUtils.DoubleToString(Collections.max(numValuesInSelection)));
+					if(finishingUom!=null) {
+						uom_field.setText(finishingUom.toString());
+						return false;
+					}
+					if(hasFinishingText) {
+						UoMDeclarationDialog.UomDeclarationPopUp(this, finishingText, uom_field, active_char);
+					}
+					return false;
+				}
+				value_field.setText(null);
+				return true;
+			}else {
+				//Numeric w/o UOM
+				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(originalValue);
+				if(numValuesInSelection.size()==0) {
+					value_field.setText(null);
+					return true;
+				}
+				if(numValuesInSelection.size()==1) {
+					value_field.setText(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+					return false;
+				}
+				value_field.setText(null);
+				return true;
+				
+			}
+		}
+		return false;
+	}
+	
 	private void launch_search(boolean checkMethodSelect) throws IOException, ParseException {
 		load_image_pane(checkMethodSelect);
 		search_google_inplace(checkMethodSelect);
@@ -669,7 +947,7 @@ public class Char_description {
 		}catch(Exception V) {
 			//V.printStackTrace(System.err);
 		}
-		classification.requestFocus();
+		value_field.requestFocus();
 		
 	}
 
@@ -757,6 +1035,11 @@ public class Char_description {
 			this.charPaneController.load_item_chars();
 		}
 		CharDescriptionRow row = (CharDescriptionRow) this.tableController.tableGrid.getSelectionModel().getSelectedItem();
+		if(row!=null) {
+			
+		}else {
+			return;
+		}
 		try {
 			int selected_col = Math.floorMod(tableController.selected_col, tableController.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
 			ClassCharacteristic active_char = tableController.active_characteristics.get(row.getClass_segment().split("&&&")[0]).get(selected_col);
@@ -788,6 +1071,24 @@ public class Char_description {
 					}
 					uom_field.setMaxWidth(0.5*(rule_field.getWidth()-(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					uom_field.setVisible(true);
+					ObservableList<Node> workingCollection = FXCollections.observableArrayList(grid.getChildren());
+					int index = -1;
+					int uomIndex = 0;
+					int valueIndex = 0;
+					for(Node node:workingCollection) {
+						index+=1;
+						if(node instanceof AutoCompleteBox_UnitOfMeasure) {
+							uomIndex=index;
+						}
+						if(node instanceof TextField) {
+							if((TextField) node == value_field) {
+								valueIndex=index;
+							}
+						}
+					}
+					Tools.moveItemInCollection(uomIndex,valueIndex+1,workingCollection);
+					grid.getChildren().setAll(workingCollection);
+					
 					//Setting the minimum value
 					custom_label_12.setText("Minimum value");
 					custom_label_12.setTranslateX(0.5*(rule_field.getWidth()+(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
@@ -1003,6 +1304,26 @@ public class Char_description {
 		
 	}
 	public void sendPatternValue(CharacteristicValue pattern_value) {
+		
+		//uiDirectValueRefresh(pattern_value);
+		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+		List<String> targetItemsIDs = tableController.tableGrid.getSelectionModel().getSelectedItems().stream().map(i->i.getItem_id()).collect(Collectors.toList());
+		CharItemFetcher.allRowItems.parallelStream().filter(e->targetItemsIDs.contains(e.getItem_id()))
+						.forEach(i->{
+							CharValuesLoader.fillData(this.classCombo.getValue().getClassSegment(),active_char_index,pattern_value,i);
+						});
+		
+		tableController.itemArray.parallelStream().filter(e->targetItemsIDs.contains(e.getItem_id())).findAny()
+		.ifPresent(i->{
+			CharValuesLoader.fillData(this.classCombo.getValue().getClassSegment(),active_char_index,pattern_value,i);
+		});
+		
+		refresh_ui_display();
+		tableController.tableGrid.refresh();
+		
+	}
+	@SuppressWarnings("unused")
+	private void uiDirectValueRefresh(CharacteristicValue pattern_value) {
 		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
 		ClassCharacteristic active_char = this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
 		.get(active_char_index);
@@ -1040,7 +1361,6 @@ public class Char_description {
 				translated_value_field.setText("");
 			}
 		}
-		
 	}
 	public void sendPatternRule(String ruleString) {
 		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());

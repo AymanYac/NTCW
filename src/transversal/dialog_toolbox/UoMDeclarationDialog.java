@@ -3,6 +3,7 @@ package transversal.dialog_toolbox;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import model.AutoCompleteBox_UnitOfMeasure;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
 import model.UnitOfMeasure;
@@ -37,10 +39,67 @@ public class UoMDeclarationDialog {
 	private static GridPane grid;
 	private static Node validationButton;
 	private static String CharUomFamily = "";
+	private static HashSet<String> uomCompBases;
 	
 
-	public static void UomDeclarationPopUp(Char_description parent, String proposedUomSymbol, int activeButtonIndex,
+	public static void UomDeclarationPopUp(Char_description parent, String proposedUomSymbol,
+			AutoCompleteBox_UnitOfMeasure uom_field, ClassCharacteristic active_char) {
+		
+		proposedUomSymbol  = proposedUomSymbol.trim();
+		CharUomFamily = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0)).getUom_base_id();
+		
+		// Create the custom dialog.
+		Dialog<UnitOfMeasure> dialog = new Dialog<>();
+		dialog.setTitle("New unit of measure declaration");
+		dialog.setHeaderText("Defining a new unit of measure");
+
+		// Set the button types.
+		ButtonType validateButtonType = new ButtonType("Store new unit", ButtonData.OK_DONE);
+		dialog.getDialogPane().getButtonTypes().addAll(validateButtonType, ButtonType.CANCEL);
+
+		// Create the  uom labels and fields.
+
+		grid = new GridPane();
+		uomName = new TextField();
+		uomSymbol = new TextField();
+		uomAlt = new TextField();
+		uomMultiplier = new TextField();
+		uomChoice = new ComboBox<UomClassComboRow>();
+
+		clear_fields(proposedUomSymbol, active_char);
+		
+		setFieldListeners(dialog,validateButtonType, proposedUomSymbol, active_char);
+		
+		
+		dialog.getDialogPane().setContent(grid);
+
+		// Request focus on the multiplier field by default.
+		Platform.runLater(() -> uomMultiplier.requestFocus());
+		
+		
+		// Convert the result to a uom when the store button is clicked.
+		dialog.setResultConverter(dialogButton -> {
+		    if (dialogButton == validateButtonType) {
+		    	return createUomfromField();
+		    }
+		    return null;
+		});
+
+		Optional<UnitOfMeasure> result = dialog.showAndWait();
+
+		result.ifPresent(newUom -> {
+			UnitOfMeasure.storeNewUom(newUom);
+			uom_field.setText(newUom.toString());
+		});
+		
+		
+	}
+
+
+	
+	public static void UomDeclarationPopUpFromPropButton(Char_description parent, String proposedUomSymbol, int activeButtonIndex,
 			ClassCharacteristic active_char) {
+		proposedUomSymbol  = proposedUomSymbol.trim();
 		CharUomFamily = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0)).getUom_base_id();
 		
 		//Get the corresponding rule and value
@@ -87,6 +146,7 @@ public class UoMDeclarationDialog {
 		Optional<UnitOfMeasure> result = dialog.showAndWait();
 
 		result.ifPresent(newUom -> {
+			UnitOfMeasure.storeNewUom(newUom);
 			System.out.println(newUom.getUom_id());
 		    System.out.println(newUom.getUom_name());
 		    preparedValue.setUom_id(newUom.getUom_id());
@@ -119,8 +179,20 @@ public class UoMDeclarationDialog {
 		    focusState(newValue, proposedUomSymbol, active_char, dialog, validateButtonType);
 		});
 		
-		uomAlt.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-			check_name_and_symbol_in_alts();
+		/*uomAlt.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+			if(!newValue) {
+				check_name_and_symbol_in_alts(uomAlt);
+			}
+		});*/
+		uomName.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+			if(!newValue) {
+				check_name_and_symbol_in_alts(uomName);
+			}
+		});
+		uomSymbol.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+			if(!newValue) {
+				check_name_and_symbol_in_alts(uomSymbol);
+			}
 		});
 		
 		uomAlt.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -134,8 +206,11 @@ public class UoMDeclarationDialog {
 		
 	}
 
-	private static void check_name_and_symbol_in_alts() {
-		if(uomName.isFocused()||uomSymbol.isFocused()) {
+	private static void check_name_and_symbol_in_alts(TextField leavingField) {
+		/*if(uomName.isFocused()||uomSymbol.isFocused()) {
+			return;
+		}*/
+		if(leavingField!=null && leavingField.isFocused()) {
 			return;
 		}
 		String name = uomName.getText();
@@ -197,7 +272,7 @@ public class UoMDeclarationDialog {
 		//uomMultiplier.setText(String.valueOf( matchedUom.getUom_multiplier().doubleValue() ));
 		uomMultiplier.setText("1.0");
 		selectUomInComboBoxByUomId(matchedUom.getUom_id());
-		check_name_and_symbol_in_alts();
+		check_name_and_symbol_in_alts(null);
 	}
 
 	private static void selectUomInComboBoxByUomId(String targetID) {
@@ -220,7 +295,10 @@ public class UoMDeclarationDialog {
 		//uomMultiplier.setText("");
 		uomChoice.getItems().addAll(UnitOfMeasure.RunTimeUOMS.values().stream()
 				.filter(u -> UnitOfMeasure.ConversionPathExists(u, active_char.getAllowedUoms()))
+				.collect(Collectors.toSet()).stream()
 				.map(u->new UomClassComboRow(u)).collect(Collectors.toSet()));
+		uomCompBases = new HashSet<String>();
+		uomChoice.getItems().forEach(c->uomCompBases.add( c.getUnitOfMeasure().getUom_base_id()));
 		uomAlt.setText("");
 		
 		grid.getChildren().clear();
@@ -242,7 +320,7 @@ public class UoMDeclarationDialog {
 		
 		sortUomChoiceList();
 		selectUomInComboBoxByUomId(active_char.getAllowedUoms().get(0));
-		check_name_and_symbol_in_alts();
+		check_name_and_symbol_in_alts(null);
 	}
 
 	private static void sortUomChoiceList() {
@@ -250,13 +328,35 @@ public class UoMDeclarationDialog {
 
 			@Override
 			public int compare(UomClassComboRow arg0, UomClassComboRow arg1) {
-				// TODO Auto-generated method stub
-				return arg1.getUnitOfMeasure().getUom_name().compareToIgnoreCase(
-						arg0.getUnitOfMeasure().getUom_name())
+				System.out.print("Comparing "+arg0.getUnitOfMeasure().getUom_symbol()+" to "
+						+arg1.getUnitOfMeasure().getUom_symbol()+"->");
+				
+				
+				int nonFamilyVal = arg0.getUnitOfMeasure().getUom_base_id().equals(CharUomFamily)?500:-500;
+				int ret = arg0.getUnitOfMeasure().getUom_name().compareToIgnoreCase(
+						arg1.getUnitOfMeasure().getUom_name())
 						+ (
 							(arg0.getUnitOfMeasure().getUom_base_id().equals(CharUomFamily)
-							&& arg1.getUnitOfMeasure().getUom_base_id().equals(CharUomFamily)
-							)?500:0);
+							== arg1.getUnitOfMeasure().getUom_base_id().equals(CharUomFamily)
+							)?0:nonFamilyVal);
+				
+				if(uomCompBases.contains(arg0.getUnitOfMeasure().getUom_id())
+						&&
+					!arg1.getUnitOfMeasure().getUom_base_id().equals(arg0.getUnitOfMeasure().getUom_id())) {
+					System.out.print(" +500 ");
+					ret+=500;
+					
+				}
+				if(uomCompBases.contains(arg1.getUnitOfMeasure().getUom_id())
+						&&
+					!arg0.getUnitOfMeasure().getUom_base_id().equals(arg1.getUnitOfMeasure().getUom_id())) {
+					System.out.print(" -500 ");
+					ret-=500;
+				}
+				
+				System.out.println(ret);
+				
+				return ret;
 			}
 			
 		});

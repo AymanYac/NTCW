@@ -2,19 +2,21 @@ package model;
 
 import java.util.HashMap;
 import java.util.HashSet;
+
+import controllers.Char_description;
 import transversal.language_toolbox.Unidecode;
+import transversal.language_toolbox.WordUtils;
 
 public class CharacteristicValue {
 	
-	public static String userLanguage;
-	public static String dataLanguage;
 	public static HashMap<String,HashSet<CharacteristicValue>> loadedValues;
 	
 	private String value_id;
+	private String dataLanguageValue;
+	private String userLanguageValue;
 	private String nominal_value;
 	private String min_value;
 	private String max_value;
-	private String text_values;
 	private String note;
 	private String uom_id;
 	private ClassCharacteristic parentChar;
@@ -22,12 +24,6 @@ public class CharacteristicValue {
 	
 	
 	
-	public String getText_values() {
-		return text_values;
-	}
-	public void setText_values(String text_values) {
-		this.text_values = text_values;
-	}
 	public String getUom_id() {
 		return uom_id;
 	}
@@ -82,17 +78,29 @@ public class CharacteristicValue {
 	public void setNote(String note) {
 		this.note = note;
 	}
-	public String getDisplayValue() {
+	//Std value is nominal value if numeric, datalanguageValue else
+	public String getStdValue() {
 		String text_val = getDataLanguageValue();
 		if(text_val!=null) {
 			return text_val;
 		}
 		return nominal_value;
 	}
+	//Display value is user formatted display value (value column in table and item export)
+	public String getDisplayValue(Char_description parent) {
+		try{
+			CharPaneRow tmp = new CharPaneRow(parent);
+			tmp.setCarac(this.parentChar);
+			tmp.setValue(this);
+			return WordUtils.textFlowToString(tmp.getValue_display());
+		}catch(Exception V) {
+			return null;
+		}
+	}
 	public boolean isNonEmpty() {
 		int concatDataLength = 0;
 		try {
-			concatDataLength += getDisplayValue().length();
+			concatDataLength += getStdValue().length();
 		}catch(Exception V) {
 			
 		}
@@ -110,6 +118,8 @@ public class CharacteristicValue {
 		return concatDataLength>0;
 	}
 	public String getUserLanguageValue() {
+		return userLanguageValue;
+		/*
 		if(text_values!=null) {
 			try {
 				for(String lang_val : text_values.split("&&&")) {
@@ -124,11 +134,12 @@ public class CharacteristicValue {
 				return null;
 			}
 		}
-		return null;
+		return null;*/
 	}
 	
 	public String getDataLanguageValue() {
-		if(text_values!=null) {
+		return dataLanguageValue;
+		/*if(text_values!=null) {
 			try {
 				for(String lang_val : text_values.split("&&&")) {
 					if(lang_val.endsWith(CharacteristicValue.dataLanguage)) {
@@ -147,8 +158,19 @@ public class CharacteristicValue {
 		if(!this.parentChar.getIsTranslatable()) {
 			return this.text_values;
 		}
-		return null;
+		return null;*/
 	}
+	
+	
+	public void setDataLanguageValue(String dataLanguageValue) {
+		this.dataLanguageValue=dataLanguageValue;
+	}
+	
+	public void setUserLanguageValue(String userLanguageValue) {
+		this.userLanguageValue=userLanguageValue;
+	}
+	
+	
 	public void setParentChar(ClassCharacteristic classCharacteristic) {
 		this.parentChar=classCharacteristic;
 		addThisValuetoKnownValuesForCharacteristic(parentChar);
@@ -215,7 +237,24 @@ public class CharacteristicValue {
 	public int hashCode() {
 		Unidecode unidecode = Unidecode.toAscii();
 		try{
-			return unidecode.decodeAndTrim(getDisplayValue().toUpperCase()).hashCode() ;
+			String concatData = "";
+			try {
+				concatData += getStdValue();
+			}catch(Exception V) {
+				
+			}
+			try {
+				concatData += getMin_value();
+			}catch(Exception V) {
+				
+			}
+			try {
+				concatData += getMax_value();
+			}catch(Exception V) {
+				
+			}
+			
+			return unidecode.decodeAndTrim(concatData.toUpperCase()).hashCode() ;
 		}catch(Exception V) {
 			return 0;
 		}

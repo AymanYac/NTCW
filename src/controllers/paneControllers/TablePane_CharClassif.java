@@ -41,7 +41,7 @@ import service.CharAdvancementUpdater;
 import service.CharItemFetcher;
 import service.ClassCharacteristicsLoader;
 import service.TableViewExtra;
-import service.Translator;
+import service.TranslationServices;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
@@ -251,7 +251,7 @@ public class TablePane_CharClassif {
 		if(description.replace(" ", "").length()==0) {
 			return "";
 		}
-		return Translator.translate("", this.user_language_gcode, description);
+		return TranslationServices.webTranslate("", this.user_language_gcode, description);
 	}
 	void scrolled(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
         newValue.doubleValue();
@@ -281,10 +281,19 @@ public class TablePane_CharClassif {
 			itemPreviousClasses.put(item, item.getClass_segment());
 			
 			try{
+				//item.setClass_segment(result);
+				//tmp.setClass_segment(loop_class_id+"&&&"+loop_class_name+"&&&"+loop_class_number);
 				item.setClass_segment(result);
-				
+				String[] resultSplit = result.split("&&&");
+				CharItemFetcher.classifiedItems.put(item.getItem_id(),
+						resultSplit[2]+"&&&"
+						+resultSplit[1]+"&&&"
+						+ClassificationMethods.MANUAL+"&&&"
+						+account.getUser_id()+"&&&"
+						+resultSplit[0]);
 			}catch(Exception V) {
 				item.setClass_segment(null);
+				CharItemFetcher.classifiedItems.put(item.getItem_id(), null);
 				V.printStackTrace(System.err);
 			}
 			
@@ -382,9 +391,6 @@ public class TablePane_CharClassif {
 	public void refresh_table_with_segment(String active_class) throws ClassNotFoundException, SQLException {
 		
 		
-		//Set the static variable for CharacteristicValue
-		CharacteristicValue.dataLanguage=this.Parent.data_language;
-		CharacteristicValue.userLanguage=this.Parent.user_language;
 			
 		tvX = new TableViewExtra(tableGrid);
 		System.out.println("Getting latest item classes with priority. Listing items for class "+active_class);
@@ -399,9 +405,6 @@ public class TablePane_CharClassif {
 		//Not needed any more loadAllClassCharWithKnownValues calls loadAllKnownValuesAssociated2Items
 		//assignValuesToItemsByClass_V2(active_class,this.Parent.classCombo.getSelectionModel().getSelectedItem().getclassName(),classItems);
 		
-		//Set the static variable for CharacteristicValue
-		CharacteristicValue.dataLanguage=this.Parent.data_language;
-		CharacteristicValue.userLanguage=this.Parent.user_language;
 		
 		
 		
@@ -445,7 +448,7 @@ public class TablePane_CharClassif {
 		PreparedStatement stmt;
 		ResultSet rs;
 		
-		stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,project_values.value_id,text_values,nominal_value,min_value,max_value,note,uom_id from "
+		stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,project_values.value_id,text_value_data_language,text_value_user_language,nominal_value,min_value,max_value,note,uom_id from "
 				+ "(select * from "+account.getActive_project()+".project_items_x_values where item_id in ('"+String.join("','", target_items)+"')"
 						+ "and characteristic_id in ('"+String.join("','", this.active_characteristics.get(target_class_id).stream().map(c->c.getCharacteristic_id()).collect(Collectors.toSet()))+"')"
 								+ ") data left join "+account.getActive_project()+".project_values "
@@ -461,7 +464,8 @@ public class TablePane_CharClassif {
 			String description_rule_id = rs.getString("description_rule_id");
 			CharacteristicValue val = new CharacteristicValue();
 			val.setValue_id(rs.getString("value_id"));
-			val.setText_values(rs.getString("text_values"));
+			val.setDataLanguageValue(rs.getString("text_value_data_language"));
+			val.setUserLanguageValue(rs.getString("text_value_user_language"));
 			val.setNominal_value(rs.getString("nominal_value"));
 			val.setMin_value(rs.getString("min_value"));
 			val.setMax_value(rs.getString("max_value"));
@@ -500,7 +504,7 @@ public class TablePane_CharClassif {
 		PreparedStatement stmt;
 		ResultSet rs;
 		
-		stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,project_values.value_id,text_values,nominal_value,min_value,max_value,note,uom_id from "
+		stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,project_values.value_id,text_value_data_language, text_value_user_language,nominal_value,min_value,max_value,note,uom_id from "
 				+ "(select * from "+account.getActive_project()+".project_items_x_values where characteristic_id in ('"+String.join("','", this.active_characteristics.get(target_class_id).stream().map(c->c.getCharacteristic_id()).collect(Collectors.toSet()))+"')"
 								+ ") data left join "+account.getActive_project()+".project_values "
 										+ "on data.value_id = project_values.value_id");
@@ -515,7 +519,8 @@ public class TablePane_CharClassif {
 			String description_rule_id = rs.getString("description_rule_id");
 			CharacteristicValue val = new CharacteristicValue();
 			val.setValue_id(rs.getString("value_id"));
-			val.setText_values(rs.getString("text_values"));
+			val.setDataLanguageValue(rs.getString("text_value_data_language"));
+			val.setUserLanguageValue(rs.getString("text_value_user_language"));
 			val.setNominal_value(rs.getString("nominal_value"));
 			val.setMin_value(rs.getString("min_value"));
 			val.setMax_value(rs.getString("max_value"));
@@ -649,7 +654,7 @@ public class TablePane_CharClassif {
             col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
                  public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                     try{
-                        return new ReadOnlyObjectWrapper(r.getValue().getData(Parent.classCombo.getSelectionModel().getSelectedItem().getClassSegment())[dataIndex].getDisplayValue());
+                        return new ReadOnlyObjectWrapper(r.getValue().getData(Parent.classCombo.getSelectionModel().getSelectedItem().getClassSegment())[dataIndex].getDisplayValue(Parent));
                     }catch(Exception V) {
                         //Object has null data at daataIndex
                         return new ReadOnlyObjectWrapper("");
@@ -726,7 +731,7 @@ public class TablePane_CharClassif {
 		    if(newValue && traverseGridFocus) {
 		    	;
 		    	traverseGridFocus=false;
-		    	Parent.classification.requestFocus();
+		    	Parent.value_field.requestFocus();
 		    }
 		});
 		Parent.classification.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
@@ -749,7 +754,7 @@ public class TablePane_CharClassif {
 		    	Parent.sd.setText(tmp.getShort_desc()+"\n\n\n\n\n");
 		    	Parent.ld.setText(tmp.getLong_desc()+"\n\n\n\n\n");
 		    	//Parent.classification.setText(tmp.getDisplay_segment_name()!=null?tmp.getDisplay_segment_name():"");
-				Parent.classification.requestFocus();
+				Parent.value_field.requestFocus();
 				traverseGridFocus=true;
 				item_selection_routine(tmp);
 		    }else {

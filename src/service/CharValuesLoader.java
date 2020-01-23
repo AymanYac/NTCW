@@ -30,7 +30,7 @@ public class CharValuesLoader {
 			PreparedStatement stmt;
 			ResultSet rs;
 			
-			stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,project_values.value_id,text_values,nominal_value,min_value,max_value,note,uom_id from "
+			stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,project_values.value_id,text_value_data_language, text_value_user_language,nominal_value,min_value,max_value,note,uom_id from "
 					+ "(select * from "+active_project+".project_items_x_values"
 									+ ") data left join "+active_project+".project_values "
 											+ "on data.value_id = project_values.value_id");
@@ -50,7 +50,9 @@ public class CharValuesLoader {
 				String description_rule_id = rs.getString("description_rule_id");
 				CharacteristicValue val = new CharacteristicValue();
 				val.setValue_id(rs.getString("value_id"));
-				val.setText_values(rs.getString("text_values"));
+				val.setDataLanguageValue(rs.getString("text_value_data_language"));
+				val.setUserLanguageValue(rs.getString("text_value_user_language"));
+				//TranslationServices.addTextEntry(rs.getString("text_value"),characteristic_id);
 				val.setNominal_value(rs.getString("nominal_value"));
 				val.setMin_value(rs.getString("min_value"));
 				val.setMax_value(rs.getString("max_value"));
@@ -121,6 +123,14 @@ public class CharValuesLoader {
 			//knownValues = null;
 		}catch(Exception V) {
 			V.printStackTrace(System.err);
+		}
+	}
+
+
+
+	public static void fillData(String classSegment, int active_char_index, CharacteristicValue value, CharDescriptionRow i) {
+		if(i.getClass_segment().contains(classSegment)) {
+			i.getData(classSegment)[active_char_index]=value;
 		}
 	}
 }

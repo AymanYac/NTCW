@@ -24,13 +24,11 @@ import org.apache.poi.xssf.usermodel.XSSFColor;
 import controllers.Char_description;
 import javafx.stage.FileChooser;
 import model.CharDescriptionRow;
-import model.CharPaneRow;
 import model.ClassCharacteristic;
 import model.UnitOfMeasure;
 import service.CharItemFetcher;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
-import transversal.language_toolbox.WordUtils;
 
 public class CharDescriptionExportServices {
 
@@ -156,7 +154,7 @@ public class CharDescriptionExportServices {
 				String itemClass = item.getClass_segment().split("&&&")[0];
 				loopCell = row.createCell(5);
 				try{
-					loopCell.setCellValue(item.getData(itemClass)[i].getDisplayValue());
+					loopCell.setCellValue(item.getData(itemClass)[i].getStdValue());
 				}catch(Exception V) {
 					
 				}
@@ -231,12 +229,17 @@ public class CharDescriptionExportServices {
 			loopCell = row.createCell(6+2*i);
 			loopCell.setCellValue(itemChars.get(i).getCharacteristic_name());
 			loopCell = row.createCell(7+2*i);
-			try{
+			/*try{
 				CharPaneRow tmp = new CharPaneRow(parent);
 				tmp.setCarac(itemChars.get(i));
 				tmp.setValue(item.getData(item.getClass_segment().split("&&&")[0])[i]);
 				loopCell.setCellValue(WordUtils.textFlowToString(tmp.getValue_display()));
 				//loopCell.setCellValue(item.getData(item.getClass_segment().split("&&&")[0])[i].getDisplayValue());
+			}catch(Exception V) {
+				
+			}*/
+			try{
+				loopCell.setCellValue(item.getData(item.getClass_segment().split("&&&")[0])[i].getDisplayValue(parent));
 			}catch(Exception V) {
 				
 			}

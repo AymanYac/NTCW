@@ -63,7 +63,7 @@ public class CharPatternServices {
 		String[] SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 		System.out.println("Trying to match the selection with known values");
 		for(CharacteristicValue known_value:active_char.getKnownValues()) {
-			System.out.println("We know value "+known_value.getDisplayValue());
+			System.out.println("We know value "+known_value.getStdValue());
 			String separator_free_known = known_value.getDataLanguageValue();
 			String separator_free_selected = corrected_text;
 			for(String sep:SEPARATORS) {
@@ -205,7 +205,7 @@ public class CharPatternServices {
 //									If NO			
 //										Value = Correction ("iron steel")
 									CharacteristicValue new_value = new CharacteristicValue();
-									new_value.setText_values(corrected_part_after_identifier+CharacteristicValue.dataLanguage);
+									new_value.setDataLanguageValue(corrected_part_after_identifier);
 									new_value.setParentChar(active_char);
 									parent.sendPatternValue(new_value);
 									parent.sendPatternRule("\""+part_before_identifier+"\"(|+1)[\""+part_after_identifier+"\"]");
@@ -281,7 +281,7 @@ public class CharPatternServices {
 //						If NO					
 //						Value = Correction (Selection)
 						CharacteristicValue tmp = new CharacteristicValue();
-						tmp.setText_values(corrected_text+CharacteristicValue.dataLanguage);
+						tmp.setDataLanguageValue(corrected_text);
 						tmp.setParentChar(active_char);
 						parent.sendPatternValue(tmp);
 //						Rule = [Selection]
@@ -308,7 +308,7 @@ public class CharPatternServices {
 //					If YES							
 //					Value = ef12-gh34-ij56
 					CharacteristicValue tmp = new CharacteristicValue();
-					tmp.setText_values(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1].trim()));
+					tmp.setDataLanguageValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1].trim()));
 					tmp.setParentChar(active_char);
 					parent.sendPatternValue(tmp);
 //					Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]		
@@ -330,7 +330,7 @@ public class CharPatternServices {
 //					If YES							
 //					Value = ef12-gh34-ij56
 					CharacteristicValue tmp = new CharacteristicValue();
-					tmp.setText_values(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1].trim()));
+					tmp.setDataLanguageValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1].trim()));
 					tmp.setParentChar(active_char);
 					parent.sendPatternValue(tmp);
 //					Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]		
@@ -356,7 +356,7 @@ public class CharPatternServices {
 //						If YES
 //							Value = ef12-gh34-ij56	
 						CharacteristicValue tmp = new CharacteristicValue();
-						tmp.setText_values(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1].trim()));
+						tmp.setDataLanguageValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1].trim()));
 						tmp.setParentChar(active_char);
 						parent.sendPatternValue(tmp);
 //							Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]
@@ -375,7 +375,7 @@ public class CharPatternServices {
 //						If NO (e.g. "ab8cd9 ef12-gh34")					
 //							Value = ab8cd9 ef12-gh34
 						CharacteristicValue tmp = new CharacteristicValue();
-						tmp.setText_values(selected_text);
+						tmp.setDataLanguageValue(selected_text);
 						tmp.setParentChar(active_char);
 						parent.sendPatternValue(tmp);
 //						
@@ -420,7 +420,7 @@ public class CharPatternServices {
 //							Value = VAL		
 					parent.sendPatternValue(VALUES_CONTAINING_SELECTION.iterator().next());
 //							Rule = Selection<"VAL">	
-					parent.sendPatternRule("\""+selected_text+"\""+"<\""+VALUES_CONTAINING_SELECTION.iterator().next().getDisplayValue()+"\">");
+					parent.sendPatternRule("\""+selected_text+"\""+"<\""+VALUES_CONTAINING_SELECTION.iterator().next().getStdValue()+"\">");
 					System.out.println("=====> Match!");
 					return;
 				}
@@ -455,7 +455,7 @@ public class CharPatternServices {
 //							Value = VAL		
 						parent.sendPatternValue(VALUES_CONTAINED_IN_SELECTION.iterator().next());
 //							Rule = Selection<"VAL">	
-						parent.sendPatternRule(selected_text+"<\""+VALUES_CONTAINED_IN_SELECTION.iterator().next().getDisplayValue()+"\">");
+						parent.sendPatternRule(selected_text+"<\""+VALUES_CONTAINED_IN_SELECTION.iterator().next().getStdValue()+"\">");
 						System.out.println("====> Match!");
 						return;
 						}else {	
@@ -468,12 +468,12 @@ public class CharPatternServices {
 //										Value = Correction (efgh)
 										CharacteristicValue tmp = new CharacteristicValue();
 										try{
-											tmp.setText_values(WordUtils.CORRECT(selected_text.split(":")[1]));
+											tmp.setDataLanguageValue(WordUtils.CORRECT(selected_text.split(":")[1]));
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 											parent.sendPatternRule("\""+selected_text.split(":")[0]+"\""+"(|+1)[\""+selected_text.split(":")[1]+"\"]");
 										}catch(Exception V) {
-											tmp.setText_values(WordUtils.CORRECT(selected_text.split("=")[1]));
+											tmp.setDataLanguageValue(WordUtils.CORRECT(selected_text.split("=")[1]));
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 											parent.sendPatternRule("\""+selected_text.split("=")[0]+"\""+"(|+1)[\""+selected_text.split("=")[1]+"\"]");
@@ -492,7 +492,7 @@ public class CharPatternServices {
 //											If YES	
 //												Value = Correction (efgh)
 											CharacteristicValue tmp = new CharacteristicValue();
-											tmp.setText_values(selected_text.split(sw_splitter)[1]);
+											tmp.setDataLanguageValue(selected_text.split(sw_splitter)[1]);
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 //												Rule = "abcd"(|+1)["efgh"]
@@ -505,7 +505,7 @@ public class CharPatternServices {
 //											If NO	
 //												Value = Correction (Selection)
 											CharacteristicValue tmp = new CharacteristicValue();
-											tmp.setText_values(corrected_text);
+											tmp.setDataLanguageValue(corrected_text);
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 //												Rule = [Selection]

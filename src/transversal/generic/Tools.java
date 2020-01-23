@@ -23,6 +23,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +35,8 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 
 import org.apache.poi.util.IOUtils;
+
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -1159,10 +1162,10 @@ public class Tools {
 		Connection conn = Tools.spawn_connection();
 		Statement st = conn.createStatement();
 		ResultSet rs;
-		
-		rs = st.executeQuery("select segment_id,level_"+Tools.get_project_granularity(account.getActive_project())+"_name_translated from "+account.getActive_project()+".project_segments");
+		int granularity = Tools.get_project_granularity(account.getActive_project());
+		rs = st.executeQuery("select segment_id,level_"+granularity+"_name_translated,level_"+granularity+"_number from "+account.getActive_project()+".project_segments");
 		while(rs.next()) {
-			CNAME_CID.add(rs.getString(1)+"&&&"+rs.getString(2));
+			CNAME_CID.add(rs.getString(1)+"&&&"+rs.getString(2)+"&&&"+rs.getString(3));
 		}
 		rs.close();
 		st.close();
@@ -1275,5 +1278,15 @@ public class Tools {
 		conn.close();
 		
 		return ret;
+	}
+
+
+
+	public static void moveItemInCollection(int sourceIndex, int targetIndex, ObservableList<Node> list) {
+		if (sourceIndex <= targetIndex) {
+	        Collections.rotate(list.subList(sourceIndex, targetIndex + 1), -1);
+	    } else {
+	        Collections.rotate(list.subList(targetIndex, sourceIndex + 1), 1);
+	    }
 	}
 }

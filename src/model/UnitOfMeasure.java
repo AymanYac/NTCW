@@ -91,7 +91,7 @@ public class UnitOfMeasure {
 	}
 	
 	public String toString() {
-		return this.getUom_symbol()+" ("+this.getUom_name()+") ";
+		return this.getUom_symbol()+" ("+this.getUom_name()+")";
 		
 	}
 	public static  HashMap<String, UnitOfMeasure> get_units_of_measures(String language_code) throws ClassNotFoundException, SQLException {
@@ -224,7 +224,12 @@ public class UnitOfMeasure {
 	
 	public static boolean ConversionPathExists(UnitOfMeasure following_uom, ArrayList<String> allowedUoms) {
 		for(String allowed:allowedUoms) {
-			if(UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_base_id().equals(following_uom.getUom_base_id())) {
+			if(UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_base_id().equals(following_uom.getUom_base_id())
+					||
+					UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_id().equals(following_uom.getUom_base_id())
+					||
+					UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_base_id().equals(following_uom.getUom_id())
+					) {
 				return true;
 			}
 		}
@@ -271,5 +276,13 @@ public class UnitOfMeasure {
           
         // Compare the data members and return accordingly  
         return this.getUom_id().equals(c.getUom_id());
-    } 	
+    }
+	
+	@Override
+	public int hashCode() {
+		return getUom_id().hashCode();
+	}
+	public static void storeNewUom(UnitOfMeasure newUom) {
+		RunTimeUOMS.put(newUom.getUom_id(), newUom);
+	}
 }

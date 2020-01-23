@@ -52,7 +52,7 @@ import transversal.generic.PixelUtils;
 	@FXML public void imagePaneClose() {
 		parent.imageButton.setSelected(false);
 		parent.setBottomRegionColumnSpans(false);
-		parent.classification.requestFocus();
+		parent.value_field.requestFocus();
 	}
 	
 		

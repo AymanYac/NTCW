@@ -40,12 +40,16 @@ public class CharClassifProposer {
 			Button loopBtn = parent.propButtons.get(i);
 			System.out.println("Checking for button "+loopBtn.getText());
 			if(loopBtn.getText().equals(buttonText)) {
-				System.out.println("Matched previous button");
 				clearRulefromButton(i);
 				return;
 			}else {
-				System.out.println("No Match for previous button");
-				System.out.println(buttonText+" != "+loopBtn.getText());
+				try{
+					
+				}catch(Exception V) {
+					if(preparedValue.getMax_value().equals(preparedValue.getMin_value())) {
+						return;
+					}
+				}
 			}
 		}
 		lastestActiveButtonIndex = lastestActiveButtonIndex+1;
@@ -56,7 +60,7 @@ public class CharClassifProposer {
 		btn.setOnAction((event) -> {
 			if(preparedValue.getUom_id()!=null && !UnitOfMeasure.RunTimeUOMS.containsKey(preparedValue.getUom_id())) {
 				//Launch UoM Declaration box
-				UoMDeclarationDialog.UomDeclarationPopUp(parent,buttonText.split("\"")[1],currentLoopButtonIndex,active_char);
+				UoMDeclarationDialog.UomDeclarationPopUpFromPropButton(parent,buttonText.split("\"")[1],currentLoopButtonIndex,active_char);
 				
 			}else {
 				parent.sendPatternRule(getRuleForButton(currentLoopButtonIndex));

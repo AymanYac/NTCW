@@ -271,7 +271,10 @@ public class ManualRuleServices {
 		}else if(bestClassNumbers.size()==1) {
 			//No conflict
 			Optional<GenericRule> bestRule = bestRules.stream().findAny();
-			return bestRule.get();
+			if(bestRule.isPresent()) {
+				return bestRule.get();
+			}
+			return null;
 		}else {
 			//Possible path: item has no active rules
 			return null;

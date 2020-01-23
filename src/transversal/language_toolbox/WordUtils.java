@@ -349,21 +349,65 @@ public class WordUtils {
 
 
 		public static ArrayList<Double> parseNumericalValues(String selected_text) {
+			ArrayList<Double> ret = new ArrayList<Double>();
+			if(!(selected_text!=null)) {
+				return ret;
+			}
+			
 			//(including decimals with "." or "," or negative values
 			
-			Pattern p = Pattern.compile("(-?\\+?\\d+(\\.\\d+)?)");
+			String numericPatternString="";
+			//patternString = "(-?\\+?\\d+(\\.\\d+)?)";
+			//"HQH-12-212 hQH+29 QSD2+3" -> "-12,212,+29,2,3"
+			//numericPatternString = "(((?<!\\d+(\\.\\d+)?)-)?((?<!\\d+(\\.\\d+)?)\\+)?\\d+(\\.\\d+)?)";
+			numericPatternString = "(((?<!\\d(\\s){0,1})-)?\\d+(\\.\\d+)?)";
+			//"HQH-12.2 -212v -21hQH+29 QSD2+3" -> "-12.2,212,-21,29,2,3"
+			
+			Pattern p = Pattern.compile(numericPatternString);
 			Matcher m = p.matcher(selected_text.replace(",", "."));
 			
-			ArrayList<Double> ret = new ArrayList<Double>();
 			while (m.find()) {
 				  ret.add(Double.valueOf( m.group(0)) );
 				}
+			
+			
 			return ret;
+		}
+		
+		public static String textWithoutParsedNumericalValues(String selected_text) {
+			System.out.println("selected text::"+selected_text);
+			if(!(selected_text!=null)) {
+				return "";
+			}
+			//(including decimals with "." or "," or negative values
+			
+			String numericPatternString="";
+			//patternString = "(-?\\+?\\d+(\\.\\d+)?)";
+			//"HQH-12-212 hQH+29 QSD2+3" -> "-12,212,+29,2,3"
+			//numericPatternString = "(((?<!\\d+(\\.\\d+)?)-)?((?<!\\d+(\\.\\d+)?)\\+)?\\d+(\\.\\d+)?)";
+			numericPatternString = "(((?<!\\d(\\s){0,1})-)?\\d+(\\.\\d+)?)";
+			//"HQH-12.2 -212v -21hQH+29 QSD2+3" -> "-12.2,212,-21,29,2,3"
+			
+			Pattern p = Pattern.compile("(?<!%)"+numericPatternString);
+			Matcher m = p.matcher(selected_text.replace(",", "."));
+			
+			int i=0;
+			while (m.find()) {
+				i+=1;
+				System.out.print(selected_text+"->");
+				selected_text = selected_text.replace(",", ".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
+				System.out.println(selected_text);
+				//ret.add(Double.valueOf( m.group(0)) );
+				  
+				}
+			System.out.println("escaped text::"+selected_text);
+			return selected_text;
 		}
 
 
+
 		public static ArrayList<UnitOfMeasure> parseCompatibleUoMs(String selected_text, ClassCharacteristic active_char) {
-			
+			System.out.println("Parsing "+selected_text);
 			//~ is used to escape intext quotes so as not to be mistaken with rule syntax quotes
 			selected_text = selected_text.replace("~\"","\"");
 			String pattern = "(-?\\d+(\\.\\d+)?)";
@@ -424,29 +468,7 @@ public class WordUtils {
 		}
 
 
-		
-
-
-		public static String textWithoutParsedNumericalValues(String selected_text) {
-			System.out.println("selected text::"+selected_text);
-			//(including decimals with "." or "," or negative values
-			
-			Pattern p = Pattern.compile("(?<!%)(-?\\+?\\d+(\\.\\d+)?)");
-			Matcher m = p.matcher(selected_text.replace(",", "."));
-			
-			int i=0;
-			while (m.find()) {
-				i+=1;
-				System.out.print(selected_text+"->");
-				selected_text = selected_text.replace(",", ".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
-				System.out.println(selected_text);
-				//ret.add(Double.valueOf( m.group(0)) );
-				  
-				}
-			System.out.println("escaped text::"+selected_text);
-			return selected_text;
-		}
-
+	
 
 		public static String reducePatternRuleSeparators(String preparedRule) {
 			try {

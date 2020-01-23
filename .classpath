@@ -21,5 +21,9 @@
 	<classpathentry kind="lib" path="C:/Users/yacay/Downloads/gtranslateapi-1.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/yacay/Documents/Deliveries/NTDW/Dev/Sent/NTDW_V1.6.0_Remote_lib/controlsfx-8.40.14.jar"/>
 	<classpathentry kind="lib" path="C:/Users/yacay/Downloads/pgjdbc-ng-0.8.2-all.jar"/>
+	<classpathentry kind="lib" path="C:/Users/yacay/Downloads/jar_files (6)/javafx-base-11-ea+19.jar"/>
+	<classpathentry kind="lib" path="C:/Users/yacay/Downloads/jar_files (6)/javafx-base-11-ea+19-linux.jar"/>
+	<classpathentry kind="lib" path="C:/Users/yacay/Downloads/jar_files (6)/javafx-graphics-11-ea+19.jar"/>
+	<classpathentry kind="lib" path="C:/Users/yacay/Downloads/jar_files (6)/javafx-graphics-11-ea+19-linux.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

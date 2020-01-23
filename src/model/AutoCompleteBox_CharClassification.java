@@ -312,7 +312,7 @@ public class AutoCompleteBox_CharClassification extends TextField
 			parent_controller.tableController.tableGrid.requestFocus();
 		}
 	else if (this.account.PRESSED_KEYBOARD.get(KeyCode.ESCAPE)) {
-			parent_controller.classification.requestFocus();
+			parent_controller.value_field.requestFocus();
 		}
 	
 	else if (this.account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
@@ -341,7 +341,7 @@ public class AutoCompleteBox_CharClassification extends TextField
 	
 }
 
-private void duplicateKeyEvent(KeyCode key) {
+public void duplicateKeyEvent(KeyCode key) {
 	if(!GlobalConstants.AUTO_TEXT_FIELD_DUPLICATE_ACTION) {
 		return;
 	}
