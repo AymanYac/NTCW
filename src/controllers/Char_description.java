@@ -173,11 +173,6 @@ public class Char_description {
 
 
 	private TextField[] uiDataFields;
-
-
-
-	
-
 	
 	
 	@FXML void nextBlank() {
@@ -269,16 +264,7 @@ public class Char_description {
 	}
 
 	private void listen_for_keyboard_events() {
-		account.PRESSED_KEYBOARD.put(KeyCode.CONTROL, false);
-		account.PRESSED_KEYBOARD.put(KeyCode.SHIFT, false);
-		account.PRESSED_KEYBOARD.put(KeyCode.ESCAPE, false);
-		account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
-		account.PRESSED_KEYBOARD.put(KeyCode.I, false);
-		account.PRESSED_KEYBOARD.put(KeyCode.P, false);
-		account.PRESSED_KEYBOARD.put(KeyCode.DOWN, false);
-		account.PRESSED_KEYBOARD.put(KeyCode.UP, false);
-		account.PRESSED_KEYBOARD.put(KeyCode.K, false);
-		account.PRESSED_KEYBOARD.put(KeyCode.L, false);
+		
 		
 		uiDataFields = new TextField[] {value_field,uom_field,min_field_uom,max_field_uom,note_field_uom,rule_field,min_field,max_field,note_field,translated_value_field};
 		
@@ -308,29 +294,132 @@ public class Char_description {
             }
         });
 		
+		sd.getScene().getWindow().focusedProperty().addListener(new ChangeListener<Boolean>()
+		{
+		    @Override
+		    public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue)
+		    {
+		    	if(!newPropertyValue) {
+		    		account.PRESSED_KEYBOARD.keySet().forEach(k->account.PRESSED_KEYBOARD.put(k, false));
+		    	}
+		    }
+		});
+		
 		Arrays.asList(uiDataFields).forEach(n->{
 			n.setOnKeyPressed(new EventHandler<KeyEvent>() 
 	        {
 	            public void handle(final KeyEvent keyEvent) 
 	            {
-	                try {
-						handleKeyBoardEvent(keyEvent,true);
-					} catch (IOException | ParseException | ClassNotFoundException | SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+	            	handleDataKeyBoardEvent(keyEvent,true);
 	            }
 	        });
 		});
 	}
 
+	protected void handleDataKeyBoardEvent(KeyEvent keyEvent, boolean pressed) {
+		
+		if(keyEvent.getCode().equals(KeyCode.CONTROL)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.CONTROL, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.SHIFT)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.SHIFT, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.ESCAPE)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.ESCAPE, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.ENTER)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.ENTER, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.I)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.I, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.P)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.P, pressed);
+		}
+		
+		if(keyEvent.getCode().equals(KeyCode.DOWN)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.DOWN, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.UP)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.UP, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.K)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.K, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.L)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.L, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.TAB)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.TAB, pressed);
+		}
+		
+		
+		Optional<TextField> focusedDataField = Arrays.asList(uiDataFields).stream().filter(e->e.isFocused()).findAny();
+		if(focusedDataField.isPresent()) {
+			if(account.PRESSED_KEYBOARD.get(KeyCode.TAB)) {
+				Node pbNode = validateDataFields();
+				if(!(pbNode!=null)) {
+					//Do nothing all items so far are valid
+				}else {
+					int pbIdx = Arrays.asList(uiDataFields).indexOf(pbNode);
+					int fcsIdx = Arrays.asList(uiDataFields).indexOf(focusedDataField.get());
+					System.out.println("Pb at index "+String.valueOf(pbIdx)+" fcs at index "+String.valueOf(fcsIdx));
+					//If pbNode is at or before focusedDataField, return to pbNode
+					if(pbIdx<=fcsIdx) {
+						System.out.println("=>Pb before focus, going back");
+						Platform.runLater(new Runnable() {
+
+							@Override
+							public void run() {
+								uiDataFields[pbIdx].requestFocus();
+							}
+							
+						});
+						
+					}else {
+						System.out.println("=>Pb beyond or at focus,staying");
+						//The pbNode is at the current focused field or after, do nothing
+					}
+				}
+			}
+			if(account.PRESSED_KEYBOARD.get(KeyCode.ENTER) && !account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)
+					&& !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
+				Node pbNode = validateDataFields();
+				if(pbNode!=null) {
+					//Do nothing the item is not valid
+				}else {
+					//Skip to next item
+					try{
+						System.out.println(":::Skipping to next item");
+						tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()+1);
+					}catch(Exception V) {
+						
+					}
+				}
+				
+			}
+			
+			if(account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
+				tableController.tableGrid.requestFocus();
+				tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()+1);
+			}
+			if(account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
+				tableController.tableGrid.requestFocus();
+				tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()-1);
+			}
+			if(account.PRESSED_KEYBOARD.get(KeyCode.K) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
+				tableController.nextChar();
+			}
+			if(account.PRESSED_KEYBOARD.get(KeyCode.L) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
+				tableController.previousChar();
+			}
+						
+		}
+		
+	}
 	protected void handleKeyBoardEvent(KeyEvent keyEvent, boolean pressed) throws IOException, ParseException, ClassNotFoundException, SQLException {
 		
-		if(keyEvent.getCode().equals(KeyCode.ENTER)&&!pressed) {
-			System.out.println("*consumed*");
-			keyEvent.consume();
-			return;
-		}
+		
 		System.out.println(keyEvent.getCode()+" "+String.valueOf(pressed));
 		
 		if(keyEvent.getCode().equals(KeyCode.CONTROL)) {
@@ -351,6 +440,7 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.P)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.P, pressed);
 		}
+		
 		if(keyEvent.getCode().equals(KeyCode.DOWN)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.DOWN, pressed);
 		}
@@ -363,8 +453,9 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.L)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.L, pressed);
 		}
-		
-		
+		if(keyEvent.getCode().equals(KeyCode.TAB)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.TAB, pressed);
+		}
 		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.SHIFT) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
 			this.lastRightPane="";
@@ -459,70 +550,7 @@ public class Char_description {
 			}
 		}
 		
-		Optional<TextField> focusedDataField = Arrays.asList(uiDataFields).stream().filter(e->e.isFocused()).findAny();
-		if(focusedDataField.isPresent()) {
-			if(keyEvent.getCode().equals(KeyCode.TAB) && pressed) {
-				System.out.println("TAB "+String.valueOf(pressed));
-				Node pbNode = validateDataFields();
-				if(!(pbNode!=null)) {
-					//Do nothing all items so far are valid
-				}else {
-					int pbIdx = Arrays.asList(uiDataFields).indexOf(pbNode);
-					int fcsIdx = Arrays.asList(uiDataFields).indexOf(focusedDataField.get());
-					System.out.println("Pb at index "+String.valueOf(pbIdx)+" fcs at index "+String.valueOf(fcsIdx));
-					//If pbNode is at or before focusedDataField, return to pbNode
-					if(pbIdx<=fcsIdx) {
-						System.out.println("=>Pb before focus, going back");
-						Platform.runLater(new Runnable() {
 
-							@Override
-							public void run() {
-								uiDataFields[pbIdx].requestFocus();
-							}
-							
-						});
-						
-					}else {
-						System.out.println("=>Pb beyond or at focus,staying");
-						//The pbNode is at the current focused field or after, do nothing
-					}
-				}
-			}
-			if(keyEvent.getCode().equals(KeyCode.ENTER) && !pressed && !account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)
-					&& !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
-				System.out.println("ENTER "+String.valueOf(pressed));
-				Node pbNode = validateDataFields();
-				if(pbNode!=null) {
-					//Do nothing the item is not valid
-				}else {
-					//Skip to next item
-					try{
-						System.out.println(":::Skipping to next item");
-						tableController.tableGrid.requestFocus();
-						classification.duplicateKeyEvent(KeyCode.DOWN);
-					}catch(Exception V) {
-						
-					}
-				}
-				
-			}
-			
-			if(account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
-				tableController.tableGrid.requestFocus();
-				classification.duplicateKeyEvent(KeyCode.DOWN);
-			}
-			if(account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
-				tableController.tableGrid.requestFocus();
-				classification.duplicateKeyEvent(KeyCode.UP);
-			}
-			if(account.PRESSED_KEYBOARD.get(KeyCode.K) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
-				tableController.nextChar();
-			}
-			if(account.PRESSED_KEYBOARD.get(KeyCode.L) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
-				tableController.previousChar();
-			}
-						
-		}
 		return;
 		
 	}
