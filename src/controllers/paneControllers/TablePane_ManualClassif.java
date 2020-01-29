@@ -983,7 +983,7 @@ public class TablePane_ManualClassif {
 		
 	}
 	public void skipClassification() {
-		;
+		account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
 		try {
 			ItemFetcherRow row = ( (ItemFetcherRow)tableGrid.getSelectionModel().getSelectedItem() );
 			String nouvel = Parent.classification.getText();

@@ -103,7 +103,7 @@ public class TablePane_CharClassif {
 
 
 
-	protected void handleKeyBoardEvent(KeyEvent keyEvent, boolean pressed) {
+	protected void initKeyBoardEvent(KeyEvent keyEvent, boolean pressed) {
 		if(keyEvent.getCode().equals(KeyCode.CONTROL)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.CONTROL, pressed);
 		}
@@ -124,21 +124,6 @@ public class TablePane_CharClassif {
 		}
 		
 		
-		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.D)) {
-			//fireClassDown();
-		}
-		
-		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.U)) {
-			//fireClassUp();
-		}
-		
-		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
-			//fireScrollNBDown();
-		}
-		
-		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
-			//fireScrollNBUp();
-		}
 	}
 	
 	
@@ -654,7 +639,7 @@ public class TablePane_CharClassif {
             col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
                  public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                     try{
-                        return new ReadOnlyObjectWrapper(r.getValue().getData(Parent.classCombo.getSelectionModel().getSelectedItem().getClassSegment())[dataIndex].getDisplayValue(Parent));
+                        return new ReadOnlyObjectWrapper(r.getValue().getData(Parent.classCombo.getSelectionModel().getSelectedItem().getClassSegment())[dataIndex].getDisplayValue(Parent,characteristic));
                     }catch(Exception V) {
                         //Object has null data at daataIndex
                         return new ReadOnlyObjectWrapper("");
@@ -708,7 +693,7 @@ public class TablePane_CharClassif {
         {
             public void handle(final KeyEvent keyEvent) 
             {
-                handleKeyBoardEvent(keyEvent,true);
+                initKeyBoardEvent(keyEvent,true);
             }
         });
          
@@ -716,7 +701,7 @@ public class TablePane_CharClassif {
         {
             public void handle(final KeyEvent keyEvent) 
             {
-                handleKeyBoardEvent(keyEvent,false);
+                initKeyBoardEvent(keyEvent,false);
             }
         });
 		
@@ -732,6 +717,8 @@ public class TablePane_CharClassif {
 		    	;
 		    	traverseGridFocus=false;
 		    	Parent.value_field.requestFocus();
+		    	Parent.value_field.end();
+		    	Parent.value_field.selectAll();
 		    }
 		});
 		Parent.classification.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
@@ -753,10 +740,12 @@ public class TablePane_CharClassif {
 		    	Parent.aidLabel.setText("Article ID: "+tmp.getClient_item_number());
 		    	Parent.sd.setText(tmp.getShort_desc()+"\n\n\n\n\n");
 		    	Parent.ld.setText(tmp.getLong_desc()+"\n\n\n\n\n");
-		    	//Parent.classification.setText(tmp.getDisplay_segment_name()!=null?tmp.getDisplay_segment_name():"");
-				Parent.value_field.requestFocus();
+		    	item_selection_routine(tmp);
+		    	Parent.value_field.requestFocus();
+				Parent.value_field.end();
+				Parent.value_field.selectAll();
 				traverseGridFocus=true;
-				item_selection_routine(tmp);
+				
 		    }else {
 		    	Parent.counterSelection.setVisible(false);
 		    }

@@ -63,8 +63,11 @@ public class CharClassifProposer {
 				UoMDeclarationDialog.UomDeclarationPopUpFromPropButton(parent,buttonText.split("\"")[1],currentLoopButtonIndex,active_char);
 				
 			}else {
-				parent.sendPatternRule(getRuleForButton(currentLoopButtonIndex));
-				parent.sendPatternValue(getValueForButton(currentLoopButtonIndex));
+				CharacteristicValue val = getValueForButton(currentLoopButtonIndex);
+				String rule = getRuleForButton(currentLoopButtonIndex);
+				parent.sendPatternValue(val);
+				parent.sendPatternRule(rule);
+				
 			}
 			
 		});
@@ -82,10 +85,18 @@ public class CharClassifProposer {
 	}
 
 	public static CharacteristicValue getValueForButton(int currentLoopButtonIndex) {
+		System.out.println("*GETTING VALUE*");
+		System.out.println(currentLoopButtonIndex);
+		System.out.println(buttonToData.get(currentLoopButtonIndex).getKey());
+		System.out.println(buttonToData.get(currentLoopButtonIndex).getValue());
 		return buttonToData.get(currentLoopButtonIndex).getKey();
 	}
 
 	public static String getRuleForButton(int currentLoopButtonIndex) {
+		System.out.println("*GETTING RULE*");
+		System.out.println(currentLoopButtonIndex);
+		System.out.println(buttonToData.get(currentLoopButtonIndex).getKey());
+		System.out.println(buttonToData.get(currentLoopButtonIndex).getValue());
 		return buttonToData.get(currentLoopButtonIndex).getValue();
 	}
 

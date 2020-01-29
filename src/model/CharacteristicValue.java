@@ -1,9 +1,15 @@
 package model;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import controllers.Char_description;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import javafx.util.Pair;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
@@ -84,19 +90,186 @@ public class CharacteristicValue {
 		if(text_val!=null) {
 			return text_val;
 		}
-		return nominal_value;
+		return getNominal_value();
 	}
+	
 	//Display value is user formatted display value (value column in table and item export)
-	public String getDisplayValue(Char_description parent) {
-		try{
-			CharPaneRow tmp = new CharPaneRow(parent);
-			tmp.setCarac(this.parentChar);
-			tmp.setValue(this);
-			return WordUtils.textFlowToString(tmp.getValue_display());
-		}catch(Exception V) {
-			return null;
-		}
+	public String getDisplayValue(Char_description parent, ClassCharacteristic parentChar) {
+		return WordUtils.textFlowToString(getFormatedDisplayAndUomPair(parent,parentChar).getValue());
 	}
+	
+	public Pair<ArrayList<String>, TextFlow> getFormatedDisplayAndUomPair(Char_description parent,ClassCharacteristic parentChar) {
+		ArrayList<Text> textes = new ArrayList<Text>();
+		String local_uom_symbol="";
+		UnitOfMeasure local_uom = null;
+		String local_Nominal_value=null;
+		String local_Min_value=null;
+		String local_Max_value=null;
+		
+		if(!parentChar.getIsNumeric()) {
+			Text tmp = new Text(getDataLanguageValue());
+			tmp.setFill(GlobalConstants.CHAR_TXT_COLOR);
+			tmp.setFont(Font.font(GlobalConstants.CHAR_TXT_FONT,GlobalConstants.CHAR_TXT_WEIGHT,GlobalConstants.CHAR_TXT_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
+			textes.add(tmp);
+			if(parentChar.getIsTranslatable() && !parent.user_language.equals(parent.data_language)) {
+				//tmp = new Text(" ("+translateValue(this.getValue()).getNominal_value()+")");
+				tmp = new Text(" ("+getUserLanguageValue()+")");
+				tmp.setFill(GlobalConstants.RULE_DISPLAY_SYNTAX_COLOR);
+				tmp.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,GlobalConstants.RULE_DISPLAY_SYNTAX_WEIGHT,GlobalConstants.ITALIC_DISPLAY_SYNTAX_POSTURE,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
+				textes.add(tmp);
+				
+			}
+			
+		}else {
+			
+			try{
+				
+				UnitOfMeasure current_uom = UnitOfMeasure.RunTimeUOMS.get(getUom_id());
+				if((!(current_uom!=null)) || parentChar.getAllowedUoms().contains(current_uom.getUom_id()) || parent.conversionToggle.isSelected()) {
+					//Either there's no uom or the uom is included in the allowed uoms
+					//Or the user doesn't want conversion
+					//No conversion and show the input value
+					try{
+						local_uom_symbol = current_uom.getUom_symbol();
+						local_uom = current_uom;
+					}catch(Exception V) {
+						//V.printStackTrace(System.err);
+					}
+					local_Nominal_value = getNominal_value();
+					local_Max_value = getMax_value();
+					local_Min_value = getMin_value();
+				}else {
+					//Converting to base uom
+					UnitOfMeasure base_uom = UnitOfMeasure.RunTimeUOMS.get(current_uom.getUom_base_id());
+					try{
+						local_uom_symbol = base_uom.getUom_symbol();
+						local_uom = base_uom;
+					}catch(Exception V) {
+						V.printStackTrace(System.err);
+					}
+					try{
+						local_Nominal_value = String.valueOf( new BigDecimal( getNominal_value().replace(",", ".").replace(" ", "") ).multiply(current_uom.getUom_multiplier())).replace(".", ",");
+					}catch(Exception V) {
+						
+					}
+					try{
+						local_Max_value = String.valueOf( new BigDecimal( getMax_value().replace(",", ".").replace(" ", "") ).multiply(current_uom.getUom_multiplier())).replace(".", ",");
+					}catch(Exception V) {
+						
+					}
+					try{
+						local_Min_value = String.valueOf( new BigDecimal( getMin_value().replace(",", ".").replace(" ", "") ).multiply(current_uom.getUom_multiplier())).replace(".", ",");
+					}catch(Exception V) {
+						
+					}
+					for(String uom:parentChar.getAllowedUoms()) {
+						UnitOfMeasure loopUom = UnitOfMeasure.RunTimeUOMS.get(uom);
+						if(loopUom.getUom_base_id().equals(base_uom.getUom_id())) {
+							
+							try{
+								local_uom_symbol = loopUom.getUom_symbol();
+								local_uom = loopUom;
+							}catch(Exception V) {
+								V.printStackTrace(System.err);
+							}
+							try{
+								local_Nominal_value = String.valueOf( new BigDecimal( local_Nominal_value.replace(",", ".").replace(" ", "") ).divide(loopUom.getUom_multiplier())).replace(".", ",");
+							}catch(Exception V) {
+								
+							}
+							try{
+								local_Max_value = String.valueOf( new BigDecimal( local_Max_value.replace(",", ".").replace(" ", "") ).divide(loopUom.getUom_multiplier())).replace(".", ",");
+							}catch(Exception V) {
+								
+							}
+							try{
+								local_Min_value = String.valueOf( new BigDecimal( local_Min_value.replace(",", ".").replace(" ", "") ).divide( loopUom.getUom_multiplier())).replace(".", ",");
+							}catch(Exception V) {
+								
+							}
+							break;
+							
+						}
+					}
+					
+					
+				}
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
+				local_uom_symbol="";
+				local_uom=null;
+			}
+			
+			if(local_Nominal_value!=null && local_Nominal_value.replace(" ","").length() > 0) {
+				//Has nominal value
+				@SuppressWarnings("static-access")
+				Text tmp = new Text(local_Nominal_value+" "+local_uom_symbol);
+				tmp.setFill(GlobalConstants.CHAR_NUM_COLOR);
+				tmp.setFont(Font.font(GlobalConstants.CHAR_NUM_FONT,GlobalConstants.CHAR_NUM_WEIGHT,GlobalConstants.CHAR_NUM_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
+				textes.add(tmp);
+				if(local_Min_value!=null && local_Min_value.replace(" ","").length() > 0) {
+					if(local_Max_value!=null && local_Max_value.replace(" ","").length() > 0) {
+						tmp = new Text(" ("+local_Min_value+" to "+local_Max_value+" "+local_uom_symbol+") ");
+						tmp.setFill(GlobalConstants.RULE_DISPLAY_SYNTAX_COLOR);
+						tmp.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,GlobalConstants.RULE_DISPLAY_SYNTAX_WEIGHT,GlobalConstants.ITALIC_DISPLAY_SYNTAX_POSTURE,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
+						textes.add(tmp);
+						
+					}else {
+						tmp = new Text(" (Min:"+local_Min_value+" "+local_uom_symbol+") ");
+						tmp.setFill(GlobalConstants.RULE_DISPLAY_SYNTAX_COLOR);
+						tmp.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,GlobalConstants.RULE_DISPLAY_SYNTAX_WEIGHT,GlobalConstants.ITALIC_DISPLAY_SYNTAX_POSTURE,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
+						textes.add(tmp);
+						
+					}
+				}else {
+					if(local_Max_value!=null && local_Max_value.replace(" ","").length() > 0) {
+						tmp = new Text(" (Max:"+local_Max_value+" "+local_uom_symbol+") ");
+						tmp.setFill(GlobalConstants.RULE_DISPLAY_SYNTAX_COLOR);
+						tmp.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,GlobalConstants.RULE_DISPLAY_SYNTAX_WEIGHT,GlobalConstants.ITALIC_DISPLAY_SYNTAX_POSTURE,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
+						textes.add(tmp);
+						}
+				}
+			}else {
+				//No nominal
+				Text tmp;
+				if(local_Min_value!=null && local_Min_value.replace(" ","").length() > 0) {
+					if(local_Max_value!=null && local_Max_value.replace(" ","").length() > 0) {
+						tmp = new Text("("+local_Min_value+" to "+local_Max_value+" "+local_uom_symbol+") ");
+						tmp.setFill(GlobalConstants.CHAR_NUM_COLOR);
+						tmp.setFont(Font.font(GlobalConstants.CHAR_NUM_FONT,GlobalConstants.CHAR_NUM_WEIGHT,GlobalConstants.CHAR_NUM_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
+						textes.add(tmp);
+						
+					}else {
+						tmp = new Text("(Min:"+local_Min_value+" "+local_uom_symbol+") ");
+						tmp.setFill(GlobalConstants.CHAR_NUM_COLOR);
+						tmp.setFont(Font.font(GlobalConstants.CHAR_NUM_FONT,GlobalConstants.CHAR_NUM_WEIGHT,GlobalConstants.CHAR_NUM_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
+						textes.add(tmp);
+						
+					}
+				}else {
+					if(local_Max_value!=null && local_Max_value.replace(" ","").length() > 0) {
+						tmp = new Text("(Max:"+local_Max_value+" "+local_uom_symbol+") ");
+						tmp.setFill(GlobalConstants.CHAR_NUM_COLOR);
+						tmp.setFont(Font.font(GlobalConstants.CHAR_NUM_FONT,GlobalConstants.CHAR_NUM_WEIGHT,GlobalConstants.CHAR_NUM_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
+						textes.add(tmp);
+						}
+			}
+		}
+		}
+		TextFlow ret = new TextFlow(textes.toArray(new Text[textes.size()]));
+		ret.setMinHeight(0);
+		ret.setPrefHeight(0);
+		
+		ArrayList<String> ls = new ArrayList<String>();
+		ls.add((local_uom!=null?local_uom.getUom_id():null));
+		ls.add(local_Nominal_value);
+		ls.add(local_Min_value);
+		ls.add(local_Max_value);
+		
+		Pair<ArrayList<String>,TextFlow> tmp = new Pair<ArrayList<String>,TextFlow>(ls,ret);
+		return tmp;
+	}
+	
 	public boolean isNonEmpty() {
 		int concatDataLength = 0;
 		try {

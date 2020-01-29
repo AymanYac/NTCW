@@ -313,6 +313,8 @@ public class AutoCompleteBox_CharClassification extends TextField
 		}
 	else if (this.account.PRESSED_KEYBOARD.get(KeyCode.ESCAPE)) {
 			parent_controller.value_field.requestFocus();
+			parent_controller.value_field.end();
+			parent_controller.value_field.selectAll();
 		}
 	
 	else if (this.account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {

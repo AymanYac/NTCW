@@ -1,6 +1,5 @@
 package model;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import controllers.Char_description;
@@ -119,6 +118,12 @@ public class CharPaneRow {
 	}
 	
 	public TextFlow getValue_display(){
+		if(!(this.getValue()!=null)) {
+			return null;
+		}
+		return this.getValue().getFormatedDisplayAndUomPair(parent, carac).getValue();
+	}
+	/*public TextFlow getValue_display(){
 		if(!(this.getValue()!=null)) {
 			return null;
 		}
@@ -276,6 +281,6 @@ public class CharPaneRow {
 		ret.setPrefHeight(0);
 		return ret;
 		
-	}
+	}*/
 	
 }

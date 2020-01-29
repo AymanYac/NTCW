@@ -78,7 +78,7 @@ public class CharPane_CharClassif {
 		valueColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
 		
 		tableGrid.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-		    if (newSelection != null && this.triggerItemTableRefresh && selected_row.getClass_segment().split("&&&")[0].equals(parent.classCombo.getValue().getClassSegment())) {
+		    if (newSelection != null && this.triggerItemTableRefresh) {
 		    	Platform.runLater(new Runnable (){
 
 					@Override

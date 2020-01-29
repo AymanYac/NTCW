@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import controllers.Char_description;
 
 
 public class AutoCompleteBox_UnitOfMeasure extends TextField
@@ -30,17 +29,16 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
   private ContextMenu entriesPopup;
   private Map<Integer, UnitOfMeasure> RESULTMAP;
   protected boolean PopupIsVisible=false;
-private Char_description parent;
+  
   /** Construct a new AutoCompleteTextField. 
  * @param char_description 
  * @param style 
  * @param account 
  * @param rowIndex */
-  public AutoCompleteBox_UnitOfMeasure( Char_description char_description, String style, UserAccount account) {
+  public AutoCompleteBox_UnitOfMeasure(String style, UserAccount account) {
     super();
     entries = new ArrayList<UnitOfMeasure>();
     entriesPopup = new ContextMenu();
-    parent = char_description;
     
     focusedProperty().addListener(new ChangeListener<Boolean>()
     {
@@ -105,7 +103,7 @@ private Char_description parent;
             	entriesPopup.getSkin().getNode().lookup(".menu-item").requestFocus();
             	entriesPopup.getSkin().getNode().lookup(".menu-item").setOnKeyPressed(ke ->{
             		if(ke.getCode().equals(KeyCode.ENTER) && !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
-            			send_uom_to_parent(RESULTMAP.get(0));
+            			print_uom_in_parent(RESULTMAP.get(0));
             		}
             	});
             	PopupIsVisible = true;
@@ -173,7 +171,7 @@ protected void check_revert_value_in_allowed_uoms() {
       {
         @Override
         public void handle(ActionEvent actionEvent) {
-        	send_uom_to_parent(result);
+        	print_uom_in_parent(result);
         }
       });
       RESULTMAP.put(i,result);
@@ -185,15 +183,22 @@ protected void check_revert_value_in_allowed_uoms() {
   }
 
 
+protected void print_uom_in_parent(UnitOfMeasure result) {
+	setText(result.toString());
+}
+
+
+
+
 public void send_uom_to_parent(UnitOfMeasure unitOfMeasure) {
-	CharDescriptionRow row = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+	/*CharDescriptionRow row = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
 	String selectedRowClass = row.getClass_segment().split("&&&")[0];
 	int active_char_index = Math.floorMod(parent.tableController.selected_col,parent.tableController.active_characteristics.get(selectedRowClass).size());
 	CharacteristicValue currentValue = row.getData(selectedRowClass)[active_char_index];
 	currentValue=(currentValue!=null)?currentValue:new CharacteristicValue();
 	currentValue.setUom_id(unitOfMeasure.getUom_id());
 	parent.sendPatternValue(currentValue);
-	
+	*/
 }
 
 

@@ -175,6 +175,8 @@
                   <ToggleButton fx:id="taxoButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_taxo.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
                   <ToggleButton fx:id="imageButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#search_image" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_image_search2.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
                   <ToggleButton fx:id="charButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#view_chars" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_eraser_inverted.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Separator maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" orientation="VERTICAL" prefHeight="15.0" prefWidth="15.0" />
+                  <ToggleButton fx:id="conversionToggle" mnemonicParsing="false" stylesheets="@../Styles/ButtonBlue.css" text="Value Conversion" />
                </items>
                <padding>
                   <Insets left="18.0" />

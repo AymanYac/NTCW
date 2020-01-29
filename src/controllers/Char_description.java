@@ -42,10 +42,13 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.TextFlow;
+import javafx.util.Pair;
 import model.GlobalConstants;
 import model.UnitOfMeasure;
 import model.AutoCompleteBox_CharClassification;
@@ -101,6 +104,7 @@ public class Char_description {
 	@FXML ToggleButton taxoButton;
 	@FXML public ToggleButton imageButton;
 	@FXML public ToggleButton charButton;
+	@FXML public ToggleButton conversionToggle;
 	
 	@FXML Button prop1;
 	@FXML Button prop2;
@@ -108,17 +112,17 @@ public class Char_description {
 	@FXML Button prop4;
 	@FXML Button prop5;
 	
-	@FXML TextField max_field_uom;
-	@FXML TextField max_field;
-	@FXML TextField min_field_uom;
-	@FXML TextField min_field;
-	@FXML TextField note_field_uom;
-	@FXML TextField note_field;
-	@FXML TextField rule_field;
-	private AutoCompleteBox_UnitOfMeasure uom_field;
+	@FXML public TextField max_field_uom;
+	@FXML public TextField max_field;
+	@FXML public TextField min_field_uom;
+	@FXML public TextField min_field;
+	@FXML public TextField note_field_uom;
+	@FXML public TextField note_field;
+	@FXML public TextField rule_field;
+	public  AutoCompleteBox_UnitOfMeasure uom_field;
 	//@FXML TextField uom_field;
 	@FXML public TextField value_field;
-	@FXML TextField translated_value_field;
+	@FXML public TextField translated_value_field;
 	
 	@FXML Label custom_label_11;
 	@FXML Label custom_label_12;
@@ -260,7 +264,22 @@ public class Char_description {
 		
 	}
 	private void toolBarButtonListener() {
+		conversionToggle.setText("Value conversion: Yes");
+		conversionToggle.setTooltip(new Tooltip("Display item values only in allowed uoms"));
 		
+		conversionToggle.selectedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldVal, Boolean newVal) {
+				if(newVal) {
+					conversionToggle.setText("Value conversion: No");
+				}else {
+					conversionToggle.setText("Value conversion: Yes");
+				}
+				refresh_ui_display();
+				tableController.tableGrid.refresh();
+			}
+			
+		});
 	}
 
 	private void listen_for_keyboard_events() {
@@ -314,6 +333,19 @@ public class Char_description {
 	            }
 	        });
 		});
+		
+		Arrays.asList(uiDataFields).forEach(n->{
+			n.focusedProperty().addListener(new ChangeListener<Boolean>(){
+
+				@Override
+				public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+					if(newValue) {
+						n.selectAll();
+					}
+				}
+				
+			});
+		});
 	}
 
 	protected void handleDataKeyBoardEvent(KeyEvent keyEvent, boolean pressed) {
@@ -346,8 +378,8 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.K)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.K, pressed);
 		}
-		if(keyEvent.getCode().equals(KeyCode.L)) {
-			account.PRESSED_KEYBOARD.put(KeyCode.L, pressed);
+		if(keyEvent.getCode().equals(KeyCode.M)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.M, pressed);
 		}
 		if(keyEvent.getCode().equals(KeyCode.TAB)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.TAB, pressed);
@@ -361,6 +393,7 @@ public class Char_description {
 				if(!(pbNode!=null)) {
 					//Do nothing all items so far are valid
 				}else {
+					System.out.println("::Data field pb::");
 					int pbIdx = Arrays.asList(uiDataFields).indexOf(pbNode);
 					int fcsIdx = Arrays.asList(uiDataFields).indexOf(focusedDataField.get());
 					System.out.println("Pb at index "+String.valueOf(pbIdx)+" fcs at index "+String.valueOf(fcsIdx));
@@ -386,12 +419,25 @@ public class Char_description {
 					&& !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
 				Node pbNode = validateDataFields();
 				if(pbNode!=null) {
-					//Do nothing the item is not valid
+					//The item is not valid, focus on problem
+					System.out.println("::Data field pb::");
+					int pbIdx = Arrays.asList(uiDataFields).indexOf(pbNode);
+					Platform.runLater(new Runnable() {
+
+						@Override
+						public void run() {
+							uiDataFields[pbIdx].requestFocus();
+						}
+						
+					});
+					
 				}else {
 					//Skip to next item
 					try{
 						System.out.println(":::Skipping to next item");
-						tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()+1);
+						int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
+						CharValuesLoader.storeItemDatafromScreen(idx,this);
+						tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
 					}catch(Exception V) {
 						
 					}
@@ -400,19 +446,27 @@ public class Char_description {
 			}
 			
 			if(account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
-				tableController.tableGrid.requestFocus();
 				tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()+1);
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						value_field.end();
+						value_field.selectAll();
+					}
+				});
 			}
 			if(account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
-				tableController.tableGrid.requestFocus();
 				tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()-1);
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						value_field.end();
+						value_field.selectAll();
+					}
+				});
+				
 			}
-			if(account.PRESSED_KEYBOARD.get(KeyCode.K) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
-				tableController.nextChar();
-			}
-			if(account.PRESSED_KEYBOARD.get(KeyCode.L) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
-				tableController.previousChar();
-			}
+			
 						
 		}
 		
@@ -450,8 +504,8 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.K)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.K, pressed);
 		}
-		if(keyEvent.getCode().equals(KeyCode.L)) {
-			account.PRESSED_KEYBOARD.put(KeyCode.L, pressed);
+		if(keyEvent.getCode().equals(KeyCode.M)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.M, pressed);
 		}
 		if(keyEvent.getCode().equals(KeyCode.TAB)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.TAB, pressed);
@@ -550,7 +604,37 @@ public class Char_description {
 			}
 		}
 		
-
+		if(account.PRESSED_KEYBOARD.get(KeyCode.K) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
+			tableController.previousChar();
+		}
+		if(account.PRESSED_KEYBOARD.get(KeyCode.M) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
+			tableController.nextChar();
+		}
+		
+		
+		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_1))) {
+			fireProposition(1);
+		}
+		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_2))) {
+			fireProposition(2);
+		}
+		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_3))) {
+			fireProposition(3);
+		}
+		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_4))) {
+			fireProposition(4);
+		}
+		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_5))) {
+			fireProposition(5);
+		}
+		
+		
+		
+		
+		
+		
+		
+		
 		return;
 		
 	}
@@ -563,12 +647,31 @@ public class Char_description {
 		int active_char_index = Math.floorMod(tableController.selected_col,tableController.active_characteristics.get(selectedRowClass).size());
 		ClassCharacteristic active_char = tableController.active_characteristics.get(selectedRowClass).get(active_char_index);
 		
-		if(validateValueField(active_char) && value_field.isVisible()) {
+		if(validateValueField(active_char,value_field) && value_field.isVisible()) {
 			return value_field;
 		};
+		
+		if(validateValueField(active_char,min_field) && min_field.isVisible()) {
+			return min_field;
+		};
+		if(validateValueField(active_char,max_field) && max_field.isVisible()) {
+			return max_field;
+		};
+		if(validateValueField(active_char,min_field_uom) && min_field_uom.isVisible()) {
+			return min_field_uom;
+		};
+		if(validateValueField(active_char,max_field_uom) && max_field_uom.isVisible()) {
+			return max_field_uom;
+		};
+		
 		if(validateUomField(row,selectedRowClass,active_char_index) && uom_field.isVisible()) {
-			return uom_field;
+			uom_field.setUom(uom_field.getEntries().get(0));
+			if(active_char.getAllowedUoms().size()>1){
+				return uom_field;
+			}
 		}
+		
+		/*
 		if(min_field.getText()!=null && min_field.getText().length()>0 && min_field.isVisible()) {
 			try {
 				Double.valueOf(min_field.getText().trim().replace(",", "."));
@@ -602,7 +705,7 @@ public class Char_description {
 				return max_field_uom;
 			}
 		}
-		
+		*/
 		return null;
 	}
 	private boolean validateUomField(CharDescriptionRow row, String selectedRowClass, int active_char_index) {
@@ -626,31 +729,67 @@ public class Char_description {
 			}
 			
 		}
-		return false;
+		return uom_field.isVisible();
 	}
-	private boolean validateValueField(ClassCharacteristic active_char) {
-		String originalValue = value_field.getText();
+	private boolean validateValueField(ClassCharacteristic active_char,TextField target_field) {
+		String originalValue = target_field.getText();
 		if(!(originalValue!=null) || originalValue.length()==0) {
 			return false;
 		}
 		if(active_char.getIsNumeric()) {
+			ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(originalValue);
+			System.out.println("num values :"+String.join(",", numValuesInSelection.stream().map(d->String.valueOf(d)).collect(Collectors.toList())));
+			UnitOfMeasure finishingUom = null;
+			boolean hasFinishingText=false;
+			
+			String selected_text = WordUtils.textWithoutParsedNumericalValues(originalValue);
+			ArrayList<String> textBetweenNumbers = new ArrayList<String>();
+			String[] textBetweenNumberstmp = (selected_text).split("%\\d");
+			for(int i=0;i<textBetweenNumberstmp.length;i++) {
+				textBetweenNumbers.add(textBetweenNumberstmp[i]);
+			}
+			System.out.println("inbetween text :"+String.join(",", textBetweenNumbers));
+			
+			String finishingText = null;
 			if(active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0) {
 				//Numeric with uom
-				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(originalValue);
-				UnitOfMeasure finishingUom = null;
-				boolean hasFinishingText=false;
-				
-				String selected_text = WordUtils.textWithoutParsedNumericalValues(originalValue);
-				ArrayList<String> textBetweenNumbers = new ArrayList<String>();
-				String[] textBetweenNumberstmp = (selected_text).split("%\\d");
-				for(int i=0;i<textBetweenNumberstmp.length;i++) {
-					textBetweenNumbers.add(textBetweenNumberstmp[i]);
-				}
-				
-				String finishingText = null;
 				try{
 					finishingText = textBetweenNumbers.get(textBetweenNumbers.size()-1);
-					hasFinishingText=true;
+					if(originalValue.trim().endsWith(finishingText)) {
+						if(numValuesInSelection.size()==2 && selected_text.replace(" ", "").contains("%1/%2")) {
+							Double first = numValuesInSelection.get(0);
+							Double second = numValuesInSelection.get(1);
+							numValuesInSelection.clear();
+							numValuesInSelection.add(first/second);
+							
+						}
+						hasFinishingText=true;
+					}else {
+						if(finishingText.trim().equals("/")) {
+							if(numValuesInSelection.size()==2) {
+								Double first = numValuesInSelection.get(0);
+								Double second = numValuesInSelection.get(1);
+								numValuesInSelection.clear();
+								numValuesInSelection.add(first/second);
+								hasFinishingText=false;
+								finishingText=null;
+							}
+						}else {
+							if(finishingText.trim().equals("")) {
+								if(numValuesInSelection.size()==2) {
+									hasFinishingText=false;
+									finishingText=null;
+								}else {
+									target_field.setText(null);
+									return true;
+								}
+							}else {
+								target_field.setText(null);
+								return true;
+							}
+						}
+						
+					}
 				}catch(Exception V) {
 					hasFinishingText=false;
 				}
@@ -667,11 +806,11 @@ public class Char_description {
 					finishingUom = null;
 				}
 				if(numValuesInSelection.size()==0) {
-					value_field.setText(null);
+					target_field.setText(null);
 					return true;
 				}
 				if(numValuesInSelection.size()==1) {
-					value_field.setText(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+					target_field.setText(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 					if(finishingUom!=null) {
 						uom_field.setText(finishingUom.toString());
 						return false;
@@ -683,8 +822,9 @@ public class Char_description {
 				}
 				
 				if(numValuesInSelection.size()==2) {
-					min_field.setText(WordUtils.DoubleToString(Collections.min(numValuesInSelection)));
-					max_field.setText(WordUtils.DoubleToString(Collections.max(numValuesInSelection)));
+					target_field.setText(null);
+					min_field_uom.setText(WordUtils.DoubleToString(Collections.min(numValuesInSelection)));
+					max_field_uom.setText(WordUtils.DoubleToString(Collections.max(numValuesInSelection)));
 					if(finishingUom!=null) {
 						uom_field.setText(finishingUom.toString());
 						return false;
@@ -694,22 +834,65 @@ public class Char_description {
 					}
 					return false;
 				}
-				value_field.setText(null);
+				target_field.setText(null);
 				return true;
 			}else {
+				System.out.println("Non uom field");
 				//Numeric w/o UOM
-				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(originalValue);
+				try{
+					finishingText = textBetweenNumbers.get(textBetweenNumbers.size()-1);
+					if(originalValue.trim().endsWith(finishingText)) {
+						System.out.println("finishes with "+finishingText+" null");
+						target_field.setText(null);
+						return true;
+					}else {
+						if(finishingText.trim().equals("/")) {
+							System.out.println("separeted by slash");
+							if(numValuesInSelection.size()==2) {
+								Double first = numValuesInSelection.get(0);
+								Double second = numValuesInSelection.get(1);
+								numValuesInSelection.clear();
+								numValuesInSelection.add(first/second);
+							}
+						}else {
+							if(finishingText.trim().equals("")) {
+								System.out.println("separaeted by space");
+								if(numValuesInSelection.size()==2) {
+									
+								}else {
+									target_field.setText(null);
+									return true;
+								}
+							}else {
+								System.out.println("separated by not slash , not space");
+								target_field.setText(null);
+								return true;
+							}
+						}
+						
+						
+					}
+				}catch(Exception V) {
+					V.printStackTrace(System.err);
+				}
+				System.out.println("value size "+numValuesInSelection.size());
 				if(numValuesInSelection.size()==0) {
-					value_field.setText(null);
+					target_field.setText(null);
 					return true;
 				}
 				if(numValuesInSelection.size()==1) {
-					value_field.setText(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+					target_field.setText(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 					return false;
 				}
-				value_field.setText(null);
+
+				if(numValuesInSelection.size()==2) {
+					target_field.setText(null);
+					min_field.setText(WordUtils.DoubleToString(Collections.min(numValuesInSelection)));
+					max_field.setText(WordUtils.DoubleToString(Collections.max(numValuesInSelection)));
+					return false;
+				}
+				target_field.setText(null);
 				return true;
-				
 			}
 		}
 		return false;
@@ -782,7 +965,7 @@ public class Char_description {
 		for( String entry : CNAME_CID) {
 			classification.getEntries().add(entry);
 		}
-		uom_field = new AutoCompleteBox_UnitOfMeasure(this,classification_style.getStyle(),account);
+		uom_field = new AutoCompleteBox_UnitOfMeasure(classification_style.getStyle(),account);
 		
 		classification_style.setVisible(false);
 		grid.add(classification, 1, 9);
@@ -976,7 +1159,8 @@ public class Char_description {
 			//V.printStackTrace(System.err);
 		}
 		value_field.requestFocus();
-		
+		value_field.end();
+		value_field.selectAll();
 	}
 
 	public void fireClassChange(String result) {
@@ -1051,6 +1235,7 @@ public class Char_description {
 			}
 			button.fire();
 		}catch(Exception V) {
+			V.printStackTrace(System.err);
 		}
 	}
 	
@@ -1073,9 +1258,34 @@ public class Char_description {
 			ClassCharacteristic active_char = tableController.active_characteristics.get(row.getClass_segment().split("&&&")[0]).get(selected_col);
 			if(active_char.getIsNumeric()) {
 				if( (active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0)) {
+					
+					
+					UnitOfMeasure local_uom = null;
+					String local_nom = null;
+					String local_min = null;
+					String local_max = null;
+					
+					CharacteristicValue val = row.getData(row.getClass_segment().split("&&&")[0])[selected_col];
+					try{
+						Pair<ArrayList<String>, TextFlow> tmp = val.getFormatedDisplayAndUomPair(this, active_char);
+						local_uom = UnitOfMeasure.RunTimeUOMS.get(tmp.getKey().get(0));
+						local_nom = tmp.getKey().get(1);
+						local_min = tmp.getKey().get(2);
+						local_max = tmp.getKey().get(3);
+					}catch(Exception V) {
+					}
+					
+					
 					//Add the allowed uoms to the autocomplete box
 					for(String uom_id:active_char.getAllowedUoms()) {
 						this.uom_field.getEntries().add(UnitOfMeasure.RunTimeUOMS.get(uom_id));
+						if(!conversionToggle.isSelected()) {
+							if(this.uom_field.getEntries().contains(local_uom)) {
+								
+							}else {
+								this.uom_field.getEntries().add(local_uom);
+							}
+						}
 					}
 					
 					
@@ -1083,7 +1293,11 @@ public class Char_description {
 					value_label.setText("Nominal value");
 					value_label.setVisible(true);
 					try{
-						value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNominal_value());
+						if(!conversionToggle.isSelected()) {
+							value_field.setText(local_nom);
+						}else {
+							value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNominal_value());
+						}
 					}catch(Exception V) {
 						
 					}
@@ -1092,7 +1306,11 @@ public class Char_description {
 					custom_label_11.setText("Unit of measure");
 					custom_label_11.setVisible(true);
 					try{
-						uom_field.setUom(UnitOfMeasure.RunTimeUOMS.get( row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUom_id() ));
+						if(!conversionToggle.isSelected()) {
+							uom_field.setUom(local_uom);
+						}else{
+							uom_field.setUom(UnitOfMeasure.RunTimeUOMS.get( row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUom_id() ));
+						}
 						//uom_field.setText(UnitOfMeasure.RunTimeUOMS.get( row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUom_id() ).getUom_symbol());
 					}catch(Exception V) {
 						
@@ -1122,7 +1340,11 @@ public class Char_description {
 					custom_label_12.setTranslateX(0.5*(rule_field.getWidth()+(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					custom_label_12.setVisible(true);
 					try{
-						min_field_uom.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getMin_value());
+						if(!conversionToggle.isSelected()) {
+							min_field_uom.setText(local_min);
+						}else{
+							min_field_uom.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getMin_value());
+						}
 					}catch(Exception V) {
 						
 					}
@@ -1132,7 +1354,11 @@ public class Char_description {
 					custom_label_21.setText("Maximum value");
 					custom_label_21.setVisible(true);
 					try {
-						max_field_uom.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getMax_value());
+						if(!conversionToggle.isSelected()) {
+							max_field_uom.setText(local_max);
+						}else{
+							max_field_uom.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getMax_value());
+						}
 					}catch(Exception V) {
 						
 					}
@@ -1288,6 +1514,16 @@ public class Char_description {
 			return;
 		}
 		
+		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				value_field.requestFocus();
+				value_field.end();
+				value_field.selectAll();
+			}
+			
+		});
 		
 	}
 	@SuppressWarnings("static-access")

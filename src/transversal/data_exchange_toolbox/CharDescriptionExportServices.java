@@ -239,7 +239,7 @@ public class CharDescriptionExportServices {
 				
 			}*/
 			try{
-				loopCell.setCellValue(item.getData(item.getClass_segment().split("&&&")[0])[i].getDisplayValue(parent));
+				loopCell.setCellValue(item.getData(item.getClass_segment().split("&&&")[0])[i].getDisplayValue(parent,itemChars.get(i)));
 			}catch(Exception V) {
 				
 			}

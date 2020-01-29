@@ -596,7 +596,7 @@ public class CharPatternServices {
 						}else {
 							// The numerical value is not followed by a known unit of measure
 							System.out.println("The numerical value is not followed by a known unit of measure");
-							if(selected_text.endsWith("%1")) {
+							if(selected_text.trim().endsWith("%1")) {
 								//The numerical value is at the end of the selection
 								System.out.println("The numerical value is at the end of the selection");
 								if(active_char.getAllowedUoms().size()==1) {
@@ -919,7 +919,7 @@ public class CharPatternServices {
 								parent.preparePatternProposition(1, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue2, preparedRule2, active_char);
 								return;
 							}else {
-								if(selected_text.replace(",", ".").endsWith("%2")) {
+								if(selected_text.replace(",", ".").trim().endsWith("%2")) {
 									//The 2nd numerical value is at the end of the selection?
 									System.out.println("The 2nd numerical value is at the end of the selection");
 									if(active_char.getAllowedUoms().size()==1) {
@@ -1112,7 +1112,7 @@ public class CharPatternServices {
 										
 										return;
 								}else {
-									if(selected_text.replace(",", ".").endsWith("%2")) {
+									if(selected_text.replace(",", ".").trim().endsWith("%2")) {
 										//The 2nd numerical value is at the end of the selection?
 										System.out.println("The 2nd numerical value is at the end of the selection");
 										int i;
@@ -1274,12 +1274,12 @@ public class CharPatternServices {
 														selected_text.replace(",", ".").indexOf("%2")+
 																"%2".length())
 												+"\""+"<MINMAX %1><MINMAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
-										parent.sendPatternRule(preparedRule2);
 										parent.sendPatternValue(preparedValue2);
+										parent.sendPatternRule(preparedRule2);
 										//parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										return;
 									}else {
-										if(selected_text.replace(",", ".").endsWith("%2")) {
+										if(selected_text.replace(",", ".").trim().endsWith("%2")) {
 											//The 2nd numerical value is at the end of the selection?
 											System.out.println("The 2nd numerical value is at the end of the selection");
 											if(active_char.getAllowedUoms().size()==1) {
@@ -1296,8 +1296,8 @@ public class CharPatternServices {
 												String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 														"%1"))+"\"(|+0)%1(|+0)\":\"(|+0)%2"
 														+"<MINMAX %1><MINMAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
-												parent.sendPatternRule(preparedRule2);
 												parent.sendPatternValue(preparedValue2);
+												parent.sendPatternRule(preparedRule2);
 												//parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 												return;
 											}else {
@@ -1648,8 +1648,9 @@ public class CharPatternServices {
 																	"%3".length())
 													+"\""+"<%1+%2/%3><UOM \""+infered_uom+"\">";
 											
-											parent.sendPatternRule(preparedRule3);
 											parent.sendPatternValue(preparedValue3);
+											parent.sendPatternRule(preparedRule3);
+											
 										}else {
 											
 											UnitOfMeasure infered_uom = uomsInSelection.get(0);
@@ -1668,8 +1669,8 @@ public class CharPatternServices {
 																	"%3".length())
 													+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
 											
-											parent.sendPatternRule(preparedRule3);
 											parent.sendPatternValue(preparedValue3);
+											parent.sendPatternRule(preparedRule3);
 											
 										}
 									}else {

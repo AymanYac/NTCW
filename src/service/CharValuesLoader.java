@@ -7,12 +7,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import controllers.Char_description;
 import controllers.paneControllers.TablePane_CharClassif;
 import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
+import model.UnitOfMeasure;
 import transversal.generic.Tools;
 
 public class CharValuesLoader {
@@ -132,5 +135,38 @@ public class CharValuesLoader {
 		if(i.getClass_segment().contains(classSegment)) {
 			i.getData(classSegment)[active_char_index]=value;
 		}
+	}
+
+
+
+	public static void storeItemDatafromScreen(int idx, Char_description parent) {
+		CharDescriptionRow row = parent.tableController.itemArray.get(idx);
+		String class_id = row.getClass_segment().split("&&&")[0];
+		ArrayList<ClassCharacteristic> chars = parent.tableController.active_characteristics.get(class_id);
+		ClassCharacteristic active_char = chars.get(parent.tableController.selected_col%chars.size());
+		
+		CharacteristicValue tmp = new CharacteristicValue();
+		if(active_char.getIsNumeric()) {
+			tmp.setNominal_value(parent.value_field.getText());
+			if(active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0) {
+				Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->u.toString().equals(parent.uom_field.getText())).findAny();
+				if(uom.isPresent()) {
+					tmp.setUom_id(uom.get().getUom_id());
+				}
+				tmp.setMin_value(parent.min_field_uom.getText());
+				tmp.setMax_value(parent.max_field_uom.getText());
+				tmp.setNote(parent.note_field_uom.getText());
+			}else {
+				tmp.setMin_value(parent.min_field.getText());
+				tmp.setMax_value(parent.max_field.getText());
+				tmp.setNote(parent.note_field.getText());
+			}
+		}else {
+			tmp.setDataLanguageValue(parent.value_field.getText());
+			tmp.setUserLanguageValue(parent.translated_value_field.getText());
+			tmp.setNote(parent.note_field.getText());
+		}
+		parent.sendPatternValue(tmp);
+		
 	}
 }

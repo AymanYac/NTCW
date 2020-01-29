@@ -293,8 +293,7 @@ public class UoMDeclarationDialog {
 		
 		uomName.setText("");
 		uomSymbol.setText(proposedUomSymbol);
-		//uomMultiplier.setText("");
-		uomChoice.getItems().addAll(UnitOfMeasure.RunTimeUOMS.values().stream()
+		uomChoice.getItems().setAll(UnitOfMeasure.RunTimeUOMS.values().stream()
 				.filter(u -> UnitOfMeasure.ConversionPathExists(u, active_char.getAllowedUoms()))
 				.collect(Collectors.toSet()).stream()
 				.map(u->new UomClassComboRow(u)).collect(Collectors.toSet()));
