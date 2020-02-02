@@ -1844,7 +1844,7 @@ public class Auto_classification_progress {
 	    				classif_cname= ITEMS_DICO.get(aid).get(2);  
 	    				classif_rule= ITEMS_DICO.get(aid).get(3);
 	    				if(Math.random()>0.01) {
-	    					System.out.println(classif_rule);
+	    					
 	    				}
 	    				GenericRule gr = new GenericRule();
 	    				try {
@@ -3193,8 +3193,8 @@ public class Auto_classification_progress {
 					MFNAME = preclass_CLASSIFICATION_RULES.get(rule).get(cid).get(1);
 				}
 				if(Math.random()<0.0001) {
-					System.out.println(rule);
-					System.out.println(preclass_CLASSIFICATION_RULES.get(rule));
+					
+					
 				}
 			}
 			if(rule.contains("|COMP=")) {
@@ -3223,7 +3223,7 @@ public class Auto_classification_progress {
 		
 		tm.stopRow(23);
 		tm.stopRow(21);
-		System.out.println(preclass_CLASSIFICATION_RULES_AGGREGATED.size());
+		
 		
 	}
 
@@ -3343,7 +3343,7 @@ public class Auto_classification_progress {
 		TMP = null;
 		tm.stopRow(9);
 		tm.stopRow(7);
-		System.out.println(CLASSIFICATION_RULES_AGGREGATED.size());
+		
 		
 	}
 	

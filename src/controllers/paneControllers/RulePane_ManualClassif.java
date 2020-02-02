@@ -161,7 +161,7 @@ public class RulePane_ManualClassif {
 	
 	private void load_previous_rules(ItemFetcherRow row) {
 		row.itemRules.forEach((k)->{
-			System.out.println("Item "+row.getClient_item_number()+" has previous rule "+k);
+			
 			GenericRule gr = ItemFetcherRow.staticRules.get(k);
 			addGR2List(gr,false,true);
 		});

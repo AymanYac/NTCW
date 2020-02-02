@@ -1,9 +1,6 @@
 package controllers.paneControllers;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +29,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
+import model.AutoCompleteBox_CharValue;
 import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
@@ -378,7 +376,7 @@ public class TablePane_CharClassif {
 		
 			
 		tvX = new TableViewExtra(tableGrid);
-		System.out.println("Getting latest item classes with priority. Listing items for class "+active_class);
+		
 		this.classItems = getActiveItemsID(active_class);
 		
 		CharItemFetcher.fetchAllItems(account.getActive_project(),this);
@@ -410,7 +408,7 @@ public class TablePane_CharClassif {
 		/*classifiedItems.entrySet().parallelStream().collect(
 				Collectors.groupingBy(Map.Entry::getValue,Collectors.counting()))
 		.forEach((k,v)->{
-			System.out.println(k+" : "+v);
+			
 		});*/
 		
 		List<String> classItems = CharItemFetcher.classifiedItems.entrySet().stream().filter(m->m.getValue().contains(active_class)).map(Entry::getKey).collect(Collectors.toList());
@@ -422,10 +420,10 @@ public class TablePane_CharClassif {
 	
 	
 	
-	
+	/*
 	@SuppressWarnings("unused")
 	private void assignValuesToItemsByClass_V1(String target_class_id, String target_class_name, List<String> target_items) throws ClassNotFoundException, SQLException {
-		System.out.println("assigning values to items by class, no items "+target_items.size());
+		
 		
 				
 		
@@ -438,7 +436,7 @@ public class TablePane_CharClassif {
 						+ "and characteristic_id in ('"+String.join("','", this.active_characteristics.get(target_class_id).stream().map(c->c.getCharacteristic_id()).collect(Collectors.toSet()))+"')"
 								+ ") data left join "+account.getActive_project()+".project_values "
 										+ "on data.value_id = project_values.value_id");
-		System.out.println(stmt.toString());
+		
 		rs = stmt.executeQuery();
 		List<String> charIdArray = this.active_characteristics.get(target_class_id).stream().map(c->c.getCharacteristic_id()).collect(Collectors.toList());
 		while(rs.next()) {
@@ -481,7 +479,7 @@ public class TablePane_CharClassif {
 	//in the item
 	@SuppressWarnings("unused")
 	private void assignValuesToItemsByClass_V2(String target_class_id, String target_class_name, List<String> target_items) throws ClassNotFoundException, SQLException {
-		System.out.println("assigning values to items by class, no items "+target_items.size());
+		
 		
 				
 		
@@ -493,7 +491,7 @@ public class TablePane_CharClassif {
 				+ "(select * from "+account.getActive_project()+".project_items_x_values where characteristic_id in ('"+String.join("','", this.active_characteristics.get(target_class_id).stream().map(c->c.getCharacteristic_id()).collect(Collectors.toSet()))+"')"
 								+ ") data left join "+account.getActive_project()+".project_values "
 										+ "on data.value_id = project_values.value_id");
-		System.out.println(stmt.toString());
+		
 		rs = stmt.executeQuery();
 		List<String> charIdArray = this.active_characteristics.get(target_class_id).stream().map(c->c.getCharacteristic_id()).collect(Collectors.toList());
 		while(rs.next()) {
@@ -532,7 +530,7 @@ public class TablePane_CharClassif {
 		conn.close();
 	}
 	
-	
+	*/
 	
 	public void nextChar() {
 		this.selected_col+=1;
@@ -557,7 +555,7 @@ public class TablePane_CharClassif {
 				}
 				
 				if(idx==-1) {
-					//keep full view columns visible if not in collasped views , hide otherwise
+					//keep full view columns visible if not in collapsed views , hide otherwise
 					//Unless column is description column
 					if(((TableColumn)col).getText().equals("Description")) {
 						((TableColumn)col).prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(collapsedView?0.68:0.3));;
@@ -582,6 +580,22 @@ public class TablePane_CharClassif {
 				
 			}
 		}
+		
+		
+		if(Parent.valueAutoComplete!=null) {
+			Parent.valueAutoComplete.refresh_entries(true);
+		}else {
+			Parent.valueAutoComplete = new AutoCompleteBox_CharValue(Parent, Parent.value_field, true, account);
+		}
+		
+		if(Parent.translationAutoComplete!=null) {
+			Parent.translationAutoComplete.refresh_entries(false);
+		}else {
+			Parent.translationAutoComplete = new AutoCompleteBox_CharValue(Parent, Parent.translated_value_field, false, account);
+		}
+		
+		
+				
 		Parent.refresh_ui_display();
 	}
 
@@ -683,7 +697,7 @@ public class TablePane_CharClassif {
         articleColumn.setResizable(false);
         this.tableGrid.getColumns().add(articleColumn);
         
-        System.out.println("Filling table with "+this.itemArray.size()+" items");
+        
         this.tableGrid.getItems().setAll(this.itemArray);
         //this.tableGrid.refresh();
         

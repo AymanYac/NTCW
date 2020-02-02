@@ -126,7 +126,7 @@ public class TablePane_ManualClassif {
 	
 	private void restorePreviousLayout() throws ClassNotFoundException, SQLException {
 		
-		System.out.println("loading previous layout" );
+		
 		
 		Connection conn = Tools.spawn_connection();
 		PreparedStatement stmt = conn.prepareStatement("select user_manual_propositions, "
@@ -137,11 +137,11 @@ public class TablePane_ManualClassif {
 		ResultSet rs = stmt.executeQuery();
 		rs.next();
 		try {
-			System.out.println(rs.getArray(1));
+			
 			account.setManualPropositions(rs.getArray(1));
-			System.out.println(rs.getArray(2));
+			
 			account.setManualSortColumns(rs.getArray(2));
-			System.out.println(rs.getArray(3));
+			
 			account.setManualSortDirs(rs.getArray(3));
 			
 		}catch(Exception V) {
@@ -679,7 +679,7 @@ public class TablePane_ManualClassif {
 		for( Object row : tableGrid.getItems() ) {
 			
 			if( itemsToBlank.contains( ((ItemFetcherRow)row).getItem_id()) ) {
-				System.out.println("blanking "+((ItemFetcherRow)row).getClient_item_number());
+				
 					((ItemFetcherRow)row).setReviewer_Rules(null);
 					//((ItemFetcherRow)row).setNew_segment_id(null);
 					//((ItemFetcherRow)row).setNew_segment_name(null);
@@ -829,7 +829,7 @@ public class TablePane_ManualClassif {
 		//Code to go to the next item if the user is not in rule pane mode
 		try {
 			if(this.Parent.rulesButton.isSelected()) {
-				System.out.println("Evaluating item rules!");
+				
 				ItemFetcherRow current_row = ((ItemFetcherRow)tableGrid.getSelectionModel().getSelectedItem());
 				ManualRuleServices.scrollEvaluateItem(current_row,this.Parent);
 				
@@ -1031,7 +1031,7 @@ public class TablePane_ManualClassif {
 	    	account.getManualSortDirs().add(c.getSortType().toString());
 	    }
 	    
-	    System.out.println("saving order");
+	    
 	    try {
 			transversal.data_exchange_toolbox.ComplexMap2JdbcObject.saveAccountProjectPreference(account);
 		} catch (ClassNotFoundException | SQLException e) {

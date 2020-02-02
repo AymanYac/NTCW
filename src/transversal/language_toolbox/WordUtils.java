@@ -375,7 +375,7 @@ public class WordUtils {
 		}
 		
 		public static String textWithoutParsedNumericalValues(String selected_text) {
-			System.out.println("selected text::"+selected_text);
+			
 			if(!(selected_text!=null)) {
 				return "";
 			}
@@ -396,18 +396,18 @@ public class WordUtils {
 				i+=1;
 				System.out.print(selected_text+"->");
 				selected_text = selected_text.replace(",", ".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
-				System.out.println(selected_text);
+				
 				//ret.add(Double.valueOf( m.group(0)) );
 				  
 				}
-			System.out.println("escaped text::"+selected_text);
+			
 			return selected_text;
 		}
 
 
 
 		public static ArrayList<UnitOfMeasure> parseCompatibleUoMs(String selected_text, ClassCharacteristic active_char) {
-			System.out.println("Parsing "+selected_text);
+			
 			//~ is used to escape intext quotes so as not to be mistaken with rule syntax quotes
 			selected_text = selected_text.replace("~\"","\"");
 			String pattern = "(-?\\d+(\\.\\d+)?)";
@@ -482,7 +482,7 @@ public class WordUtils {
 					if(preparedRule.equals(loopRule)) {
 						break;
 					}
-					System.out.println(preparedRule+"->"+loopRule);
+					
 					preparedRule = loopRule;
 				}
 				
@@ -557,7 +557,7 @@ public class WordUtils {
 			ruleString="";
 			textIdx = 0;
 			textBetweenNumbers.forEach(t->{
-				System.out.println("**"+t);
+				
 				if(textIdx>0) {
 					ruleString = ruleString+"(|+0)%"+String.valueOf(textIdx)+"(|+0)";
 				}
@@ -585,14 +585,14 @@ public class WordUtils {
 
 
 		public static boolean FreeRuleSyntaxContainsSep(String freeRule, String sep) {
-			System.out.println("<<<<<<<<<<<<<<"+freeRule);
+			
 			return WordUtils.RuleSyntaxContainsSep(String.join("",freeRule.chars().mapToObj((c -> (char) c)).
 					map(c->(Character.isAlphabetic(c)||Character.isDigit(c)||String.valueOf(c).equals(sep))?String.valueOf(c):"(|+0)").
 					collect(Collectors.toList())),sep);
 		}
 		
 		public static boolean RuleSyntaxContainsSep(String searchText, String sep) {
-			System.out.println(">>>>>>>>>>>>>"+searchText);
+			
 			searchText = searchText.replace("~\"","\"");
 			return searchText.contains("(|+0)"+sep+"(|+0)")
 					||searchText.equals("(|+0)"+sep+"")

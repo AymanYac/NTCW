@@ -45,7 +45,7 @@ public class CharDescriptionExportServices {
         }else {
         	return;
         }
-        System.out.println("Saving...");
+        
         
 		SXSSFWorkbook wb = new SXSSFWorkbook(5000); // keep 5000 rows in memory, exceeding rows will be flushed to disk
         Sheet reviewSheet = wb.createSheet("Review format");

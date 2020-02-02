@@ -39,7 +39,7 @@ public class ComplexMap2JdbcObject {
 		stmt.setString(4, account.getUser_id());
 		stmt.setString(5, account.getActive_project());
 		
-		System.out.println(stmt.toString());
+		
 		stmt.execute();
 		stmt.close();
 		conn.close();

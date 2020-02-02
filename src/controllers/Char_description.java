@@ -52,6 +52,7 @@ import javafx.util.Pair;
 import model.GlobalConstants;
 import model.UnitOfMeasure;
 import model.AutoCompleteBox_CharClassification;
+import model.AutoCompleteBox_CharValue;
 import model.AutoCompleteBox_UnitOfMeasure;
 import model.CharDescClassComboRow;
 import model.CharDescriptionRow;
@@ -62,6 +63,7 @@ import service.CharClassifProposer;
 import service.CharItemFetcher;
 import service.CharPatternServices;
 import service.CharValuesLoader;
+import service.TranslationServices;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.UoMDeclarationDialog;
@@ -177,6 +179,14 @@ public class Char_description {
 
 
 	private TextField[] uiDataFields;
+
+
+
+	public AutoCompleteBox_CharValue translationAutoComplete;
+
+
+
+	public AutoCompleteBox_CharValue valueAutoComplete;
 	
 	
 	@FXML void nextBlank() {
@@ -224,6 +234,8 @@ public class Char_description {
 		
 		toolBarButtonListener();
 		initializePropButtons();
+		
+		
 		
 	}
 	
@@ -346,6 +358,8 @@ public class Char_description {
 				
 			});
 		});
+		
+		
 	}
 
 	protected void handleDataKeyBoardEvent(KeyEvent keyEvent, boolean pressed) {
@@ -393,13 +407,13 @@ public class Char_description {
 				if(!(pbNode!=null)) {
 					//Do nothing all items so far are valid
 				}else {
-					System.out.println("::Data field pb::");
+					
 					int pbIdx = Arrays.asList(uiDataFields).indexOf(pbNode);
 					int fcsIdx = Arrays.asList(uiDataFields).indexOf(focusedDataField.get());
-					System.out.println("Pb at index "+String.valueOf(pbIdx)+" fcs at index "+String.valueOf(fcsIdx));
+					
 					//If pbNode is at or before focusedDataField, return to pbNode
 					if(pbIdx<=fcsIdx) {
-						System.out.println("=>Pb before focus, going back");
+						
 						Platform.runLater(new Runnable() {
 
 							@Override
@@ -410,7 +424,7 @@ public class Char_description {
 						});
 						
 					}else {
-						System.out.println("=>Pb beyond or at focus,staying");
+						
 						//The pbNode is at the current focused field or after, do nothing
 					}
 				}
@@ -420,7 +434,7 @@ public class Char_description {
 				Node pbNode = validateDataFields();
 				if(pbNode!=null) {
 					//The item is not valid, focus on problem
-					System.out.println("::Data field pb::");
+					
 					int pbIdx = Arrays.asList(uiDataFields).indexOf(pbNode);
 					Platform.runLater(new Runnable() {
 
@@ -434,7 +448,7 @@ public class Char_description {
 				}else {
 					//Skip to next item
 					try{
-						System.out.println(":::Skipping to next item");
+						
 						int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
 						CharValuesLoader.storeItemDatafromScreen(idx,this);
 						tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
@@ -474,7 +488,7 @@ public class Char_description {
 	protected void handleKeyBoardEvent(KeyEvent keyEvent, boolean pressed) throws IOException, ParseException, ClassNotFoundException, SQLException {
 		
 		
-		System.out.println(keyEvent.getCode()+" "+String.valueOf(pressed));
+		
 		
 		if(keyEvent.getCode().equals(KeyCode.CONTROL)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.CONTROL, pressed);
@@ -718,12 +732,12 @@ public class Char_description {
 				if(UnitOfMeasure.ConversionPathExists(matchinguom.get(), tableController.active_characteristics.get(row_class_id).get(active_char_index).getAllowedUoms())) {
 					return false;
 				}else {
-					System.out.println("No conversion path");
+					
 					uom_field.setText("");
 					return true;
 				}
 			}else {
-				System.out.println("No matching uom "+uomFieldText);
+				
 				uom_field.setText("");
 				return true;
 			}
@@ -738,7 +752,7 @@ public class Char_description {
 		}
 		if(active_char.getIsNumeric()) {
 			ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(originalValue);
-			System.out.println("num values :"+String.join(",", numValuesInSelection.stream().map(d->String.valueOf(d)).collect(Collectors.toList())));
+			
 			UnitOfMeasure finishingUom = null;
 			boolean hasFinishingText=false;
 			
@@ -748,7 +762,7 @@ public class Char_description {
 			for(int i=0;i<textBetweenNumberstmp.length;i++) {
 				textBetweenNumbers.add(textBetweenNumberstmp[i]);
 			}
-			System.out.println("inbetween text :"+String.join(",", textBetweenNumbers));
+			
 			
 			String finishingText = null;
 			if(active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0) {
@@ -798,7 +812,7 @@ public class Char_description {
 				if(uomsInSelection.size()>0) {
 					finishingUom = uomsInSelection.get(0);
 					if(finishingUom!=null) {
-						System.out.println("found uom "+finishingUom.getUom_name());
+						
 					}
 					
 					
@@ -837,17 +851,17 @@ public class Char_description {
 				target_field.setText(null);
 				return true;
 			}else {
-				System.out.println("Non uom field");
+				
 				//Numeric w/o UOM
 				try{
 					finishingText = textBetweenNumbers.get(textBetweenNumbers.size()-1);
 					if(originalValue.trim().endsWith(finishingText)) {
-						System.out.println("finishes with "+finishingText+" null");
+						
 						target_field.setText(null);
 						return true;
 					}else {
 						if(finishingText.trim().equals("/")) {
-							System.out.println("separeted by slash");
+							
 							if(numValuesInSelection.size()==2) {
 								Double first = numValuesInSelection.get(0);
 								Double second = numValuesInSelection.get(1);
@@ -856,7 +870,7 @@ public class Char_description {
 							}
 						}else {
 							if(finishingText.trim().equals("")) {
-								System.out.println("separaeted by space");
+								
 								if(numValuesInSelection.size()==2) {
 									
 								}else {
@@ -864,7 +878,7 @@ public class Char_description {
 									return true;
 								}
 							}else {
-								System.out.println("separated by not slash , not space");
+								
 								target_field.setText(null);
 								return true;
 							}
@@ -875,7 +889,7 @@ public class Char_description {
 				}catch(Exception V) {
 					V.printStackTrace(System.err);
 				}
-				System.out.println("value size "+numValuesInSelection.size());
+				
 				if(numValuesInSelection.size()==0) {
 					target_field.setText(null);
 					return true;
@@ -1581,7 +1595,7 @@ public class Char_description {
 		.ifPresent(i->{
 			CharValuesLoader.fillData(this.classCombo.getValue().getClassSegment(),active_char_index,pattern_value,i);
 		});
-		
+		TranslationServices.beAwareOfNewValue(pattern_value,tableController.active_characteristics.get(classCombo.getValue().getClassSegment()).get(active_char_index));
 		refresh_ui_display();
 		tableController.tableGrid.refresh();
 		

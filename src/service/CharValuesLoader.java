@@ -55,7 +55,7 @@ public class CharValuesLoader {
 				val.setValue_id(rs.getString("value_id"));
 				val.setDataLanguageValue(rs.getString("text_value_data_language"));
 				val.setUserLanguageValue(rs.getString("text_value_user_language"));
-				//TranslationServices.addTextEntry(rs.getString("text_value"),characteristic_id);
+				TranslationServices.beAwareOfNewValue(val,tablePane_CharClassif.active_characteristics.get(loop_class_id).get(charIdArrays.get(loop_class_id).indexOf(characteristic_id)));
 				val.setNominal_value(rs.getString("nominal_value"));
 				val.setMin_value(rs.getString("min_value"));
 				val.setMax_value(rs.getString("max_value"));

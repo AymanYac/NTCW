@@ -75,7 +75,7 @@ public class SpreadsheetUpload {
 	            if (parsedHeaders) {
 	                rowValues = new ArrayList <String> ();
 	            }
-	            // System.out.println ("Row No.: " + row.getRowNum ());
+	            // 
 	            // For each row, iterate through each columns
 	            Iterator < Cell > cellIterator = row.cellIterator();
 	            
@@ -239,7 +239,7 @@ public class SpreadsheetUpload {
             if (parsedHeaders) {
                 rowValues = new ArrayList <String> ();
             }
-            // System.out.println ("Row No.: " + row.getRowNum ());
+            // 
             // For each row, iterate through each columns
             Iterator < Cell > cellIterator = row.cellIterator();
             

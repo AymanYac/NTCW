@@ -808,7 +808,7 @@ public class Tools {
 			stmt.setDate(7, new java.sql.Date((new java.util.Date()).getTime()));
 			;
 			stmt.addBatch();
-			System.out.println(stmt.toString());
+			
 			
 			//stmt2.setString(1, eventid);
 			//stmt2.addBatch();

@@ -10,6 +10,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Pair;
+import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
@@ -30,6 +31,10 @@ public class CharacteristicValue {
 	
 	
 	
+	public CharacteristicValue() {
+		super();
+		this.value_id = Tools.generate_uuid();
+	}
 	public String getUom_id() {
 		return uom_id;
 	}
@@ -431,6 +436,11 @@ public class CharacteristicValue {
 		}catch(Exception V) {
 			return 0;
 		}
+	}
+	
+	//Alias for set datalanguageValue used to distinguish setting value for non translatable chars
+	public void setTXTValue(String text) {
+		setDataLanguageValue(text);
 	}
 	
 }

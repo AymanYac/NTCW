@@ -308,7 +308,7 @@ public class CharPatternServices {
 //					If YES							
 //					Value = ef12-gh34-ij56
 					CharacteristicValue tmp = new CharacteristicValue();
-					tmp.setDataLanguageValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1].trim()));
+					tmp.setTXTValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1].trim()));
 					tmp.setParentChar(active_char);
 					parent.sendPatternValue(tmp);
 //					Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]		
@@ -330,7 +330,7 @@ public class CharPatternServices {
 //					If YES							
 //					Value = ef12-gh34-ij56
 					CharacteristicValue tmp = new CharacteristicValue();
-					tmp.setDataLanguageValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1].trim()));
+					tmp.setTXTValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1].trim()));
 					tmp.setParentChar(active_char);
 					parent.sendPatternValue(tmp);
 //					Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]		
@@ -356,7 +356,7 @@ public class CharPatternServices {
 //						If YES
 //							Value = ef12-gh34-ij56	
 						CharacteristicValue tmp = new CharacteristicValue();
-						tmp.setDataLanguageValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1].trim()));
+						tmp.setTXTValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1].trim()));
 						tmp.setParentChar(active_char);
 						parent.sendPatternValue(tmp);
 //							Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]
@@ -375,7 +375,7 @@ public class CharPatternServices {
 //						If NO (e.g. "ab8cd9 ef12-gh34")					
 //							Value = ab8cd9 ef12-gh34
 						CharacteristicValue tmp = new CharacteristicValue();
-						tmp.setDataLanguageValue(selected_text);
+						tmp.setTXTValue(selected_text);
 						tmp.setParentChar(active_char);
 						parent.sendPatternValue(tmp);
 //						
@@ -468,12 +468,12 @@ public class CharPatternServices {
 //										Value = Correction (efgh)
 										CharacteristicValue tmp = new CharacteristicValue();
 										try{
-											tmp.setDataLanguageValue(WordUtils.CORRECT(selected_text.split(":")[1]));
+											tmp.setTXTValue(WordUtils.CORRECT(selected_text.split(":")[1]));
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 											parent.sendPatternRule("\""+selected_text.split(":")[0]+"\""+"(|+1)[\""+selected_text.split(":")[1]+"\"]");
 										}catch(Exception V) {
-											tmp.setDataLanguageValue(WordUtils.CORRECT(selected_text.split("=")[1]));
+											tmp.setTXTValue(WordUtils.CORRECT(selected_text.split("=")[1]));
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 											parent.sendPatternRule("\""+selected_text.split("=")[0]+"\""+"(|+1)[\""+selected_text.split("=")[1]+"\"]");
@@ -492,7 +492,7 @@ public class CharPatternServices {
 //											If YES	
 //												Value = Correction (efgh)
 											CharacteristicValue tmp = new CharacteristicValue();
-											tmp.setDataLanguageValue(selected_text.split(sw_splitter)[1]);
+											tmp.setTXTValue(selected_text.split(sw_splitter)[1]);
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 //												Rule = "abcd"(|+1)["efgh"]
@@ -505,7 +505,7 @@ public class CharPatternServices {
 //											If NO	
 //												Value = Correction (Selection)
 											CharacteristicValue tmp = new CharacteristicValue();
-											tmp.setDataLanguageValue(corrected_text);
+											tmp.setTXTValue(corrected_text);
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 //												Rule = [Selection]

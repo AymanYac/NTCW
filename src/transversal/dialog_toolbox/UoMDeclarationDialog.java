@@ -148,8 +148,8 @@ public class UoMDeclarationDialog {
 
 		result.ifPresent(newUom -> {
 			UnitOfMeasure.storeNewUom(newUom);
-			System.out.println(newUom.getUom_id());
-		    System.out.println(newUom.getUom_name());
+			
+		    
 		    preparedValue.setUom_id(newUom.getUom_id());
 		    parent.sendPatternValue(preparedValue);
 		    parent.sendPatternRule(preparedRule.replace("$$$UOM_SYMBOL$$$", newUom.getUom_symbol()));
@@ -229,10 +229,10 @@ public class UoMDeclarationDialog {
 
 	private static void focusState(Boolean uomMultiplierInFocus, String proposedUomSymbol, ClassCharacteristic active_char, Dialog<UnitOfMeasure> dialog, ButtonType validateButtonType) {
 		if (uomMultiplierInFocus) {
-	        System.out.println("Focus Gained");
+	        
 	    }
 	    else {
-	        System.out.println("Focus Lost");
+	        
 	        try {
 				double inputMultiplier = Double.valueOf(uomMultiplier.getText().replace(",", "."));
 				UnitOfMeasure inputBaseUom = uomChoice.getValue().getUnitOfMeasure();
@@ -286,7 +286,7 @@ public class UoMDeclarationDialog {
 	}
 
 	private static void clear_fields(String proposedUomSymbol,ClassCharacteristic active_char) {
-		System.out.println("clearing fields");
+		
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(20, 150, 10, 10));
@@ -354,7 +354,7 @@ public class UoMDeclarationDialog {
 					ret-=500;
 				}
 				
-				System.out.println(ret);
+				
 				
 				return ret;
 			}

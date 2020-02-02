@@ -30,10 +30,13 @@ public class AutoCompleteBox_CharValue {
 	  private Map<Integer, CharValueTextSuggestion> RESULTMAP;
 	  protected boolean PopupIsVisible=false;
 	  private TextField textfield;
+	  private Char_description parent;
+	private ArrayList<CharValueTextSuggestion> entries;
 	  
-	  AutoCompleteBox_CharValue(Char_description parent,TextField textField,String sourceLanguage,String targetLanguage, UserAccount account){
+	  public AutoCompleteBox_CharValue(Char_description parent,TextField textField,boolean isDataField, UserAccount account){
 		  this.textfield = textField;
-		  ArrayList<CharValueTextSuggestion> entries = TranslationServices.getTextEntriesForActiveCharOnLanguages(parent,sourceLanguage,targetLanguage);
+		  this.parent = parent;
+		  refresh_entries(isDataField);
 		  entriesPopup = new ContextMenu();
 		    
 		  
@@ -42,7 +45,7 @@ public class AutoCompleteBox_CharValue {
 		      @SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 		      public void changed(ObservableValue<? extends String> observableValue, String s, String s2) {
-		        if (textfield.getText().length() == 0 || !textfield.isFocused())
+		        if (!textfield.isFocused() || !(textfield.getText()!=null) ||  textfield.getText().length() == 0)
 		        {
 
 		          entriesPopup.hide();
@@ -84,7 +87,7 @@ public class AutoCompleteBox_CharValue {
 		            	entriesPopup.getSkin().getNode().lookup(".menu-item").requestFocus();
 		            	entriesPopup.getSkin().getNode().lookup(".menu-item").setOnKeyPressed(ke ->{
 		            		if(ke.getCode().equals(KeyCode.ENTER) && !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
-		            			setValuesOnParent(RESULTMAP.get(0));
+		            			setValuesOnParent(RESULTMAP.get(0), parent);
 		            		}
 		            	});
 		            	PopupIsVisible = true;
@@ -113,7 +116,14 @@ public class AutoCompleteBox_CharValue {
 
 		  
 
-  /**
+  public void refresh_entries(boolean isDataField) {
+	  entries = TranslationServices.getTextEntriesForActiveCharOnLanguages(parent,isDataField); 
+	  
+	}
+
+
+
+/**
    * Populate the entry set with the given search results.  Display is limited to 10 entries, for performance.
    * @param searchResult The set of matching strings.
    */
@@ -126,13 +136,13 @@ public class AutoCompleteBox_CharValue {
     for (int i = 0; i < count; i++)
     {
       final CharValueTextSuggestion result = searchResult.get(i);
-      Label entryLabel = new Label(result.toString());
+      Label entryLabel = new Label(result.getDisplay_value());
       CustomMenuItem item = new CustomMenuItem(entryLabel, true);
       item.setOnAction(new EventHandler<ActionEvent>()
       {
         @Override
         public void handle(ActionEvent actionEvent) {
-        	setValuesOnParent(result);
+        	setValuesOnParent(result,parent);
         }
       });
       RESULTMAP.put(i,result);
@@ -145,9 +155,17 @@ public class AutoCompleteBox_CharValue {
 
 
 
-protected void setValuesOnParent(CharValueTextSuggestion result) {
-	// TODO Auto-generated method stub
+protected void setValuesOnParent(CharValueTextSuggestion result, Char_description parent) {
+	parent.note_field.requestFocus();
+	if(result.isDataFieldSuggestion()) {
+		parent.value_field.setText(result.getSource_value());
+		parent.translated_value_field.setText(result.getTarget_value());
+		return;
+	}
 	
+	parent.translated_value_field.setText(result.getSource_value());
+	parent.value_field.setText(result.getTarget_value());
+	return;
 }
 
 

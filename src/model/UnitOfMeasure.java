@@ -242,12 +242,12 @@ public class UnitOfMeasure {
 			if(loop_uom.getUom_base_id().equals(uom_base_id)) {
 				if(loop_uom.getUom_multiplier().doubleValue()-inputMultiplierToBase< min_found) {
 					min_found = loop_uom.getUom_multiplier().doubleValue()-inputMultiplierToBase;
-					System.out.println(":::"+min_found);
+					
 					if( (Math.abs(min_found)/loop_uom.getUom_multiplier().doubleValue())
 							<
 							GlobalConstants.MAX_UOM_MULTIPLIER_TOLERANCE) {
-						System.out.println(":::"+min_found);
-						System.out.println((min_found)/loop_uom.getUom_multiplier().doubleValue());
+						
+						
 						candidate = loop_uom;
 					}
 					
