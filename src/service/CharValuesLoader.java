@@ -155,17 +155,24 @@ public class CharValuesLoader {
 				}
 				tmp.setMin_value(parent.min_field_uom.getText());
 				tmp.setMax_value(parent.max_field_uom.getText());
-				tmp.setNote(parent.note_field_uom.getText());
 			}else {
 				tmp.setMin_value(parent.min_field.getText());
 				tmp.setMax_value(parent.max_field.getText());
-				tmp.setNote(parent.note_field.getText());
 			}
 		}else {
-			tmp.setDataLanguageValue(parent.value_field.getText());
-			tmp.setUserLanguageValue(parent.translated_value_field.getText());
-			tmp.setNote(parent.note_field.getText());
+			if(parent.value_field.getText()!=null && parent.value_field.getText().replace(" ", "").length()>0) {
+				tmp.setDataLanguageValue(parent.value_field.getText());
+			}else {
+				tmp.setDataLanguageValue(null);
+			}
+			
+			if(parent.translated_value_field.getText()!=null && parent.translated_value_field.getText().replace(" ", "").length()>0) {
+				tmp.setUserLanguageValue(parent.translated_value_field.getText());
+			}else {
+				tmp.setUserLanguageValue(null);
+			}
 		}
+		tmp.setNote(parent.note_field_uom.getText());
 		parent.sendPatternValue(tmp);
 		
 	}

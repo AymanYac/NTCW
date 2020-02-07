@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import controllers.Char_description;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -21,6 +23,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import service.TranslationServices;
+import transversal.dialog_toolbox.ValueTranslationDisambiguation;
 
 public class AutoCompleteBox_CharValue {
 	
@@ -28,13 +31,15 @@ public class AutoCompleteBox_CharValue {
 	  /** The popup used to select an entry. */
 	  private ContextMenu entriesPopup;
 	  private Map<Integer, CharValueTextSuggestion> RESULTMAP;
-	  protected boolean PopupIsVisible=false;
 	  private TextField textfield;
 	  private Char_description parent;
-	private ArrayList<CharValueTextSuggestion> entries;
+	  private ArrayList<CharValueTextSuggestion> entries;
+	  private AutoCompleteBox_CharValue sibling;
+	  private static boolean blockFocusLostProcessing=false;
 	  
 	  public AutoCompleteBox_CharValue(Char_description parent,TextField textField,boolean isDataField, UserAccount account){
 		  this.textfield = textField;
+		  setOnFocusLostProcessValue(isDataField);
 		  this.parent = parent;
 		  refresh_entries(isDataField);
 		  entriesPopup = new ContextMenu();
@@ -54,7 +59,7 @@ public class AutoCompleteBox_CharValue {
 		        	
 		        	
 		          LinkedList<CharValueTextSuggestion> searchResult = new LinkedList<>();
-		          final List<CharValueTextSuggestion> filteredEntries = entries.stream().filter(e -> e.valueTextContains(textfield.getText()))
+		          final List<CharValueTextSuggestion> filteredEntries = entries.stream().filter(e -> e.sourceTextContains(textfield.getText()))
 		        		  .collect(Collectors.toList());
 		          searchResult.addAll(filteredEntries);
 		          //searchResult.addAll(entries.subSet(getText(), getText() + Character.MAX_VALUE));
@@ -84,17 +89,18 @@ public class AutoCompleteBox_CharValue {
 		            }
 		            
 		            try{
+		            	blockFocusLostProcessing = true;
 		            	entriesPopup.getSkin().getNode().lookup(".menu-item").requestFocus();
 		            	entriesPopup.getSkin().getNode().lookup(".menu-item").setOnKeyPressed(ke ->{
 		            		if(ke.getCode().equals(KeyCode.ENTER) && !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
 		            			setValuesOnParent(RESULTMAP.get(0), parent);
 		            		}
 		            	});
-		            	PopupIsVisible = true;
+		            	blockFocusLostProcessing = false;
 		            	
 		            }catch(Exception V) {
 		            	//Empty list
-		            	PopupIsVisible = false;
+		            	blockFocusLostProcessing = false;
 		            }
 		          } else
 		          {
@@ -114,11 +120,49 @@ public class AutoCompleteBox_CharValue {
 		    textfield.setStyle(parent.classification.getStyle());
 	}
 
-		  
-
-  public void refresh_entries(boolean isDataField) {
-	  entries = TranslationServices.getTextEntriesForActiveCharOnLanguages(parent,isDataField); 
 	  
+
+  private void setOnFocusLostProcessValue(boolean isDataField) {
+		this.textfield.focusedProperty().addListener(new ChangeListener<Boolean>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if(oldValue && !newValue && parent.translated_value_field.isVisible()) {
+					if(textfield.getText()!=null && textfield.getText().length()>0) {
+						
+						processValueOnFocusLost(isDataField);
+						
+					}
+				}
+			}
+			
+		});
+	}
+
+
+
+public void processValueOnFocusLost(boolean isDataField) {
+	if(blockFocusLostProcessing || !textfield.getScene().getWindow().isFocused()) {
+		return;
+	}
+	System.out.println("Focus lost on autocomplete field");
+	Optional<CharValueTextSuggestion> result = entries.stream().filter(e -> e.sourceTextEquals(textfield.getText())).findAny();
+	if(result.isPresent()) {
+		//Process the known suggestion
+		setValuesOnParent(result.get(),parent);
+	}else {
+		//Create a new suggestion and process
+		CharValueTextSuggestion tmp = new CharValueTextSuggestion(isDataField?"DATA":"USER", isDataField?"USER":"DATA");
+		tmp.setSource_value(textfield.getText());
+		tmp.setTarget_value(TranslationServices.getEntryTranslation(tmp.getSource_value(),isDataField));
+		setValuesOnParent(tmp,parent);
+	}	
+}
+
+
+
+public void refresh_entries(boolean isDataField) {
+	  entries = TranslationServices.getTextEntriesForActiveCharOnLanguages(parent,isDataField);
 	}
 
 
@@ -156,16 +200,219 @@ public class AutoCompleteBox_CharValue {
 
 
 protected void setValuesOnParent(CharValueTextSuggestion result, Char_description parent) {
-	parent.note_field.requestFocus();
-	if(result.isDataFieldSuggestion()) {
-		parent.value_field.setText(result.getSource_value());
-		parent.translated_value_field.setText(result.getTarget_value());
-		return;
-	}
 	
-	parent.translated_value_field.setText(result.getSource_value());
-	parent.value_field.setText(result.getTarget_value());
-	return;
+	System.out.println("Processing suggestion: "+result.getDisplay_value());
+	CharValueTextSuggestion otherResultCopy;
+	
+	if(result.isDataFieldSuggestion()) {
+		TextField otherfield = parent.translated_value_field;
+		if(otherfield.getText()!=null && otherfield.getText().length()>0) {
+			//The other field is not empty
+			String otherText = otherfield.getText();
+			if(result.getTarget_value()!=null && result.getTarget_value().length()>0) {
+				//We know what value the other field is supposed to have
+				if(otherText.equals(result.getTarget_value())) {
+					//The value equals the present value, just update the source value
+					System.out.println("Matching links");
+					parent.value_field.setText(result.getSource_value());
+				}else {
+					//Conflict, resolve
+					Boolean updateValues = ValueTranslationDisambiguation.promptTranslationUpdate(parent, result, otherText);
+					if(updateValues!=null) {
+						if(updateValues) {
+							updateValues = ValueTranslationDisambiguation.promptTranslationWarning(parent, result, otherText);
+							if(updateValues!=null) {
+								if(updateValues) {
+									System.out.println("Updating links and values");
+									TranslationServices.updateTranslation(result,true,otherText);
+									parent.value_field.setText(result.getSource_value());
+								}else {
+									System.out.println("Keeping links and values");
+									//The user chose to keep old value
+									parent.value_field.setText(result.getSource_value());
+									parent.translated_value_field.setText(result.getTarget_value());
+								}
+							}else {
+								//The user cancelled, do nothing
+								
+							}
+						}else {
+							System.out.println("Keeping links and values");
+							//The user chose to keep old value
+							parent.value_field.setText(result.getSource_value());
+							parent.translated_value_field.setText(result.getTarget_value());
+						}
+					}else {
+						//The user cancelled, do nothing
+						
+					}
+				}
+			}else {
+				//We don't know what the other field is supposed to have
+				System.out.println("We don't know what the other field is supposed to have");
+				Optional<CharValueTextSuggestion> otherResult = sibling.entries.stream().filter(e -> e.sourceTextEquals(otherfield.getText())).findAny();
+				if(otherResult.isPresent()) {
+					//If the other field has no known translation
+					if(!(otherResult.get().getTarget_value()!=null) || otherResult.get().getTarget_value().length()==0) {
+						Boolean linkResults = ValueTranslationDisambiguation.promptTranslationCreation(parent, result, otherResult.get());
+						if(linkResults!=null) {
+							if(linkResults) {
+								TranslationServices.updateTranslation(result,true,otherText);
+								parent.value_field.setText(result.getSource_value());
+							}else {
+								parent.value_field.setText(result.getSource_value());
+								parent.translated_value_field.setText(null);
+							}
+						}else {
+							parent.value_field.setText(result.getSource_value());
+						}
+					}else {
+						//The other field has a known translation
+						//Launch this function with the otherResult as input
+						parent.value_field.setText(result.getSource_value());
+						otherResultCopy = otherResult.get().flipIsDataFieldSuggestion();
+						setValuesOnParent(otherResultCopy, parent);
+					}
+					
+				}else {
+					//The other word is not known
+					Boolean linkResults = ValueTranslationDisambiguation.promptTranslationCreation(parent, result, otherText);
+					if(linkResults!=null) {
+						if(linkResults) {
+							TranslationServices.updateTranslation(result,true,otherText);
+							parent.value_field.setText(result.getSource_value());
+						}else {
+							parent.value_field.setText(result.getSource_value());
+							parent.translated_value_field.setText(null);
+						}
+					}else {
+						parent.value_field.setText(result.getSource_value());
+					}
+				}
+				
+			}
+			
+		}else {
+			//The other field is empty
+			parent.value_field.setText(result.getSource_value());
+			parent.translated_value_field.setText(result.getTarget_value());
+		}
+
+	}else {
+		TextField otherfield = parent.value_field;
+		if(otherfield.getText()!=null && otherfield.getText().length()>0) {
+			//The other field is not empty
+			String otherText = otherfield.getText();
+			if(result.getTarget_value()!=null && result.getTarget_value().length()>0) {
+				//We know what value the other field is supposed to have
+				if(otherText.equals(result.getTarget_value())) {
+					//The value equals the present value, just update the source value
+					System.out.println("Matching links");
+					parent.translated_value_field.setText(result.getSource_value());
+				}else {
+					//Conflict, resolve
+					Boolean updateValues = ValueTranslationDisambiguation.promptTranslationUpdate(parent, result, otherText);
+					if(updateValues!=null) {
+						if(updateValues) {
+							updateValues = ValueTranslationDisambiguation.promptTranslationWarning(parent, result, otherText);
+							if(updateValues!=null) {
+								if(updateValues) {
+									System.out.println("Updating links and values");
+									TranslationServices.updateTranslation(result,false,otherText);
+									parent.translated_value_field.setText(result.getSource_value());
+								}else {
+									System.out.println("Keeping links and values");
+									//The user chose to keep old value
+									parent.translated_value_field.setText(result.getSource_value());
+									parent.value_field.setText(result.getTarget_value());
+								}
+							}else {
+								//The user cancelled, do nothing
+								
+							}
+						}else {
+							System.out.println("Keeping links and values");
+							//The user chose to keep old value
+							parent.translated_value_field.setText(result.getSource_value());
+							parent.value_field.setText(result.getTarget_value());
+						}
+					}else {
+						//The user cancelled, do nothing
+						
+					}
+				}
+			}else {
+				//We don't know what the other field is supposed to have
+				System.out.println("We don't know what the other field is supposed to have");
+				Optional<CharValueTextSuggestion> otherResult = sibling.entries.stream().filter(e -> e.sourceTextEquals(otherfield.getText())).findAny();
+				if(otherResult.isPresent()) {
+					//If the other field has no known translation
+					if(!(otherResult.get().getTarget_value()!=null) || otherResult.get().getTarget_value().length()==0) {
+						Boolean linkResults = ValueTranslationDisambiguation.promptTranslationCreation(parent, result, otherResult.get());
+						if(linkResults!=null) {
+							if(linkResults) {
+								TranslationServices.updateTranslation(result,false,otherText);
+								parent.translated_value_field.setText(result.getSource_value());
+							}else {
+								parent.translated_value_field.setText(result.getSource_value());
+								parent.value_field.setText(null);
+							}
+						}else {
+							parent.translated_value_field.setText(result.getSource_value());
+						}
+					}else {
+						//The other field has a known translation
+						//Launch this function with the otherResult as input
+						parent.value_field.setText(result.getSource_value());
+						otherResultCopy = otherResult.get().flipIsDataFieldSuggestion();
+						setValuesOnParent(otherResultCopy, parent);
+					}
+					
+				}else {
+					//The other word is not known
+					Boolean linkResults = ValueTranslationDisambiguation.promptTranslationCreation(parent, result, otherText);
+					if(linkResults!=null) {
+						if(linkResults) {
+							TranslationServices.updateTranslation(result,false,otherText);
+							parent.translated_value_field.setText(result.getSource_value());
+						}else {
+							parent.translated_value_field.setText(result.getSource_value());
+							parent.value_field.setText(null);
+						}
+					}else {
+						parent.translated_value_field.setText(result.getSource_value());
+					}
+				}
+				
+			}
+			
+		}else {
+			//The other field is empty
+			parent.translated_value_field.setText(result.getSource_value());
+			parent.value_field.setText(result.getTarget_value());
+		}
+	}
+	Platform.runLater(new Runnable() {
+
+		@Override
+		public void run() {
+			hidePopUp();
+			
+		}
+		
+	});
+}
+
+
+
+public void hidePopUp() {
+	this.entriesPopup.hide();
+}
+
+
+
+public void setSibling(AutoCompleteBox_CharValue sibling) {
+	this.sibling = sibling;
 }
 
 

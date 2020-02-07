@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 import transversal.language_toolbox.Unidecode;
@@ -20,17 +21,28 @@ public class CharValueTextSuggestion {
 		this.targetLanguage=targetLanguage;
 	}
 	
-	public boolean isDataFieldSuggestion() {
+	public Boolean isDataFieldSuggestion() {
 		return sourceLanguage.equals("DATA");
+	}
+	
+	public CharValueTextSuggestion flipIsDataFieldSuggestion() {
+		CharValueTextSuggestion tmp = new CharValueTextSuggestion(targetLanguage,sourceLanguage);
+		tmp.langValuePair = (ArrayList<Pair<String, String>>) this.langValuePair.clone();
+		return tmp;
 	}
 
 	public String getSource_value() {
-		Optional<Pair<String, String>> potPair = langValuePair.stream().filter(p->(p.getKey().equals(sourceLanguage))||(!(p.getValue()!=null)))
+		Optional<Pair<String, String>> potPair = langValuePair.stream().filter(p->(p.getKey().equals(sourceLanguage)))
 								.findAny();
 		if(potPair.isPresent()) {
 			return potPair.get().getValue();
 		}
 		return null;
+	}
+	
+	public void setSource_value(String newSourceValue) {
+		langValuePair = new ArrayList<Pair<String,String>>(langValuePair.stream().filter(p->!(p.getKey().equals(sourceLanguage))).collect(Collectors.toList()));
+		addValueInLanguage(sourceLanguage,newSourceValue);
 	}
 	
 	public String getTarget_value() {
@@ -42,9 +54,14 @@ public class CharValueTextSuggestion {
 		return null;
 	}
 	
+	public void setTarget_value(String newSourceValue) {
+		langValuePair = new ArrayList<Pair<String,String>>(langValuePair.stream().filter(p->!(p.getKey().equals(targetLanguage))).collect(Collectors.toList()));
+		addValueInLanguage(targetLanguage,newSourceValue);
+	}
+	
 	public String getDisplay_value() {
-		if(getSource_value()!=null) {
-			if(getTarget_value()!=null) {
+		if(getSource_value()!=null && getSource_value().replace(" ", "").length()>0) {
+			if(getTarget_value()!=null && getTarget_value().replace(" ", "").length()>0) {
 				return getSource_value()+" ("+getTarget_value()+") ";
 			}else {
 				return getSource_value();
@@ -73,7 +90,14 @@ public class CharValueTextSuggestion {
 		return langValuePair.stream().anyMatch(p->p.getKey().equals("USER") && p.getValue()!=null); 
 	}
 
-	public boolean valueTextContains(String subText) {
+	public boolean sourceTextContains(String subText) {
+		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
+		try{
+			return unidecode.decodeAndTrim(getSource_value().toLowerCase()).contains(unidecode.decodeAndTrim(subText.toLowerCase()));
+		}catch(Exception V) {
+			return false;
+		}
+		/*
 		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
 		if(sourceLanguage.equals("DATA")) {
 			return langValuePair.stream().anyMatch(p->p.getKey().equals("DATA") &&
@@ -81,6 +105,16 @@ public class CharValueTextSuggestion {
 		}
 		return langValuePair.stream().anyMatch(p->p.getKey().equals("USER") &&
 				unidecode.decodeAndTrim(p.getValue().toLowerCase()).contains(unidecode.decodeAndTrim(subText.toLowerCase())));
+				*/
+	}
+	
+	public boolean sourceTextEquals(String text) {
+		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
+		try{
+			return unidecode.decodeAndTrim(getSource_value().toLowerCase()).equals(unidecode.decodeAndTrim(text.toLowerCase()));
+		}catch(Exception V) {
+			return false;
+		}
 	}
 
 	@Override
@@ -93,7 +127,7 @@ public class CharValueTextSuggestion {
 
         CharValueTextSuggestion tmp = (CharValueTextSuggestion) o;
         Unidecode unidec = Unidecode.toAscii();
-        return unidec.decodeAndTrim(tmp.getSource_value()).toLowerCase().equals(unidec.decodeAndTrim(getSource_value()).toLowerCase())
+        return isDataFieldSuggestion().equals(isDataFieldSuggestion()) && unidec.decodeAndTrim(tmp.getSource_value()).toLowerCase().equals(unidec.decodeAndTrim(getSource_value()).toLowerCase())
         		&&
         		unidec.decodeAndTrim(tmp.getTarget_value()).toLowerCase().equals(unidec.decodeAndTrim(getTarget_value()).toLowerCase());
     }
@@ -104,7 +138,10 @@ public class CharValueTextSuggestion {
     	Unidecode unidec = Unidecode.toAscii();
     	return (unidec.decodeAndTrim(getSource_value()).toLowerCase()
     			+unidec.decodeAndTrim(getTarget_value()).toLowerCase()
+    			+"|<>|"+String.valueOf(isDataFieldSuggestion())
     			).hashCode();
     }
+
+	
 	
 }

@@ -91,11 +91,11 @@ public class TranslationServices {
 			String userVal = pattern_value.getUserLanguageValue();
 			Unidecode unidecode = Unidecode.toAscii();
 			
-			Boolean conflictingLinks = createTranslationLink(dataVal,userVal);
+			Boolean conflictingLinks = createDicoTranslationLink(dataVal,userVal,false);
 			
 			if(conflictingLinks!=null) {
 				if(conflictingLinks) {
-					System.out.println("Translation conflict on pair <"+dataVal+">-<"+userVal+">, known: "+Data2UserTermsDico.get(unidecode.decodeAndTrim(dataVal.toLowerCase())));
+					
 				}else {
 					//Link is known, no conflicts
 					addThisValueToTheCharKnownSets(pattern_value, charac,true);
@@ -153,6 +153,7 @@ public class TranslationServices {
 			arr.add(tmp);
 			textEntries.put(charac.getCharacteristic_id(), arr);
 		}
+		//System.out.println("Added suggestion ("+pattern_value.getDataLanguageValue()+","+pattern_value.getUserLanguageValue()+") "+tmp.getDisplay_value());
 		if(logUserLanguageValue) {
 			tmp = new CharValueTextSuggestion("USER","DATA");
 			tmp.addValueInLanguage("DATA", pattern_value.getDataLanguageValue());
@@ -164,11 +165,12 @@ public class TranslationServices {
 				arr.add(tmp);
 				textEntries.put(charac.getCharacteristic_id(), arr);
 			}
+			//System.out.println("Added suggestion ("+pattern_value.getDataLanguageValue()+","+pattern_value.getUserLanguageValue()+") "+tmp.getDisplay_value());
 		}
 		
 	}
 
-	private static Boolean createTranslationLink(String dataVal, String userVal) {
+	private static Boolean createDicoTranslationLink(String dataVal, String userVal, boolean forceUpdate) {
 		Data2UserTermsDico = (Data2UserTermsDico!=null)?Data2UserTermsDico:new HashMap<String,String>();
 		User2DataTermsDico = (User2DataTermsDico!=null)?User2DataTermsDico:new HashMap<String,String>();
 		
@@ -182,6 +184,10 @@ public class TranslationServices {
 			
 			try{
 				boolean matched = unidecode.decodeAndTrim(Data2UserTermsDico.get(dataValTrimmed).toLowerCase()).equals(userValTrimmed);
+				if(forceUpdate) {
+					Data2UserTermsDico.put(dataValTrimmed, userVal);
+					User2DataTermsDico.put(userValTrimmed, dataVal);
+				}
 				return !matched;
 			}catch(Exception V) {
 				//dataVal not known
@@ -192,10 +198,120 @@ public class TranslationServices {
 			
 			
 		}else {
-			//One of the values is null no need to store translation link
+			//One of the values is null
+			if(dataVal!=null && dataVal.replaceAll(" ", "").length()>0) {
+				String dataValTrimmed = unidecode.decodeAndTrim(dataVal.toLowerCase());
+				Data2UserTermsDico.put(dataValTrimmed, null);
+			}
+			if(userVal!=null && userVal.replaceAll(" ", "").length()>0) {
+				String userValTrimmed = unidecode.decodeAndTrim(userVal.toLowerCase());
+				User2DataTermsDico.put(userValTrimmed, null);
+			}
 			return null;
 		}
 		
+	}
+
+	public static void updateTranslation(CharValueTextSuggestion result, boolean keyIsData, String newValue) {
+		
+		
+		updateTextEntriesTranslationSuggestions(result.getSource_value(),keyIsData,newValue);
+		//removeTranslationLink(result.getTarget_value(),!keyIsData);
+		//updateTranslationLink(result.getTarget_value(),!keyIsData,result.getSource_value());
+		updateTextEntriesTranslationSuggestions(newValue,!keyIsData,result.getSource_value());
+		
+		updateTranslatedValues(result.getSource_value(),keyIsData,newValue);
+		//removeTranslationValues(result.getTarget_value(),!keyIsData);
+		//updateTranslatedValues(result.getTarget_value(),!keyIsData,result.getSource_value());
+		updateTranslatedValues(newValue,!keyIsData,result.getSource_value());
+		
+		textEntries.forEach((k,v)->{
+			textEntries.put(k, new HashSet(v));
+		});
+	}
+
+	
+
+	private static void updateTranslatedValues(String key, boolean keyIsData, String newValue) {
+		Unidecode unidecode = Unidecode.toAscii();
+		if(keyIsData) {
+			try {
+				Data2ValuesDico.get(unidecode.decode(key.toLowerCase())).parallelStream().forEach(
+						v->{
+							
+							v.setUserLanguageValue(newValue);
+							
+						});
+			}catch(Exception V) {
+				
+			}
+		}else {
+			try {
+				User2ValuesDico.get(unidecode.decode(key.toLowerCase())).parallelStream().forEach(
+						v->{
+							
+							v.setDataLanguageValue(newValue);
+							
+						});
+			}catch(Exception V) {
+				
+			}
+		}
+	}
+
+	
+	
+	private static void updateTextEntriesTranslationSuggestions(String key, boolean keyIsData, String newValue) {
+		
+		System.out.println("Updating link, key:"+key+(keyIsData?",data":",user")+",value:"+newValue);
+		createDicoTranslationLink(key,newValue,true);
+		
+		textEntries.values().parallelStream().forEach(a->a.stream().forEach(s->{
+			
+			if(keyIsData) {
+				if(s.isDataFieldSuggestion()) {
+					if(s.getSource_value() != null && s.getSource_value().equals(key)) {
+						System.out.print("\t "+s.getDisplay_value()+"->");
+						s.setTarget_value(newValue);
+						System.out.println(s.getDisplay_value());
+					}
+				}else {
+					if(s.getTarget_value() != null && s.getTarget_value().equals(key)) {
+						System.out.print("\t "+s.getDisplay_value()+"->");
+						s.setSource_value(newValue);
+						System.out.println(s.getDisplay_value());
+					}
+				}
+			}else {
+				if(!s.isDataFieldSuggestion()) {
+					if(s.getSource_value() != null && s.getSource_value().equals(key)) {
+						System.out.print("\t "+s.getDisplay_value()+"->");
+						s.setTarget_value(newValue);
+						System.out.println(s.getDisplay_value());
+					}
+				}else {
+					if(s.getTarget_value() != null && s.getTarget_value().equals(key)) {
+						System.out.print("\t "+s.getDisplay_value()+"->");
+						s.setSource_value(newValue);
+						System.out.println(s.getDisplay_value());
+					}
+				}
+			}
+			
+		}));
+	}
+
+	public static String getEntryTranslation(String source_value, boolean checkInDataLanguage) {
+		try {
+			Unidecode unidecode = Unidecode.toAscii();
+			if(checkInDataLanguage) {
+				return Data2UserTermsDico.get(unidecode.decodeAndTrim(source_value).toLowerCase());
+			}else {
+				return User2DataTermsDico.get(unidecode.decodeAndTrim(source_value).toLowerCase());
+			}
+		}catch(Exception V) {
+			return null;
+		}
 	}
 
     

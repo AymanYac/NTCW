@@ -53,6 +53,7 @@ import transversal.generic.PixelUtils;
 		parent.imageButton.setSelected(false);
 		parent.setBottomRegionColumnSpans(false);
 		parent.value_field.requestFocus();
+		parent.hideAutoCompletePopups();
 		parent.value_field.end();
 		parent.value_field.selectAll();
 	}

@@ -116,7 +116,7 @@ public class CharacteristicValue {
 			tmp.setFill(GlobalConstants.CHAR_TXT_COLOR);
 			tmp.setFont(Font.font(GlobalConstants.CHAR_TXT_FONT,GlobalConstants.CHAR_TXT_WEIGHT,GlobalConstants.CHAR_TXT_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
 			textes.add(tmp);
-			if(parentChar.getIsTranslatable() && !parent.user_language.equals(parent.data_language)) {
+			if(parentChar.getIsTranslatable() && !parent.user_language.equals(parent.data_language) && getUserLanguageValue()!=null) {
 				//tmp = new Text(" ("+translateValue(this.getValue()).getNominal_value()+")");
 				tmp = new Text(" ("+getUserLanguageValue()+")");
 				tmp.setFill(GlobalConstants.RULE_DISPLAY_SYNTAX_COLOR);

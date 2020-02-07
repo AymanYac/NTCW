@@ -63,7 +63,6 @@ import service.CharClassifProposer;
 import service.CharItemFetcher;
 import service.CharPatternServices;
 import service.CharValuesLoader;
-import service.TranslationServices;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.UoMDeclarationDialog;
@@ -431,6 +430,7 @@ public class Char_description {
 			}
 			if(account.PRESSED_KEYBOARD.get(KeyCode.ENTER) && !account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)
 					&& !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
+				CheckForTranslationValidity();
 				Node pbNode = validateDataFields();
 				if(pbNode!=null) {
 					//The item is not valid, focus on problem
@@ -484,6 +484,22 @@ public class Char_description {
 						
 		}
 		
+	}
+	private void CheckForTranslationValidity() {
+		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+		ClassCharacteristic active_char = this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
+		.get(active_char_index);
+		if(active_char.getIsTranslatable()) {
+			if(value_field.getText()!=null && value_field.getText().length()>0) {
+				valueAutoComplete.processValueOnFocusLost(true);
+				return;
+			}
+			if(translated_value_field.getText()!=null && translated_value_field.getText().length()>0) {
+				translationAutoComplete.processValueOnFocusLost(false);
+				return;
+			}
+			
+		}
 	}
 	protected void handleKeyBoardEvent(KeyEvent keyEvent, boolean pressed) throws IOException, ParseException, ClassNotFoundException, SQLException {
 		
@@ -1067,7 +1083,7 @@ public class Char_description {
 		}*/
 		tableController.setCollapsedViewColumns(new String[] {"Completion status","Question status"});
 		tableController.refresh_table_with_segment(account.getUser_desc_class());
-		 System.gc();
+		System.gc();
 		 
 		
 	}
@@ -1173,6 +1189,7 @@ public class Char_description {
 			//V.printStackTrace(System.err);
 		}
 		value_field.requestFocus();
+		hideAutoCompletePopups();
 		value_field.end();
 		value_field.selectAll();
 	}
@@ -1533,6 +1550,7 @@ public class Char_description {
 			@Override
 			public void run() {
 				value_field.requestFocus();
+				hideAutoCompletePopups();
 				value_field.end();
 				value_field.selectAll();
 			}
@@ -1595,7 +1613,6 @@ public class Char_description {
 		.ifPresent(i->{
 			CharValuesLoader.fillData(this.classCombo.getValue().getClassSegment(),active_char_index,pattern_value,i);
 		});
-		TranslationServices.beAwareOfNewValue(pattern_value,tableController.active_characteristics.get(classCombo.getValue().getClassSegment()).get(active_char_index));
 		refresh_ui_display();
 		tableController.tableGrid.refresh();
 		
@@ -1674,4 +1691,31 @@ public class Char_description {
 		}
 		
 	}
+	public void hideAutoCompletePopups() {
+		try{
+			valueAutoComplete.hidePopUp();
+		}catch(Exception V) {
+			
+		}
+		try{
+			translationAutoComplete.hidePopUp();
+		}catch(Exception V) {
+			
+		}
+	}
+	
+	public void refreshAutoCompleteEntries() {
+		try{
+			valueAutoComplete.refresh_entries(true);
+		}catch(Exception V) {
+			
+		}
+		try{
+			translationAutoComplete.refresh_entries(false);
+		}catch(Exception V) {
+			
+		}
+	}
+	
+	
 }

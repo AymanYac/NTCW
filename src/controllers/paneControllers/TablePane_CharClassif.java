@@ -592,6 +592,8 @@ public class TablePane_CharClassif {
 			Parent.translationAutoComplete.refresh_entries(false);
 		}else {
 			Parent.translationAutoComplete = new AutoCompleteBox_CharValue(Parent, Parent.translated_value_field, false, account);
+			Parent.valueAutoComplete.setSibling(Parent.translationAutoComplete);
+			Parent.translationAutoComplete.setSibling(Parent.valueAutoComplete);
 		}
 		
 		
@@ -731,6 +733,7 @@ public class TablePane_CharClassif {
 		    	;
 		    	traverseGridFocus=false;
 		    	Parent.value_field.requestFocus();
+		    	Parent.hideAutoCompletePopups();
 		    	Parent.value_field.end();
 		    	Parent.value_field.selectAll();
 		    }
@@ -756,6 +759,8 @@ public class TablePane_CharClassif {
 		    	Parent.ld.setText(tmp.getLong_desc()+"\n\n\n\n\n");
 		    	item_selection_routine(tmp);
 		    	Parent.value_field.requestFocus();
+		    	Parent.hideAutoCompletePopups();
+		    	Parent.refreshAutoCompleteEntries();
 				Parent.value_field.end();
 				Parent.value_field.selectAll();
 				traverseGridFocus=true;
