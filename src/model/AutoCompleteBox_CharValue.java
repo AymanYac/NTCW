@@ -24,6 +24,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import service.TranslationServices;
 import transversal.dialog_toolbox.ValueTranslationDisambiguation;
+import transversal.language_toolbox.Unidecode;
 
 public class AutoCompleteBox_CharValue {
 	
@@ -93,7 +94,8 @@ public class AutoCompleteBox_CharValue {
 		            	entriesPopup.getSkin().getNode().lookup(".menu-item").requestFocus();
 		            	entriesPopup.getSkin().getNode().lookup(".menu-item").setOnKeyPressed(ke ->{
 		            		if(ke.getCode().equals(KeyCode.ENTER) && !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
-		            			setValuesOnParent(RESULTMAP.get(0), parent);
+		            			parent.validateFieldsThenSkipToNext(setValuesOnParent(RESULTMAP.get(0), parent));
+		            			
 		            		}
 		            	});
 		            	blockFocusLostProcessing = false;
@@ -129,9 +131,10 @@ public class AutoCompleteBox_CharValue {
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				if(oldValue && !newValue && parent.translated_value_field.isVisible()) {
 					if(textfield.getText()!=null && textfield.getText().length()>0) {
-						
 						processValueOnFocusLost(isDataField);
 						
+					}else {
+						processEmptyValueOnFocusLost(isDataField);
 					}
 				}
 			}
@@ -141,21 +144,67 @@ public class AutoCompleteBox_CharValue {
 
 
 
-public void processValueOnFocusLost(boolean isDataField) {
+public Boolean processEmptyValueOnFocusLost(boolean isDataField) {
 	if(blockFocusLostProcessing || !textfield.getScene().getWindow().isFocused()) {
-		return;
+		return false;
 	}
-	System.out.println("Focus lost on autocomplete field");
+	
+	TextField otherField = isDataField?parent.translated_value_field:parent.value_field;
+	
+	Optional<CharValueTextSuggestion> result = sibling.entries.stream().filter(e -> e.sourceTextEquals(otherField.getText())).findAny();
+	if(result.isPresent()) {
+		
+		if(result.get().getTarget_value()!=null && result.get().getTarget_value().length()>0) {
+			
+			//The other text has a non null translation
+			Boolean deleteMatch = ValueTranslationDisambiguation.promptTranslationDeletion(parent, result.get());
+			if(deleteMatch!=null) {
+				if(deleteMatch) {
+					TranslationServices.removeTranslation(result.get());
+				}else {
+					//Do nothing
+				}
+			}else {
+				//The user has cancelled
+				textfield.selectAll();
+				return null;
+			}
+		}else {
+			
+		}
+		
+	}else {
+		//The other value is not known, do nothing
+		
+		/*
+		CharValueTextSuggestion tmp = new CharValueTextSuggestion(!isDataField?"DATA":"USER", !isDataField?"USER":"DATA");
+		tmp.setSource_value(otherField.getText());
+		tmp.setTarget_value(TranslationServices.getEntryTranslation(tmp.getSource_value(),!isDataField));
+		sibling.setValuesOnParent(tmp,parent);
+		*/
+	}
+	return true;
+}
+
+
+
+public Boolean processValueOnFocusLost(boolean isDataField) {
+	if(blockFocusLostProcessing || !textfield.getScene().getWindow().isFocused()) {
+		return false;
+	}
+	
 	Optional<CharValueTextSuggestion> result = entries.stream().filter(e -> e.sourceTextEquals(textfield.getText())).findAny();
 	if(result.isPresent()) {
 		//Process the known suggestion
-		setValuesOnParent(result.get(),parent);
+		
+		return setValuesOnParent(result.get(),parent);
 	}else {
+		
 		//Create a new suggestion and process
 		CharValueTextSuggestion tmp = new CharValueTextSuggestion(isDataField?"DATA":"USER", isDataField?"USER":"DATA");
 		tmp.setSource_value(textfield.getText());
 		tmp.setTarget_value(TranslationServices.getEntryTranslation(tmp.getSource_value(),isDataField));
-		setValuesOnParent(tmp,parent);
+		return setValuesOnParent(tmp,parent);
 	}	
 }
 
@@ -186,7 +235,7 @@ public void refresh_entries(boolean isDataField) {
       {
         @Override
         public void handle(ActionEvent actionEvent) {
-        	setValuesOnParent(result,parent);
+        	parent.validateFieldsThenSkipToNext(setValuesOnParent(result,parent));
         }
       });
       RESULTMAP.put(i,result);
@@ -199,10 +248,9 @@ public void refresh_entries(boolean isDataField) {
 
 
 
-protected void setValuesOnParent(CharValueTextSuggestion result, Char_description parent) {
+protected Boolean setValuesOnParent(CharValueTextSuggestion result, Char_description parent) {
 	
-	System.out.println("Processing suggestion: "+result.getDisplay_value());
-	CharValueTextSuggestion otherResultCopy;
+	
 	
 	if(result.isDataFieldSuggestion()) {
 		TextField otherfield = parent.translated_value_field;
@@ -213,47 +261,53 @@ protected void setValuesOnParent(CharValueTextSuggestion result, Char_descriptio
 				//We know what value the other field is supposed to have
 				if(otherText.equals(result.getTarget_value())) {
 					//The value equals the present value, just update the source value
-					System.out.println("Matching links");
+					
 					parent.value_field.setText(result.getSource_value());
 				}else {
 					//Conflict, resolve
+					parent.account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
 					Boolean updateValues = ValueTranslationDisambiguation.promptTranslationUpdate(parent, result, otherText);
 					if(updateValues!=null) {
 						if(updateValues) {
+							parent.account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
 							updateValues = ValueTranslationDisambiguation.promptTranslationWarning(parent, result, otherText);
 							if(updateValues!=null) {
 								if(updateValues) {
-									System.out.println("Updating links and values");
+									
 									TranslationServices.updateTranslation(result,true,otherText);
 									parent.value_field.setText(result.getSource_value());
 								}else {
-									System.out.println("Keeping links and values");
+									
 									//The user chose to keep old value
 									parent.value_field.setText(result.getSource_value());
 									parent.translated_value_field.setText(result.getTarget_value());
 								}
 							}else {
 								//The user cancelled, do nothing
+								return null;
 								
 							}
 						}else {
-							System.out.println("Keeping links and values");
+							
 							//The user chose to keep old value
 							parent.value_field.setText(result.getSource_value());
 							parent.translated_value_field.setText(result.getTarget_value());
 						}
 					}else {
 						//The user cancelled, do nothing
+						return null;
 						
 					}
 				}
 			}else {
 				//We don't know what the other field is supposed to have
-				System.out.println("We don't know what the other field is supposed to have");
+				
 				Optional<CharValueTextSuggestion> otherResult = sibling.entries.stream().filter(e -> e.sourceTextEquals(otherfield.getText())).findAny();
 				if(otherResult.isPresent()) {
 					//If the other field has no known translation
 					if(!(otherResult.get().getTarget_value()!=null) || otherResult.get().getTarget_value().length()==0) {
+						
+						parent.account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
 						Boolean linkResults = ValueTranslationDisambiguation.promptTranslationCreation(parent, result, otherResult.get());
 						if(linkResults!=null) {
 							if(linkResults) {
@@ -264,18 +318,57 @@ protected void setValuesOnParent(CharValueTextSuggestion result, Char_descriptio
 								parent.translated_value_field.setText(null);
 							}
 						}else {
+							//The user cancelled
+							
 							parent.value_field.setText(result.getSource_value());
+							return null;
 						}
 					}else {
 						//The other field has a known translation
 						//Launch this function with the otherResult as input
-						parent.value_field.setText(result.getSource_value());
-						otherResultCopy = otherResult.get().flipIsDataFieldSuggestion();
-						setValuesOnParent(otherResultCopy, parent);
+						
+						String knownTranslation = otherResult.get().getTarget_value();
+						Unidecode unidec = Unidecode.toAscii();
+						if(unidec.decodeAndTrim(knownTranslation.toLowerCase()).equals(
+								unidec.decodeAndTrim(textfield.getText().toLowerCase()))){
+							
+							
+						}else {
+							
+							//Textfield / Textfield, otherText
+							Boolean updateValues = ValueTranslationDisambiguation.promptTranslationUpdate(textfield.getText(), otherfield.getText());
+							if(updateValues!=null) {
+								if(updateValues) {
+									parent.account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
+									updateValues = ValueTranslationDisambiguation.promptTranslationWarning(textfield.getText(), otherResult.get());
+									if(updateValues!=null) {
+										if(updateValues) {
+											//Update the values
+											TranslationServices.updateTranslation(otherResult.get(),false,textfield.getText());
+										}else {
+											//Clear the other field
+											otherfield.setText("");
+										}
+									}else {
+										//The user cancelled, do nothing
+										return null;
+									}
+									
+								}else {
+									//Clear the other field
+									otherfield.setText("");
+								}
+							}else {
+								//The user cancelled, do nothing
+								return null;
+							}
+						}
 					}
 					
 				}else {
 					//The other word is not known
+					
+					parent.account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
 					Boolean linkResults = ValueTranslationDisambiguation.promptTranslationCreation(parent, result, otherText);
 					if(linkResults!=null) {
 						if(linkResults) {
@@ -286,7 +379,9 @@ protected void setValuesOnParent(CharValueTextSuggestion result, Char_descriptio
 							parent.translated_value_field.setText(null);
 						}
 					}else {
+						//The user cancelled
 						parent.value_field.setText(result.getSource_value());
+						return null;
 					}
 				}
 				
@@ -307,47 +402,54 @@ protected void setValuesOnParent(CharValueTextSuggestion result, Char_descriptio
 				//We know what value the other field is supposed to have
 				if(otherText.equals(result.getTarget_value())) {
 					//The value equals the present value, just update the source value
-					System.out.println("Matching links");
+					
 					parent.translated_value_field.setText(result.getSource_value());
 				}else {
 					//Conflict, resolve
+					parent.account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
 					Boolean updateValues = ValueTranslationDisambiguation.promptTranslationUpdate(parent, result, otherText);
 					if(updateValues!=null) {
 						if(updateValues) {
+							parent.account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
 							updateValues = ValueTranslationDisambiguation.promptTranslationWarning(parent, result, otherText);
 							if(updateValues!=null) {
 								if(updateValues) {
-									System.out.println("Updating links and values");
+									
 									TranslationServices.updateTranslation(result,false,otherText);
 									parent.translated_value_field.setText(result.getSource_value());
 								}else {
-									System.out.println("Keeping links and values");
+									
 									//The user chose to keep old value
 									parent.translated_value_field.setText(result.getSource_value());
 									parent.value_field.setText(result.getTarget_value());
 								}
 							}else {
 								//The user cancelled, do nothing
+								return null;
 								
 							}
 						}else {
-							System.out.println("Keeping links and values");
+							
 							//The user chose to keep old value
 							parent.translated_value_field.setText(result.getSource_value());
 							parent.value_field.setText(result.getTarget_value());
 						}
 					}else {
 						//The user cancelled, do nothing
+						return null;
 						
 					}
 				}
 			}else {
+				
 				//We don't know what the other field is supposed to have
-				System.out.println("We don't know what the other field is supposed to have");
+				
 				Optional<CharValueTextSuggestion> otherResult = sibling.entries.stream().filter(e -> e.sourceTextEquals(otherfield.getText())).findAny();
 				if(otherResult.isPresent()) {
 					//If the other field has no known translation
 					if(!(otherResult.get().getTarget_value()!=null) || otherResult.get().getTarget_value().length()==0) {
+						
+						parent.account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
 						Boolean linkResults = ValueTranslationDisambiguation.promptTranslationCreation(parent, result, otherResult.get());
 						if(linkResults!=null) {
 							if(linkResults) {
@@ -358,18 +460,57 @@ protected void setValuesOnParent(CharValueTextSuggestion result, Char_descriptio
 								parent.value_field.setText(null);
 							}
 						}else {
+							//The user cancelled
+							
 							parent.translated_value_field.setText(result.getSource_value());
+							return null;
 						}
 					}else {
+
 						//The other field has a known translation
-						//Launch this function with the otherResult as input
-						parent.value_field.setText(result.getSource_value());
-						otherResultCopy = otherResult.get().flipIsDataFieldSuggestion();
-						setValuesOnParent(otherResultCopy, parent);
+						
+						String knownTranslation = otherResult.get().getTarget_value();
+						Unidecode unidec = Unidecode.toAscii();
+						if(unidec.decodeAndTrim(knownTranslation.toLowerCase()).equals(
+								unidec.decodeAndTrim(textfield.getText().toLowerCase()))){
+							
+							
+						}else {
+							
+							//Textfield / Textfield, otherText
+							Boolean updateValues = ValueTranslationDisambiguation.promptTranslationUpdate(textfield.getText(), otherfield.getText());
+							if(updateValues!=null) {
+								if(updateValues) {
+									parent.account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
+									updateValues = ValueTranslationDisambiguation.promptTranslationWarning(textfield.getText(), otherResult.get());
+									if(updateValues!=null) {
+										if(updateValues) {
+											//Update the values
+											TranslationServices.updateTranslation(otherResult.get(),true,textfield.getText());
+											
+										}else {
+											//Clear the other field
+											otherfield.setText("");
+										}
+									}else {
+										//The user cancelled, do nothing
+										return null;
+									}
+									
+								}else {
+									//Clear the other field
+									otherfield.setText("");
+								}
+							}else {
+								//The user cancelled, do nothing
+								return null;
+							}
+						}						
 					}
 					
 				}else {
 					//The other word is not known
+					parent.account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
 					Boolean linkResults = ValueTranslationDisambiguation.promptTranslationCreation(parent, result, otherText);
 					if(linkResults!=null) {
 						if(linkResults) {
@@ -380,7 +521,10 @@ protected void setValuesOnParent(CharValueTextSuggestion result, Char_descriptio
 							parent.value_field.setText(null);
 						}
 					}else {
+						//The user cancelled
+						
 						parent.translated_value_field.setText(result.getSource_value());
+						return null;
 					}
 				}
 				
@@ -401,6 +545,8 @@ protected void setValuesOnParent(CharValueTextSuggestion result, Char_descriptio
 		}
 		
 	});
+	
+	return true;
 }
 
 

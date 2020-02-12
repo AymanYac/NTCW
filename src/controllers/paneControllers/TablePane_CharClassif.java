@@ -613,7 +613,6 @@ public class TablePane_CharClassif {
             tmp.setVisible(false);
             this.tableGrid.getColumns().add(tmp);
             
-        	
         }
         
         TableColumn classNameColumn = new TableColumn<>("Class Name");

@@ -63,6 +63,7 @@ import service.CharClassifProposer;
 import service.CharItemFetcher;
 import service.CharPatternServices;
 import service.CharValuesLoader;
+import service.TranslationServices;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.UoMDeclarationDialog;
@@ -430,32 +431,9 @@ public class Char_description {
 			}
 			if(account.PRESSED_KEYBOARD.get(KeyCode.ENTER) && !account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)
 					&& !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
-				CheckForTranslationValidity();
-				Node pbNode = validateDataFields();
-				if(pbNode!=null) {
-					//The item is not valid, focus on problem
-					
-					int pbIdx = Arrays.asList(uiDataFields).indexOf(pbNode);
-					Platform.runLater(new Runnable() {
-
-						@Override
-						public void run() {
-							uiDataFields[pbIdx].requestFocus();
-						}
-						
-					});
-					
-				}else {
-					//Skip to next item
-					try{
-						
-						int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
-						CharValuesLoader.storeItemDatafromScreen(idx,this);
-						tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
-					}catch(Exception V) {
-						
-					}
-				}
+				account.PRESSED_KEYBOARD.put(KeyCode.ENTER, false);
+				Boolean TranslationProcessResult = CheckForTranslationValidity();
+				validateFieldsThenSkipToNext(TranslationProcessResult);
 				
 			}
 			
@@ -485,21 +463,57 @@ public class Char_description {
 		}
 		
 	}
-	private void CheckForTranslationValidity() {
+	public void validateFieldsThenSkipToNext(Boolean TranslationProcessResult) {
+		Node pbNode = validateDataFields();
+		if(pbNode!=null) {
+			//The item is not valid, focus on problem
+			
+			int pbIdx = Arrays.asList(uiDataFields).indexOf(pbNode);
+			Platform.runLater(new Runnable() {
+
+				@Override
+				public void run() {
+					uiDataFields[pbIdx].requestFocus();
+				}
+				
+			});
+			
+		}else {
+			//Skip to next item
+			try{
+				
+				int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
+				if(TranslationProcessResult!=null) {
+					CharValuesLoader.storeItemDatafromScreen(idx,this);
+				}
+				tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
+			}catch(Exception V) {
+				
+			}
+		}
+	}
+	private Boolean CheckForTranslationValidity() {
 		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
 		ClassCharacteristic active_char = this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
 		.get(active_char_index);
 		if(active_char.getIsTranslatable()) {
-			if(value_field.getText()!=null && value_field.getText().length()>0) {
-				valueAutoComplete.processValueOnFocusLost(true);
-				return;
+			if(value_field.isFocused() && value_field.getText()!=null && value_field.getText().length()>0) {
+				return valueAutoComplete.processValueOnFocusLost(true);
 			}
 			if(translated_value_field.getText()!=null && translated_value_field.getText().length()>0) {
-				translationAutoComplete.processValueOnFocusLost(false);
-				return;
+				return translationAutoComplete.processValueOnFocusLost(false);
+			}
+			
+			if(value_field.isFocused()) {
+				return valueAutoComplete.processEmptyValueOnFocusLost(true);
+			}
+			
+			if(translated_value_field.isFocused()) {
+				return translationAutoComplete.processEmptyValueOnFocusLost(false);
 			}
 			
 		}
+		return true;
 	}
 	protected void handleKeyBoardEvent(KeyEvent keyEvent, boolean pressed) throws IOException, ParseException, ClassNotFoundException, SQLException {
 		
@@ -1598,6 +1612,9 @@ public class Char_description {
 		value_field.setText("");
 		translated_value_field.setText("");
 		
+		
+		
+		
 	}
 	public void sendPatternValue(CharacteristicValue pattern_value) {
 		
@@ -1613,6 +1630,9 @@ public class Char_description {
 		.ifPresent(i->{
 			CharValuesLoader.fillData(this.classCombo.getValue().getClassSegment(),active_char_index,pattern_value,i);
 		});
+		TranslationServices.beAwareOfNewValue(pattern_value, tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index));
+		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index),true);
+		
 		refresh_ui_display();
 		tableController.tableGrid.refresh();
 		

@@ -191,7 +191,7 @@ public class Tools {
 	//Creates an independent connection session to the database
 
 	public static Connection spawn_connection() throws ClassNotFoundException, SQLException {
-		//load postgresql driver
+		 //load postgresql driver
 		 Class.forName("org.postgresql.Driver");
 		 //load database address, port and database name
 	     String url = "jdbc:postgresql://" + load_ip() + ":"+load_port()+"/" + getDatabaseName();

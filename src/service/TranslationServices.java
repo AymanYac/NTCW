@@ -57,7 +57,6 @@ public class TranslationServices {
              in.close();
              return StringEscapeUtils.unescapeHtml(response.toString());
         }catch(Exception V) {
-        	V.printStackTrace(System.err);
         	return "";
         }
        
@@ -107,27 +106,12 @@ public class TranslationServices {
 			
 			//Add this charval to known values carrying this dataVal
 			if(dataVal!=null && dataVal.replaceAll(" ", "").length()>0) {
-				Data2ValuesDico = (Data2ValuesDico!=null)?Data2ValuesDico:new HashMap<String,ArrayList<CharacteristicValue>>();
-				try {
-					Data2ValuesDico.get(unidecode.decode(dataVal.toLowerCase())).add(pattern_value);
-				}catch(Exception V) {
-					ArrayList<CharacteristicValue> tmp = new ArrayList<CharacteristicValue>();
-					tmp.add(pattern_value);
-					Data2ValuesDico.put(unidecode.decode(dataVal.toLowerCase()), tmp);
-				}
+				addToDataValues(dataVal, unidecode, pattern_value);
 			}
 			
 			//Add this charval to known values carrying this dataVal
 			if(userVal!=null && userVal.replaceAll(" ", "").length()>0) {
-				
-				User2ValuesDico = (User2ValuesDico!=null)?User2ValuesDico:new HashMap<String,ArrayList<CharacteristicValue>>();
-				try {
-					User2ValuesDico.get(unidecode.decode(userVal.toLowerCase())).add(pattern_value);
-				}catch(Exception V) {
-					ArrayList<CharacteristicValue> tmp = new ArrayList<CharacteristicValue>();
-					tmp.add(pattern_value);
-					User2ValuesDico.put(unidecode.decode(userVal.toLowerCase()), tmp);
-				}
+				addToUserValues(userVal,unidecode,pattern_value);
 			}
 		}else {
 			//Charac is not translatable only add this value for autocompletion abilities
@@ -141,7 +125,64 @@ public class TranslationServices {
 		
 	}
 
-	private static void addThisValueToTheCharKnownSets(CharacteristicValue pattern_value, ClassCharacteristic charac , boolean logUserLanguageValue) {
+	private static void addToUserValues(String userVal, Unidecode unidecode, CharacteristicValue pattern_value) {
+		
+		User2ValuesDico = (User2ValuesDico!=null)?User2ValuesDico:new HashMap<String,ArrayList<CharacteristicValue>>();
+		try {
+			User2ValuesDico.get(unidecode.decode(userVal.toLowerCase())).add(pattern_value);
+		}catch(Exception V) {
+			ArrayList<CharacteristicValue> tmp = new ArrayList<CharacteristicValue>();
+			tmp.add(pattern_value);
+			User2ValuesDico.put(unidecode.decode(userVal.toLowerCase()), tmp);
+		}
+	}
+
+	private static void addToDataValues(String dataVal,Unidecode unidecode, CharacteristicValue pattern_value) {
+		Data2ValuesDico = (Data2ValuesDico!=null)?Data2ValuesDico:new HashMap<String,ArrayList<CharacteristicValue>>();
+		try {
+			Data2ValuesDico.get(unidecode.decode(dataVal.toLowerCase())).add(pattern_value);
+		}catch(Exception V) {
+			ArrayList<CharacteristicValue> tmp = new ArrayList<CharacteristicValue>();
+			tmp.add(pattern_value);
+			Data2ValuesDico.put(unidecode.decode(dataVal.toLowerCase()), tmp);
+		}
+	}
+	
+	private static void cleanValueDicts() {
+		
+		Unidecode unidec = Unidecode.toAscii();
+		
+		User2ValuesDico = (User2ValuesDico!=null)?User2ValuesDico:new HashMap<String,ArrayList<CharacteristicValue>>();
+		User2ValuesDico.replaceAll((k,v)->cleanUserValueArray(v,k,unidec));
+		
+		Data2ValuesDico = (Data2ValuesDico!=null)?Data2ValuesDico:new HashMap<String,ArrayList<CharacteristicValue>>();
+		Data2ValuesDico.replaceAll((k,v)->cleanDataValueArray(v,k,unidec));
+	}
+
+	private static ArrayList<CharacteristicValue> cleanDataValueArray(ArrayList<CharacteristicValue> v, String k, Unidecode unidec) {
+		
+		final String key = unidec.decodeAndTrim(k).toLowerCase();
+		return new ArrayList<CharacteristicValue>(
+				v.parallelStream().filter(cv->ValueisCleanWithRespectToKey(cv.getDataLanguageValue(),unidec,key)).collect(Collectors.toList())
+				);
+	}
+
+	private static Boolean ValueisCleanWithRespectToKey(String valueInLanguage, Unidecode unidec, String key) {
+		try{
+			return unidec.decodeAndTrim(valueInLanguage).toLowerCase().equals(key);
+		}catch(Exception V) {
+			return true;
+		}
+	}
+
+	private static ArrayList<CharacteristicValue> cleanUserValueArray(ArrayList<CharacteristicValue> v, String k, Unidecode unidec) {
+		final String key = unidec.decodeAndTrim(k).toLowerCase();
+		return new ArrayList<CharacteristicValue>(
+				v.parallelStream().filter(cv->ValueisCleanWithRespectToKey(cv.getUserLanguageValue(),unidec,key)).collect(Collectors.toList())
+				);
+	}
+
+	public static void addThisValueToTheCharKnownSets(CharacteristicValue pattern_value, ClassCharacteristic charac , boolean logUserLanguageValue) {
 		CharValueTextSuggestion tmp = new CharValueTextSuggestion("DATA","USER");
 		tmp.addValueInLanguage("DATA", pattern_value.getDataLanguageValue());
 		tmp.addValueInLanguage("USER", pattern_value.getUserLanguageValue());
@@ -153,7 +194,7 @@ public class TranslationServices {
 			arr.add(tmp);
 			textEntries.put(charac.getCharacteristic_id(), arr);
 		}
-		//System.out.println("Added suggestion ("+pattern_value.getDataLanguageValue()+","+pattern_value.getUserLanguageValue()+") "+tmp.getDisplay_value());
+
 		if(logUserLanguageValue) {
 			tmp = new CharValueTextSuggestion("USER","DATA");
 			tmp.addValueInLanguage("DATA", pattern_value.getDataLanguageValue());
@@ -165,7 +206,7 @@ public class TranslationServices {
 				arr.add(tmp);
 				textEntries.put(charac.getCharacteristic_id(), arr);
 			}
-			//System.out.println("Added suggestion ("+pattern_value.getDataLanguageValue()+","+pattern_value.getUserLanguageValue()+") "+tmp.getDisplay_value());
+
 		}
 		
 	}
@@ -214,6 +255,8 @@ public class TranslationServices {
 
 	public static void updateTranslation(CharValueTextSuggestion result, boolean keyIsData, String newValue) {
 		
+		CharValueTextSuggestion result_for_deletion = result.flipIsDataFieldSuggestion().flipIsDataFieldSuggestion();
+		removeTranslation(result_for_deletion);
 		
 		updateTextEntriesTranslationSuggestions(result.getSource_value(),keyIsData,newValue);
 		//removeTranslationLink(result.getTarget_value(),!keyIsData);
@@ -225,14 +268,36 @@ public class TranslationServices {
 		//updateTranslatedValues(result.getTarget_value(),!keyIsData,result.getSource_value());
 		updateTranslatedValues(newValue,!keyIsData,result.getSource_value());
 		
-		textEntries.forEach((k,v)->{
+		
+		textEntries.replaceAll((k,v)->new HashSet(v));
+		/*textEntries.forEach((k,v)->{
 			textEntries.put(k, new HashSet(v));
-		});
+		});*/
 	}
 
-	
+	public static void removeTranslation(CharValueTextSuggestion result_original) {
+		
+		CharValueTextSuggestion result = result_original.flipIsDataFieldSuggestion().flipIsDataFieldSuggestion();
+		updateTextEntriesTranslationSuggestions(result.getSource_value(),result.isDataFieldSuggestion(),null);
+		updateTranslatedValues(result.getSource_value(),result.isDataFieldSuggestion(),null);
+		
+		System.out.println("Processing translation dict removal for sugg ("+result.getSource_value()+","+result.getTarget_value()+")");
+		if(!result.isDataFieldSuggestion()) {
+			createDicoTranslationLink(result.getTarget_value(),null,true);
+		}else {
+			System.out.println("Deleting translation for data: "+result.getTarget_value());
+			createDicoTranslationLink(null,result.getTarget_value(),true);
+		}
+		
+		textEntries.replaceAll((k,v)->new HashSet(v));
+		/*textEntries.forEach((k,v)->{
+			textEntries.put(k, new HashSet(v));
+		});*/
+	}
 
 	private static void updateTranslatedValues(String key, boolean keyIsData, String newValue) {
+		
+		
 		Unidecode unidecode = Unidecode.toAscii();
 		if(keyIsData) {
 			try {
@@ -240,10 +305,10 @@ public class TranslationServices {
 						v->{
 							
 							v.setUserLanguageValue(newValue);
-							
+							addToUserValues(newValue, unidecode, v);
 						});
 			}catch(Exception V) {
-				
+
 			}
 		}else {
 			try {
@@ -251,19 +316,24 @@ public class TranslationServices {
 						v->{
 							
 							v.setDataLanguageValue(newValue);
+							addToDataValues(newValue, unidecode, v);
 							
 						});
 			}catch(Exception V) {
 				
 			}
 		}
+		
+		cleanValueDicts();
+		
 	}
 
 	
 	
+	
+
 	private static void updateTextEntriesTranslationSuggestions(String key, boolean keyIsData, String newValue) {
 		
-		System.out.println("Updating link, key:"+key+(keyIsData?",data":",user")+",value:"+newValue);
 		createDicoTranslationLink(key,newValue,true);
 		
 		textEntries.values().parallelStream().forEach(a->a.stream().forEach(s->{
@@ -271,29 +341,25 @@ public class TranslationServices {
 			if(keyIsData) {
 				if(s.isDataFieldSuggestion()) {
 					if(s.getSource_value() != null && s.getSource_value().equals(key)) {
-						System.out.print("\t "+s.getDisplay_value()+"->");
 						s.setTarget_value(newValue);
-						System.out.println(s.getDisplay_value());
+						
 					}
 				}else {
 					if(s.getTarget_value() != null && s.getTarget_value().equals(key)) {
-						System.out.print("\t "+s.getDisplay_value()+"->");
 						s.setSource_value(newValue);
-						System.out.println(s.getDisplay_value());
+						
 					}
 				}
 			}else {
 				if(!s.isDataFieldSuggestion()) {
 					if(s.getSource_value() != null && s.getSource_value().equals(key)) {
-						System.out.print("\t "+s.getDisplay_value()+"->");
 						s.setTarget_value(newValue);
-						System.out.println(s.getDisplay_value());
+						
 					}
 				}else {
 					if(s.getTarget_value() != null && s.getTarget_value().equals(key)) {
-						System.out.print("\t "+s.getDisplay_value()+"->");
 						s.setSource_value(newValue);
-						System.out.println(s.getDisplay_value());
+						
 					}
 				}
 			}
@@ -313,6 +379,8 @@ public class TranslationServices {
 			return null;
 		}
 	}
+
+	
 
     
 }
