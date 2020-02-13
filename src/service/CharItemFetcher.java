@@ -26,6 +26,7 @@ public class CharItemFetcher {
 			
 		}else {
 			System.out.println("Fetching all items");
+			Tools.userID2Author = Tools.get_user_names();
 			allRowItems = new ArrayList<CharDescriptionRow>();
 			Connection conn = Tools.spawn_connection();
 			PreparedStatement stmt;

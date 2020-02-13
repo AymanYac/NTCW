@@ -26,6 +26,13 @@ public class CharacteristicValue {
 	private String max_value;
 	private String note;
 	private String uom_id;
+	
+	private String source;
+	private String author;
+	private String rule_id;
+	private String url;
+	
+	
 	private ClassCharacteristic parentChar;
 	
 	
@@ -34,12 +41,6 @@ public class CharacteristicValue {
 	public CharacteristicValue() {
 		super();
 		this.value_id = Tools.generate_uuid();
-	}
-	public String getUom_id() {
-		return uom_id;
-	}
-	public void setUom_id(String uom_id) {
-		this.uom_id = uom_id;
 	}
 	public String getValue_id() {
 		return value_id;
@@ -348,7 +349,41 @@ public class CharacteristicValue {
 		this.userLanguageValue=userLanguageValue;
 	}
 	
+	public String getUom_id() {
+		return uom_id;
+	}
+	public void setUom_id(String uom_id) {
+		this.uom_id = uom_id;
+	}
 	
+	
+	public String getSource() {
+		return source;
+	}
+	public void setSource(String source) {
+		this.source = source;
+	}
+	public String getAuthor() {
+		return author;
+	}
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+	public String getRule_id() {
+		return rule_id;
+	}
+	public void setRule_id(String rule_id) {
+		this.rule_id = rule_id;
+	}
+	
+	
+	
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
 	public void setParentChar(ClassCharacteristic classCharacteristic) {
 		this.parentChar=classCharacteristic;
 		addThisValuetoKnownValuesForCharacteristic(parentChar);
@@ -441,6 +476,13 @@ public class CharacteristicValue {
 	//Alias for set datalanguageValue used to distinguish setting value for non translatable chars
 	public void setTXTValue(String text) {
 		setDataLanguageValue(text);
+	}
+	public String getAuthorName() {
+		try{
+			return Tools.userID2Author.get(getAuthor());
+		}catch(Exception V) {
+			return getAuthor();
+		}
 	}
 	
 }

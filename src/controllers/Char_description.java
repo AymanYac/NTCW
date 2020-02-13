@@ -1424,7 +1424,7 @@ public class Char_description {
 					rule_label.setText("Rule");
 					rule_label.setVisible(true);
 					try{
-						rule_field.setText(row.getRule_id());
+						rule_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getRule_id());
 					}catch(Exception V) {
 						
 					}
@@ -1475,7 +1475,7 @@ public class Char_description {
 					rule_label.setText("Rule");
 					rule_label.setVisible(true);
 					try{
-						rule_field.setText(row.getRule_id());
+						rule_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getRule_id());
 					}catch(Exception V) {
 						
 					}
@@ -1517,7 +1517,7 @@ public class Char_description {
 					rule_label.setText("Rule");
 					rule_label.setVisible(true);
 					try{
-						rule_field.setText(row.getRule_id());
+						rule_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getRule_id());
 					}catch(Exception V) {
 						
 					}
@@ -1546,7 +1546,7 @@ public class Char_description {
 					rule_label.setText("Rule");
 					rule_label.setVisible(true);
 					try{
-						rule_field.setText(row.getRule_id());
+						rule_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getRule_id());
 					}catch(Exception V) {
 						
 					}

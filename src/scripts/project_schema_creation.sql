@@ -68,11 +68,11 @@ EXECUTE format('
 )',  project_id);
 
 EXECUTE format('
-   CREATE TABLE IF NOT EXISTS %I.project_items_x_values(item_id character varying, characteristic_id character varying ,user_id character varying, description_method character varying, description_time timestamp with time zone, value_id character varying, description_rule_id character varying ,PRIMARY KEY(item_id,characteristic_id)
+   CREATE TABLE IF NOT EXISTS %I.project_items_x_values(item_id character varying, characteristic_id character varying ,user_id character varying, description_method character varying, description_time timestamp with time zone, value_id character varying, description_rule_id character varying, url_link character varying, PRIMARY KEY(item_id,characteristic_id)
 )',  project_id);
 
 EXECUTE format('
-   CREATE TABLE IF NOT EXISTS %I.project_items_x_values_history(item_id character varying, characteristic_id character varying ,user_id character varying, description_method character varying, description_time timestamp with time zone,value_id character varying, description_rule_id character varying
+   CREATE TABLE IF NOT EXISTS %I.project_items_x_values_history(item_id character varying, characteristic_id character varying ,user_id character varying, description_method character varying, description_time timestamp with time zone,value_id character varying, description_rule_id character varying, url_link character varying
 )',  project_id);
 
 EXECUTE format('

@@ -35,7 +35,6 @@ public class ItemFetcher {
 	private Integer projectCardinality;
 	private Integer projectGranularity;
 	public HashMap<String, String> classifiedItems;
-	private HashMap<String, String> userID2Author;
 	public HashMap<String, String> CID2NAME = new HashMap<String,String>();
 	public HashMap<String, String> ONLINE_LABELS = new HashMap<String,String>();
 	private List<String> dw_words;
@@ -49,7 +48,7 @@ public class ItemFetcher {
 		this.active_project = active_project;
 		projectCardinality = Tools.count_project_cardinality(active_project);
 		projectGranularity = Tools.get_project_granularity(active_project);
-		userID2Author = Tools.get_user_names();
+		Tools.userID2Author = Tools.get_user_names();
 		
 		if(GlobalConstants.MANUAL_PREORDER) {
 			orderedItems = new ArrayList<String>(projectCardinality);
@@ -157,7 +156,7 @@ public class ItemFetcher {
 					tmp.setManual_segment_id( classifiedItems.get(tmp.getItem_id()).split("&&&")[4] );
 					tmp.setManual_segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
 					tmp.setSource_Manual(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
-					tmp.setAuthor_Manual(userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
+					tmp.setAuthor_Manual(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
 					
 				}
 				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(ClassificationMethods.PROJECT_SETUP_UPLOAD)){
@@ -165,7 +164,7 @@ public class ItemFetcher {
 					tmp.setUpload_segment_id( classifiedItems.get(tmp.getItem_id()).split("&&&")[4] );
 					tmp.setUpload_segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
 					tmp.setSource_Upload(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
-					tmp.setAuthor_Upload(userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
+					tmp.setAuthor_Upload(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
 					
 				}
 				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(ClassificationMethods.USER_RULE)
@@ -175,7 +174,7 @@ public class ItemFetcher {
 					tmp.setRule_Segment_id( classifiedItems.get(tmp.getItem_id()).split("&&&")[4] );
 					tmp.setRule_Segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
 					tmp.setSource_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
-					tmp.setAuthor_Rules(userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
+					tmp.setAuthor_Rules(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
 					tmp.setRule_id_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[5]);
 					tmp.setRule_description_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[5]);
 					QueryFormater.ADD_UPLOAD_ITEM_CLASS(tmp, projectGranularity, active_project);

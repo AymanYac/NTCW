@@ -308,6 +308,10 @@ public class Tools {
 		
 	}
 
+
+
+	public static HashMap<String, String> userID2Author;
+
 	public void create_project_schema(String pid) {
 		try {
 			String schema_creation_query = readStringFile("/scripts/project_schema_creation.sql",Charset.defaultCharset());

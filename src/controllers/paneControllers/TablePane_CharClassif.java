@@ -639,7 +639,11 @@ public class TablePane_CharClassif {
                  if(r.getValue().getLong_desc()!=null && r.getValue().getLong_desc().length()>0) {
                      return new ReadOnlyObjectWrapper(r.getValue().getLong_desc());
                  }
-                 return new ReadOnlyObjectWrapper(r.getValue().getShort_desc());
+                 try{
+                	 return new ReadOnlyObjectWrapper(r.getValue().getShort_desc());
+                 }catch(Exception V) {
+                	 return new ReadOnlyObjectWrapper("");
+                 }
              }
           });
         this.tableGrid.getColumns().add(descriptionColumn);
@@ -669,25 +673,64 @@ public class TablePane_CharClassif {
         }
         
         TableColumn linkColumn = new TableColumn<>("Link");
-        linkColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
+        //linkColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
+        linkColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+                try{
+                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment().split("&&&")[0])[selected_col].getUrl());
+                }catch(Exception V) {
+               	 return new ReadOnlyObjectWrapper("");
+                }
+            }
+         });
         linkColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
         linkColumn.setResizable(false);
         this.tableGrid.getColumns().add(linkColumn);
         
         TableColumn sourceColumn = new TableColumn<>("Source");
-        sourceColumn.setCellValueFactory(new PropertyValueFactory<>("source"));
+        //sourceColumn.setCellValueFactory(new PropertyValueFactory<>("source"));
+        sourceColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+                try{
+                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment().split("&&&")[0])[selected_col].getSource());
+                }catch(Exception V) {
+               	 return new ReadOnlyObjectWrapper("");
+                }
+            }
+         });
+        
         sourceColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
         sourceColumn.setResizable(false);
         this.tableGrid.getColumns().add(sourceColumn);
         
         TableColumn ruleColumn = new TableColumn<>("Rule");
-        ruleColumn.setCellValueFactory(new PropertyValueFactory<>("rule_id"));
+        //ruleColumn.setCellValueFactory(new PropertyValueFactory<>("rule_id"));
+        ruleColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+                try{
+                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment().split("&&&")[0])[selected_col].getRule_id());
+                }catch(Exception V) {
+               	 return new ReadOnlyObjectWrapper("");
+                }
+            }
+         });
+        
         ruleColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
         ruleColumn.setResizable(false);
         this.tableGrid.getColumns().add(ruleColumn);
         
         TableColumn authorColumn = new TableColumn<>("Author");
-        authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
+        //authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
+        authorColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+                try{
+                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment().split("&&&")[0])[selected_col].getAuthorName());
+                }catch(Exception V) {
+               	 return new ReadOnlyObjectWrapper("");
+                }
+            }
+         });
+        
         authorColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
         authorColumn.setResizable(false);
         this.tableGrid.getColumns().add(authorColumn);

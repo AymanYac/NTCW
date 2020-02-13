@@ -15,6 +15,7 @@ import controllers.paneControllers.TablePane_CharClassif;
 import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
+import model.ClassificationMethods;
 import model.UnitOfMeasure;
 import transversal.generic.Tools;
 
@@ -33,7 +34,7 @@ public class CharValuesLoader {
 			PreparedStatement stmt;
 			ResultSet rs;
 			
-			stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,project_values.value_id,text_value_data_language, text_value_user_language,nominal_value,min_value,max_value,note,uom_id from "
+			stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,url_link,project_values.value_id,text_value_data_language, text_value_user_language,nominal_value,min_value,max_value,note,uom_id from "
 					+ "(select * from "+active_project+".project_items_x_values"
 									+ ") data left join "+active_project+".project_values "
 											+ "on data.value_id = project_values.value_id");
@@ -61,6 +62,11 @@ public class CharValuesLoader {
 				val.setMax_value(rs.getString("max_value"));
 				val.setNote(rs.getString("note"));
 				val.setUom_id(rs.getString("uom_id"));
+				val.setAuthor(user_id);
+				val.setSource(description_method);
+				val.setRule_id(description_rule_id);
+				val.setUrl(rs.getString("url_link"));
+				
 				try{
 					val.setParentChar(tablePane_CharClassif.active_characteristics.get(loop_class_id).get(charIdArrays.get(loop_class_id).indexOf(characteristic_id)));
 				}catch(Exception V) {
@@ -77,9 +83,7 @@ public class CharValuesLoader {
 				}catch(Exception V) {
 					System.out.println("Couldn't set data for char "+characteristic_id+" in class "+loop_class_id);
 				}
-				row.setAuthor(user_id);
-				row.setSource(description_method);
-				row.setRule_id(description_rule_id);
+				
 				
 			}
 			
@@ -173,6 +177,9 @@ public class CharValuesLoader {
 			}
 		}
 		tmp.setNote(parent.note_field_uom.getText());
+		tmp.setSource(ClassificationMethods.MANUAL);
+		tmp.setAuthor(parent.account.getUser_id());
+		
 		parent.sendPatternValue(tmp);
 		
 	}

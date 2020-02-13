@@ -25,23 +25,13 @@ public class CharDescriptionRow {
 		String long_desc_corrected;
 		String material_group;
 		
-		String url;
-		String source;
-		String author;
 		String client_item_number;
 		String item_id;
 		public HashMap<String,CharacteristicValue[]> data = new HashMap<String,CharacteristicValue[]>();
-		String rule_id;
 		String class_segment;
 		
 		
 		
-		public String getRule_id() {
-			return rule_id;
-		}
-		public void setRule_id(String rule_id) {
-			this.rule_id = rule_id;
-		}
 		/*
 		public CharDescriptionRow(String segment_id, int data_length) {
 			this.data.put(segment_id, new CharacteristicValue[data_length]);
@@ -120,24 +110,7 @@ public class CharDescriptionRow {
 		public void setQuestionStatus(Boolean questionStatus) {
 			this.questionStatus = questionStatus;
 		}
-		public String getUrl() {
-			return url;
-		}
-		public void setUrl(String url) {
-			this.url = url;
-		}
-		public String getSource() {
-			return source;
-		}
-		public void setSource(String source) {
-			this.source = source;
-		}
-		public String getAuthor() {
-			return author;
-		}
-		public void setAuthor(String author) {
-			this.author = author;
-		}
+		
 		public String getClient_item_number() {
 			return client_item_number;
 		}
