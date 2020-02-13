@@ -49,11 +49,18 @@ public class ManualRuleServices {
 	@SuppressWarnings("unchecked")
 	public static void reEvaluateAllActiveRules(boolean reevaluateClassifiedItems, Manual_classif manualClassifController, MenuItem menu) {
 		
-		System.out.println("Refreshing rules");
 		List<ItemFetcherRow> databaseSyncLists = new ArrayList<ItemFetcherRow>();
+		
+		ArrayList<GenericRule> grs = new ArrayList<GenericRule>();
+		ArrayList<ArrayList<String[]>> itemRuleMaps = new ArrayList<ArrayList<String[]>>();
+		ArrayList<Boolean> activeStatuses = new ArrayList<Boolean>();
+		ArrayList<String> METHODS = new ArrayList<String>();
+		
 		i = 0.0;
 		double ruleNumber = ItemFetcherRow.staticRules.values().parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()).size();
 		String orginalMenuText = menu.getText();
+		System.out.println("Refreshing "+String.valueOf(ruleNumber)+" rules");
+		
 		
 		ItemFetcherRow.staticRules.values().stream().filter(gr->gr.active&&gr.classif.get(0)!=null)
 		.forEach(gr -> {
@@ -97,11 +104,14 @@ public class ManualRuleServices {
 			databaseSyncList.addAll( manualClassifController.tableController.fireRuleClassBlank(itemsToBlank) );
 			
 			databaseSyncLists.addAll(databaseSyncList);
-			Tools.StoreRule(manualClassifController.account,gr,itemRuleMap,true,ClassificationMethods.USER_RULE);
-			
+			//Tools.StoreRule(manualClassifController.account,gr,itemRuleMap,true,ClassificationMethods.USER_RULE);
+			grs.add(gr);
+			itemRuleMaps.add(itemRuleMap);
+			activeStatuses.add(true);
+			METHODS.add(ClassificationMethods.USER_RULE);
 		});
-		
-		Tools.ItemFetcherRow2ClassEvent(databaseSyncLists,manualClassifController.account,ClassificationMethods.USER_RULE);
+		//Tools.StoreRules(manualClassifController.account, grs, itemRuleMaps, activeStatuses, METHODS);
+		//Tools.ItemFetcherRow2ClassEvent(databaseSyncLists,manualClassifController.account,ClassificationMethods.USER_RULE);
 		System.out.println("Refreshing finished");
 		manualClassifController.tableController.tableGrid.refresh();
 	}

@@ -919,7 +919,111 @@ public class Tools {
 		
 		return ret;
 	}
+	
+	public static void StoreRules(UserAccount account,ArrayList<GenericRule> grs, ArrayList<ArrayList<String[]>> itemRuleMaps, ArrayList<Boolean> activeStatuses, ArrayList<String> METHODS) {
+		
+		Task<Void> task = new Task<Void>() {
+		    
+			@Override
+		    protected Void call() throws Exception {
+				
+				Connection conn = Tools.spawn_connection();
+				final PreparedStatement ps = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_rules(" + 
+						"            rule_id, main, application, complement, material_group," + 
+						"            pre_classification, drawing, class_id, rule_source, rule_type," + 
+						"            user_id, rule_date, active_status)" + 
+						"    VALUES (?, ?, ?, ?, ?," + 
+						"            ?, ?, ?, ?, ?," + 
+						"            ?, clock_timestamp() ,?) on conflict(rule_id) do update set active_status = EXCLUDED.active_status, class_id = EXCLUDED.class_id;");
+				
+				final PreparedStatement ps2 = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_items_x_rules(" + 
+						"            item_id, rule_id)" + 
+						"    VALUES (?, ?) on conflict(item_id,rule_id) do nothing;");
+				
+				for(int i=0;i<grs.size();i++) {
+					GenericRule gr = grs.get(i);
+					String METHOD = METHODS.get(i);
+					Boolean active = activeStatuses.get(i);
+					ArrayList<String[]> itemRuleMap = itemRuleMaps.get(i);
+					
+					
+					ps.setString(1, gr.toString());
+					ps.setString(2, gr.getMain());
+					ps.setString(3, gr.getApp());
+					ps.setString(4, gr.getComp());
+					ps.setString(5, gr.getMg());
+					
+					ps.setString(6, gr.getPc());
+					ps.setBoolean(7, gr.getDwg());
+					ps.setString(8, String.join("&&&", gr.classif));
+					ps.setString(9, METHOD);
+					ps.setString(10, gr.getType());
+					
+					ps.setString(11, account.getUser_id());
+					//ps.setDate(12, x);
+					ps.setBoolean(12, active);
+					ps.addBatch();
+					
+					
+					itemRuleMap.forEach((A)->{
+						String item_id = A[0];
+						String rule_id = A[1];
+						try {
+							ps2.setString(1, item_id);
+							ps2.setString(2, rule_id);
+							ps2.addBatch();
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					});
+					
+				}
+				
+				
+				ps.executeBatch();
+				ps.clearBatch();
+				ps.close();
+				
+				
+				
+				ps2.executeBatch();
+				ps2.clearBatch();
+				ps2.close();
+				
+				conn.close();
+				
+				
+	    		return null;
+		    	}
+			};
+		task.setOnSucceeded(e -> {
+			;
 
+			
+			});
+
+		task.setOnFailed(e -> {
+		    Throwable problem = task.getException();
+		    /* code to execute if task throws exception */
+		    System.err.println("failed to sync rules ");
+		    //System.err.println(ExceptionUtils.getRootCauseMessage( problem ))	;
+		    problem.printStackTrace(System.err);
+		    
+		    
+		});
+
+		task.setOnCancelled(e -> {
+		    /* task was cancelled */
+			;
+		});
+			
+			Thread thread = new Thread(task);; thread.setDaemon(true);
+			thread.setName("Sync db for "+String.valueOf(grs.size())+" rules ");
+			thread.start();
+			
+		}
+		
 
 
 	public static void StoreRule(UserAccount account, GenericRule gr, ArrayList<String[]> itemRuleMap, boolean active, String METHOD) {
