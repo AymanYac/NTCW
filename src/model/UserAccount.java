@@ -23,7 +23,12 @@ public class UserAccount {
 	String[] user_desc_classes;
 	
 	
-	
+	public String getUser_desc_class(String defaultSegment) {
+		if(user_desc_class!=null) {
+			return user_desc_class;
+		}
+		return defaultSegment;
+	}
 	
 	public String getUser_desc_class() {
 		return user_desc_class;

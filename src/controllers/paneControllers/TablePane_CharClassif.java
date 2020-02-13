@@ -373,7 +373,7 @@ public class TablePane_CharClassif {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void refresh_table_with_segment(String active_class) throws ClassNotFoundException, SQLException {
 		
-		
+		System.out.println("Refreshing table with segment "+active_class);
 			
 		tvX = new TableViewExtra(tableGrid);
 		

@@ -281,11 +281,9 @@ public class TranslationServices {
 		updateTextEntriesTranslationSuggestions(result.getSource_value(),result.isDataFieldSuggestion(),null);
 		updateTranslatedValues(result.getSource_value(),result.isDataFieldSuggestion(),null);
 		
-		System.out.println("Processing translation dict removal for sugg ("+result.getSource_value()+","+result.getTarget_value()+")");
 		if(!result.isDataFieldSuggestion()) {
 			createDicoTranslationLink(result.getTarget_value(),null,true);
 		}else {
-			System.out.println("Deleting translation for data: "+result.getTarget_value());
 			createDicoTranslationLink(null,result.getTarget_value(),true);
 		}
 		

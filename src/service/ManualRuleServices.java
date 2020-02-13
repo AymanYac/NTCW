@@ -13,15 +13,18 @@ import java.util.stream.Collectors;
 import controllers.Manual_classif;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
+import javafx.scene.control.MenuItem;
 import model.ClassificationMethods;
 import model.GenericRule;
 import model.ItemFetcherRow;
 import model.RulePaneRow;
 import transversal.generic.Tools;
+import transversal.language_toolbox.WordUtils;
 
 public class ManualRuleServices {
 
 	static long tickTime;
+	private static double i;
 
 	public static void benchmark(GenericRule gr, Manual_classif manualClassifController) {
 		
@@ -42,6 +45,67 @@ public class ManualRuleServices {
 		}
 		TimeMaster.tock("Scanning "+String.valueOf(k)+" items for rule of type '"+gr.getType()+"', found "+String.valueOf(i)+" items matching after");
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static void reEvaluateAllActiveRules(boolean reevaluateClassifiedItems, Manual_classif manualClassifController, MenuItem menu) {
+		
+		System.out.println("Refreshing rules");
+		List<ItemFetcherRow> databaseSyncLists = new ArrayList<ItemFetcherRow>();
+		i = 0.0;
+		double ruleNumber = ItemFetcherRow.staticRules.values().parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()).size();
+		String orginalMenuText = menu.getText();
+		
+		ItemFetcherRow.staticRules.values().stream().filter(gr->gr.active&&gr.classif.get(0)!=null)
+		.forEach(gr -> {
+			i+=1;
+			if(i%100==0) {
+				menu.setText(orginalMenuText+"("+WordUtils.DoubleToString(100 * i/ruleNumber)+"%)");
+			}
+			Pattern p_tmp = null;
+			HashMap<String,GenericRule> itemsToUpdate= new HashMap<String,GenericRule>();
+			ArrayList<String> itemsToBlank= new ArrayList<String>();
+			ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
+			
+			if(gr.getComp()!=null) {
+				p_tmp = Pattern.compile(".* "+gr.getComp()+" .*");
+			}
+			final Pattern p = p_tmp;
+			gr.matched=false;
+			
+			manualClassifController.tableController.tableGrid.getItems().parallelStream()
+			.filter(row -> reevaluateClassifiedItems || !(((ItemFetcherRow) row).getDisplay_segment_id()!=null) )
+			.forEach(row->{
+				if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
+					String[] itemRule = new String [] {null,null};
+					itemRule[0]= ((ItemFetcherRow) row).getItem_id();
+					itemRule[1]= gr.toString();
+					itemRuleMap.add(itemRule);
+					
+					GenericRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
+					if(finalRule!=null) {
+						itemsToUpdate.put(((ItemFetcherRow) row).getItem_id(), finalRule);
+					}else {
+						itemsToBlank.add(((ItemFetcherRow) row).getItem_id());
+					}
+					
+				}
+			});
+			
+			gr.matched=true;
+			
+			List<ItemFetcherRow> databaseSyncList = manualClassifController.tableController.fireRuleClassChange(itemsToUpdate);
+			databaseSyncList.addAll( manualClassifController.tableController.fireRuleClassBlank(itemsToBlank) );
+			
+			databaseSyncLists.addAll(databaseSyncList);
+			Tools.StoreRule(manualClassifController.account,gr,itemRuleMap,true,ClassificationMethods.USER_RULE);
+			
+		});
+		
+		Tools.ItemFetcherRow2ClassEvent(databaseSyncLists,manualClassifController.account,ClassificationMethods.USER_RULE);
+		System.out.println("Refreshing finished");
+		manualClassifController.tableController.tableGrid.refresh();
+	}
+	
 	
 	private static boolean tryRuleOnItem(GenericRule gr, ItemFetcherRow row, Pattern compiledCompPattern) {
 		if(gr.matched) {
@@ -109,6 +173,7 @@ public class ManualRuleServices {
 		return false;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static void unapplyRule(GenericRule gr, Manual_classif manualClassifController) {
 		
 		try {
@@ -124,15 +189,33 @@ public class ManualRuleServices {
 		gr.active=false;
 		ItemFetcherRow.staticRules.put(gr.toString(), gr);
 		
-		Pattern p = null;
+		Pattern tmp_p = null;
 		HashMap<String,GenericRule> itemsToUpdate= new HashMap<String,GenericRule>();
 		ArrayList<String> itemsToBlank= new ArrayList<String>();
 		ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
 		
 		if(gr.getComp()!=null) {
-			p = Pattern.compile(".* "+gr.getComp()+" .*");
+			tmp_p = Pattern.compile(".* "+gr.getComp()+" .*");
 		}
-		for ( Object row:manualClassifController.tableController.tableGrid.getItems()){
+		
+		final Pattern p = tmp_p;
+		manualClassifController.tableController.tableGrid.getItems().parallelStream().forEach(row->{
+			if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
+				GenericRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
+				String[] itemRule = new String [] {null,null};
+				itemRule[0]= ((ItemFetcherRow) row).getItem_id();
+				itemRule[1]= gr.toString();
+				itemRuleMap.add(itemRule);
+				
+				if(finalRule!=null) {
+					itemsToUpdate.put(((ItemFetcherRow) row).getItem_id(), finalRule);
+				}else {
+					itemsToBlank.add(((ItemFetcherRow) row).getItem_id());
+				}
+			}
+		});
+		
+		/*for ( Object row:manualClassifController.tableController.tableGrid.getItems()){
 			if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
 				GenericRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
 				String[] itemRule = new String [] {null,null};
@@ -147,7 +230,7 @@ public class ManualRuleServices {
 				}
 			}
 			
-		}
+		}*/
 		gr.matched=true;
 		
 		List<ItemFetcherRow> databaseSyncList = manualClassifController.tableController.fireRuleClassChange(itemsToUpdate);
@@ -183,6 +266,7 @@ public class ManualRuleServices {
 		}*/
 		Tools.StoreRule(manualClassifController.account, gr,itemRuleMap,false,ClassificationMethods.USER_RULE);
 	}
+	@SuppressWarnings("unchecked")
 	public static void applyRule(GenericRule gr, Manual_classif manualClassifController) {
 		
 		/*
@@ -199,16 +283,34 @@ public class ManualRuleServices {
 		gr.active=true;
 		ItemFetcherRow.staticRules.put(gr.toString(), gr);
 		
-		Pattern p = null;
+		Pattern p_tmp = null;
 		
 		HashMap<String,GenericRule> itemsToUpdate= new HashMap<String,GenericRule>();
 		ArrayList<String> itemsToBlank= new ArrayList<String>();
 		ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
 		
 		if(gr.getComp()!=null) {
-			p = Pattern.compile(".* "+gr.getComp()+" .*");
+			p_tmp = Pattern.compile(".* "+gr.getComp()+" .*");
 		}
-		for ( Object row:manualClassifController.tableController.tableGrid.getItems()){
+		final Pattern p = p_tmp;
+		
+		manualClassifController.tableController.tableGrid.getItems().parallelStream().forEach(row->{
+			if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
+				String[] itemRule = new String [] {null,null};
+				itemRule[0]= ((ItemFetcherRow) row).getItem_id();
+				itemRule[1]= gr.toString();
+				itemRuleMap.add(itemRule);
+				
+				GenericRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
+				if(finalRule!=null) {
+					itemsToUpdate.put(((ItemFetcherRow) row).getItem_id(), finalRule);
+				}else {
+					itemsToBlank.add(((ItemFetcherRow) row).getItem_id());
+				}
+				
+			}
+		});
+		/*for ( Object row:manualClassifController.tableController.tableGrid.getItems()){
 			if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
 				String[] itemRule = new String [] {null,null};
 				itemRule[0]= ((ItemFetcherRow) row).getItem_id();
@@ -224,7 +326,7 @@ public class ManualRuleServices {
 				
 			}
 			
-		}
+		}*/
 		gr.matched=true;
 		
 		List<ItemFetcherRow> databaseSyncList = manualClassifController.tableController.fireRuleClassChange(itemsToUpdate);

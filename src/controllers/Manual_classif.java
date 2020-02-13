@@ -41,6 +41,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -49,6 +50,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -67,6 +69,7 @@ import model.UserAccount;
 import service.ItemFetcher;
 import service.ManualClassifContext;
 import service.ManualClassifProposer;
+import service.ManualRuleServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
 
@@ -751,6 +754,7 @@ public class Manual_classif {
 	public void setUserAccount(UserAccount account) throws IOException, ClassNotFoundException, SQLException, InterruptedException {
 		this.account = account;
 		Tools.decorate_menubar(menubar,account);
+		decorate_menubar_with_rule_eval(this);
 		this.user_language_gcode = Tools.get_project_user_language_code(account.getActive_project());
 		
 		this.proposer = new ManualClassifProposer(account.getActive_project());
@@ -779,6 +783,37 @@ public class Manual_classif {
 	}
 
 	
+	private void decorate_menubar_with_rule_eval(Manual_classif parent) {
+		
+		Menu manual_classif = menubar.getMenus().get(3);
+		menubar.setOnMouseEntered(e->{
+			manual_classif.show();
+		});
+		MenuItem reeval_rules_true = new MenuItem("Refresh rules on all items");
+		reeval_rules_true.setOnAction(new EventHandler<ActionEvent>() {
+		    public void handle(ActionEvent t) {
+		    	try {
+					ManualRuleServices.reEvaluateAllActiveRules(true,parent,reeval_rules_true);
+				} catch(Exception e) {
+					e.printStackTrace(System.err);
+				}
+		    }
+		});
+
+		MenuItem reeval_rules_false = new MenuItem("Refresh rules on unclassified items");
+		reeval_rules_false.setOnAction(new EventHandler<ActionEvent>() {
+				    public void handle(ActionEvent t) {
+				    	try {
+				    		ManualRuleServices.reEvaluateAllActiveRules(false,parent,reeval_rules_false);
+						} catch(Exception e) {
+							e.printStackTrace(System.err);
+						}
+				    }
+				});
+		
+		manual_classif.getItems().addAll(reeval_rules_true,reeval_rules_false);
+		
+	}
 	@SuppressWarnings({ "static-access", "unchecked" })
 	private void load_table_pane() throws IOException {
 		
