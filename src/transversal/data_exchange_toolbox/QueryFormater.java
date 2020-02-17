@@ -59,7 +59,7 @@ public class QueryFormater {
 	}
 	
 	public static String FetchItemsClassifiedBlanks(String active_project) {
-		return "select item_id from (SELECT item_id,classification_method,user_id,segment_id FROM ( SELECT DISTINCT ON (item_id) * FROM "+active_project+".project_classification_event  ORDER BY item_id, classification_time DESC ) tmp ORDER BY classification_time DESC) as latest_events where length(segment_id) = 0 or segment_id is null";
+		return "select item_id from (SELECT item_id,classification_method,user_id,segment_id FROM ( SELECT DISTINCT ON (item_id) * FROM "+active_project+".project_classification_event  ORDER BY item_id, classification_time DESC ) tmp ORDER BY classification_time DESC) as latest_events where segment_id is null or length(segment_id) = 0";
 		
 	}
 	

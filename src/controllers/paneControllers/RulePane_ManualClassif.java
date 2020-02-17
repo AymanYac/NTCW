@@ -163,7 +163,10 @@ public class RulePane_ManualClassif {
 		row.itemRules.forEach((k)->{
 			
 			GenericRule gr = ItemFetcherRow.staticRules.get(k);
-			addGR2List(gr,false,true);
+			if(gr!=null) {
+				addGR2List(gr,false,true);
+			}
+			
 		});
 	}
 
