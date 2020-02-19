@@ -538,9 +538,10 @@ public class ItemFetcher {
 		}
 		rs.close();
 		
-		rs = st.executeQuery("select main, application, complement, material_group," + 
+		rs = st.executeQuery("select rule_id, main, application, complement, material_group," + 
 				"pre_classification, drawing, class_id, active_status from "+active_project+".project_rules");
-		
+		System.out.println("select rule_id, main, application, complement, material_group," + 
+				"pre_classification, drawing, class_id, active_status from "+active_project+".project_rules");
 		while(rs.next()) {
 			GenericRule gr = new GenericRule();
 			gr.setMain(rs.getString("main"));
@@ -552,12 +553,21 @@ public class ItemFetcher {
 			gr.classif=new ArrayList<> ( Arrays.asList( rs.getString("class_id").split("&&&") ) );
 			gr.active=rs.getBoolean("active_status");
 			ItemFetcherRow.staticRules.put(gr.toString(), gr);
+			if(rs.getString("rule_id").equals("CLAPET (PILOTE)")) {
+				System.out.println(rs.getString("item_id"));
+				System.out.println(gr.toString());
+				System.out.println(gr.toString().equals(rs.getString("rule_id")));
+			}
 		}
 		rs.close();
 		
 		items_x_rules = new HashMap<String,ArrayList<String>>();
 		rs = st.executeQuery("select item_id,rule_id from "+active_project+".project_items_x_rules");
+		System.out.println("select item_id,rule_id from "+active_project+".project_items_x_rules");
 		while(rs.next()) {
+			if(rs.getString("rule_id").equals("CLAPET (PILOTE)")) {
+				System.out.println(rs.getString("item_id"));
+			}
 			String item = rs.getString("item_id");
 			String rule = rs.getString("rule_id");
 			try {

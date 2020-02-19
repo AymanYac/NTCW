@@ -674,77 +674,60 @@ public class TablePane_ManualClassif {
 		Parent.propose(proposer.propositions,null,null,null,null);
 	}
 	
-	public List<ItemFetcherRow> fireRuleClassBlank(ArrayList<String> itemsToBlank) {
-		List<ItemFetcherRow> databaseSyncList = new ArrayList<ItemFetcherRow>();
-		for( Object row : tableGrid.getItems() ) {
-			
-			if( itemsToBlank.contains( ((ItemFetcherRow)row).getItem_id()) ) {
-				
-					((ItemFetcherRow)row).setReviewer_Rules(null);
-					//((ItemFetcherRow)row).setNew_segment_id(null);
-					//((ItemFetcherRow)row).setNew_segment_name(null);
-					((ItemFetcherRow)row).setRule_Segment_id(null);
-					((ItemFetcherRow)row).setRule_Segment_name(null);
-					((ItemFetcherRow)row).setRule_Segment_number(null);
-					((ItemFetcherRow)row).setRule_description_Rules(null);
-					((ItemFetcherRow)row).setSource_Rules(null);
-					
-				//Add items to the list to be pushed in the database
-				
-				databaseSyncList.add(((ItemFetcherRow)row));
-				//Tools.ItemFetcherRow2ClassEvent(this,databaseSyncList,account);
-			}else {
-			continue;
-			}
-		}
+	public List<ItemFetcherRow> fireRuleClassBlank(ArrayList<ItemFetcherRow> itemsToBlank) {
 		
-		return databaseSyncList;
+		itemsToBlank.stream().forEach(row->{
+			((ItemFetcherRow)row).setReviewer_Rules(null);
+			//((ItemFetcherRow)row).setNew_segment_id(null);
+			//((ItemFetcherRow)row).setNew_segment_name(null);
+			((ItemFetcherRow)row).setRule_Segment_id(null);
+			((ItemFetcherRow)row).setRule_Segment_name(null);
+			((ItemFetcherRow)row).setRule_Segment_number(null);
+			((ItemFetcherRow)row).setRule_description_Rules(null);
+			((ItemFetcherRow)row).setSource_Rules(null);
+		});
+		
+		return itemsToBlank;
 		
 	}
 	
-	public List<ItemFetcherRow> fireRuleClassChange(HashMap<String,GenericRule> itemsToUpdate) {
+	public List<ItemFetcherRow> fireRuleClassChange(HashMap<ItemFetcherRow, GenericRule> itemsToUpdate) {
 		
-		List<ItemFetcherRow> databaseSyncList = new ArrayList<ItemFetcherRow>();
-		
-		for( Object row : tableGrid.getItems() ) {
+		itemsToUpdate.entrySet().stream().forEach( e ->{
+			GenericRule gr = e.getValue();
+			ItemFetcherRow row = e.getKey();
 			
-			if( itemsToUpdate.containsKey( ((ItemFetcherRow)row).getItem_id()) ) {
-				GenericRule gr = itemsToUpdate.get(((ItemFetcherRow)row).getItem_id());
-				((ItemFetcherRow)row).setReviewer_Rules(account.getUser_name());
-				try{
-					((ItemFetcherRow)row).setRule_Segment_id(gr.classif.get(0));
-					((ItemFetcherRow)row).setRule_Segment_name(gr.classif.get(2));
-					if(UUID2CID!=null) {
-						
-					}else {
-						UUID2CID = Tools.UUID2CID(account.getActive_project());
-					}
-					((ItemFetcherRow)row).setRule_Segment_number(UUID2CID.get(gr.classif.get(1)));
-					((ItemFetcherRow)row).setRule_description_Rules(gr.toString());
-					((ItemFetcherRow)row).setRule_id_Rules((gr.toString()));
-				}catch(Exception V) {
-					V.printStackTrace(System.err);
-					//((ItemFetcherRow)row).setNew_segment_id(null);
-					//((ItemFetcherRow)row).setNew_segment_name(null);
-					((ItemFetcherRow)row).setRule_Segment_id(null);
-					((ItemFetcherRow)row).setRule_Segment_name(null);
-					((ItemFetcherRow)row).setRule_Segment_number(null);
-					((ItemFetcherRow)row).setRule_description_Rules(null);
-					((ItemFetcherRow)row).setRule_id_Rules(null);
+			((ItemFetcherRow)row).setReviewer_Rules(account.getUser_name());
+			try{
+				((ItemFetcherRow)row).setRule_Segment_id(gr.classif.get(0));
+				((ItemFetcherRow)row).setRule_Segment_name(gr.classif.get(2));
+				if(UUID2CID!=null) {
 					
+				}else {
+					UUID2CID = Tools.UUID2CID(account.getActive_project());
 				}
-				((ItemFetcherRow)row).setSource_Rules(ClassificationMethods.USER_RULE);
+				((ItemFetcherRow)row).setRule_Segment_number(UUID2CID.get(gr.classif.get(1)));
+				((ItemFetcherRow)row).setRule_description_Rules(gr.toString());
+				((ItemFetcherRow)row).setRule_id_Rules((gr.toString()));
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
+				//((ItemFetcherRow)row).setNew_segment_id(null);
+				//((ItemFetcherRow)row).setNew_segment_name(null);
+				((ItemFetcherRow)row).setRule_Segment_id(null);
+				((ItemFetcherRow)row).setRule_Segment_name(null);
+				((ItemFetcherRow)row).setRule_Segment_number(null);
+				((ItemFetcherRow)row).setRule_description_Rules(null);
+				((ItemFetcherRow)row).setRule_id_Rules(null);
 				
-				
-				//Add items to the list to be pushed in the database
-				
-				databaseSyncList.add(((ItemFetcherRow)row));
-				//Tools.ItemFetcherRow2ClassEvent(this,databaseSyncList,account);
-			}else {
-			continue;
 			}
-		}
-		return databaseSyncList;
+			((ItemFetcherRow)row).setSource_Rules(ClassificationMethods.USER_RULE);
+			
+			
+			
+		});
+		
+		return new ArrayList<ItemFetcherRow>(itemsToUpdate.keySet());
+		
 	}
 	
 	public void fireManualClassChange(String result,boolean jumpNext) {
