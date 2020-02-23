@@ -274,7 +274,7 @@ public class WordUtils {
 
 		public static String ALPHANUM_PATTERN_RULE_INREPLACE(String selected_text, boolean keepAlphaBeforeFirstSep) {
 			//e.g. "abcd ef12-gh34-ij56"
-			//Rule = ["ab"#"cd"#(|-1)@@##(|-1)@@##]
+			//Rule = ["ab"#"cd"#(|+0)@@##(|+0)@@##]
 			String rule="";
 			boolean firstSepPassed=!keepAlphaBeforeFirstSep;
 			boolean last_is_alpha=false;
@@ -287,7 +287,7 @@ public class WordUtils {
 					rule=rule+(firstSepPassed?"#":(last_is_alpha?"\"#":"#"));
 					last_is_alpha = false;
 				}else {
-					rule=rule+(last_is_alpha&&!firstSepPassed?"\"(|-1)":"(|-1)");
+					rule=rule+(last_is_alpha&&!firstSepPassed?"\"(|+0)":"(|+0)");
 					if(i!=0) {
 						firstSepPassed=true;
 					}
@@ -304,7 +304,7 @@ public class WordUtils {
 			for(int i=0;i<input.length();i++) {
 				char c = input.charAt(i);
 				if(Character.isAlphabetic(c) || Character.isDigit(c)) {
-					if(inQuote) {
+					if(inQuote && i!=0) {
 						output=output+c;
 					}else {
 						output=output+"\""+c;
@@ -312,10 +312,10 @@ public class WordUtils {
 					inQuote=true;
 				}else{
 					if(inQuote) {
-						output=output+"\"(|-1)";
+						output=output+"\"(|+0)";
 					}else {
 						if(i==0) {
-							output="(|-1)";
+							output="(|+0)";
 						}
 					}
 					inQuote = false;

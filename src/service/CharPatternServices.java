@@ -75,7 +75,7 @@ public class CharPatternServices {
 //					Value = "VAL"														
 //					Rule = [Selection]
 					parent.sendPatternValue(known_value);
-					parent.sendPatternRule("["+WordUtils.QUOTE_NON_SEP_TEXT(corrected_text)+"]");
+					parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(corrected_text)+"<DL "+known_value.getDataLanguageValue()+">");
 					System.out.println("=====>Match !");
 					return;
 				}
@@ -122,7 +122,7 @@ public class CharPatternServices {
 //								Value (Pivot language) = PIVOTtranslation (VAL)						
 //								Rule = "material"(|+1)["iron steel"]	
 								parent.sendPatternValue(known_value);
-								parent.sendPatternRule("\""+part_before_identifier+"\"(|+1)[\""+part_after_identifier+"\"]");
+								parent.sendPatternRule("\""+part_before_identifier+"\"(|+1)\""+part_after_identifier+"\"<DL "+part_after_identifier+">");
 								System.out.println("=====>Match !");
 								return;
 							}
@@ -196,7 +196,7 @@ public class CharPatternServices {
 									parent.sendPatternValue(VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next());
 //									
 //											Rule = Selection<LOCALtranslation("ENVAL")>	
-									parent.sendPatternRule("\""+selected_text+"\""+"<\""+VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next().getDataLanguageValue()+"\">");
+									parent.sendPatternRule("\""+selected_text+"\""+"<DL "+VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next().getDataLanguageValue()+">");
 									System.out.println("=====>Match !");
 									return;
 									
@@ -208,7 +208,7 @@ public class CharPatternServices {
 									new_value.setDataLanguageValue(corrected_part_after_identifier);
 									new_value.setParentChar(active_char);
 									parent.sendPatternValue(new_value);
-									parent.sendPatternRule("\""+part_before_identifier+"\"(|+1)[\""+part_after_identifier+"\"]");
+									parent.sendPatternRule("\""+part_before_identifier+"\"(|+1)\""+part_after_identifier+"\"<DL "+part_after_identifier+">");
 									System.out.println("DEFAULT: The value is the corrected selection");
 									return;
 									
@@ -240,7 +240,7 @@ public class CharPatternServices {
 //								Value (Pivot language) = PIVOTtranslation (VAL)
 					parent.sendPatternValue(VALUES_CONTAINING_SELECTION.iterator().next());
 //								Rule = [Selection]
-					parent.sendPatternRule("["+WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"]");
+					parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"<DL "+VALUES_CONTAINING_SELECTION.iterator().next()+">");
 					System.out.println("=====> Match!");
 					return;
 				}else {
@@ -273,7 +273,7 @@ public class CharPatternServices {
 //							Value = LOCALtranslation (ENVAL)
 						parent.sendPatternValue(VALUES_CONTAINING_SELECTION.iterator().next());
 //							Rule = Selection<LOCALtranslation("ENVAL")>
-						parent.sendPatternRule("\""+selected_text+"\""+"<"+VALUES_CONTAINING_SELECTION.iterator().next().getUserLanguageValue()+">");
+						parent.sendPatternRule("\""+selected_text+"\""+"<UL "+VALUES_CONTAINING_SELECTION.iterator().next().getUserLanguageValue()+">");
 						System.out.println("====> Match");
 						return;
 					}else {
@@ -285,7 +285,7 @@ public class CharPatternServices {
 						tmp.setParentChar(active_char);
 						parent.sendPatternValue(tmp);
 //						Rule = [Selection]
-						parent.sendPatternRule("["+WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"]");
+						parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"<DL "+corrected_text+">");
 						System.out.println("DEFAULT Value : correction of selection");
 						return;
 					}
@@ -311,15 +311,16 @@ public class CharPatternServices {
 					tmp.setTXTValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1].trim()));
 					tmp.setParentChar(active_char);
 					parent.sendPatternValue(tmp);
-//					Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]		
+//					Rule = "abcd"(|+1)[@@##(|+0)@@##(|+0)@@##]		
 					/*
 					parent.sendPatternRule("\""+selected_text.split(":")[0]+
 					"\"(|+1)["+String.join("", WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]).chars().mapToObj((c -> (char) c)).
-					map(c->Character.isAlphabetic(c)?"@":(Character.isDigit(c)?"#":"(|-1)")).collect(Collectors.toList()))+"]");
+					map(c->Character.isAlphabetic(c)?"@":(Character.isDigit(c)?"#":"(|+0)")).collect(Collectors.toList()))+"]");
 					*/
 					parent.sendPatternRule("\""+selected_text.split(":")[0]+
-							"\"(|+1)["+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+"]");
+							"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+">");
 							
 					
 					System.out.println("Match!");
@@ -333,14 +334,15 @@ public class CharPatternServices {
 					tmp.setTXTValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1].trim()));
 					tmp.setParentChar(active_char);
 					parent.sendPatternValue(tmp);
-//					Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]		
+//					Rule = "abcd"(|+1)[@@##(|+0)@@##(|+0)@@##]		
 					/*parent.sendPatternRule("\""+selected_text.split("=")[0]+
 					"\"(|+1)["+String.join("", WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]).chars().mapToObj((c -> (char) c)).
-					map(c->Character.isAlphabetic(c)?"@":(Character.isDigit(c)?"#":"(|-1)")).collect(Collectors.toList()))+"]");
+					map(c->Character.isAlphabetic(c)?"@":(Character.isDigit(c)?"#":"(|+0)")).collect(Collectors.toList()))+"]");
 					*/
 					parent.sendPatternRule("\""+selected_text.split("=")[0]+
-							"\"(|+1)["+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+"]");
+							"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+">");
 							
 					
 					System.out.println("Match!");
@@ -359,14 +361,15 @@ public class CharPatternServices {
 						tmp.setTXTValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1].trim()));
 						tmp.setParentChar(active_char);
 						parent.sendPatternValue(tmp);
-//							Rule = "abcd"(|+1)[@@##(|-1)@@##(|-1)@@##]
+//							Rule = "abcd"(|+1)[@@##(|+0)@@##(|+0)@@##]
 						/*parent.sendPatternRule("\""+sw_splitter+
 								"\"(|+1)["+String.join("", WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]).chars().mapToObj((c -> (char) c)).
-								map(c->Character.isAlphabetic(c)?"@":(Character.isDigit(c)?"#":"(|-1)")).collect(Collectors.toList()))+"]");
+								map(c->Character.isAlphabetic(c)?"@":(Character.isDigit(c)?"#":"(|+0)")).collect(Collectors.toList()))+"]");
 						*/
 						parent.sendPatternRule("\""+sw_splitter+
-								"\"(|+1)["+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-										WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+"]");
+								"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+										WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+												WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+">");
 						
 						System.out.println("Match!");
 						return;
@@ -379,11 +382,11 @@ public class CharPatternServices {
 						tmp.setParentChar(active_char);
 						parent.sendPatternValue(tmp);
 //						
-//							Rule = ["ab"#"cd"#(|-1)@@##(|-1)@@##]
+//							Rule = ["ab"#"cd"#(|+0)@@##(|+0)@@##]
 						
-						parent.sendPatternRule("["+
+						parent.sendPatternRule(WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true)+"<TXT "+
 						WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true)
-						+"]");
+						+">");
 						System.out.println("Match!");
 //						
 					}
@@ -420,7 +423,7 @@ public class CharPatternServices {
 //							Value = VAL		
 					parent.sendPatternValue(VALUES_CONTAINING_SELECTION.iterator().next());
 //							Rule = Selection<"VAL">	
-					parent.sendPatternRule("\""+selected_text+"\""+"<\""+VALUES_CONTAINING_SELECTION.iterator().next().getStdValue()+"\">");
+					parent.sendPatternRule("\""+selected_text+"\""+"<TXT "+VALUES_CONTAINING_SELECTION.iterator().next().getStdValue()+">");
 					System.out.println("=====> Match!");
 					return;
 				}
@@ -455,7 +458,7 @@ public class CharPatternServices {
 //							Value = VAL		
 						parent.sendPatternValue(VALUES_CONTAINED_IN_SELECTION.iterator().next());
 //							Rule = Selection<"VAL">	
-						parent.sendPatternRule(selected_text+"<\""+VALUES_CONTAINED_IN_SELECTION.iterator().next().getStdValue()+"\">");
+						parent.sendPatternRule(selected_text+"<TXT "+VALUES_CONTAINED_IN_SELECTION.iterator().next().getStdValue()+">");
 						System.out.println("====> Match!");
 						return;
 						}else {	
@@ -471,12 +474,12 @@ public class CharPatternServices {
 											tmp.setTXTValue(WordUtils.CORRECT(selected_text.split(":")[1]));
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
-											parent.sendPatternRule("\""+selected_text.split(":")[0]+"\""+"(|+1)[\""+selected_text.split(":")[1]+"\"]");
+											parent.sendPatternRule("\""+selected_text.split(":")[0]+"\""+"(|+1)\""+selected_text.split(":")[1]+"\"<TXT "+selected_text.split(":")[1]+">");
 										}catch(Exception V) {
 											tmp.setTXTValue(WordUtils.CORRECT(selected_text.split("=")[1]));
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
-											parent.sendPatternRule("\""+selected_text.split("=")[0]+"\""+"(|+1)[\""+selected_text.split("=")[1]+"\"]");
+											parent.sendPatternRule("\""+selected_text.split("=")[0]+"\""+"(|+1)\""+selected_text.split("=")[1]+"\"<TXT "+selected_text.split("=")[1]+">");
 											
 										}
 //										Rule = "abcd"(|+1)["efgh"]		
@@ -496,7 +499,7 @@ public class CharPatternServices {
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 //												Rule = "abcd"(|+1)["efgh"]
-											parent.sendPatternRule("\""+sw_splitter+"\"(|+1)[\""+selected_text.split(sw_splitter)[1]+"\"]");
+											parent.sendPatternRule("\""+sw_splitter+"\"(|+1)\""+selected_text.split(sw_splitter)[1]+"\"<TXT "+selected_text.split(sw_splitter)[1]+">");
 											System.out.println("====> Match");
 											return;
 											
@@ -509,7 +512,7 @@ public class CharPatternServices {
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 //												Rule = [Selection]
-											parent.sendPatternRule("["+WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"]");
+											parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"<TXT "+WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+">");
 											System.out.println("Default match");
 											return;
 										}
@@ -1646,7 +1649,7 @@ public class CharPatternServices {
 													+"\""+selected_text.substring(
 															selected_text.replace(",", ".").indexOf("%3")+
 																	"%3".length())
-													+"\""+"<%1+%2/%3><UOM \""+infered_uom+"\">";
+													+"\""+"<NOM %1+%2/%3><UOM \""+infered_uom+"\">";
 											
 											parent.sendPatternValue(preparedValue3);
 											parent.sendPatternRule(preparedRule3);

@@ -482,15 +482,14 @@ public class ManualRuleServices {
 	}
 
 	public static void scrollEvaluateRule(ItemFetcherRow current_row, GenericRule rule,Manual_classif manual_classif_controller,boolean isSelected) {
-		System.out.print("scroll evaluating rule: "+WordUtils.textFlowToString(rule.toDisplay()));
 		if(!assignClass2GR(rule,current_row)) {
 			return;
 		}
 		if(isSelected) {
-			System.out.println(" >apply");
+			System.out.println("scroll evaluating rule: "+WordUtils.textFlowToString(rule.toDisplay())+" >apply");
 			applyRule(rule, manual_classif_controller);
 		}else {
-			System.out.println(" >unapply");
+			System.out.println("scroll evaluating rule: "+WordUtils.textFlowToString(rule.toDisplay())+" >unapply");
 			unapplyRule(rule,manual_classif_controller);
 		}
 	}
