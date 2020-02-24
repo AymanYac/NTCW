@@ -481,14 +481,14 @@ public class Char_description {
 		}else {
 			//Skip to next item
 			try{
-				
+				CharPatternServices.applyItemRule(this);
 				int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
 				if(TranslationProcessResult!=null) {
 					CharValuesLoader.storeItemDatafromScreen(idx,this);
 				}
 				tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
 			}catch(Exception V) {
-				
+				V.printStackTrace(System.err);
 			}
 		}
 	}

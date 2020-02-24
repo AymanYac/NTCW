@@ -16,7 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.scene.control.MenuItem;
 import model.ClassificationMethods;
-import model.GenericRule;
+import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.RulePaneRow;
 import transversal.generic.Tools;
@@ -27,7 +27,7 @@ public class ManualRuleServices {
 	static long tickTime;
 	private static double i;
 
-	public static void benchmark(GenericRule gr, Manual_classif manualClassifController) {
+	public static void benchmark(GenericClassRule gr, Manual_classif manualClassifController) {
 		
 		TimeMaster.tick();
 		int i=0;
@@ -58,7 +58,7 @@ public class ManualRuleServices {
 
 				List<ItemFetcherRow> databaseSyncLists = new ArrayList<ItemFetcherRow>();
 				
-				ArrayList<GenericRule> grs = new ArrayList<GenericRule>();
+				ArrayList<GenericClassRule> grs = new ArrayList<GenericClassRule>();
 				ArrayList<ArrayList<String[]>> itemRuleMaps = new ArrayList<ArrayList<String[]>>();
 				ArrayList<Boolean> activeStatuses = new ArrayList<Boolean>();
 				ArrayList<String> METHODS = new ArrayList<String>();
@@ -83,7 +83,7 @@ public class ManualRuleServices {
 						
 					}
 					Pattern p_tmp = null;
-					HashMap<ItemFetcherRow, GenericRule> itemsToUpdate= new HashMap<ItemFetcherRow,GenericRule>();
+					HashMap<ItemFetcherRow, GenericClassRule> itemsToUpdate= new HashMap<ItemFetcherRow,GenericClassRule>();
 					ArrayList<ItemFetcherRow> itemsToBlank= new ArrayList<ItemFetcherRow>();
 					ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
 					
@@ -102,7 +102,7 @@ public class ManualRuleServices {
 							itemRule[1]= gr.toString();
 							itemRuleMap.add(itemRule);
 							
-							GenericRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
+							GenericClassRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
 							if(finalRule!=null) {
 								itemsToUpdate.put(((ItemFetcherRow) row), finalRule);
 							}else {
@@ -166,7 +166,7 @@ public class ManualRuleServices {
 	}
 	
 	
-	private static boolean tryRuleOnItem(GenericRule gr, ItemFetcherRow row, Pattern compiledCompPattern) {
+	private static boolean tryRuleOnItem(GenericClassRule gr, ItemFetcherRow row, Pattern compiledCompPattern) {
 		if(gr.matched) {
 			return row.itemRules.contains(gr.toString());
 		}
@@ -222,7 +222,7 @@ public class ManualRuleServices {
 		}
 	}
 
-	public static boolean assignClass2GR(GenericRule gr, ItemFetcherRow selectedItem) {
+	public static boolean assignClass2GR(GenericClassRule gr, ItemFetcherRow selectedItem) {
 		if(selectedItem.getDisplay_segment_id()!=null && selectedItem.getSource_Display().equals("MANUAL")) {
 			gr.classif.set(0, selectedItem.getDisplay_segment_id());
 			gr.classif.set(1, selectedItem.getDisplay_segment_number());
@@ -233,7 +233,7 @@ public class ManualRuleServices {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void unapplyRule(GenericRule gr, Manual_classif manualClassifController) {
+	public static void unapplyRule(GenericClassRule gr, Manual_classif manualClassifController) {
 		
 		try {
 			if(! ItemFetcherRow.staticRules.get(gr.toString()).active) {
@@ -249,7 +249,7 @@ public class ManualRuleServices {
 		ItemFetcherRow.staticRules.put(gr.toString(), gr);
 		
 		Pattern tmp_p = null;
-		HashMap<ItemFetcherRow,GenericRule> itemsToUpdate= new HashMap<ItemFetcherRow,GenericRule>();
+		HashMap<ItemFetcherRow,GenericClassRule> itemsToUpdate= new HashMap<ItemFetcherRow,GenericClassRule>();
 		ArrayList<ItemFetcherRow> itemsToBlank= new ArrayList<ItemFetcherRow>();
 		ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
 		
@@ -260,7 +260,7 @@ public class ManualRuleServices {
 		final Pattern p = tmp_p;
 		manualClassifController.tableController.tableGrid.getItems().parallelStream().forEach(row->{
 			if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
-				GenericRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
+				GenericClassRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
 				String[] itemRule = new String [] {null,null};
 				itemRule[0]= ((ItemFetcherRow) row).getItem_id();
 				itemRule[1]= gr.toString();
@@ -299,7 +299,7 @@ public class ManualRuleServices {
 		Tools.StoreRule(manualClassifController.account,gr,itemRuleMap,false,ClassificationMethods.USER_RULE);
 	}
 
-	public static void evaluateNewRule(GenericRule gr,Manual_classif manualClassifController) {
+	public static void evaluateNewRule(GenericClassRule gr,Manual_classif manualClassifController) {
 		
 		gr.active=false;
 		ItemFetcherRow.staticRules.put(gr.toString(), gr);
@@ -326,7 +326,7 @@ public class ManualRuleServices {
 		Tools.StoreRule(manualClassifController.account, gr,itemRuleMap,false,ClassificationMethods.USER_RULE);
 	}
 	@SuppressWarnings("unchecked")
-	public static void applyRule(GenericRule gr, Manual_classif manualClassifController) {
+	public static void applyRule(GenericClassRule gr, Manual_classif manualClassifController) {
 		
 		/*
 		try {
@@ -345,7 +345,7 @@ public class ManualRuleServices {
 		
 		Pattern p_tmp = null;
 		
-		HashMap<ItemFetcherRow,GenericRule> itemsToUpdate= new HashMap<ItemFetcherRow,GenericRule>();
+		HashMap<ItemFetcherRow,GenericClassRule> itemsToUpdate= new HashMap<ItemFetcherRow,GenericClassRule>();
 		ArrayList<ItemFetcherRow> itemsToBlank= new ArrayList<ItemFetcherRow>();
 		ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
 		
@@ -362,7 +362,7 @@ public class ManualRuleServices {
 				itemRule[1]= gr.toString();
 				itemRuleMap.add(itemRule);
 				
-				GenericRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
+				GenericClassRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
 				if(finalRule!=null) {
 					itemsToUpdate.put(((ItemFetcherRow) row), finalRule);
 				}else {
@@ -399,14 +399,14 @@ public class ManualRuleServices {
 
 	
 
-	private static GenericRule EvaluateItemRules(ItemFetcherRow row) {
+	private static GenericClassRule EvaluateItemRules(ItemFetcherRow row) {
 		System.out.println("\t Evaluating rules for item "+row.getClient_item_number());
 		int max_score = Short.MIN_VALUE;
-		HashSet<GenericRule> bestRules = new HashSet<GenericRule>();
+		HashSet<GenericClassRule> bestRules = new HashSet<GenericClassRule>();
 		
 		for( String loopRuleDesc : row.itemRules) {
 			System.out.println("Item matches rule: "+loopRuleDesc);
-			GenericRule loopRule = ItemFetcherRow.staticRules.get(loopRuleDesc);
+			GenericClassRule loopRule = ItemFetcherRow.staticRules.get(loopRuleDesc);
 			System.out.println("This rule is known in static as: "+WordUtils.textFlowToString(loopRule.toDisplay()));
 			Boolean loopRuleActive = loopRule.active;
 			
@@ -423,11 +423,11 @@ public class ManualRuleServices {
 				}
 			}
 		}
-		GenericRule finalRule = manageRuleDisambiguation(bestRules);
+		GenericClassRule finalRule = manageRuleDisambiguation(bestRules);
 		return finalRule;
 	}
 
-	public static GenericRule manageRuleDisambiguation(HashSet<GenericRule> bestRules) {
+	public static GenericClassRule manageRuleDisambiguation(HashSet<GenericClassRule> bestRules) {
 		//Check for conflict
 		Set<String> bestClassNumbers = bestRules.stream().map(e->e.classif.get(1)).collect(Collectors.toSet());
 		if(bestClassNumbers.size()>1) {
@@ -435,7 +435,7 @@ public class ManualRuleServices {
 			return null;
 		}else if(bestClassNumbers.size()==1) {
 			//No conflict
-			Optional<GenericRule> bestRule = bestRules.stream().findAny();
+			Optional<GenericClassRule> bestRule = bestRules.stream().findAny();
 			if(bestRule.isPresent()) {
 				return bestRule.get();
 			}
@@ -446,17 +446,17 @@ public class ManualRuleServices {
 		}
 	}
 
-	public static int scoreManualRule(GenericRule loopRule) {
+	public static int scoreManualRule(GenericClassRule loopRule) {
 		int score = 0;
 		score += scoreManualRuleByType(loopRule);
 		return score;
 	}
 
-	private static int scoreManualRuleByType(GenericRule loopRule) {
+	private static int scoreManualRuleByType(GenericClassRule loopRule) {
 		return loopRule.getTypeScore();
 	}
 
-	public static Boolean getRuleAutoSelect(GenericRule nouvelle_regle, boolean manualAdd, boolean previousAdd) {
+	public static Boolean getRuleAutoSelect(GenericClassRule nouvelle_regle, boolean manualAdd, boolean previousAdd) {
 		
 		if(previousAdd) {
 			if(nouvelle_regle.active) {
@@ -471,17 +471,17 @@ public class ManualRuleServices {
 		return manualAdd || (autoSelectByType || autoSelectByScore);
 	}
 
-	private static Boolean getRuleAutoSelectByScore(GenericRule nouvelle_regle) {
+	private static Boolean getRuleAutoSelectByScore(GenericClassRule nouvelle_regle) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	private static Boolean getRuleAutoSelectByType(GenericRule nouvelle_regle) {
+	private static Boolean getRuleAutoSelectByType(GenericClassRule nouvelle_regle) {
 		// TODO Auto-generated method stub
 		return nouvelle_regle.getTypeScore()>=1100;
 	}
 
-	public static void scrollEvaluateRule(ItemFetcherRow current_row, GenericRule rule,Manual_classif manual_classif_controller,boolean isSelected) {
+	public static void scrollEvaluateRule(ItemFetcherRow current_row, GenericClassRule rule,Manual_classif manual_classif_controller,boolean isSelected) {
 		if(!assignClass2GR(rule,current_row)) {
 			return;
 		}

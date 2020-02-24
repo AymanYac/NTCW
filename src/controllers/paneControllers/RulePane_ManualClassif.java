@@ -21,7 +21,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
-import model.GenericRule;
+import model.GenericClassRule;
 import model.GlobalConstants;
 import model.ItemFetcherRow;
 import model.RulePaneRow;
@@ -162,7 +162,7 @@ public class RulePane_ManualClassif {
 	private void load_previous_rules(ItemFetcherRow row) {
 		row.itemRules.forEach((k)->{
 			
-			GenericRule gr = ItemFetcherRow.staticRules.get(k);
+			GenericClassRule gr = ItemFetcherRow.staticRules.get(k);
 			if(gr!=null) {
 				addGR2List(gr,false,true);
 			}
@@ -198,17 +198,17 @@ public class RulePane_ManualClassif {
 		}
 		
 		
-		GenericRule r1 = new GenericRule();
+		GenericClassRule r1 = new GenericClassRule();
 		r1.setMain(w1w2);
 		addGR2List(r1,false,false);
 		
 		if(f1f2!=null) {
-			GenericRule r2 = new GenericRule();
+			GenericClassRule r2 = new GenericClassRule();
 			r2.setMain(w1);
 			r2.setApp(f1f2);
 			addGR2List(r2,false,false);
 			
-			GenericRule r3 = new GenericRule();
+			GenericClassRule r3 = new GenericClassRule();
 			r3.setMain(w1);
 			r3.setApp(f1);
 			addGR2List(r3,false,false);
@@ -216,51 +216,51 @@ public class RulePane_ManualClassif {
 		}
 		
 		if(mg!=null) {
-			GenericRule r4 = new GenericRule();
+			GenericClassRule r4 = new GenericClassRule();
 			r4.setMain(w1);
 			r4.setMg(mg);
 			addGR2List(r4,false,false);
 			sameMG.setDisable(false);
 		}
 		if(pc!=null) {
-			GenericRule r5 = new GenericRule();
+			GenericClassRule r5 = new GenericClassRule();
 			r5.setMain(w1);
 			r5.setPc(pc);
 			addGR2List(r5,false,false);
 			samePC.setDisable(false);
 		}
 		if(dwg) {
-			GenericRule r6 = new GenericRule();
+			GenericClassRule r6 = new GenericClassRule();
 			r6.setMain(w1);
 			r6.setDwg(true);
 			addGR2List(r6,false,false);
 		}
 		
-		GenericRule r7 = new GenericRule();
+		GenericClassRule r7 = new GenericClassRule();
 		r7.setMain(w1);
 		this.customMAIN.setText(w1);
 		addGR2List(r7,false,false);
 		
 		
 		if(f1f2!=null) {
-			GenericRule r8 = new GenericRule();
+			GenericClassRule r8 = new GenericClassRule();
 			r8.setApp(f1f2);
 			addGR2List(r8,false,false);
 			
-			GenericRule r9 = new GenericRule();
+			GenericClassRule r9 = new GenericClassRule();
 			r9.setApp(f1);
 			addGR2List(r9,false,false);
 			
 		}
 		
 		if(mg!=null) {
-			GenericRule r10 = new GenericRule();
+			GenericClassRule r10 = new GenericClassRule();
 			r10.setMg(mg);
 			addGR2List(r10,false,false);
 		}
 		
 		if(pc!=null) {
-			GenericRule r11 = new GenericRule();
+			GenericClassRule r11 = new GenericClassRule();
 			r11.setPc(pc);
 			addGR2List(r11,false,false);
 		}
@@ -278,7 +278,7 @@ public class RulePane_ManualClassif {
 		parent.classification.requestFocus();
 	}
 	@FXML public void addRuleButtonAction() {
-		GenericRule nouvelle = new GenericRule();
+		GenericClassRule nouvelle = new GenericClassRule();
 		if(customMAIN.getText().replace(" ", "").length()>0) {
 			nouvelle.setMain(customMAIN.getText().toUpperCase().trim());
 		}
@@ -313,7 +313,7 @@ public class RulePane_ManualClassif {
 		
 	}
 
-	private void addGR2List(GenericRule nouvelle_regle,boolean manualAdd, boolean previousAdd) {
+	private void addGR2List(GenericClassRule nouvelle_regle,boolean manualAdd, boolean previousAdd) {
 		
 		for( RulePaneRow rrw : ruleView.getItems()) {
 			if(rrw.getRule_desc().equals(nouvelle_regle.toString())) {

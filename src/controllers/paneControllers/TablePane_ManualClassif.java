@@ -34,7 +34,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Screen;
 import model.GlobalConstants;
 import model.ClassificationMethods;
-import model.GenericRule;
+import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.ManualClassProposition;
 import model.ObservableDeque;
@@ -691,10 +691,10 @@ public class TablePane_ManualClassif {
 		
 	}
 	
-	public List<ItemFetcherRow> fireRuleClassChange(HashMap<ItemFetcherRow, GenericRule> itemsToUpdate) {
+	public List<ItemFetcherRow> fireRuleClassChange(HashMap<ItemFetcherRow, GenericClassRule> itemsToUpdate) {
 		
 		itemsToUpdate.entrySet().stream().forEach( e ->{
-			GenericRule gr = e.getValue();
+			GenericClassRule gr = e.getValue();
 			ItemFetcherRow row = e.getKey();
 			
 			((ItemFetcherRow)row).setReviewer_Rules(account.getUser_name());

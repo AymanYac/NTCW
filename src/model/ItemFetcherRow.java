@@ -67,7 +67,7 @@ public class ItemFetcherRow {
 	Boolean DWG=false;
 	
 	public ArrayList<String> itemRules = new ArrayList<String>();
-	public static HashMap<String,GenericRule> staticRules = new HashMap<String,GenericRule>();
+	public static HashMap<String,GenericClassRule> staticRules = new HashMap<String,GenericClassRule>();
 	
 
 	public String getManual_segment_id() {

@@ -59,7 +59,7 @@ import model.GlobalConstants;
 import model.BinaryClassificationParameters;
 import model.CharDescriptionRow;
 import model.ClassificationMethods;
-import model.GenericRule;
+import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.UserAccount;
 import transversal.dialog_toolbox.ExceptionDialog;
@@ -924,7 +924,7 @@ public class Tools {
 		return ret;
 	}
 	
-	public static void StoreRules(UserAccount account,ArrayList<GenericRule> grs, ArrayList<ArrayList<String[]>> itemRuleMaps, ArrayList<Boolean> activeStatuses, ArrayList<String> METHODS) {
+	public static void StoreRules(UserAccount account,ArrayList<GenericClassRule> grs, ArrayList<ArrayList<String[]>> itemRuleMaps, ArrayList<Boolean> activeStatuses, ArrayList<String> METHODS) {
 		
 		Task<Void> task = new Task<Void>() {
 		    
@@ -945,7 +945,7 @@ public class Tools {
 						"    VALUES (?, ?) on conflict(item_id,rule_id) do nothing;");
 				
 				for(int i=0;i<grs.size();i++) {
-					GenericRule gr = grs.get(i);
+					GenericClassRule gr = grs.get(i);
 					String METHOD = METHODS.get(i);
 					Boolean active = activeStatuses.get(i);
 					ArrayList<String[]> itemRuleMap = itemRuleMaps.get(i);
@@ -1030,7 +1030,7 @@ public class Tools {
 		
 
 
-	public static void StoreRule(UserAccount account, GenericRule gr, ArrayList<String[]> itemRuleMap, boolean active, String METHOD) {
+	public static void StoreRule(UserAccount account, GenericClassRule gr, ArrayList<String[]> itemRuleMap, boolean active, String METHOD) {
 		Task<Void> task = new Task<Void>() {
 		    
 			@Override
@@ -1115,7 +1115,7 @@ public class Tools {
 			
 		}
 
-	public static void StoreAutoRules(UserAccount account, ArrayList<GenericRule> grs, ArrayList<String[]> itemRuleMap, boolean ISCLASSIF, String METHOD) {
+	public static void StoreAutoRules(UserAccount account, ArrayList<GenericClassRule> grs, ArrayList<String[]> itemRuleMap, boolean ISCLASSIF, String METHOD) {
 		/*
 		 * Set classif rule to active if conflict
 		 * Do nothing for preclassif rule if conflict
@@ -1135,7 +1135,7 @@ public class Tools {
 						"            ?, clock_timestamp() ,?) on conflict(rule_id) do "
 						+ (ISCLASSIF?"update set active_status = EXCLUDED.active_status, class_id = EXCLUDED.class_id;":"nothing"));
 				
-				for(GenericRule gr:grs) {
+				for(GenericClassRule gr:grs) {
 					ps.setString(1, gr.toString());
 					ps.setString(2, gr.getMain());
 					ps.setString(3, gr.getApp());

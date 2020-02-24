@@ -69,7 +69,7 @@ import model.AbaqueRow;
 import model.BinaryClassificationParameters;
 import model.ClassificationMethods;
 import model.DescriptionFetchRow;
-import model.GenericRule;
+import model.GenericClassRule;
 import model.UserAccount;
 import service.Bigram;
 import service.ConfusionMatrixReader;
@@ -1799,7 +1799,7 @@ public class Auto_classification_progress {
 		    	
 		    	Connection conn = Tools.spawn_connection();
 		    	HashMap<String, ArrayList<String>> items_x_rules = new HashMap<String,ArrayList<String>>();
-		    	HashMap<String,GenericRule> staticRules = new HashMap<String,GenericRule>();
+		    	HashMap<String,GenericClassRule> staticRules = new HashMap<String,GenericClassRule>();
 		    	Statement st = conn.createStatement();
 		    	
 		    	ResultSet rs = st.executeQuery("select rule_id, main, application, complement, material_group," + 
@@ -1807,7 +1807,7 @@ public class Auto_classification_progress {
 				System.out.println("select rule_id, main, application, complement, material_group," + 
 						"pre_classification, drawing, class_id, active_status from "+pid+".project_rules");
 				while(rs.next()) {
-					GenericRule gr = new GenericRule();
+					GenericClassRule gr = new GenericClassRule();
 					gr.setMain(rs.getString("main"));
 					gr.setApp(rs.getString("application"));
 					gr.setComp(rs.getString("complement"));
@@ -1864,7 +1864,7 @@ public class Auto_classification_progress {
 		    	st4.close();
 		    	conn4.close();
 		    	
-		    	ArrayList<GenericRule> CLASSIFICATION_GRS = new ArrayList<GenericRule>();
+		    	ArrayList<GenericClassRule> CLASSIFICATION_GRS = new ArrayList<GenericClassRule>();
 		    	ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
 		    	
 		    	
@@ -1882,7 +1882,7 @@ public class Auto_classification_progress {
 	    				classif_cname= ITEMS_DICO.get(aid).get(2);  
 	    				classif_rule= ITEMS_DICO.get(aid).get(3);
 	    				
-	    				GenericRule gr = new GenericRule();
+	    				GenericClassRule gr = new GenericClassRule();
 	    				try {
 	    					gr.setMain(classif_rule.split("MAIN=")[1].split("\\|")[0]);
 	    				}catch(Exception V) {
@@ -1911,10 +1911,10 @@ public class Auto_classification_progress {
 						}
 	    				
 	    				int max_score = Short.MIN_VALUE;
-	    				HashSet<GenericRule> bestRules = new HashSet<GenericRule>();
+	    				HashSet<GenericClassRule> bestRules = new HashSet<GenericClassRule>();
 	    				
 	    				for( String loopRuleDesc : items_x_rules.get(aid)) {
-	    					GenericRule loopRule = staticRules.get(loopRuleDesc);
+	    					GenericClassRule loopRule = staticRules.get(loopRuleDesc);
 	    					Boolean loopRuleActive = loopRule.active;
 	    					
 	    					if(loopRuleActive && loopRule.classif.get(0)!=null) {
@@ -1930,7 +1930,7 @@ public class Auto_classification_progress {
 	    						}
 	    					}
 	    				}
-	    				GenericRule finalRule = ManualRuleServices.manageRuleDisambiguation(bestRules);
+	    				GenericClassRule finalRule = ManualRuleServices.manageRuleDisambiguation(bestRules);
 	    				if(finalRule!=null) {
 	    					CLASSIFICATION_GRS.add(finalRule);
 		    				String[] itemRule = new String [] {null,null};

@@ -9,10 +9,10 @@ import javafx.scene.text.TextFlow;
 
 public class RulePaneRow {
 	
-	GenericRule gr;
+	GenericClassRule gr;
 	CheckBox cb;
 	private static Manual_classif manualClassifController;
-	public RulePaneRow(Manual_classif parent,GenericRule gr, Boolean isSelected) {
+	public RulePaneRow(Manual_classif parent,GenericClassRule gr, Boolean isSelected) {
 		RulePaneRow.manualClassifController = parent;
 		this.gr = gr;
 		
@@ -75,10 +75,10 @@ public class RulePaneRow {
 		});
 		
 	}
-	public GenericRule getGr() {
+	public GenericClassRule getGr() {
 		return gr;
 	}
-	public void setGr(GenericRule gr) {
+	public void setGr(GenericClassRule gr) {
 		this.gr = gr;
 	}
 	public String getType() {

@@ -8,9 +8,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import controllers.Char_description;
+import model.GenericCharRule;
+import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
 import model.GlobalConstants;
@@ -2556,6 +2560,49 @@ public class CharPatternServices {
 		}
 		
 		return null;
+	}
+
+	public static void applyItemRule(Char_description parent) {
+		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+		String activeRule = parent.rule_field.getText();
+		if(activeRule!=null && activeRule.replaceAll(" ", "").length()>0) {
+			String activeClass = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0];
+			int activeCharIndex = parent.tableController.selected_col;
+			ArrayList<ClassCharacteristic> activeChars = parent.tableController.active_characteristics.get(activeClass);
+			ClassCharacteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
+			GenericCharRule activeCharRule = new GenericCharRule(activeClass,activeChar,activeRule);
+			if(activeCharRule.parseSuccess()) {
+				Pattern regexPattern = Pattern.compile(".*("+activeCharRule.getRegexMarker()+").*",Pattern.CASE_INSENSITIVE);
+				CharItemFetcher.allRowItems.parallelStream().forEach(r->{
+					tryRuleOnItem(r,activeCharRule,regexPattern);
+				});
+			}
+		}else {
+			
+		}
+		
+		
+	}
+
+	private static void tryRuleOnItem(CharDescriptionRow r, GenericCharRule activeCharRule, Pattern regexPattern) {
+		boolean exitOnShortDesc = false;
+		Matcher m;
+		if(r.getShort_desc()!=null) {
+			m = regexPattern.matcher(r.getShort_desc());
+			exitOnShortDesc = false;
+			while(m.find()) {
+				System.out.println("Rule "+activeCharRule.getRuleMarker()+" matches item "+r.getClient_item_number()+" with desc "+m.group()+" at group "+m.group(1));
+				exitOnShortDesc = true;
+			}
+		}
+		if(exitOnShortDesc || !(r.getLong_desc()!=null)) {
+			return;
+		}
+		m = regexPattern.matcher(r.getLong_desc());
+		while(m.find()) {
+			System.out.println("Rule "+activeCharRule.getRuleMarker()+"\n\t matches item "+r.getClient_item_number()+"\n\t with desc "+m.group()+"\n\t at group "+m.group(1));
+		}
+		
 	}
 
 }

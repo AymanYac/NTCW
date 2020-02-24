@@ -15,7 +15,7 @@ import controllers.Manual_classif;
 import javafx.scene.control.TableView;
 import model.GlobalConstants;
 import model.ClassificationMethods;
-import model.GenericRule;
+import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.ObservableDeque;
 import transversal.data_exchange_toolbox.QueryFormater;
@@ -543,7 +543,7 @@ public class ItemFetcher {
 		System.out.println("select rule_id, main, application, complement, material_group," + 
 				"pre_classification, drawing, class_id, active_status from "+active_project+".project_rules");
 		while(rs.next()) {
-			GenericRule gr = new GenericRule();
+			GenericClassRule gr = new GenericClassRule();
 			gr.setMain(rs.getString("main"));
 			gr.setApp(rs.getString("application"));
 			gr.setComp(rs.getString("complement"));

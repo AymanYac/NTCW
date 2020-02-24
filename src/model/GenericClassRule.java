@@ -9,7 +9,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-public class GenericRule {
+public class GenericClassRule {
 	
 	   Boolean dwg=false;
 	   String main=null;
@@ -23,7 +23,7 @@ public class GenericRule {
 	   public Boolean active;
 	   public Boolean matched=false;
 
-	public GenericRule() {
+	public GenericClassRule() {
 		classif.add(null);
 		classif.add(null);
 		classif.add(null);

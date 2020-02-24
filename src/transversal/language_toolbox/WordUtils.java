@@ -608,4 +608,21 @@ public class WordUtils {
 		            .forEach(t -> sb.append(((Text) t).getText()));
 		    return sb.toString();
 		}
+
+
+		public static String substituteRuleItemToRegexItem(String ruleMarker, String ancien, String nouveau) {
+			if(ancien.equals("%\\d")) {
+				System.out.println("\t\t\t"+ruleMarker+"->"+ruleMarker.replaceAll(ancien, nouveau));
+				return ruleMarker.replaceAll(ancien, nouveau);
+			}
+			System.out.println("*"+nouveau+"*");
+			System.out.println("\t\t\t"+ruleMarker+"->"+ruleMarker.replace(ancien, nouveau));
+			return ruleMarker.replace(ancien, nouveau);
+		}
+
+
+		public static String quote(String ruleMarker) {
+			String q = Pattern.quote(ruleMarker);
+			return q.substring(2).substring(0,q.length()-4);
+		}
 }
