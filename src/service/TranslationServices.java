@@ -365,10 +365,10 @@ public class TranslationServices {
 		}));
 	}
 
-	public static String getEntryTranslation(String source_value, boolean checkInDataLanguage) {
+	public static String getEntryTranslation(String source_value, boolean sourceInDataLanguage) {
 		try {
 			Unidecode unidecode = Unidecode.toAscii();
-			if(checkInDataLanguage) {
+			if(sourceInDataLanguage) {
 				return Data2UserTermsDico.get(unidecode.decodeAndTrim(source_value).toLowerCase());
 			}else {
 				return User2DataTermsDico.get(unidecode.decodeAndTrim(source_value).toLowerCase());

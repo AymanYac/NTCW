@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="C:/Users/yacay/Downloads/jar_files (6)/javafx-base-11-ea+19-linux.jar"/>
 	<classpathentry kind="lib" path="C:/Users/yacay/Downloads/jar_files (6)/javafx-graphics-11-ea+19.jar"/>
 	<classpathentry kind="lib" path="C:/Users/yacay/Downloads/jar_files (6)/javafx-graphics-11-ea+19-linux.jar"/>
+	<classpathentry kind="lib" path="C:/Users/yacay/Downloads/javaluator-3.0.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

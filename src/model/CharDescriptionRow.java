@@ -1,6 +1,7 @@
 package model;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class CharDescriptionRow {
 
@@ -27,7 +28,7 @@ public class CharDescriptionRow {
 		
 		String client_item_number;
 		String item_id;
-		public HashMap<String,CharacteristicValue[]> data = new HashMap<String,CharacteristicValue[]>();
+		private HashMap<String,CharacteristicValue[]> data = new HashMap<String,CharacteristicValue[]>();
 		String class_segment;
 		
 		
@@ -120,12 +121,21 @@ public class CharDescriptionRow {
 		public CharacteristicValue[] getData(String segment_id) {
 			return data.get(segment_id);
 		}
-		
+		public HashMap<String, CharacteristicValue[]> getData() {
+			return data;
+		}
 		public String getClass_segment() {
 			return class_segment;
 		}
 		public void setClass_segment(String class_segment) {
 			this.class_segment = class_segment;
+		}
+		public boolean hasDataInSegments(List<String> targetClasses) {
+			return targetClasses.stream().anyMatch(s->hasDataDataInSegment(s));
+		}
+		
+		private boolean hasDataDataInSegment(String segment) {
+			return data.keySet().contains(segment);
 		}
 		
 		

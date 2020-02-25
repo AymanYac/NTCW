@@ -8,15 +8,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import com.fathzer.soft.javaluator.DoubleEvaluator;
 
 import controllers.Char_description;
 import model.GenericCharRule;
 import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
+import model.ClassificationMethods;
 import model.GlobalConstants;
 import model.UnitOfMeasure;
 import model.UserAccount;
@@ -27,6 +32,7 @@ import transversal.language_toolbox.WordUtils;
 public class CharPatternServices {
 	
 	private static HashMap<String,LinkedHashSet<String>> specialwords;
+	private static HashMap<String, List<String>> charIdArrays;
 
 	public static void scanSelectionForPatternDetection(Char_description parent, ClassCharacteristic active_char) {
 		parent.refresh_ui_display();
@@ -2563,6 +2569,15 @@ public class CharPatternServices {
 	}
 
 	public static void applyItemRule(Char_description parent) {
+		
+		if(!(charIdArrays!=null)) {
+			charIdArrays = new HashMap<String,List<String>>();
+			parent.tableController.active_characteristics.forEach((k,v)->{
+			charIdArrays.put(k, v.stream().map(c->c.getCharacteristic_id()).collect(Collectors.toList()));	
+			});
+		}
+		
+		
 		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 		String activeRule = parent.rule_field.getText();
 		if(activeRule!=null && activeRule.replaceAll(" ", "").length()>0) {
@@ -2572,9 +2587,13 @@ public class CharPatternServices {
 			ClassCharacteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
 			GenericCharRule activeCharRule = new GenericCharRule(activeClass,activeChar,activeRule);
 			if(activeCharRule.parseSuccess()) {
-				Pattern regexPattern = Pattern.compile(".*("+activeCharRule.getRegexMarker()+").*",Pattern.CASE_INSENSITIVE);
-				CharItemFetcher.allRowItems.parallelStream().forEach(r->{
-					tryRuleOnItem(r,activeCharRule,regexPattern);
+				Pattern regexPattern = Pattern.compile(activeCharRule.getRegexMarker(),Pattern.CASE_INSENSITIVE);
+				List<String> targetClasses = parent.tableController.active_characteristics
+						.entrySet().stream().filter(
+								e->e.getValue().stream().anyMatch(a->a.getCharacteristic_id().equals(activeChar.getCharacteristic_id())))
+						.map(e->e.getKey()).collect(Collectors.toList());
+				CharItemFetcher.allRowItems.stream().forEach(r->{
+					tryRuleOnItem(r,activeCharRule,regexPattern,targetClasses,parent);
 				});
 			}
 		}else {
@@ -2584,14 +2603,17 @@ public class CharPatternServices {
 		
 	}
 
-	private static void tryRuleOnItem(CharDescriptionRow r, GenericCharRule activeCharRule, Pattern regexPattern) {
+	private static void tryRuleOnItem(CharDescriptionRow r, GenericCharRule activeCharRule, Pattern regexPattern, List<String> targetClasses, Char_description parent) {
+		if(!r.hasDataInSegments(targetClasses)) {
+			return;
+		}
 		boolean exitOnShortDesc = false;
 		Matcher m;
 		if(r.getShort_desc()!=null) {
 			m = regexPattern.matcher(r.getShort_desc());
 			exitOnShortDesc = false;
 			while(m.find()) {
-				System.out.println("Rule "+activeCharRule.getRuleMarker()+" matches item "+r.getClient_item_number()+" with desc "+m.group()+" at group "+m.group(1));
+				processItemRuleMatch(r,activeCharRule,r.getShort_desc(),m.group(),parent);
 				exitOnShortDesc = true;
 			}
 		}
@@ -2600,8 +2622,159 @@ public class CharPatternServices {
 		}
 		m = regexPattern.matcher(r.getLong_desc());
 		while(m.find()) {
-			System.out.println("Rule "+activeCharRule.getRuleMarker()+"\n\t matches item "+r.getClient_item_number()+"\n\t with desc "+m.group()+"\n\t at group "+m.group(1));
+			processItemRuleMatch(r,activeCharRule,r.getLong_desc(),m.group(),parent);
 		}
+		
+	}
+
+	private static void processItemRuleMatch(CharDescriptionRow matchedRow, GenericCharRule matchedRule, String matchedText,
+			String matchedGroup, Char_description parent) {
+		
+		
+		
+		System.out.println("Rule "+matchedRule.getRuleMarker()+":"+
+			"\n\t matches item "+matchedRow.getClient_item_number()+
+			"\n\t with desc "+matchedText+
+			"\n\t at group "+matchedGroup);
+		for(String segment:matchedRow.getData().keySet()) {
+			int charIdx = charIdArrays.get(segment).indexOf(matchedRule.getSourceChar().getCharacteristic_id());
+			if(charIdx!=-1) {
+				if(!(matchedRow.getData(segment)[charIdx]!=null)) {
+					matchedRow.getData(segment)[charIdx] = new CharacteristicValue();
+				}
+				for(String action:matchedRule.getRuleActions()) {
+					if(action.startsWith("DL ")) {
+						action=action.substring(3).trim();
+						matchedRow.getData(segment)[charIdx].setDataLanguageValue(action);
+						matchedRow.getData(segment)[charIdx].setUserLanguageValue(TranslationServices.getEntryTranslation(action, true));
+						matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
+						matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+						matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
+					}
+					if(action.startsWith("UL ")) {
+						action=action.substring(3).trim();
+						matchedRow.getData(segment)[charIdx].setUserLanguageValue(action);
+						matchedRow.getData(segment)[charIdx].setDataLanguageValue(TranslationServices.getEntryTranslation(action, false));
+						matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
+						matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+						matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
+					}
+					if(action.startsWith("TXT ")) {
+						action=action.substring(4).trim();
+						matchedRow.getData(segment)[charIdx].setTXTValue(action);
+						matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
+						matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+						matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
+					}
+					if(action.startsWith("NOM ")) {
+						try {
+							action=action.substring(4).trim();
+							ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedText);
+							Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+						    StringBuffer sb = new StringBuffer();
+						    while(tmp.find()){
+						      String idx = tmp.group(1);
+						      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+						      tmp.appendReplacement(sb, replacement);
+						    }
+						    action = sb.toString();
+					    	matchedRow.getData(segment)[charIdx].setNominal_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+					        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
+							matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+							matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
+							
+				      } catch (Exception e) {
+				    	  e.printStackTrace(System.err);
+				      }
+					}
+					if(action.startsWith("MIN ")) {
+						try {
+							action=action.substring(4).trim();
+							ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedText);
+							Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+						    StringBuffer sb = new StringBuffer();
+						    while(tmp.find()){
+						      String idx = tmp.group(1);
+						      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+						      tmp.appendReplacement(sb, replacement);
+						    }
+						    action = sb.toString();
+					    	matchedRow.getData(segment)[charIdx].setMin_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+					        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
+							matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+							matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
+							
+				      } catch (Exception e) {
+				    	  e.printStackTrace(System.err);
+				      }
+					}
+					
+					if(action.startsWith("MAX ")) {
+						try {
+							action=action.substring(4).trim();
+							ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedText);
+							Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+						    StringBuffer sb = new StringBuffer();
+						    while(tmp.find()){
+						      String idx = tmp.group(1);
+						      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+						      tmp.appendReplacement(sb, replacement);
+						    }
+						    action = sb.toString();
+					    	matchedRow.getData(segment)[charIdx].setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+					        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
+							matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+							matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
+							
+				      } catch (Exception e) {
+				    	  e.printStackTrace(System.err);
+				      }
+					}
+					
+					if(action.startsWith("MINMAX ")) {
+						try {
+							action=action.substring(7).trim();
+							ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedText);
+							Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+						    StringBuffer sb = new StringBuffer();
+						    while(tmp.find()){
+						      String idx = tmp.group(1);
+						      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+						      tmp.appendReplacement(sb, replacement);
+						    }
+						    action = sb.toString();
+					    	matchedRow.getData(segment)[charIdx].setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+					        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
+							matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+							matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
+							
+				      } catch (Exception e) {
+				    	  e.printStackTrace(System.err);
+				      }
+					}
+					
+					if(action.startsWith("UOM ")) {
+						try {
+							final String symbol=action.substring(4).trim();
+							Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->u.getUom_symbols().contains(symbol)).findAny();
+							if(uom.isPresent()) {
+								matchedRow.getData(segment)[charIdx].setUom_id(uom.get().getUom_id());
+								matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
+								matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+								matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
+							}
+							
+							
+				      } catch (Exception e) {
+				    	  e.printStackTrace(System.err);
+				      }
+					}
+					
+				}
+			}
+		}
+		
+		
 		
 	}
 
