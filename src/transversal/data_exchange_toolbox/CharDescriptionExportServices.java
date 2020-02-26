@@ -194,6 +194,34 @@ public class CharDescriptionExportServices {
 					
 				}
 				
+				loopCell = row.createCell(11);
+				try{
+					loopCell.setCellValue(item.getData(itemClass)[i].getSource());
+				}catch(Exception V) {
+					
+				}
+				
+				loopCell = row.createCell(12);
+				try{
+					loopCell.setCellValue(item.getData(itemClass)[i].getRule_id());
+				}catch(Exception V) {
+					
+				}
+				
+				loopCell = row.createCell(13);
+				try{
+					loopCell.setCellValue(item.getData(itemClass)[i].getAuthorName());
+				}catch(Exception V) {
+					
+				}
+				
+				loopCell = row.createCell(14);
+				try{
+					loopCell.setCellValue(item.getData(itemClass)[i].getUrl());
+				}catch(Exception V) {
+					
+				}
+				
 				
 			}else {
 				continue;
