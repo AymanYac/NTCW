@@ -14,7 +14,7 @@ public class GenericCharRule {
 	private ClassCharacteristic sourceChar;
 	private String regexMarker;
 	private Boolean parseFailed;
-	private static String SEP_CLASS;
+	public static String SEP_CLASS;
 	
 	
 	

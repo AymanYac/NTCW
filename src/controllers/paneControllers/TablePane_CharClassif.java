@@ -33,7 +33,7 @@ import model.AutoCompleteBox_CharValue;
 import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
-import model.ClassificationMethods;
+import model.DataInputMethods;
 import model.UserAccount;
 import service.CharAdvancementUpdater;
 import service.CharItemFetcher;
@@ -271,7 +271,7 @@ public class TablePane_CharClassif {
 				CharItemFetcher.classifiedItems.put(item.getItem_id(),
 						resultSplit[2]+"&&&"
 						+resultSplit[1]+"&&&"
-						+ClassificationMethods.MANUAL+"&&&"
+						+DataInputMethods.MANUAL+"&&&"
 						+account.getUser_id()+"&&&"
 						+resultSplit[0]);
 			}catch(Exception V) {
@@ -297,7 +297,7 @@ public class TablePane_CharClassif {
 		}
 		
 		tableGrid.refresh();
-		Tools.CharDescriptionRow2ClassEvent(databaseSyncList,account,ClassificationMethods.MANUAL);
+		Tools.CharDescriptionRow2ClassEvent(databaseSyncList,account,DataInputMethods.MANUAL);
 		
 		
 	}

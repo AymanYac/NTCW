@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class CharDescriptionRow {
 		String client_item_number;
 		String item_id;
 		private HashMap<String,CharacteristicValue[]> data = new HashMap<String,CharacteristicValue[]>();
+		private HashMap<String, ArrayList<CharRuleResult>[]> ruleResults = new HashMap<String,ArrayList<CharRuleResult>[]>();
 		String class_segment;
 		
 		
@@ -136,6 +138,25 @@ public class CharDescriptionRow {
 		
 		private boolean hasDataDataInSegment(String segment) {
 			return data.keySet().contains(segment);
+		}
+		
+		
+		public void addCharRuleResult(CharRuleResult newMatch, String segment, int charIdx, int charIdSize) {
+			try {
+				this.ruleResults.get(segment)[charIdx].add(newMatch);
+			}catch(Exception V) {
+				ArrayList<CharRuleResult>[] al = new ArrayList[charIdSize];
+				// initializing 
+		        for (int i = 0; i < charIdSize; i++) { 
+		            al[i] = new ArrayList<CharRuleResult>(); 
+		        }
+				this.ruleResults.put(segment, al);
+				this.ruleResults.get(segment)[charIdx].add(newMatch);
+			}
+		}
+		
+		public void reEvalCharRules(String segment, int charIdx) {
+			
 		}
 		
 		

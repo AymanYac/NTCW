@@ -13,15 +13,17 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.fathzer.soft.javaluator.DoubleEvaluator;
 
 import controllers.Char_description;
 import model.GenericCharRule;
 import model.CharDescriptionRow;
+import model.CharRuleResult;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
-import model.ClassificationMethods;
+import model.DataInputMethods;
 import model.GlobalConstants;
 import model.UnitOfMeasure;
 import model.UserAccount;
@@ -86,6 +88,7 @@ public class CharPatternServices {
 //					Rule = [Selection]
 					parent.sendPatternValue(known_value);
 					parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(corrected_text)+"<DL "+known_value.getDataLanguageValue()+">");
+					parent.sendSemiAutoPattern(known_value, WordUtils.QUOTE_NON_SEP_TEXT(corrected_text)+"<DL "+known_value.getDataLanguageValue()+">");
 					System.out.println("=====>Match !");
 					return;
 				}
@@ -133,6 +136,7 @@ public class CharPatternServices {
 //								Rule = "material"(|+1)["iron steel"]	
 								parent.sendPatternValue(known_value);
 								parent.sendPatternRule("\""+part_before_identifier+"\"(|+1)\""+part_after_identifier+"\"<DL "+part_after_identifier+">");
+								parent.sendSemiAutoPattern(known_value, "\""+part_before_identifier+"\"(|+1)\""+part_after_identifier+"\"<DL "+part_after_identifier+">");
 								System.out.println("=====>Match !");
 								return;
 							}
@@ -171,6 +175,7 @@ public class CharPatternServices {
 //								Value (Pivot language) = PIVOTtranslation (VAL)				
 //								Rule = Selection<"VAL">				
 								parent.sendPatternRule("\""+selected_text+"\""+"<\""+VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next().getDataLanguageValue()+"\">");
+								parent.sendSemiAutoPattern(VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next(), "\""+selected_text+"\""+"<\""+VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next().getDataLanguageValue()+"\">");
 								System.out.println("=====> Match!");
 								return;
 							}else {
@@ -207,6 +212,7 @@ public class CharPatternServices {
 //									
 //											Rule = Selection<LOCALtranslation("ENVAL")>	
 									parent.sendPatternRule("\""+selected_text+"\""+"<DL "+VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next().getDataLanguageValue()+">");
+									parent.sendSemiAutoPattern(VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next(), "\""+selected_text+"\""+"<DL "+VALUES_CONTAINING_AFTER_IDENTIFIER.iterator().next().getDataLanguageValue()+">");
 									System.out.println("=====>Match !");
 									return;
 									
@@ -219,6 +225,7 @@ public class CharPatternServices {
 									new_value.setParentChar(active_char);
 									parent.sendPatternValue(new_value);
 									parent.sendPatternRule("\""+part_before_identifier+"\"(|+1)\""+part_after_identifier+"\"<DL "+part_after_identifier+">");
+									parent.sendSemiAutoPattern(new_value, "\""+part_before_identifier+"\"(|+1)\""+part_after_identifier+"\"<DL "+part_after_identifier+">");
 									System.out.println("DEFAULT: The value is the corrected selection");
 									return;
 									
@@ -251,6 +258,7 @@ public class CharPatternServices {
 					parent.sendPatternValue(VALUES_CONTAINING_SELECTION.iterator().next());
 //								Rule = [Selection]
 					parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"<DL "+VALUES_CONTAINING_SELECTION.iterator().next()+">");
+					parent.sendSemiAutoPattern(VALUES_CONTAINING_SELECTION.iterator().next(), WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"<DL "+VALUES_CONTAINING_SELECTION.iterator().next()+">");
 					System.out.println("=====> Match!");
 					return;
 				}else {
@@ -284,6 +292,7 @@ public class CharPatternServices {
 						parent.sendPatternValue(VALUES_CONTAINING_SELECTION.iterator().next());
 //							Rule = Selection<LOCALtranslation("ENVAL")>
 						parent.sendPatternRule("\""+selected_text+"\""+"<UL "+VALUES_CONTAINING_SELECTION.iterator().next().getUserLanguageValue()+">");
+						parent.sendSemiAutoPattern(VALUES_CONTAINING_SELECTION.iterator().next(), "\""+selected_text+"\""+"<UL "+VALUES_CONTAINING_SELECTION.iterator().next().getUserLanguageValue()+">");
 						System.out.println("====> Match");
 						return;
 					}else {
@@ -296,6 +305,7 @@ public class CharPatternServices {
 						parent.sendPatternValue(tmp);
 //						Rule = [Selection]
 						parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"<DL "+corrected_text+">");
+						parent.sendSemiAutoPattern(tmp, WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"<DL "+corrected_text+">");
 						System.out.println("DEFAULT Value : correction of selection");
 						return;
 					}
@@ -332,7 +342,11 @@ public class CharPatternServices {
 									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
 											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+">");
 							
-					
+					parent.sendSemiAutoPattern(tmp, "\""+selected_text.split(":")[0]+
+							"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+">");
+							
 					System.out.println("Match!");
 					return;
 								
@@ -354,7 +368,11 @@ public class CharPatternServices {
 									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
 											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+">");
 							
-					
+					parent.sendSemiAutoPattern(tmp, "\""+selected_text.split("=")[0]+
+							"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+">");
+							
 					System.out.println("Match!");
 					return;
 	
@@ -380,6 +398,10 @@ public class CharPatternServices {
 								"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
 										WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
 												WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+">");
+						parent.sendSemiAutoPattern(tmp, "\""+sw_splitter+
+								"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+										WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+												WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+">");
 						
 						System.out.println("Match!");
 						return;
@@ -395,6 +417,9 @@ public class CharPatternServices {
 //							Rule = ["ab"#"cd"#(|+0)@@##(|+0)@@##]
 						
 						parent.sendPatternRule(WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true)+"<TXT "+
+						WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true)
+						+">");
+						parent.sendSemiAutoPattern(tmp, WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true)+"<TXT "+
 						WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true)
 						+">");
 						System.out.println("Match!");
@@ -434,6 +459,7 @@ public class CharPatternServices {
 					parent.sendPatternValue(VALUES_CONTAINING_SELECTION.iterator().next());
 //							Rule = Selection<"VAL">	
 					parent.sendPatternRule("\""+selected_text+"\""+"<TXT "+VALUES_CONTAINING_SELECTION.iterator().next().getStdValue()+">");
+					parent.sendSemiAutoPattern(VALUES_CONTAINING_SELECTION.iterator().next(), "\""+selected_text+"\""+"<TXT "+VALUES_CONTAINING_SELECTION.iterator().next().getStdValue()+">");
 					System.out.println("=====> Match!");
 					return;
 				}
@@ -469,6 +495,7 @@ public class CharPatternServices {
 						parent.sendPatternValue(VALUES_CONTAINED_IN_SELECTION.iterator().next());
 //							Rule = Selection<"VAL">	
 						parent.sendPatternRule(selected_text+"<TXT "+VALUES_CONTAINED_IN_SELECTION.iterator().next().getStdValue()+">");
+						parent.sendSemiAutoPattern(VALUES_CONTAINED_IN_SELECTION.iterator().next(), selected_text+"<TXT "+VALUES_CONTAINED_IN_SELECTION.iterator().next().getStdValue()+">");
 						System.out.println("====> Match!");
 						return;
 						}else {	
@@ -485,12 +512,13 @@ public class CharPatternServices {
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 											parent.sendPatternRule("\""+selected_text.split(":")[0]+"\""+"(|+1)\""+selected_text.split(":")[1]+"\"<TXT "+selected_text.split(":")[1]+">");
+											parent.sendSemiAutoPattern(tmp, "\""+selected_text.split(":")[0]+"\""+"(|+1)\""+selected_text.split(":")[1]+"\"<TXT "+selected_text.split(":")[1]+">");
 										}catch(Exception V) {
 											tmp.setTXTValue(WordUtils.CORRECT(selected_text.split("=")[1]));
 											tmp.setParentChar(active_char);
 											parent.sendPatternValue(tmp);
 											parent.sendPatternRule("\""+selected_text.split("=")[0]+"\""+"(|+1)\""+selected_text.split("=")[1]+"\"<TXT "+selected_text.split("=")[1]+">");
-											
+											parent.sendSemiAutoPattern(tmp, "\""+selected_text.split("=")[0]+"\""+"(|+1)\""+selected_text.split("=")[1]+"\"<TXT "+selected_text.split("=")[1]+">");
 										}
 //										Rule = "abcd"(|+1)["efgh"]		
 										System.out.println("DEFAULT MATCH Correction");
@@ -510,6 +538,7 @@ public class CharPatternServices {
 											parent.sendPatternValue(tmp);
 //												Rule = "abcd"(|+1)["efgh"]
 											parent.sendPatternRule("\""+sw_splitter+"\"(|+1)\""+selected_text.split(sw_splitter)[1]+"\"<TXT "+selected_text.split(sw_splitter)[1]+">");
+											parent.sendSemiAutoPattern(tmp, "\""+sw_splitter+"\"(|+1)\""+selected_text.split(sw_splitter)[1]+"\"<TXT "+selected_text.split(sw_splitter)[1]+">");
 											System.out.println("====> Match");
 											return;
 											
@@ -523,6 +552,7 @@ public class CharPatternServices {
 											parent.sendPatternValue(tmp);
 //												Rule = [Selection]
 											parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"<TXT "+WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+">");
+											parent.sendSemiAutoPattern(tmp, WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+"<TXT "+WordUtils.QUOTE_NON_SEP_TEXT(selected_text)+">");
 											System.out.println("Default match");
 											return;
 										}
@@ -569,7 +599,13 @@ public class CharPatternServices {
 								+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
 										selected_text.replace(",", ".").indexOf("%1")+
 												"%1".length())+"\""
-										+"<MAX %1><UOM\""+following_uom.getUom_symbol()+"\">");
+										+"<MAX %1><UOM \""+following_uom.getUom_symbol()+"\">");
+								parent.sendSemiAutoPattern(tmp, "\""+selected_text.substring(0,
+										selected_text.replace(",", ".").indexOf("%1"))
+								+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+										selected_text.replace(",", ".").indexOf("%1")+
+												"%1".length())+"\""
+										+"<MAX %1><UOM \""+following_uom.getUom_symbol()+"\">");
 								return;
 							}
 							if(selected_text.toLowerCase().contains("min")&&!following_uom.getUom_name().contains("min")) {
@@ -589,7 +625,13 @@ public class CharPatternServices {
 								+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
 										selected_text.replace(",", ".").indexOf("%1")+
 												"%1".length())+"\""
-										+"<MIN %1><UOM\""+following_uom.getUom_symbol()+"\">");
+										+"<MIN %1><UOM \""+following_uom.getUom_symbol()+"\">");
+								parent.sendSemiAutoPattern(tmp, "\""+selected_text.substring(0,
+										selected_text.replace(",", ".").indexOf("%1"))
+								+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+										selected_text.replace(",", ".").indexOf("%1")+
+												"%1".length())+"\""
+										+"<MIN %1><UOM \""+following_uom.getUom_symbol()+"\">");
 								return;
 							}else {
 								System.out.println("The selection does not contain \"MIN\" nor \"MAX\"  (e.g. \"LZ= 1160 MM\")");
@@ -602,7 +644,13 @@ public class CharPatternServices {
 								+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
 										selected_text.replace(",", ".").indexOf("%1")+
 												"%1".length())+"\""
-										+"<NOM %1><UOM\""+following_uom.getUom_symbol()+"\">");
+										+"<NOM %1><UOM \""+following_uom.getUom_symbol()+"\">");
+								parent.sendSemiAutoPattern(tmp, "\""+selected_text.substring(0,
+										selected_text.replace(",", ".").indexOf("%1"))
+								+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
+										selected_text.replace(",", ".").indexOf("%1")+
+												"%1".length())+"\""
+										+"<NOM %1><UOM \""+following_uom.getUom_symbol()+"\">");
 								return;
 							}
 							
@@ -625,7 +673,10 @@ public class CharPatternServices {
 										parent.sendPatternValue(tmp);
 										parent.sendPatternRule("\""+selected_text.substring(0,
 												selected_text.replace(",", ".").indexOf("%1"))
-										+"\"(|+0)%1<MAX %1><UOM\""+infered_uom.getUom_symbol()+"\">");
+										+"\"(|+0)%1<MAX %1><UOM \""+infered_uom.getUom_symbol()+"\">");
+										parent.sendSemiAutoPattern(tmp, "\""+selected_text.substring(0,
+												selected_text.replace(",", ".").indexOf("%1"))
+										+"\"(|+0)%1<MAX %1><UOM \""+infered_uom.getUom_symbol()+"\">");
 										return;
 									}
 									if(selected_text.toLowerCase().contains("min")&&!infered_uom.getUom_name().contains("min")) {
@@ -642,7 +693,10 @@ public class CharPatternServices {
 										parent.sendPatternValue(tmp);
 										parent.sendPatternRule("\""+selected_text.substring(0,
 												selected_text.replace(",", ".").indexOf("%1"))
-										+"\"(|+0)%1<MIN %1><UOM\""+infered_uom.getUom_symbol()+"\">");
+										+"\"(|+0)%1<MIN %1><UOM \""+infered_uom.getUom_symbol()+"\">");
+										parent.sendSemiAutoPattern(tmp, "\""+selected_text.substring(0,
+												selected_text.replace(",", ".").indexOf("%1"))
+										+"\"(|+0)%1<MIN %1><UOM \""+infered_uom.getUom_symbol()+"\">");
 										return;
 									}else {
 										System.out.println("The selection does not contain \"MIN\" nor \"MAX\"  (e.g. \"LZ= 1160\")");
@@ -652,7 +706,10 @@ public class CharPatternServices {
 										parent.sendPatternValue(tmp);
 										parent.sendPatternRule("\""+selected_text.substring(0,
 												selected_text.replace(",", ".").indexOf("%1"))
-										+"\"(|+0)%1<NOM %1><UOM\""+infered_uom.getUom_symbol()+"\">");
+										+"\"(|+0)%1<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">");
+										parent.sendSemiAutoPattern(tmp, "\""+selected_text.substring(0,
+												selected_text.replace(",", ".").indexOf("%1"))
+										+"\"(|+0)%1<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">");
 										return;
 									}
 
@@ -672,7 +729,7 @@ public class CharPatternServices {
 										
 										String preparedRule = "\""+selected_text.substring(0,
 												selected_text.replace(",", ".").indexOf("%1"))
-										+"\"(|+0)%1<MAX %1><UOM\""+loop_uom.getUom_symbol()+"\">";
+										+"\"(|+0)%1<MAX %1><UOM \""+loop_uom.getUom_symbol()+"\">";
 										
 										parent.preparePatternProposition(i,"Max= "+preparedValue.getMax_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule,active_char);
 										continue;
@@ -691,7 +748,7 @@ public class CharPatternServices {
 										
 										String preparedRule = "\""+selected_text.substring(0,
 												selected_text.replace(",", ".").indexOf("%1"))
-										+"\"(|+0)%1<MIN %1><UOM\""+loop_uom.getUom_symbol()+"\">";
+										+"\"(|+0)%1<MIN %1><UOM \""+loop_uom.getUom_symbol()+"\">";
 										
 										parent.preparePatternProposition(i,"Min= "+preparedValue.getMin_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 										continue;
@@ -703,7 +760,7 @@ public class CharPatternServices {
 	
 										String preparedRule ="\""+selected_text.substring(0,
 												selected_text.replace(",", ".").indexOf("%1"))
-										+"\"(|+0)%1<NOM %1><UOM\""+loop_uom.getUom_symbol()+"\">";
+										+"\"(|+0)%1<NOM %1><UOM \""+loop_uom.getUom_symbol()+"\">";
 										
 										parent.preparePatternProposition(i,preparedValue.getNominal_value_truncated()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 										continue;
@@ -736,7 +793,7 @@ public class CharPatternServices {
 									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
 											selected_text.replace(",", ".").indexOf("%1")+
 													"%1".length())+"\""
-											+"<MAX %1><UOM\""+loop_uom.getUom_symbol()+"\">";
+											+"<MAX %1><UOM \""+loop_uom.getUom_symbol()+"\">";
 									
 									parent.preparePatternProposition(i,"Max= "+preparedValue.getMax_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 									continue;
@@ -758,7 +815,7 @@ public class CharPatternServices {
 									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
 											selected_text.replace(",", ".").indexOf("%1")+
 													"%1".length())+"\""
-											+"<MIN %1><UOM\""+loop_uom.getUom_symbol()+"\">";
+											+"<MIN %1><UOM \""+loop_uom.getUom_symbol()+"\">";
 									
 									parent.preparePatternProposition(i,"Min= "+preparedValue.getMin_value()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 									continue;
@@ -773,7 +830,7 @@ public class CharPatternServices {
 									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
 											selected_text.replace(",", ".").indexOf("%1")+
 													"%1".length())+"\""
-											+"<NOM %1><UOM\""+loop_uom.getUom_symbol()+"\">";
+											+"<NOM %1><UOM \""+loop_uom.getUom_symbol()+"\">";
 									
 									parent.preparePatternProposition(i,preparedValue.getNominal_value_truncated()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
 									continue;
@@ -794,7 +851,7 @@ public class CharPatternServices {
 									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
 											selected_text.replace(",", ".").indexOf("%1")+
 													"%1".length())+"\""
-											+"<MAX %1><UOM\""+"$$$UOM_SYMBOL$$$"+"\">";
+											+"<MAX %1><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
 									
 									parent.preparePatternProposition(i,"Max= "+preparedValue.getMax_value()+" \""+UOM_INFERED_NAME+"\"",preparedValue,preparedRule, active_char);
 									return;
@@ -816,7 +873,7 @@ public class CharPatternServices {
 									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
 											selected_text.replace(",", ".").indexOf("%1")+
 													"%1".length())+"\""
-											+"<MIN %1><UOM\""+"$$$UOM_SYMBOL$$$"+"\">";
+											+"<MIN %1><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
 									
 									parent.preparePatternProposition(i,"Min= "+preparedValue.getMin_value()+" \""+UOM_INFERED_NAME+"\"",preparedValue,preparedRule, active_char);
 									return;
@@ -831,7 +888,7 @@ public class CharPatternServices {
 									+"\"(|+0)%1(|+0)"+"\""+selected_text.substring(
 											selected_text.replace(",", ".").indexOf("%1")+
 													"%1".length())+"\""
-											+"<NOM %1><UOM\""+"$$$UOM_SYMBOL$$$"+"\">";
+											+"<NOM %1><UOM \""+"$$$UOM_SYMBOL$$$"+"\">";
 									
 									parent.preparePatternProposition(i,preparedValue.getNominal_value_truncated()+" \""+UOM_INFERED_NAME+"\"",preparedValue,preparedRule, active_char);
 									return;
@@ -852,13 +909,8 @@ public class CharPatternServices {
 								tmp.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 								tmp.setUom_id(infered_uom.getUom_id());
 								parent.sendPatternValue(tmp);
-								/*
-								parent.sendPatternRule("\""+selected_text.substring(0,
-										selected_text.replace(",", ".").indexOf("%1"))
-								+"\"(|+0)%1<NOM %1><UOM\""+infered_uom.getUom_symbol()+"\">");
-								*/
 								parent.sendPatternRule(null);
-								
+								parent.sendSemiAutoPattern(tmp,null);
 								return;
 							}else {
 								for(int i=0;i<active_char.getAllowedUoms().size();i++) {
@@ -870,7 +922,7 @@ public class CharPatternServices {
 									/*
 									String preparedRule ="\""+selected_text.substring(0,
 											selected_text.replace(",", ".").indexOf("%1"))
-									+"\"(|+0)%1<NOM %1><UOM\""+loop_uom.getUom_symbol()+"\">";
+									+"\"(|+0)%1<NOM %1><UOM \""+loop_uom.getUom_symbol()+"\">";
 									*/
 									String preparedRule=null;
 									parent.preparePatternProposition(i,preparedValue.getNominal_value_truncated()+" "+loop_uom.getUom_symbol()+" ("+loop_uom.getUom_name()+")",preparedValue,preparedRule, active_char);
@@ -1289,7 +1341,7 @@ public class CharPatternServices {
 												+"\""+"<MINMAX %1><MINMAX %2><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
 										parent.sendPatternValue(preparedValue2);
 										parent.sendPatternRule(preparedRule2);
-										//parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue2, preparedRule2, active_char);
+										parent.sendSemiAutoPattern(preparedValue2,preparedRule2);
 										return;
 									}else {
 										if(selected_text.replace(",", ".").trim().endsWith("%2")) {
@@ -1311,7 +1363,7 @@ public class CharPatternServices {
 														+"<MINMAX %1><MINMAX %2><UOM \""+infered_uom.getUom_symbol()+"\">";
 												parent.sendPatternValue(preparedValue2);
 												parent.sendPatternRule(preparedRule2);
-												//parent.preparePatternProposition(0, preparedValue2.getMin_value()+" to "+preparedValue2.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
+												parent.sendSemiAutoPattern(preparedValue2,preparedRule2);
 												return;
 											}else {
 												int i;
@@ -1431,6 +1483,7 @@ public class CharPatternServices {
 													+"\""+"<NOM %1><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
 											parent.sendPatternValue(preparedValue2);
 											parent.sendPatternRule(preparedRule2);
+											parent.sendSemiAutoPattern(preparedValue2,preparedRule2);
 											return;
 										}else {
 											// (e.g. "Pression = 10 @T=100") with "bar" and "psi" as declared UoM
@@ -1663,6 +1716,7 @@ public class CharPatternServices {
 											
 											parent.sendPatternValue(preparedValue3);
 											parent.sendPatternRule(preparedRule3);
+											parent.sendSemiAutoPattern(preparedValue3,preparedRule3);
 											
 										}else {
 											
@@ -1684,6 +1738,7 @@ public class CharPatternServices {
 											
 											parent.sendPatternValue(preparedValue3);
 											parent.sendPatternRule(preparedRule3);
+											parent.sendSemiAutoPattern(preparedValue3,preparedRule3);
 											
 										}
 									}else {
@@ -1901,12 +1956,16 @@ public class CharPatternServices {
 						parent.sendPatternRule(WordUtils.generateRuleSyntax(
 								textBetweenNumbers,new String[] {"NOM"},new String[] {"%1"},null
 								));
+						parent.sendSemiAutoPattern(tmp,WordUtils.generateRuleSyntax(
+								textBetweenNumbers,new String[] {"NOM"},new String[] {"%1"},null
+								));
 					}else {
 						System.out.println("No letter in selection");
 						CharacteristicValue tmp = new CharacteristicValue();
 						tmp.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 						parent.sendPatternValue(tmp);
-						
+						parent.sendPatternRule(null);
+						parent.sendSemiAutoPattern(tmp,null);
 					}
 				}else {
 					if(numValuesInSelection.size()==2) {
@@ -2587,7 +2646,8 @@ public class CharPatternServices {
 			ClassCharacteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
 			GenericCharRule activeCharRule = new GenericCharRule(activeClass,activeChar,activeRule);
 			if(activeCharRule.parseSuccess()) {
-				Pattern regexPattern = Pattern.compile(activeCharRule.getRegexMarker(),Pattern.CASE_INSENSITIVE);
+				System.out.println("Trying rule "+activeCharRule.getRuleMarker());
+				Pattern regexPattern = Pattern.compile("["+GenericCharRule.SEP_CLASS+"]"+activeCharRule.getRegexMarker()+"["+GenericCharRule.SEP_CLASS+"]",Pattern.CASE_INSENSITIVE);
 				List<String> targetClasses = parent.tableController.active_characteristics
 						.entrySet().stream().filter(
 								e->e.getValue().stream().anyMatch(a->a.getCharacteristic_id().equals(activeChar.getCharacteristic_id())))
@@ -2610,7 +2670,7 @@ public class CharPatternServices {
 		boolean exitOnShortDesc = false;
 		Matcher m;
 		if(r.getShort_desc()!=null) {
-			m = regexPattern.matcher(r.getShort_desc());
+			m = regexPattern.matcher(" "+r.getShort_desc()+" ");
 			exitOnShortDesc = false;
 			while(m.find()) {
 				processItemRuleMatch(r,activeCharRule,r.getShort_desc(),m.group(),parent);
@@ -2620,7 +2680,7 @@ public class CharPatternServices {
 		if(exitOnShortDesc || !(r.getLong_desc()!=null)) {
 			return;
 		}
-		m = regexPattern.matcher(r.getLong_desc());
+		m = regexPattern.matcher(" "+r.getLong_desc()+" ");
 		while(m.find()) {
 			processItemRuleMatch(r,activeCharRule,r.getLong_desc(),m.group(),parent);
 		}
@@ -2631,147 +2691,170 @@ public class CharPatternServices {
 			String matchedGroup, Char_description parent) {
 		
 		
+		//For every segment that contains char in item
+		for(String segment:matchedRow.getData().keySet()) {
+			IntStream.range(0, charIdArrays.get(segment).size()).filter(i -> charIdArrays.get(segment).get(i).equals(matchedRule.getSourceChar().getCharacteristic_id()))
+			.forEach(charIdx->{
+				if(!(matchedRow.getData(segment)[charIdx]!=null)) {
+					matchedRow.getData(segment)[charIdx] = new CharacteristicValue();
+				}
+				//If the value is MANUAL or UPLOAD, continue
+				if(DataInputMethods.MANUAL.equals(matchedRow.getData(segment)[charIdx].getSource())
+					||DataInputMethods.PROJECT_SETUP_UPLOAD.equals(matchedRow.getData(segment)[charIdx].getSource())) {
+					return;
+				}
+				CharRuleResult newMatch = new CharRuleResult(matchedRule,matchedText,matchedGroup);
+				newMatch.ruleActionToValue(parent);
+				matchedRow.addCharRuleResult(newMatch,segment,charIdx,charIdArrays.get(segment).size());
+				matchedRow.reEvalCharRules(segment,charIdx);
+				
+			});
+		}
 		
 		System.out.println("Rule "+matchedRule.getRuleMarker()+":"+
 			"\n\t matches item "+matchedRow.getClient_item_number()+
 			"\n\t with desc "+matchedText+
 			"\n\t at group "+matchedGroup);
+		
+		
 		for(String segment:matchedRow.getData().keySet()) {
-			int charIdx = charIdArrays.get(segment).indexOf(matchedRule.getSourceChar().getCharacteristic_id());
-			if(charIdx!=-1) {
-				if(!(matchedRow.getData(segment)[charIdx]!=null)) {
-					matchedRow.getData(segment)[charIdx] = new CharacteristicValue();
-				}
-				for(String action:matchedRule.getRuleActions()) {
-					if(action.startsWith("DL ")) {
-						action=action.substring(3).trim();
-						matchedRow.getData(segment)[charIdx].setDataLanguageValue(action);
-						matchedRow.getData(segment)[charIdx].setUserLanguageValue(TranslationServices.getEntryTranslation(action, true));
-						matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
-						matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
-						matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
+			IntStream.range(0, charIdArrays.get(segment).size()).filter(i -> charIdArrays.get(segment).get(i).equals(matchedRule.getSourceChar().getCharacteristic_id()))
+			.forEach(charIdx->{
+				if(charIdx!=-1) {
+					if(!(matchedRow.getData(segment)[charIdx]!=null)) {
+						matchedRow.getData(segment)[charIdx] = new CharacteristicValue();
 					}
-					if(action.startsWith("UL ")) {
-						action=action.substring(3).trim();
-						matchedRow.getData(segment)[charIdx].setUserLanguageValue(action);
-						matchedRow.getData(segment)[charIdx].setDataLanguageValue(TranslationServices.getEntryTranslation(action, false));
-						matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
-						matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
-						matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
-					}
-					if(action.startsWith("TXT ")) {
-						action=action.substring(4).trim();
-						matchedRow.getData(segment)[charIdx].setTXTValue(action);
-						matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
-						matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
-						matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
-					}
-					if(action.startsWith("NOM ")) {
-						try {
+					for(String action:matchedRule.getRuleActions()) {
+						if(action.startsWith("DL ")) {
+							action=action.substring(3).trim();
+							matchedRow.getData(segment)[charIdx].setDataLanguageValue(action);
+							matchedRow.getData(segment)[charIdx].setUserLanguageValue(TranslationServices.getEntryTranslation(action, true));
+							matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("><",matchedRule.getRuleActions())+">");
+							matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+							matchedRow.getData(segment)[charIdx].setSource(DataInputMethods.AUTO_CHAR_DESC);
+						}
+						if(action.startsWith("UL ")) {
+							action=action.substring(3).trim();
+							matchedRow.getData(segment)[charIdx].setUserLanguageValue(action);
+							matchedRow.getData(segment)[charIdx].setDataLanguageValue(TranslationServices.getEntryTranslation(action, false));
+							matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("><",matchedRule.getRuleActions())+">");
+							matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+							matchedRow.getData(segment)[charIdx].setSource(DataInputMethods.AUTO_CHAR_DESC);
+						}
+						if(action.startsWith("TXT ")) {
 							action=action.substring(4).trim();
-							ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedText);
-							Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-						    StringBuffer sb = new StringBuffer();
-						    while(tmp.find()){
-						      String idx = tmp.group(1);
-						      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-						      tmp.appendReplacement(sb, replacement);
-						    }
-						    action = sb.toString();
-					    	matchedRow.getData(segment)[charIdx].setNominal_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-					        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
+							matchedRow.getData(segment)[charIdx].setTXTValue(action);
+							matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("><",matchedRule.getRuleActions())+">");
 							matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
-							matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
-							
-				      } catch (Exception e) {
-				    	  e.printStackTrace(System.err);
-				      }
-					}
-					if(action.startsWith("MIN ")) {
-						try {
-							action=action.substring(4).trim();
-							ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedText);
-							Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-						    StringBuffer sb = new StringBuffer();
-						    while(tmp.find()){
-						      String idx = tmp.group(1);
-						      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-						      tmp.appendReplacement(sb, replacement);
-						    }
-						    action = sb.toString();
-					    	matchedRow.getData(segment)[charIdx].setMin_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-					        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
-							matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
-							matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
-							
-				      } catch (Exception e) {
-				    	  e.printStackTrace(System.err);
-				      }
-					}
-					
-					if(action.startsWith("MAX ")) {
-						try {
-							action=action.substring(4).trim();
-							ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedText);
-							Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-						    StringBuffer sb = new StringBuffer();
-						    while(tmp.find()){
-						      String idx = tmp.group(1);
-						      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-						      tmp.appendReplacement(sb, replacement);
-						    }
-						    action = sb.toString();
-					    	matchedRow.getData(segment)[charIdx].setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-					        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
-							matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
-							matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
-							
-				      } catch (Exception e) {
-				    	  e.printStackTrace(System.err);
-				      }
-					}
-					
-					if(action.startsWith("MINMAX ")) {
-						try {
-							action=action.substring(7).trim();
-							ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedText);
-							Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-						    StringBuffer sb = new StringBuffer();
-						    while(tmp.find()){
-						      String idx = tmp.group(1);
-						      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-						      tmp.appendReplacement(sb, replacement);
-						    }
-						    action = sb.toString();
-					    	matchedRow.getData(segment)[charIdx].setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-					        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
-							matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
-							matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
-							
-				      } catch (Exception e) {
-				    	  e.printStackTrace(System.err);
-				      }
-					}
-					
-					if(action.startsWith("UOM ")) {
-						try {
-							final String symbol=action.substring(4).trim();
-							Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->u.getUom_symbols().contains(symbol)).findAny();
-							if(uom.isPresent()) {
-								matchedRow.getData(segment)[charIdx].setUom_id(uom.get().getUom_id());
-								matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("<>",matchedRule.getRuleActions())+">");
+							matchedRow.getData(segment)[charIdx].setSource(DataInputMethods.AUTO_CHAR_DESC);
+						}
+						if(action.startsWith("NOM ")) {
+							try {
+								action=action.substring(4).trim();
+								ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedGroup);
+								Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+							    StringBuffer sb = new StringBuffer();
+							    while(tmp.find()){
+							      String idx = tmp.group(1);
+							      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+							      tmp.appendReplacement(sb, replacement);
+							    }
+							    action = sb.toString();
+							    matchedRow.getData(segment)[charIdx].setNominal_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+						        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("><",matchedRule.getRuleActions())+">");
 								matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
-								matchedRow.getData(segment)[charIdx].setSource(ClassificationMethods.USER_RULE);
-							}
-							
-							
-				      } catch (Exception e) {
-				    	  e.printStackTrace(System.err);
-				      }
+								matchedRow.getData(segment)[charIdx].setSource(DataInputMethods.AUTO_CHAR_DESC);
+								
+					      } catch (Exception e) {
+					    	  e.printStackTrace(System.err);
+					      }
+						}
+						if(action.startsWith("MIN ")) {
+							try {
+								action=action.substring(4).trim();
+								ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedGroup);
+								Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+							    StringBuffer sb = new StringBuffer();
+							    while(tmp.find()){
+							      String idx = tmp.group(1);
+							      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+							      tmp.appendReplacement(sb, replacement);
+							    }
+							    action = sb.toString();
+						    	matchedRow.getData(segment)[charIdx].setMin_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+						        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("><",matchedRule.getRuleActions())+">");
+								matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+								matchedRow.getData(segment)[charIdx].setSource(DataInputMethods.AUTO_CHAR_DESC);
+								
+					      } catch (Exception e) {
+					    	  e.printStackTrace(System.err);
+					      }
+						}
+						
+						if(action.startsWith("MAX ")) {
+							try {
+								action=action.substring(4).trim();
+								ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedGroup);
+								Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+							    StringBuffer sb = new StringBuffer();
+							    while(tmp.find()){
+							      String idx = tmp.group(1);
+							      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+							      tmp.appendReplacement(sb, replacement);
+							    }
+							    action = sb.toString();
+						    	matchedRow.getData(segment)[charIdx].setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+						        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("><",matchedRule.getRuleActions())+">");
+								matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+								matchedRow.getData(segment)[charIdx].setSource(DataInputMethods.AUTO_CHAR_DESC);
+								
+					      } catch (Exception e) {
+					    	  e.printStackTrace(System.err);
+					      }
+						}
+						
+						if(action.startsWith("MINMAX ")) {
+							try {
+								action=action.substring(7).trim();
+								ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedGroup);
+								Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+							    StringBuffer sb = new StringBuffer();
+							    while(tmp.find()){
+							      String idx = tmp.group(1);
+							      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+							      tmp.appendReplacement(sb, replacement);
+							    }
+							    action = sb.toString();
+						    	matchedRow.getData(segment)[charIdx].setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+						        matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("><",matchedRule.getRuleActions())+">");
+								matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+								matchedRow.getData(segment)[charIdx].setSource(DataInputMethods.AUTO_CHAR_DESC);
+								
+					      } catch (Exception e) {
+					    	  e.printStackTrace(System.err);
+					      }
+						}
+						
+						if(action.startsWith("UOM ")) {
+							try {
+								final String symbol=action.substring(5).substring(0,action.length()-6).trim();
+								Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->u.getUom_symbols().contains(symbol)).findAny();
+								if(uom.isPresent()) {
+									matchedRow.getData(segment)[charIdx].setUom_id(uom.get().getUom_id());
+									matchedRow.getData(segment)[charIdx].setRule_id(matchedRule.getRuleMarker()+"<"+String.join("><",matchedRule.getRuleActions())+">");
+									matchedRow.getData(segment)[charIdx].setAuthor(parent.account.getUser_id());
+									matchedRow.getData(segment)[charIdx].setSource(DataInputMethods.AUTO_CHAR_DESC);
+								}
+								
+								
+					      } catch (Exception e) {
+					    	  e.printStackTrace(System.err);
+					      }
+						}
+						
 					}
-					
 				}
-			}
+			});
 		}
 		
 		

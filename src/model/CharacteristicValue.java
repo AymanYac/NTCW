@@ -15,6 +15,7 @@ import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
 public class CharacteristicValue {
+	public boolean ManualValueReviewed=false;
 	
 	public static HashMap<String,HashSet<CharacteristicValue>> loadedValues;
 	
@@ -34,6 +35,7 @@ public class CharacteristicValue {
 	
 	
 	private ClassCharacteristic parentChar;
+
 	
 	
 	
@@ -101,7 +103,11 @@ public class CharacteristicValue {
 	
 	//Display value is user formatted display value (value column in table and item export)
 	public String getDisplayValue(Char_description parent, ClassCharacteristic parentChar) {
-		return WordUtils.textFlowToString(getFormatedDisplayAndUomPair(parent,parentChar).getValue());
+		String ret = WordUtils.textFlowToString(getFormatedDisplayAndUomPair(parent,parentChar).getValue());
+		if(ManualValueReviewed && ret.length()==0) {
+			return "*UNKNOWN*";
+		}
+		return ret;
 	}
 	
 	public Pair<ArrayList<String>, TextFlow> getFormatedDisplayAndUomPair(Char_description parent,ClassCharacteristic parentChar) {

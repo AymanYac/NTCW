@@ -33,7 +33,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Screen;
 import model.GlobalConstants;
-import model.ClassificationMethods;
+import model.DataInputMethods;
 import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.ManualClassProposition;
@@ -705,8 +705,14 @@ public class TablePane_ManualClassif {
 					
 				}else {
 					UUID2CID = Tools.UUID2CID(account.getActive_project());
+					System.out.println(UUID2CID);
+					System.out.println(gr.classif.get(0));
+					System.out.println(gr.classif.get(1));
+					System.out.println(gr.classif.get(2));
+					System.out.println(UUID2CID.get(gr.classif.get(0)));
+					
 				}
-				((ItemFetcherRow)row).setRule_Segment_number(UUID2CID.get(gr.classif.get(1)));
+				((ItemFetcherRow)row).setRule_Segment_number(UUID2CID.get(gr.classif.get(0)));
 				((ItemFetcherRow)row).setRule_description_Rules(gr.toString());
 				((ItemFetcherRow)row).setRule_id_Rules((gr.toString()));
 			}catch(Exception V) {
@@ -720,7 +726,7 @@ public class TablePane_ManualClassif {
 				((ItemFetcherRow)row).setRule_id_Rules(null);
 				
 			}
-			((ItemFetcherRow)row).setSource_Rules(ClassificationMethods.USER_RULE);
+			((ItemFetcherRow)row).setSource_Rules(DataInputMethods.USER_CLASSIFICATION_RULE);
 			
 			
 			
@@ -747,7 +753,7 @@ public class TablePane_ManualClassif {
 				oa.get(idx).setReviewer_Manual(account.getUser_name());
 				oa.get(idx).setRule_description_Manual(null);
 				oa.get(idx).setRule_id_Manual(null);
-				oa.get(idx).setSource_Manual(ClassificationMethods.MANUAL);
+				oa.get(idx).setSource_Manual(DataInputMethods.MANUAL);
 				
 				ManualClassProposition lastClassProp = new ManualClassProposition();
 				lastClassProp.setSegment_id(result.split("&&&")[0]);
@@ -804,7 +810,7 @@ public class TablePane_ManualClassif {
 			
 		}
 		tableGrid.refresh();
-		Tools.ItemFetcherRow2ClassEvent(databaseSyncList,account,ClassificationMethods.MANUAL);
+		Tools.ItemFetcherRow2ClassEvent(databaseSyncList,account,DataInputMethods.MANUAL);
 		
 		
 	}

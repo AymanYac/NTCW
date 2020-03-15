@@ -64,7 +64,7 @@ public class CharDescriptionExportServices {
         		reviewCharCardinality = itemChars.size();
         	}
         	appendReviewItem(item,reviewSheet,itemChars,parent);
-        	appendBaseItem(item,baseSheet,itemChars);
+        	appendBaseItem(item,baseSheet,itemChars,parent);
         }
         
         
@@ -125,7 +125,7 @@ public class CharDescriptionExportServices {
 		baseSheet.createFreezePane(0, 1);
 	}
 
-	private static void appendBaseItem(CharDescriptionRow item, Sheet baseSheet, ArrayList<ClassCharacteristic> itemChars) {
+	private static void appendBaseItem(CharDescriptionRow item, Sheet baseSheet, ArrayList<ClassCharacteristic> itemChars, Char_description parent) {
 		
 		for(int i=0;i<itemChars.size();i++) {
 			if(item.getData(item.getClass_segment().split("&&&")[0])!=null) {
@@ -257,15 +257,6 @@ public class CharDescriptionExportServices {
 			loopCell = row.createCell(6+2*i);
 			loopCell.setCellValue(itemChars.get(i).getCharacteristic_name());
 			loopCell = row.createCell(7+2*i);
-			/*try{
-				CharPaneRow tmp = new CharPaneRow(parent);
-				tmp.setCarac(itemChars.get(i));
-				tmp.setValue(item.getData(item.getClass_segment().split("&&&")[0])[i]);
-				loopCell.setCellValue(WordUtils.textFlowToString(tmp.getValue_display()));
-				//loopCell.setCellValue(item.getData(item.getClass_segment().split("&&&")[0])[i].getDisplayValue());
-			}catch(Exception V) {
-				
-			}*/
 			try{
 				loopCell.setCellValue(item.getData(item.getClass_segment().split("&&&")[0])[i].getDisplayValue(parent,itemChars.get(i)));
 			}catch(Exception V) {

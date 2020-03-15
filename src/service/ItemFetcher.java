@@ -14,7 +14,7 @@ import java.util.List;
 import controllers.Manual_classif;
 import javafx.scene.control.TableView;
 import model.GlobalConstants;
-import model.ClassificationMethods;
+import model.DataInputMethods;
 import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.ObservableDeque;
@@ -151,7 +151,7 @@ public class ItemFetcher {
 				//tmp.setSegment_number(classifiedItems.get(tmp.getItem_id()).split("&&&")[0]);
 				//tmp.setSegment_id(classifiedItems.get(tmp.getItem_id()).split("&&&")[4]);
 				//tmp.setSegment_name(classifiedItems.get(tmp.getItem_id()).split("&&&")[1]);
-				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(ClassificationMethods.MANUAL)){
+				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(DataInputMethods.MANUAL)){
 					tmp.setManual_segment_number( classifiedItems.get(tmp.getItem_id()).split("&&&")[0] );
 					tmp.setManual_segment_id( classifiedItems.get(tmp.getItem_id()).split("&&&")[4] );
 					tmp.setManual_segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
@@ -159,7 +159,7 @@ public class ItemFetcher {
 					tmp.setAuthor_Manual(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
 					
 				}
-				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(ClassificationMethods.PROJECT_SETUP_UPLOAD)){
+				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(DataInputMethods.PROJECT_SETUP_UPLOAD)){
 					tmp.setUpload_segment_number( classifiedItems.get(tmp.getItem_id()).split("&&&")[0] );
 					tmp.setUpload_segment_id( classifiedItems.get(tmp.getItem_id()).split("&&&")[4] );
 					tmp.setUpload_segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
@@ -167,9 +167,9 @@ public class ItemFetcher {
 					tmp.setAuthor_Upload(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
 					
 				}
-				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(ClassificationMethods.USER_RULE)
+				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(DataInputMethods.USER_CLASSIFICATION_RULE)
 						||
-						classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(ClassificationMethods.BINARY_CLASSIFICATION)){
+						classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(DataInputMethods.BINARY_CLASSIFICATION)){
 					tmp.setRule_Segment_number( classifiedItems.get(tmp.getItem_id()).split("&&&")[0] );
 					tmp.setRule_Segment_id( classifiedItems.get(tmp.getItem_id()).split("&&&")[4] );
 					tmp.setRule_Segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );

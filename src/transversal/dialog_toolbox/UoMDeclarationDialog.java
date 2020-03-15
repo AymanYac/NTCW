@@ -151,8 +151,7 @@ public class UoMDeclarationDialog {
 			
 		    
 		    preparedValue.setUom_id(newUom.getUom_id());
-		    parent.sendPatternValue(preparedValue);
-		    parent.sendPatternRule(preparedRule.replace("$$$UOM_SYMBOL$$$", newUom.getUom_symbol()));
+		    parent.sendSemiAutoPattern(preparedValue, preparedRule.replace("$$$UOM_SYMBOL$$$", newUom.getUom_symbol()));
 		});
 		
 		

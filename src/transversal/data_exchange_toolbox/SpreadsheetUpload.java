@@ -28,7 +28,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.monitorjbl.xlsx.StreamingReader;
 
-import model.ClassificationMethods;
+import model.DataInputMethods;
 import model.UserAccount;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
@@ -376,7 +376,7 @@ public class SpreadsheetUpload {
            				ps2.setString(1, Tools.generate_uuid());
            				ps2.setString(2, row_id);
            				ps2.setString(3, CID2SEGMENT.get(cid));
-           				ps2.setString(4, ClassificationMethods.PROJECT_SETUP_UPLOAD);
+           				ps2.setString(4, DataInputMethods.PROJECT_SETUP_UPLOAD);
            				ps2.setString(5, account.getUser_id());
            				ps2.setDate(6, java.sql.Date.valueOf(LocalDate.now()));
            				

@@ -67,7 +67,7 @@ import javafx.stage.Stage;
 import model.GlobalConstants;
 import model.AbaqueRow;
 import model.BinaryClassificationParameters;
-import model.ClassificationMethods;
+import model.DataInputMethods;
 import model.DescriptionFetchRow;
 import model.GenericClassRule;
 import model.UserAccount;
@@ -1849,7 +1849,7 @@ public class Auto_classification_progress {
 		    	Connection conn2 = Tools.spawn_connection();
 		    	
 		    	PreparedStatement ps1 = conn1.prepareStatement("update "+pid+".project_items set pre_classification = ? where item_id = ?");
-		    	PreparedStatement ps2 = conn2.prepareStatement("insert into "+pid+".project_classification_event(classification_event_id,item_id,segment_id,classification_method,rule_id,user_id,classification_date,classification_time) values (?,?,?,'"+ClassificationMethods.BINARY_CLASSIFICATION+"',?,'"+account.getUser_id()+"',?,clock_timestamp())");
+		    	PreparedStatement ps2 = conn2.prepareStatement("insert into "+pid+".project_classification_event(classification_event_id,item_id,segment_id,classification_method,rule_id,user_id,classification_date,classification_time) values (?,?,?,'"+DataInputMethods.BINARY_CLASSIFICATION+"',?,'"+account.getUser_id()+"',?,clock_timestamp())");
 		    	
 		    	ArrayList<DescriptionFetchRow> rws = DESCS.get(pid);
 	    		
@@ -1963,7 +1963,7 @@ public class Auto_classification_progress {
 	    			
 	    		}
 	    		
-	    		Tools.StoreAutoRules(account,CLASSIFICATION_GRS,itemRuleMap,true,ClassificationMethods.BINARY_CLASSIFICATION);
+	    		Tools.StoreAutoRules(account,CLASSIFICATION_GRS,itemRuleMap,true,DataInputMethods.BINARY_CLASSIFICATION);
     			
 	    		ps2.executeBatch();
 	    		//ps2W.executeBatch();

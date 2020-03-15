@@ -65,8 +65,7 @@ public class CharClassifProposer {
 			}else {
 				CharacteristicValue val = getValueForButton(currentLoopButtonIndex);
 				String rule = getRuleForButton(currentLoopButtonIndex);
-				parent.sendPatternValue(val);
-				parent.sendPatternRule(rule);
+				parent.sendSemiAutoPattern(val, rule);
 				
 			}
 			

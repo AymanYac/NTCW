@@ -7,7 +7,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import model.ClassificationMethods;
+import model.DataInputMethods;
 import model.ItemFetcherRow;
 import transversal.generic.Tools;
 
@@ -119,8 +119,8 @@ public class QueryFormater {
 			Integer projectGranularity, String active_project) throws ClassNotFoundException, SQLException {
 		// Load items with classification : upload or manual
 		ArrayList<String> methods = new ArrayList<String>();
-		methods.add(ClassificationMethods.MANUAL);
-		methods.add(ClassificationMethods.PROJECT_SETUP_UPLOAD);
+		methods.add(DataInputMethods.MANUAL);
+		methods.add(DataInputMethods.PROJECT_SETUP_UPLOAD);
 		ArrayList<Boolean> acceptBlanks = new ArrayList<Boolean>();
 		acceptBlanks.add(true);
 		acceptBlanks.add(true);
@@ -134,7 +134,7 @@ public class QueryFormater {
 		HashMap<String, String> classifiedItems = new HashMap<String,String>();
 		while(rs.next()) {
 			
-				if(rs.getString(2)!=null && rs.getString("classification_method").equals(ClassificationMethods.MANUAL)) {
+				if(rs.getString(2)!=null && rs.getString("classification_method").equals(DataInputMethods.MANUAL)) {
 					//2 : level_granularity_number
 					//3 : level_granularity_name_translated
 					classifiedItems.put(rs.getString("item_id"), rs.getString(2)+"&&&"+rs.getString(3)+"&&&"+rs.getString("classification_method")+"&&&"+rs.getString("user_id")+"&&&"+rs.getString("segment_id"));
@@ -144,9 +144,9 @@ public class QueryFormater {
 		
 		
 		methods = new ArrayList<String>();
-		methods.add(ClassificationMethods.PROJECT_SETUP_UPLOAD);
-		methods.add(ClassificationMethods.USER_RULE);
-		methods.add(ClassificationMethods.BINARY_CLASSIFICATION);
+		methods.add(DataInputMethods.PROJECT_SETUP_UPLOAD);
+		methods.add(DataInputMethods.USER_CLASSIFICATION_RULE);
+		methods.add(DataInputMethods.BINARY_CLASSIFICATION);
 		acceptBlanks = new ArrayList<Boolean>();
 		acceptBlanks.add(true);
 		acceptBlanks.add(false);
@@ -180,7 +180,7 @@ public class QueryFormater {
 			userID2Author = Tools.get_user_names();
 			uploadClasses = new HashMap<String,String>();
 			ArrayList<String> methods = new ArrayList<String>();
-			methods.add(ClassificationMethods.PROJECT_SETUP_UPLOAD);
+			methods.add(DataInputMethods.PROJECT_SETUP_UPLOAD);
 			ArrayList<Boolean> acceptBlanks = new ArrayList<Boolean>();
 			acceptBlanks.add(true);
 			Connection conn = Tools.spawn_connection();

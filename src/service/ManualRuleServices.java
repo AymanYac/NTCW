@@ -15,12 +15,11 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.scene.control.MenuItem;
-import model.ClassificationMethods;
+import model.DataInputMethods;
 import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.RulePaneRow;
 import transversal.generic.Tools;
-import transversal.language_toolbox.WordUtils;
 
 public class ManualRuleServices {
 
@@ -51,21 +50,23 @@ public class ManualRuleServices {
 	public static void reEvaluateAllActiveRules(boolean reevaluateClassifiedItems, Manual_classif manualClassifController, MenuItem menu) {
 		
 		String originalMenuText = menu.getText();
+		List<ItemFetcherRow> databaseSyncLists = new ArrayList<ItemFetcherRow>();
+		
+		ArrayList<GenericClassRule> grs = new ArrayList<GenericClassRule>();
+		ArrayList<ArrayList<String[]>> itemRuleMaps = new ArrayList<ArrayList<String[]>>();
+		ArrayList<Boolean> activeStatuses = new ArrayList<Boolean>();
+		ArrayList<String> METHODS = new ArrayList<String>();
+		
+		
 		Task<Void> task = new Task<Void>() {
 		    
 			@Override
 		    protected Void call() throws Exception {
 
-				List<ItemFetcherRow> databaseSyncLists = new ArrayList<ItemFetcherRow>();
-				
-				ArrayList<GenericClassRule> grs = new ArrayList<GenericClassRule>();
-				ArrayList<ArrayList<String[]>> itemRuleMaps = new ArrayList<ArrayList<String[]>>();
-				ArrayList<Boolean> activeStatuses = new ArrayList<Boolean>();
-				ArrayList<String> METHODS = new ArrayList<String>();
 				
 				i = 0.0;
 				double ruleNumber = ItemFetcherRow.staticRules.values().parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()).size();
-				System.out.println("Refreshing "+String.valueOf(ruleNumber)+" rules");
+				
 				
 				
 				ItemFetcherRow.staticRules.values().stream().filter(gr->gr.active&&gr.classif.get(0)!=null)
@@ -121,7 +122,7 @@ public class ManualRuleServices {
 					grs.add(gr);
 					itemRuleMaps.add(itemRuleMap);
 					activeStatuses.add(true);
-					METHODS.add(ClassificationMethods.USER_RULE);
+					METHODS.add(DataInputMethods.USER_CLASSIFICATION_RULE);
 				});
 				
 				return null;
@@ -129,7 +130,7 @@ public class ManualRuleServices {
 			};
 		task.setOnSucceeded(e -> {
 			;
-			System.out.println("Refreshing finished");
+			
 			Platform.runLater(new Runnable() {
 
 				@Override
@@ -139,8 +140,8 @@ public class ManualRuleServices {
 				}
 				
 			});
-			//Tools.StoreRules(manualClassifController.account, grs, itemRuleMaps, activeStatuses, METHODS);
-			//Tools.ItemFetcherRow2ClassEvent(databaseSyncLists,manualClassifController.account,ClassificationMethods.USER_RULE);
+			Tools.StoreRules(manualClassifController.account, grs, itemRuleMaps, activeStatuses, METHODS);
+			Tools.ItemFetcherRow2ClassEvent(databaseSyncLists,manualClassifController.account,DataInputMethods.USER_CLASSIFICATION_RULE);
 			
 			});
 
@@ -294,9 +295,9 @@ public class ManualRuleServices {
 		
 		List<ItemFetcherRow> databaseSyncList = manualClassifController.tableController.fireRuleClassChange(itemsToUpdate);
 		databaseSyncList.addAll( manualClassifController.tableController.fireRuleClassBlank(itemsToBlank) );
-		Tools.ItemFetcherRow2ClassEvent(databaseSyncList,manualClassifController.account,ClassificationMethods.USER_RULE);
+		Tools.ItemFetcherRow2ClassEvent(databaseSyncList,manualClassifController.account,DataInputMethods.USER_CLASSIFICATION_RULE);
 		
-		Tools.StoreRule(manualClassifController.account,gr,itemRuleMap,false,ClassificationMethods.USER_RULE);
+		Tools.StoreRule(manualClassifController.account,gr,itemRuleMap,false,DataInputMethods.USER_CLASSIFICATION_RULE);
 	}
 
 	public static void evaluateNewRule(GenericClassRule gr,Manual_classif manualClassifController) {
@@ -323,7 +324,7 @@ public class ManualRuleServices {
 			}
 			
 		}*/
-		Tools.StoreRule(manualClassifController.account, gr,itemRuleMap,false,ClassificationMethods.USER_RULE);
+		Tools.StoreRule(manualClassifController.account, gr,itemRuleMap,false,DataInputMethods.USER_CLASSIFICATION_RULE);
 	}
 	@SuppressWarnings("unchecked")
 	public static void applyRule(GenericClassRule gr, Manual_classif manualClassifController) {
@@ -340,7 +341,7 @@ public class ManualRuleServices {
 		*/
 		
 		gr.active=true;
-		System.out.println("putting rule in static: "+gr.toString());
+		
 		ItemFetcherRow.staticRules.put(gr.toString(), gr);
 		
 		Pattern p_tmp = null;
@@ -356,7 +357,7 @@ public class ManualRuleServices {
 		
 		manualClassifController.tableController.tableGrid.getItems().parallelStream().forEach(row->{
 			if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
-				System.out.println(gr.toString()+" applies to "+((ItemFetcherRow)row).getClient_item_number());
+				
 				String[] itemRule = new String [] {null,null};
 				itemRule[0]= ((ItemFetcherRow) row).getItem_id();
 				itemRule[1]= gr.toString();
@@ -392,22 +393,22 @@ public class ManualRuleServices {
 		
 		List<ItemFetcherRow> databaseSyncList = manualClassifController.tableController.fireRuleClassChange(itemsToUpdate);
 		databaseSyncList.addAll( manualClassifController.tableController.fireRuleClassBlank(itemsToBlank) );
-		Tools.ItemFetcherRow2ClassEvent(databaseSyncList,manualClassifController.account,ClassificationMethods.USER_RULE);
-		Tools.StoreRule(manualClassifController.account,gr,itemRuleMap,true,ClassificationMethods.USER_RULE);
+		Tools.ItemFetcherRow2ClassEvent(databaseSyncList,manualClassifController.account,DataInputMethods.USER_CLASSIFICATION_RULE);
+		Tools.StoreRule(manualClassifController.account,gr,itemRuleMap,true,DataInputMethods.USER_CLASSIFICATION_RULE);
 		
 	}
 
 	
 
 	private static GenericClassRule EvaluateItemRules(ItemFetcherRow row) {
-		System.out.println("\t Evaluating rules for item "+row.getClient_item_number());
+		
 		int max_score = Short.MIN_VALUE;
 		HashSet<GenericClassRule> bestRules = new HashSet<GenericClassRule>();
 		
 		for( String loopRuleDesc : row.itemRules) {
-			System.out.println("Item matches rule: "+loopRuleDesc);
+			
 			GenericClassRule loopRule = ItemFetcherRow.staticRules.get(loopRuleDesc);
-			System.out.println("This rule is known in static as: "+WordUtils.textFlowToString(loopRule.toDisplay()));
+			
 			Boolean loopRuleActive = loopRule.active;
 			
 			if(loopRuleActive && loopRule.classif.get(0)!=null) {
@@ -486,17 +487,17 @@ public class ManualRuleServices {
 			return;
 		}
 		if(isSelected) {
-			System.out.println("scroll evaluating rule: "+WordUtils.textFlowToString(rule.toDisplay())+" >apply");
+			
 			applyRule(rule, manual_classif_controller);
 		}else {
-			System.out.println("scroll evaluating rule: "+WordUtils.textFlowToString(rule.toDisplay())+" >unapply");
+			
 			unapplyRule(rule,manual_classif_controller);
 		}
 	}
 
 	public static void scrollEvaluateItem(ItemFetcherRow current_row, Manual_classif parent) {
 
-		System.out.println("scroll evaluating item "+current_row.getClient_item_number());
+		
 		
 		Task<Void> task = new Task<Void>() {
 		    
@@ -505,7 +506,7 @@ public class ManualRuleServices {
 				
 				for(RulePaneRow row:FXCollections.observableArrayList(parent.rulePaneController.ruleView.getItems())) {
 					if(row.getCb().isIndeterminate()) {
-						System.out.println("indeterminate rule "+row.getRule_desc());
+						
 						continue;
 					}
 					boolean isSelected = row.getCb().isSelected();

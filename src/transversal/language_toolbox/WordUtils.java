@@ -511,7 +511,7 @@ public class WordUtils {
 		}
 
 
-		private static String reduceExtremetiesPatternRuleSeparators(String preparedRule,
+		public static String reduceExtremetiesPatternRuleSeparators(String preparedRule,
 				String[] SEPARATORS, ArrayList<String> exceptions) {
 			
 			String uomClause = null;

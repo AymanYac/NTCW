@@ -58,6 +58,7 @@ import model.CharDescClassComboRow;
 import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
+import model.DataInputMethods;
 import model.UserAccount;
 import service.CharClassifProposer;
 import service.CharItemFetcher;
@@ -481,7 +482,6 @@ public class Char_description {
 		}else {
 			//Skip to next item
 			try{
-				CharPatternServices.applyItemRule(this);
 				int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
 				if(TranslationProcessResult!=null) {
 					CharValuesLoader.storeItemDatafromScreen(idx,this);
@@ -1610,33 +1610,62 @@ public class Char_description {
 		rule_field.setText("");
 		uom_field.setText("");
 		value_field.setText("");
-		translated_value_field.setText("");
-		
-		
-		
-		
+		translated_value_field.setText("");	
 	}
-	public void sendPatternValue(CharacteristicValue pattern_value) {
-		
+	
+	public void persistValueOnSelectedItem(CharacteristicValue value) {
+
 		//uiDirectValueRefresh(pattern_value);
 		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
 		List<String> targetItemsIDs = tableController.tableGrid.getSelectionModel().getSelectedItems().stream().map(i->i.getItem_id()).collect(Collectors.toList());
 		CharItemFetcher.allRowItems.parallelStream().filter(e->targetItemsIDs.contains(e.getItem_id()))
 						.forEach(i->{
-							CharValuesLoader.fillData(this.classCombo.getValue().getClassSegment(),active_char_index,pattern_value,i);
+							CharValuesLoader.fillData(this.classCombo.getValue().getClassSegment(),active_char_index,value,i);
 						});
 		
-		tableController.itemArray.parallelStream().filter(e->targetItemsIDs.contains(e.getItem_id())).findAny()
-		.ifPresent(i->{
-			CharValuesLoader.fillData(this.classCombo.getValue().getClassSegment(),active_char_index,pattern_value,i);
-		});
-		TranslationServices.beAwareOfNewValue(pattern_value, tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index));
+		TranslationServices.beAwareOfNewValue(value, tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index));
 		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index),true);
 		
 		refresh_ui_display();
 		tableController.tableGrid.refresh();
 		
 	}
+	public void sendSemiAutoPattern(CharacteristicValue pattern_value, String ruleString) {
+		
+		pattern_value.setSource(DataInputMethods.SEMI_CHAR_DESC);
+		pattern_value.setAuthor(account.getUser_id());
+		
+		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+		ClassCharacteristic active_char = this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
+		.get(active_char_index);
+		
+		if(active_char.getIsNumeric()) {
+			ruleString=WordUtils.reducePatternRuleSeparators(ruleString);
+		}else {
+			String[] SEPARATORS = new String[] {",","."," ","=",":","+","-","/","|","\\"};
+			String loopRule = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+			while(true) {
+				loopRule = WordUtils.reduceExtremetiesPatternRuleSeparators(ruleString,SEPARATORS,new ArrayList<String>());
+				if(ruleString.equals(loopRule)) {
+					break;
+				}
+				
+				ruleString = loopRule;
+			}
+		}
+		pattern_value.setRule_id(ruleString);
+		rule_field.setText(ruleString);
+		CharPatternServices.applyItemRule(this);
+		persistValueOnSelectedItem(pattern_value);
+		
+	}
+	
+	public void sendPatternRule(String ruleString) {
+	}
+	
+	public void sendPatternValue(CharacteristicValue pattern_value) {	
+	}
+	
 	@SuppressWarnings("unused")
 	private void uiDirectValueRefresh(CharacteristicValue pattern_value) {
 		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
@@ -1676,17 +1705,6 @@ public class Char_description {
 				translated_value_field.setText("");
 			}
 		}
-	}
-	public void sendPatternRule(String ruleString) {
-		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
-		ClassCharacteristic active_char = this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
-		.get(active_char_index);
-		
-		if(active_char.getIsNumeric()) {
-			ruleString=WordUtils.reducePatternRuleSeparators(ruleString);
-		}
-		rule_field.setText(ruleString);
-		
 	}
 	public void preparePatternProposition(int i, String buttonText, CharacteristicValue preparedValue,
 			String preparedRule, ClassCharacteristic active_char) {
@@ -1736,6 +1754,7 @@ public class Char_description {
 			
 		}
 	}
+	
 	
 	
 }

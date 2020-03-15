@@ -15,7 +15,7 @@ import controllers.paneControllers.TablePane_CharClassif;
 import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
-import model.ClassificationMethods;
+import model.DataInputMethods;
 import model.UnitOfMeasure;
 import transversal.generic.Tools;
 
@@ -177,10 +177,10 @@ public class CharValuesLoader {
 			}
 		}
 		tmp.setNote(parent.note_field_uom.getText());
-		tmp.setSource(ClassificationMethods.MANUAL);
+		tmp.setSource(DataInputMethods.MANUAL);
 		tmp.setAuthor(parent.account.getUser_id());
-		
-		parent.sendPatternValue(tmp);
+		tmp.ManualValueReviewed=true;
+		parent.persistValueOnSelectedItem(tmp);
 		
 	}
 }

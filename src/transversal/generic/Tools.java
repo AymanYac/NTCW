@@ -58,7 +58,7 @@ import javafx.stage.Stage;
 import model.GlobalConstants;
 import model.BinaryClassificationParameters;
 import model.CharDescriptionRow;
-import model.ClassificationMethods;
+import model.DataInputMethods;
 import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.UserAccount;
@@ -211,8 +211,8 @@ public class Tools {
 	}
 
 	public static String load_ip() {
-		return "localhost";
-		//return "88.190.148.154";
+		//return "localhost";
+		return "82.66.148.154";//"88.190.148.154";
 		//return "192.168.0.25";
 	}
 	public static String load_port() {
@@ -770,7 +770,7 @@ public class Tools {
 	    protected Void call() throws Exception {
 		Connection conn = Tools.spawn_connection();
 		//Connection conn2 = Tools.spawn_connection();
-		
+		HashSet<String> visitedRows = new HashSet<String>();
 		PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_classification_event("
 				+ "classification_event_id,item_id,segment_id,classification_method,rule_id,user_id,classification_date,classification_time) values("
 				+ "?,?,?,?,?,?,?,clock_timestamp())");
@@ -779,13 +779,16 @@ public class Tools {
 		
 		
 		for(ItemFetcherRow tmp:rows) {
-			
+			if(visitedRows.contains(tmp.getItem_id())) {
+				continue;
+			}
+			visitedRows.add(tmp.getItem_id());
 			
 			try {
 				//Don't update rule matching items that are assigned to a manual input
 				//This is optional now as on screen-load no longer uses the latest event
 				//The latest manual class is always loaded
-				if( tmp.getSource_Display().equals(ClassificationMethods.MANUAL) && !METHOD.equals(ClassificationMethods.MANUAL)) {
+				if( tmp.getSource_Display().equals(DataInputMethods.MANUAL) && !METHOD.equals(DataInputMethods.MANUAL)) {
 					continue;
 				}
 			}catch(Exception V) {
@@ -798,7 +801,7 @@ public class Tools {
 			stmt.setString(1, eventid);
 			stmt.setString(2, tmp.getItem_id());
 			//stmt.setString(3, tmp.getDisplay_segment_id());//WRONG ! see update above
-			if(METHOD.equals(ClassificationMethods.USER_RULE)) {
+			if(METHOD.equals(DataInputMethods.USER_CLASSIFICATION_RULE)) {
 				stmt.setString(3,tmp.getRule_Segment_id());
 				stmt.setString(5, tmp.getRule_id_Display());
 				
