@@ -102,7 +102,7 @@ public class CharacteristicValue {
 	}
 	
 	//Display value is user formatted display value (value column in table and item export)
-	public String getDisplayValue(Char_description parent, ClassCharacteristic parentChar) {
+	public String getDisplayValue(Char_description parent) {
 		String ret = WordUtils.textFlowToString(getFormatedDisplayAndUomPair(parent,parentChar).getValue());
 		if(ManualValueReviewed && ret.length()==0) {
 			return "*UNKNOWN*";

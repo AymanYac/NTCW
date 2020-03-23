@@ -12,10 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.json.simple.parser.ParseException;
@@ -168,12 +166,6 @@ public class Char_description {
 
 	public ArrayList<String> CNAME_CID;
 	public CharPane_CharClassif charPaneController;
-
-
-
-	public Set<CharDescriptionRow> ROW_SYNC_POOL = new HashSet<CharDescriptionRow>();
-
-
 
 	public CharClassifProposer proposer;
 
@@ -657,19 +649,19 @@ public class Char_description {
 		
 		
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_1))) {
-			fireProposition(1);
+			firePropositionButton(1);
 		}
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_2))) {
-			fireProposition(2);
+			firePropositionButton(2);
 		}
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_3))) {
-			fireProposition(3);
+			firePropositionButton(3);
 		}
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_4))) {
-			fireProposition(4);
+			firePropositionButton(4);
 		}
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_5))) {
-			fireProposition(5);
+			firePropositionButton(5);
 		}
 		
 		
@@ -1271,7 +1263,7 @@ public class Char_description {
 		
 	}
 
-	public void fireProposition(int i) {
+	public void firePropositionButton(int i) {
 		;
 		try {
 			Button button = propButtons.get(i-1);
@@ -1301,6 +1293,8 @@ public class Char_description {
 		try {
 			int selected_col = Math.floorMod(tableController.selected_col, tableController.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
 			ClassCharacteristic active_char = tableController.active_characteristics.get(row.getClass_segment().split("&&&")[0]).get(selected_col);
+			proposer.loadCharRuleProps(row,row.getClass_segment().split("&&&")[0],selected_col,tableController.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
+			CharDescriptionExportServices.flushToDB(account);
 			if(active_char.getIsNumeric()) {
 				if( (active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0)) {
 					
@@ -1613,16 +1607,17 @@ public class Char_description {
 		translated_value_field.setText("");	
 	}
 	
-	public void persistValueOnSelectedItem(CharacteristicValue value) {
+	public void AssignValueOnSelectedItems(CharacteristicValue value) {
 
 		//uiDirectValueRefresh(pattern_value);
 		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
 		List<String> targetItemsIDs = tableController.tableGrid.getSelectionModel().getSelectedItems().stream().map(i->i.getItem_id()).collect(Collectors.toList());
 		CharItemFetcher.allRowItems.parallelStream().filter(e->targetItemsIDs.contains(e.getItem_id()))
-						.forEach(i->{
-							CharValuesLoader.fillData(this.classCombo.getValue().getClassSegment(),active_char_index,value,i);
+						.forEach(r->{
+							CharDescriptionExportServices.addCharDataToPush(r, this.classCombo.getValue().getClassSegment(), active_char_index,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+							CharValuesLoader.updateRuntimeDataForItem(r,this.classCombo.getValue().getClassSegment(),active_char_index,value);
 						});
-		
+		CharDescriptionExportServices.flushToDB(account);
 		TranslationServices.beAwareOfNewValue(value, tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index));
 		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index),true);
 		
@@ -1656,7 +1651,7 @@ public class Char_description {
 		pattern_value.setRule_id(ruleString);
 		rule_field.setText(ruleString);
 		CharPatternServices.applyItemRule(this);
-		persistValueOnSelectedItem(pattern_value);
+		AssignValueOnSelectedItems(pattern_value);
 		
 	}
 	
@@ -1711,7 +1706,7 @@ public class Char_description {
 		
 		preparedRule=WordUtils.reducePatternRuleSeparators(preparedRule);
 		try{
-			proposer.addProposition(buttonText,preparedValue,preparedRule,active_char);
+			proposer.addSemiAutoProposition(buttonText,preparedValue,preparedRule,active_char);
 		}catch(Exception V) {
 			
 		}
@@ -1723,7 +1718,7 @@ public class Char_description {
 			preparedRule=WordUtils.reducePatternRuleSeparators(preparedRule);
 		}
 		try{
-			proposer.addProposition(buttonText,preparedValue,preparedRule,active_char);
+			proposer.addSemiAutoProposition(buttonText,preparedValue,preparedRule,active_char);
 		}catch(Exception V) {
 			
 		}

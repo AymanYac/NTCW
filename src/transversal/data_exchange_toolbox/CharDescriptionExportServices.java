@@ -26,6 +26,7 @@ import javafx.stage.FileChooser;
 import model.CharDescriptionRow;
 import model.ClassCharacteristic;
 import model.UnitOfMeasure;
+import model.UserAccount;
 import service.CharItemFetcher;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
@@ -258,7 +259,7 @@ public class CharDescriptionExportServices {
 			loopCell.setCellValue(itemChars.get(i).getCharacteristic_name());
 			loopCell = row.createCell(7+2*i);
 			try{
-				loopCell.setCellValue(item.getData(item.getClass_segment().split("&&&")[0])[i].getDisplayValue(parent,itemChars.get(i)));
+				loopCell.setCellValue(item.getData(item.getClass_segment().split("&&&")[0])[i].getDisplayValue(parent/*,itemChars.get(i)*/));
 			}catch(Exception V) {
 				
 			}
@@ -418,5 +419,18 @@ public class CharDescriptionExportServices {
 		return headerRow;
 	}
 
+
+	public static void addCharDataToPush(CharDescriptionRow matchedRow, String segment, int charIdx, int charIdxSize) {
+		matchedRow.reEvaluateCharRules(segment, charIdxSize);
+		
+	}
+
+
+	public static void flushToDB(UserAccount account) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 	
 }

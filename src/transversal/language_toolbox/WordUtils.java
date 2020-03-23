@@ -298,13 +298,16 @@ public class WordUtils {
 		}
 
 
-		public static String QUOTE_NON_SEP_TEXT(String input) {
+		public static String QUOTE_NON_SEP_TEXT(String input, boolean quoteOuterText) {
 			String output = "";
 			boolean inQuote = false;
 			for(int i=0;i<input.length();i++) {
 				char c = input.charAt(i);
 				if(Character.isAlphabetic(c) || Character.isDigit(c)) {
-					if(inQuote && i!=0) {
+					if(i==0) {
+						output=(quoteOuterText?"\"":"")+c;
+					}
+					else if(inQuote) {
 						output=output+c;
 					}else {
 						output=output+"\""+c;
@@ -322,7 +325,7 @@ public class WordUtils {
 				}
 				}
 			if(inQuote) {
-				output=output+"\"";
+				output=output+(quoteOuterText?"\"":"");
 			}
 			return output;
 		}
@@ -514,41 +517,47 @@ public class WordUtils {
 		public static String reduceExtremetiesPatternRuleSeparators(String preparedRule,
 				String[] SEPARATORS, ArrayList<String> exceptions) {
 			
-			String uomClause = null;
-			try {
-				uomClause = preparedRule.split("<UOM")[1];
-				preparedRule = preparedRule.split("<UOM")[0];
-			}catch(Exception V) {
-				
-			}
+			String ruleClause = null;
+			ArrayList<String> ruleActions = new ArrayList<String>();
+			Pattern regexPattern = Pattern.compile("<([^<>]*)>");
+			Matcher m = regexPattern.matcher(preparedRule);
+			while(m.find()){
+		    	ruleActions.add(m.group(1));
+		    }
+			System.out.println("Reducing rule :"+preparedRule);
+			System.out.println("ruleActions: "+(ruleActions.size()>0?"<":"")+String.join("><", ruleActions)+(ruleActions.size()>0?">":""));
+			System.out.println("first action: "+ruleActions.get(0));
+			ruleClause = preparedRule.substring(0,preparedRule.indexOf("<"+ruleActions.get(0)));
+			System.out.println("rule clause: "+ruleClause);
 			for(String sep:SEPARATORS) {
 				if(exceptions.contains(sep)&&!sep.equals(" ")) {
 					continue;
 				}
-				preparedRule = preparedRule.replaceAll("(?<!~)\""+Pattern.quote(sep)+"+", "(|+1)\"")
+				ruleClause = ruleClause.replaceAll("(?<!~)\""+Pattern.quote(sep)+"+", "(|+1)\"")
 					      .replaceAll(Pattern.quote(sep)+"+(?<!~)\"", "\"(|+1)")
 					      .replaceAll("(?<!~)\"\"", "");
 			}
-			preparedRule = preparedRule.replaceAll("(\\(\\|\\+0\\))+","(|+0)")
+			ruleClause = ruleClause.replaceAll("(\\(\\|\\+0\\))+","(|+0)")
 						.replaceAll("(\\(\\|\\+1\\))+","(|+1)")
 						.replaceAll("(\\(\\|\\+0\\))+\\(\\|\\+1\\)","(|+1)")
 						.replaceAll("\\(\\|\\+1\\)(\\(\\|\\+0\\))+","(|+1)");
 			
-			if(preparedRule.endsWith("(|+1)")){
-				preparedRule= preparedRule.substring(0,preparedRule.length()-"(|+1)".length());
+			if(ruleClause.endsWith("(|+1)")){
+				ruleClause= ruleClause.substring(0,ruleClause.length()-"(|+1)".length());
 			}
-			if(preparedRule.startsWith("(|+1)")){
-				preparedRule= preparedRule.substring("(|+1)".length());
+			if(ruleClause.startsWith("(|+1)")){
+				ruleClause= ruleClause.substring("(|+1)".length());
 			}
-			if(preparedRule.endsWith("(|+0)")){
-				preparedRule= preparedRule.substring(0,preparedRule.length()-"(|+0)".length());
+			if(ruleClause.endsWith("(|+0)")){
+				ruleClause= ruleClause.substring(0,ruleClause.length()-"(|+0)".length());
 			}
-			if(preparedRule.startsWith("(|+0)")){
-				preparedRule= preparedRule.substring("(|+0)".length());
+			if(ruleClause.startsWith("(|+0)")){
+				ruleClause= ruleClause.substring("(|+0)".length());
 			}
 			
 			
-			return preparedRule+((uomClause!=null)?"<UOM"+uomClause:"");
+			//return ruleClause+((uomClause!=null)?"<UOM"+uomClause:"");
+			return ruleClause+(ruleActions.size()>0?"<":"")+String.join("><", ruleActions)+(ruleActions.size()>0?">":"");
 			
 		}
 

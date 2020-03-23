@@ -2,7 +2,15 @@ package model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.IntStream;
+
+import org.apache.commons.lang.StringUtils;
+
+import controllers.Char_description;
+import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 
 public class CharDescriptionRow {
 
@@ -16,7 +24,7 @@ public class CharDescriptionRow {
 	//Author
 	//Article ID
 	
-
+		private Char_description parent;
 		Boolean completionStatus;
 		Boolean questionStatus;
 		String short_desc;
@@ -31,17 +39,12 @@ public class CharDescriptionRow {
 		String item_id;
 		private HashMap<String,CharacteristicValue[]> data = new HashMap<String,CharacteristicValue[]>();
 		private HashMap<String, ArrayList<CharRuleResult>[]> ruleResults = new HashMap<String,ArrayList<CharRuleResult>[]>();
+		private HashMap<String, ArrayList<HashMap<String, CharRuleResult>>> rulePropositions = new HashMap<String, ArrayList<HashMap<String, CharRuleResult>>>();
 		String class_segment;
 		
-		
-		
-		/*
-		public CharDescriptionRow(String segment_id, int data_length) {
-			this.data.put(segment_id, new CharacteristicValue[data_length]);
+		public void setParent(Char_description parent) {
+			this.parent = parent;
 		}
-		public CharDescriptionRow() {
-			// TODO Auto-generated constructor stub
-		}*/
 		public void allocateDataField(String target_class, int data_length) {
 			if(this.data.containsKey(target_class)) {
 				//This item class has already been initalized with the target class
@@ -123,6 +126,11 @@ public class CharDescriptionRow {
 		public CharacteristicValue[] getData(String segment_id) {
 			return data.get(segment_id);
 		}
+		
+		
+		public HashMap<String, ArrayList<HashMap<String, CharRuleResult>>> getRulePropositions() {
+			return rulePropositions;
+		}
 		public HashMap<String, CharacteristicValue[]> getData() {
 			return data;
 		}
@@ -155,12 +163,106 @@ public class CharDescriptionRow {
 			}
 		}
 		
-		public void reEvalCharRules(String segment, int charIdx) {
+		public void disableSubTextRules(String segment, int charIdx) {
+			try {
+				ruleResults.get(segment)[charIdx].stream().forEach(r->{
+					
+					Optional<CharRuleResult> SuperRule = ruleResults.get(segment)[charIdx].stream()
+					.filter(rloop->rloop.isSuperBlockOf(r)).findAny();
+					if(SuperRule.isPresent()) {
+						System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
+						r.addSuperRule(SuperRule);
+					}
+					
+				});
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
+			}
+		}
+		public HashMap<String, CharRuleResult> returnUnfilledResults(String segment, int charIdx, int size) {
+			// Filter out subrules then return map of (value display) -> CharResult of unfilled results
+			HashMap<String, CharRuleResult> distinctUnfilledResult = new HashMap<String,CharRuleResult>();
+			HashSet<Integer> filledResultsMatched = new HashSet<Integer>();
+			try {
+				ruleResults.get(segment)[charIdx].stream()
+				.filter(r->!r.isSubRule()).filter(r->!itemHasDisplayValue(r,segment,charIdx,size,filledResultsMatched))
+				.forEach(r->distinctUnfilledResult.put(r.getActionValue().getDisplayValue(parent), r));;
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
+			}
+			return distinctUnfilledResult;
 			
 		}
+		private boolean itemHasDisplayValue(CharRuleResult r, String segment, int charIdx, int size, HashSet<Integer> filledResultsMatched) {
+			//filledResultsMatched tracks char idxes already matching a rule result
+			//For the input char result check if there's a filled value that matches it
+			//If it does, add the index to filledResultsMatched and return true
+			return IntStream.range(0, size).anyMatch(idx->{
+				try {
+					if(filledResultsMatched.contains(idx)) {
+						return false;
+					}
+					String loopVal = getData(segment)[idx].getDisplayValue(parent);
+					String ruleVal = r.getActionValue().getDisplayValue(parent);
+					boolean ret = StringUtils.equalsIgnoreCase(loopVal, ruleVal);
+					if(ret) {
+						System.out.println("known value "+ruleVal+" for rule "+r.getGenericCharRule().getRuleMarker()+" at index "+String.valueOf(idx+1));
+						filledResultsMatched.add(idx);
+					}
+					return ret;
+				}catch(Exception V) {
+					return false;
+				}
+			});
+		}
 		
-		
-		
-		
+		public void setCharProp(String segment, int charIdx, HashMap<String, CharRuleResult> distinctResultsLeft, int charIdSize) {
+			try {
+				this.rulePropositions.get(segment).set(charIdx,distinctResultsLeft);
+			}catch(Exception V) {
+				ArrayList<HashMap<String, CharRuleResult>> al = new ArrayList<HashMap<String, CharRuleResult>>(charIdSize);
+				// initializing 
+		        for (int i = 0; i < charIdSize; i++) { 
+		            al.add(new HashMap<String,CharRuleResult>()); 
+		        }
+		        
+				this.rulePropositions.put(segment, al);
+				this.rulePropositions.get(segment).set(charIdx,distinctResultsLeft);
+			}
+		}
+		public void reEvaluateRulesForChar(String segment, int charIdx, int charIdxSize) {
+			//If the value is MANUAL or UPLOAD, continue
+			if(DataInputMethods.MANUAL.equals(getData(segment)[charIdx].getSource())
+				||DataInputMethods.PROJECT_SETUP_UPLOAD.equals(getData(segment)[charIdx].getSource())) {
+				return;
+			}
+			
+			disableSubTextRules(segment,charIdx);
+			HashMap<String, CharRuleResult> distinctResultsLeft = returnUnfilledResults(segment,charIdx,charIdxSize);
+			System.out.println("**\tDistinct results :"+distinctResultsLeft.size());
+			if(distinctResultsLeft.size()>0) {
+				if(distinctResultsLeft.size()==1) {
+					try{
+						getRulePropositions().get(segment).get(charIdx).clear();
+					}catch(Exception V) {
+						
+					}
+					getData(segment)[charIdx] = distinctResultsLeft.values().stream().findFirst().get().getActionValue();
+					CharDescriptionExportServices.addCharDataToPush(this,segment,charIdx,charIdxSize);
+				}else {
+					setCharProp(segment,charIdx,distinctResultsLeft,charIdxSize);
+				}
+			}
+		}
+		public void reEvaluateCharRules(String segment, int charIdxSize) {
+			IntStream.range(0, charIdxSize).forEach(loopIdx->{
+				try{
+					reEvaluateRulesForChar(segment,loopIdx,charIdxSize);
+				}catch(Exception V) {
+					
+				}
+			});
+		}
+
 		
 }

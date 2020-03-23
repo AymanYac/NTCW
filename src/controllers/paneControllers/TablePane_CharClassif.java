@@ -40,6 +40,7 @@ import service.CharItemFetcher;
 import service.ClassCharacteristicsLoader;
 import service.TableViewExtra;
 import service.TranslationServices;
+import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
@@ -51,7 +52,7 @@ public class TablePane_CharClassif {
 	
 	
 	
-	private Char_description Parent;
+	public Char_description Parent;
 	protected String translated_sd;
 	protected String translated_ld;
 	private UserAccount account;
@@ -333,6 +334,7 @@ public class TablePane_CharClassif {
 									old_char.getCharacteristic_name_translated().toLowerCase().equals(new_char.getCharacteristic_name_translated().toLowerCase()
 							)) {
 								row.getData(row.getClass_segment().split("&&&")[0])[idx]=row.getData(itemPreviousClasses.get(row).split("&&&")[0])[idx2];
+								CharDescriptionExportServices.addCharDataToPush(row,row.getClass_segment().split("&&&")[0],idx,active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
 								break;
 							}
 						}
@@ -341,7 +343,7 @@ public class TablePane_CharClassif {
 					}
 				}
 			}
-			this.Parent.ROW_SYNC_POOL.add(row);
+			CharDescriptionExportServices.flushToDB(account);
 		}
 	}
 	private void jumpNext() {
@@ -658,7 +660,7 @@ public class TablePane_CharClassif {
             col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
                  public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                     try{
-                        return new ReadOnlyObjectWrapper(r.getValue().getData(Parent.classCombo.getSelectionModel().getSelectedItem().getClassSegment())[dataIndex].getDisplayValue(Parent,characteristic));
+                        return new ReadOnlyObjectWrapper(r.getValue().getData(Parent.classCombo.getSelectionModel().getSelectedItem().getClassSegment())[dataIndex].getDisplayValue(Parent));
                     }catch(Exception V) {
                         //Object has null data at daataIndex
                         return new ReadOnlyObjectWrapper("");

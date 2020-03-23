@@ -285,6 +285,8 @@
                                     <Label style="-fx-font-size: 14;" text="Class code (optional)" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                                     <TextField fx:id="CIDColumn" style="-fx-border-color: white; -fx-font-weight: normal; -fx-font-size: 10;" GridPane.columnIndex="2" GridPane.rowIndex="8" />
                                     <TextFlow fx:id="dataFileTextFlow" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Label style="-fx-font-size: 14;" text="Pre-classification label" GridPane.columnIndex="4" GridPane.rowIndex="8" />
+                                    <TextField fx:id="PCColumn" style="-fx-border-color: white; -fx-font-weight: normal; -fx-font-size: 10;" GridPane.columnIndex="5" GridPane.rowIndex="8" />
                                  </children>
                               </GridPane>
                            </children>

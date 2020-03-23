@@ -1,20 +1,23 @@
 package service;
 
 import java.util.HashMap;
-
 import controllers.Char_description;
 import javafx.scene.control.Button;
 import javafx.util.Pair;
+import model.CharDescriptionRow;
 import model.CharacteristicValue;
 import model.ClassCharacteristic;
 import model.UnitOfMeasure;
+import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.UoMDeclarationDialog;
 
 public class CharClassifProposer {
 
 	
 	private static Char_description parent;
-	private static int lastestActiveButtonIndex = -1;
+	private static int lastestActiveSAIndex = -1;
+	private static int lastestActiveCRIndex = -1;
+	
 	private static HashMap<Integer,Pair<CharacteristicValue,String>> buttonToData = new HashMap<Integer,Pair<CharacteristicValue,String>>();
 	
 	public CharClassifProposer(Char_description parent) {
@@ -23,7 +26,7 @@ public class CharClassifProposer {
 
 	public void clearPropButtons() {
 		buttonToData.clear();
-		lastestActiveButtonIndex=-1;
+		lastestActiveSAIndex=-1;
 		for(Button btn:parent.propButtons) {
 			btn.setOnAction((event) -> {
 				  
@@ -33,10 +36,10 @@ public class CharClassifProposer {
 		}
 	}
 
-	public void addProposition(String buttonText, CharacteristicValue preparedValue, String preparedRule,
+	public void addSemiAutoProposition(String buttonText, CharacteristicValue preparedValue, String preparedRule,
 			ClassCharacteristic active_char) {
 		
-		for(int i=0;i<=lastestActiveButtonIndex;i++) {
+		for(int i=0;i<=lastestActiveSAIndex;i++) {
 			Button loopBtn = parent.propButtons.get(i);
 			System.out.println("Checking for button "+loopBtn.getText());
 			if(loopBtn.getText().equals(buttonText)) {
@@ -52,9 +55,9 @@ public class CharClassifProposer {
 				}
 			}
 		}
-		lastestActiveButtonIndex = lastestActiveButtonIndex+1;
-		int currentLoopButtonIndex = Integer.valueOf(lastestActiveButtonIndex);
-		Button btn = parent.propButtons.get(lastestActiveButtonIndex);
+		lastestActiveSAIndex = lastestActiveSAIndex+1;
+		int currentLoopButtonIndex = Integer.valueOf(lastestActiveSAIndex);
+		Button btn = parent.propButtons.get(lastestActiveSAIndex);
 		btn.setText(buttonText);
 		btn.setOpacity(1.0);
 		btn.setOnAction((event) -> {
@@ -71,9 +74,9 @@ public class CharClassifProposer {
 			
 		});
 		
-		System.out.println("Putting in prop "+lastestActiveButtonIndex+" rule "+preparedRule);
+		System.out.println("Putting in prop "+lastestActiveSAIndex+" rule "+preparedRule);
 		Pair<CharacteristicValue,String> data = new Pair<CharacteristicValue,String>(preparedValue, preparedRule);
-		buttonToData.put(lastestActiveButtonIndex, data);
+		buttonToData.put(lastestActiveSAIndex, data);
 		
 		
 	}
@@ -97,6 +100,28 @@ public class CharClassifProposer {
 		System.out.println(buttonToData.get(currentLoopButtonIndex).getKey());
 		System.out.println(buttonToData.get(currentLoopButtonIndex).getValue());
 		return buttonToData.get(currentLoopButtonIndex).getValue();
+	}
+
+	public void loadCharRuleProps(CharDescriptionRow row, String segment, int char_idx, int charIdxSize) {
+		try {
+			lastestActiveCRIndex=0;
+			row.getRulePropositions().get(segment).get(char_idx).entrySet().stream().forEach(e->{
+				
+				Button btn = parent.propButtons.get(lastestActiveCRIndex);
+				btn.setText(e.getKey());
+				btn.setOpacity(1.0);
+				btn.setOnAction((event) -> {
+					CharDescriptionExportServices.addCharDataToPush(row, segment, char_idx,charIdxSize);
+					CharValuesLoader.updateRuntimeDataForItem(row,segment,char_idx,e.getValue().getActionValue());
+					clearPropButtons();
+					row.getRulePropositions().get(segment).get(char_idx).clear();
+				});
+				lastestActiveCRIndex+=1;
+			});	
+		}catch(Exception V) {
+			
+		}
+		
 	}
 
 

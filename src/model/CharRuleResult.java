@@ -5,10 +5,13 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.fathzer.soft.javaluator.DoubleEvaluator;
 
 import controllers.Char_description;
 import service.TranslationServices;
+import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
 public class CharRuleResult {
@@ -17,11 +20,15 @@ public class CharRuleResult {
 	private String matchedText;
 	private String matchedBlock;
 	private CharacteristicValue actionValue;
+	private ArrayList<CharRuleResult> superRules= new ArrayList<CharRuleResult>();
+	private ClassCharacteristic parentChar;
+	private static Unidecode unidecode;
 
-	public CharRuleResult(GenericCharRule matchedRule, String matchedText, String matchedGroup) {
+	public CharRuleResult(GenericCharRule matchedRule, String matchedText, String matchedGroup, ClassCharacteristic parentChar) {
 		this.genericCharRule = matchedRule;
 		this.matchedText = matchedText;
 		this.matchedBlock = matchedGroup;
+		this.parentChar = parentChar;
 	}
 
 	public GenericCharRule getGenericCharRule() {
@@ -47,9 +54,15 @@ public class CharRuleResult {
 	public void setMatchedBlock(String matchedBlock) {
 		this.matchedBlock = matchedBlock;
 	}
+	
+
+	public CharacteristicValue getActionValue() {
+		return actionValue;
+	}
 
 	public void ruleActionToValue(Char_description parent) {
 		actionValue = new CharacteristicValue();
+		actionValue.setParentChar(parentChar);
 		for(String action:genericCharRule.getRuleActions()) {
 			if(action.startsWith("DL ")) {
 				action=action.substring(3).trim();
@@ -179,6 +192,21 @@ public class CharRuleResult {
 			}
 			
 		}
+	}
+
+	public boolean isSuperBlockOf(CharRuleResult r) {
+		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
+		String thisBlock = unidecode.decodeAndTrim(getMatchedBlock());
+		String targetBlock = unidecode.decodeAndTrim(r.getMatchedBlock());
+		return thisBlock.length()>targetBlock.length() && StringUtils.containsIgnoreCase(thisBlock, targetBlock);
+	}
+
+	public void addSuperRule(Optional<CharRuleResult> superRule) {
+		superRules.add(superRule.get());
+	}
+
+	public boolean isSubRule() {
+		return this.superRules.size()>0;
 	}
 	
 	

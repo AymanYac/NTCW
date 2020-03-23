@@ -41,6 +41,7 @@ public class CharItemFetcher {
 				//String loop_class_id = tablePane_CharClassif.classifiedItems.get(rs.getString("item_id")).split("&&&")[4];
 				//CharDescriptionRow tmp = new CharDescriptionRow(loop_class_id,tablePane_CharClassif.active_characteristics.get(loop_class_id).size());
 				CharDescriptionRow tmp = new CharDescriptionRow();
+				tmp.setParent(tablePane_CharClassif.Parent);
 				tmp.setItem_id(rs.getString("item_id"));
 				i+=1;
 				indexedRowItems.put(tmp.getItem_id(), i);

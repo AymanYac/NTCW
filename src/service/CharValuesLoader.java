@@ -135,9 +135,9 @@ public class CharValuesLoader {
 
 
 
-	public static void fillData(String classSegment, int active_char_index, CharacteristicValue value, CharDescriptionRow i) {
-		if(i.getClass_segment().contains(classSegment)) {
-			i.getData(classSegment)[active_char_index]=value;
+	public static void updateRuntimeDataForItem(CharDescriptionRow r, String classSegment, int active_char_index, CharacteristicValue value) {
+		if(r.getClass_segment().contains(classSegment)) {
+			r.getData(classSegment)[active_char_index]=value;
 		}
 	}
 
@@ -150,6 +150,7 @@ public class CharValuesLoader {
 		ClassCharacteristic active_char = chars.get(parent.tableController.selected_col%chars.size());
 		
 		CharacteristicValue tmp = new CharacteristicValue();
+		tmp.setParentChar(active_char);
 		if(active_char.getIsNumeric()) {
 			tmp.setNominal_value(parent.value_field.getText());
 			if(active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0) {
@@ -180,7 +181,7 @@ public class CharValuesLoader {
 		tmp.setSource(DataInputMethods.MANUAL);
 		tmp.setAuthor(parent.account.getUser_id());
 		tmp.ManualValueReviewed=true;
-		parent.persistValueOnSelectedItem(tmp);
+		parent.AssignValueOnSelectedItems(tmp);
 		
 	}
 }

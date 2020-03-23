@@ -132,6 +132,7 @@ public class Project_parameters {
 	@FXML Label dataFileLabel;
 	@FXML TextField aidColumn;
 	@FXML TextField MGColumn;
+	@FXML TextField PCColumn;
 	@FXML TextField SDDColumn;
 	@FXML TextField SDCColumn;
 	@FXML TextField LDDColumn;
@@ -210,7 +211,7 @@ public class Project_parameters {
 			Statement stmt = connX.createStatement();
 			//#
 			//Set the TAXOS variable with the appropriate available classification systems
-			ResultSet rs = stmt.executeQuery("select distinct classification_system_name, classification_system_id from administration.projects where project_name is not null and classification_system_id is not null");
+			ResultSet rs = stmt.executeQuery("select distinct classification_system_name, classification_system_id from administration.projects where project_name is not null and classification_system_id is not null and (suppression_status is null or not suppression_status)");
 			while(rs.next()) {
 				try{
 					if(rs.getString("classification_system_name")!=null && rs.getString("classification_system_name").length()>0) {
@@ -2479,6 +2480,7 @@ public class Project_parameters {
 		DataColumnMap.put(SDDColumn.getText().toUpperCase(), "short_description");
 		DataColumnMap.put(LDDColumn.getText().toUpperCase(), "long_description");
 		DataColumnMap.put(MGColumn.getText().toUpperCase(), "material_group");
+		DataColumnMap.put(PCColumn.getText().toUpperCase(), "pre_classification");
 		DataColumnMap.put(SDCColumn.getText().toUpperCase(), "short_description_translated");
 		DataColumnMap.put(LDCColumn.getText().toUpperCase(), "long_description_translated");
 		

@@ -265,19 +265,19 @@ public class AutoCompleteBox_CharClassification extends TextField
 	}
 	
 	if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_1))) {
-		parent_controller.fireProposition(1);
+		parent_controller.firePropositionButton(1);
 	}
 	if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_2))) {
-		parent_controller.fireProposition(2);
+		parent_controller.firePropositionButton(2);
 	}
 	if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_3))) {
-		parent_controller.fireProposition(3);
+		parent_controller.firePropositionButton(3);
 	}
 	if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_4))) {
-		parent_controller.fireProposition(4);
+		parent_controller.firePropositionButton(4);
 	}
 	if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_5))) {
-		parent_controller.fireProposition(5);
+		parent_controller.firePropositionButton(5);
 	}
 	
 	
