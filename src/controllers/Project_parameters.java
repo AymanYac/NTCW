@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -33,9 +34,14 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -49,7 +55,9 @@ import javafx.stage.Stage;
 import model.GlobalConstants;
 import model.Project;
 import model.ProjectTemplate;
+import model.RuleSet;
 import model.UserAccount;
+import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.data_exchange_toolbox.SpreadsheetUpload;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.ExceptionDialog;
@@ -85,6 +93,29 @@ public class Project_parameters {
 	@FXML TitledPane CLASSIF;
 	@FXML TitledPane DATA;
 	@FXML TitledPane SPECIAL;
+	@FXML private TableView<RuleSet> rules_table;
+	@FXML
+	//Binds to the screen's classification table project column
+	private TableColumn<?, ?> Classification_projectColumn;
+	@FXML
+	//Binds to the screen's classification table language column
+	private TableColumn<?, ?> Classification_languageColumn;
+	@FXML
+	//Binds to the screen's classification taxonomy column
+	private TableColumn<?, ?> Classification_ruleCardColumn;
+	@FXML
+	//Binds to the screen's classification cardinality column
+	private TableColumn<?, ?> Classification_cardColumn;
+	@FXML
+	//Binds to the screen's classficiation check box column
+	private TableColumn<?, ?> Classification_checkboxColumn;
+	@FXML private ProgressIndicator ruleLoadingIndicator;
+	@FXML private ProgressIndicator itemLoadingIndicator;
+	@FXML private Label ruleApplyLabel;
+	@FXML private Button ruleApplyButton;
+	@FXML private ProgressBar ruleApplyProgress;
+	
+	@FXML TitledPane RULES;
 	@FXML TitledPane USERS;
 	
 	
@@ -179,6 +210,8 @@ public class Project_parameters {
 	private boolean general_applied;
 
 	private boolean classif_applied;
+
+	private Thread RuleRefreshthread;
 	
 	//This function is ran when the controller of this screen is created in the project selection screen, it sets up the necessary content and conrol variables
 	public Project_parameters() {
@@ -862,6 +895,16 @@ public class Project_parameters {
 			        	}
 			        }});
 				
+				RULES.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
+			        if (isNowExpanded) {
+			        	if(classif_applied) {
+			        		
+			        	}else {
+			        		CLASSIF.setExpanded(true);
+			        	}
+			        }});
+				
+				
 				SPECIAL.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
 			        if (isNowExpanded) {
 			        	if(general_applied) {
@@ -1220,9 +1263,10 @@ public class Project_parameters {
 							}
 						}
 						REUSING_OLD_TAXO=true;
-		    			
+		    			refreshRuleSet(REUSING_OLD_TAXO);
 		    		}else {
 		    			REUSING_OLD_TAXO=false;
+		    			refreshRuleSet(REUSING_OLD_TAXO);
 		    			if(newValue.length()>0) {
 		    				taxoFile.setVisible(true);
 			    			taxoFileLabel.setVisible(true);
@@ -1281,10 +1325,12 @@ public class Project_parameters {
 						}
 					}
 					REUSING_OLD_TAXO=true;
+					refreshRuleSet(REUSING_OLD_TAXO);
 				//		Else, call the (sync_classification_level_definition)
 				}else {
 					sync_classification_level_definition(classificationLevels.getValue());
 					REUSING_OLD_TAXO=false;
+					refreshRuleSet(REUSING_OLD_TAXO);
 				}
 				
 				prj.setTaxoName(taxoName.getValue().toUpperCase());
@@ -1346,6 +1392,113 @@ public class Project_parameters {
 	
 	
 	
+	@SuppressWarnings("deprecation")
+	protected void refreshRuleSet(boolean knownTaxoChosen) {
+		System.out.println("Refreshing rule set "+String.valueOf(knownTaxoChosen));
+		//Set column 1 to point to the project_name field in the RULES data structure
+		Classification_projectColumn.setCellValueFactory(new PropertyValueFactory<>("project_name"));
+		//Set column 2 to point to the language field in the RULES data structure
+		Classification_languageColumn.setCellValueFactory(new PropertyValueFactory<>("language"));
+		//Set column 3 to point to the classification_system field in the RULES data structure
+		Classification_ruleCardColumn.setCellValueFactory(new PropertyValueFactory<>("no_rules"));
+		//Set column 4 to point to the no_items field in the RULES data structure
+		Classification_cardColumn.setCellValueFactory(new PropertyValueFactory<>("no_items"));
+		//Set column 5 to point to the referent_data field in the RULES data structure
+		Classification_checkboxColumn.setCellValueFactory(new PropertyValueFactory<>("referentData"));
+		try {
+			RuleRefreshthread.stop();
+		}catch(Exception V) {
+			
+		}
+		if(knownTaxoChosen) {
+			
+			Task<Void> executeAppTask = new Task<Void>() {
+			    @Override
+			    protected Void call() throws Exception {
+
+					Connection conn;
+					conn = Tools.spawn_connection();
+					Statement ps = conn.createStatement();
+					ResultSet rs = ps.executeQuery("select * from administration.projects where classification_system_name = '"+taxoName.getValue()+"' and (not suppression_status or suppression_status is null) and project_id is not null and project_id !='"+account.getActive_project()+"'");
+					System.out.println("select * from administration.projects where classification_system_name = '"+taxoName.getValue()+"' and (not suppression_status or suppression_status is null) and project_id is not null and project_id !='"+account.getActive_project()+"'");
+					Connection conn2 = Tools.spawn_connection();
+					Statement ps2 = conn2.createStatement();
+					//For every known projects
+					while(rs.next()) {
+						//	Create a RuleSet data structure
+						RuleSet tmp = new RuleSet();
+						if(!(rs.getString("classification_system_name")!=null)) {
+							continue;
+						}
+						//	Set the project's id
+						//	Set the project's name
+						//	Set the project's language id
+						//	Set the project's language
+						//	Set the project's classification system id
+						//	Set the project's classification system name
+						//	Set the project's cardinality
+						//	Set the project's granularity
+						//	Set the project's combo box
+						
+						String SUMquery = "select sum(count) from ("
+								+QueryFormater.FetchClassifProgresionByDateByUser(rs.getString("project_id"))
+								+") progress";
+						int sum = 0;
+						ResultSet rs2 = ps2.executeQuery(SUMquery);
+						//ResultSet rs2 = ps2.executeQuery("select count(*) from (select item_id , level_4_number,level_1_name_translated,level_2_name_translated,level_3_name_translated,level_4_name_translated from  ( select item_id, segment_id from ( select item_id, segment_id, local_rn, max(local_rn) over (partition by  item_id) as max_rn from ( select item_id, segment_id, row_number() over (partition by item_id order by global_rn asc ) as local_rn from  ( SELECT  item_id,segment_id, row_number() over ( order by (select 0) ) as global_rn  FROM "+rs.getString("project_id")+".project_classification_event where item_id in (select distinct item_id from "+rs.getString("project_id")+".project_items) ) as global_rank ) as ranked_events ) as maxed_events where local_rn = max_rn ) as latest_events left join  "+rs.getString("project_id")+".project_segments on project_segments.segment_id = latest_events.segment_id ) as rich_events left join "+rs.getString("project_id")+".project_items on rich_events.item_id = project_items.item_id");
+						
+						while(rs2.next()) {
+							sum+=rs2.getInt(1);
+						};
+						tmp.setProject_id(rs.getString("project_id"));
+						tmp.setProject_name(rs.getString("project_name"));
+						tmp.setLanguage_id(rs.getString("data_language"));
+						tmp.setLanguage(LANGUAGES.entrySet().stream().filter(e->e.getValue().equals(tmp.getLanguage_id())).findAny().get().getKey());
+						tmp.setTaxoid(rs.getString("classification_system_name"));
+						tmp.setClassifcation_system(tmp.getTaxoid());
+						
+						
+						tmp.setNo_items(Tools.formatThounsands(sum));
+						
+						rs2 = ps2.executeQuery("SELECT COUNT(DISTINCT rule_id) FROM "+rs.getString("project_id")+".project_rules where active_status");
+						rs2.next();
+						if(rs2.getInt(1)==0) {
+							//The reference project has no classified items
+							rs2.close();
+							continue;
+						}
+						tmp.setNo_rules(Tools.formatThounsands(rs2.getInt(1)));
+						tmp.setGranularity(rs.getInt("number_of_levels"));
+						CheckBox cb = new CheckBox();
+						//	If the project uses the same classification system (it can be used for classification)
+						
+						//Add the project to the known reference projects
+						tmp.setReferentData(cb);
+						rules_table.getItems().add(tmp);
+						//Close the connection
+						rs2.close();
+					};
+					
+					rs.close();
+					ps.close();
+					ps2.close();
+					conn.close();
+					conn2.close();
+					
+					return null;
+			    }
+			};
+			
+			
+			RuleRefreshthread = new Thread(executeAppTask);; RuleRefreshthread.setDaemon(true);
+			RuleRefreshthread.setName("Refreshing rule set from chosen taxo");
+			RuleRefreshthread.start();
+			
+			
+		}else {
+			rules_table.getItems().clear();
+		}
+	}
 	//Adds to a specific button a listener that keeps it disabled until all its dependency text fields are filled
 	private void ADD_FILL_LISTENER(Button target,boolean isTaxo) {
 		//Initialize the button to disabled at first
@@ -1600,6 +1753,7 @@ public class Project_parameters {
 		GENERAL.setAnimated(true);
 		CLASSIF.setAnimated(true);
 		DATA.setAnimated(true);
+		RULES.setAnimated(true);
 		SPECIAL.setAnimated(true);
 		USERS.setAnimated(true);
 	}
@@ -1674,7 +1828,7 @@ public class Project_parameters {
 							pfl.getItems().addAll(ROLES);
 							pfl.setValue(this.prj.getLOGINS().get(text).get(1));
 							pfl.setStyle(box_template);
-							pfl.getStylesheets().add(getClass().getResource("/Styles/ComboBoxRed.css").toExternalForm());
+							pfl.getStylesheets().add(getClass().getResource("/Styles/ComboBoxGrey.css").toExternalForm());
 							pfl.setMaxHeight(28);
 							pfl.setMinHeight(28);
 							pfl.setPrefHeight(28);
@@ -1692,7 +1846,7 @@ public class Project_parameters {
 									tmp.set(1, pfl.getValue());
 									prj.getLOGINS().put(CREDENTIALS.get((login_pane.getRowIndex(lgn)-0)+","+login_pane.getColumnIndex(lgn)),tmp);
 									pfl.setStyle(box_template);
-									pfl.getStylesheets().add(getClass().getResource("/Styles/ComboBoxRed.css").toExternalForm());
+									pfl.getStylesheets().add(getClass().getResource("/Styles/ComboBoxGrey.css").toExternalForm());
 									try {
 										update_users_and_specials();
 									} catch (ClassNotFoundException | SQLException e) {
@@ -1717,7 +1871,7 @@ public class Project_parameters {
 								
 							});
 							btn.setStyle(delete_template);
-							btn.getStylesheets().add(getClass().getResource("/Styles/ButtonRed.css").toExternalForm());
+							btn.getStylesheets().add(getClass().getResource("/Styles/ButtonGrey.css").toExternalForm());
 							btn.setMaxHeight(28);
 							btn.setMinHeight(28);
 							btn.setPrefWidth(28);
@@ -2000,7 +2154,7 @@ public class Project_parameters {
 							}
 							
 		//                  Set the button's style to the corresponding css class					
-							btn.getStylesheets().add(getClass().getResource("/Styles/CloseButtonOrange.css").toExternalForm());
+							btn.getStylesheets().add(getClass().getResource("/Styles/CloseButtonRed.css").toExternalForm());
 							btn.setMaxHeight(20);
 							btn.setMaxWidth(20);
 		//                  Add the button to the special pane at the corresponding row and to the corresponding column +3
@@ -2442,6 +2596,7 @@ public class Project_parameters {
                     //  Set the taxonomy file location text field to uneditable
                     taxoFile.setEditable(false);
                     REUSING_OLD_TAXO=false;
+                    refreshRuleSet(REUSING_OLD_TAXO);
                     //  Set the TAXO_FILE_MISSING variable to false
                     TAXO_FILE_MISSING=false;
                     //  Call the CHECK_FILL procedure

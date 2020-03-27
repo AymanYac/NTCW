@@ -12,6 +12,7 @@ public class RuleSet {
 	String language;
 	String Classifcation_system;
 	String no_items;
+	String no_rules;
 	CheckBox referentData;
 	Integer granularity;
 	
@@ -94,6 +95,14 @@ public class RuleSet {
 	}
 	public void setLanguage_id(String language_id) {
 		this.language_id = language_id;
+	}
+
+	public String getNo_rules() {
+		return no_rules;
+	}
+
+	public void setNo_rules(String no_rules) {
+		this.no_rules = no_rules;
 	}
 	
 	
