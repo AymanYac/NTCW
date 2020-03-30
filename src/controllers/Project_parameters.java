@@ -1182,7 +1182,7 @@ public class Project_parameters {
 						
 						double ruleNumber = newImportedRules.parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()).size();
 						
-						ManualRuleServices.StreamRulesOnItemFetcherRows(ruleNumber, newImportedRules,
+						ManualRuleServices.StreamRulesOnItemFetcherRows(ruleNumber, newImportedRules.parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()),
 								ftc.currentList_STATIC.parallelStream()
 								.filter(row -> reevaluateClassifiedItems || !(((ItemFetcherRow) row).getDisplay_segment_id()!=null) ).collect(Collectors.toList())
 								,ruleApplyProgress,
@@ -1645,7 +1645,7 @@ public class Project_parameters {
 						
 						double ruleNumber = newImportedRules.parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()).size();
 						
-						ManualRuleServices.StreamRulesOnItemFetcherRows(ruleNumber, newImportedRules,
+						ManualRuleServices.StreamRulesOnItemFetcherRows(ruleNumber, newImportedRules.parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()),
 								ftc.currentList_STATIC.parallelStream()
 								.filter(row -> reevaluateClassifiedItems || !(((ItemFetcherRow) row).getDisplay_segment_id()!=null) ).collect(Collectors.toList())
 								,ruleApplyProgress,

@@ -130,46 +130,52 @@ public class ManualRuleServices {
 			i+=1;
 			if(i%100==0) {
 				Tools.setRuleStreamProgress(Math.floor(100 * i/ruleNumber),progressUIElement,progressSyntax);
+				System.out.println(":::::::: "+String.valueOf(Math.floor(100 * i/ruleNumber))+" ::::::::");
 				
 			}
-			Pattern p_tmp = null;
-			HashMap<ItemFetcherRow, GenericClassRule> itemsToUpdate= new HashMap<ItemFetcherRow,GenericClassRule>();
-			ArrayList<ItemFetcherRow> itemsToBlank= new ArrayList<ItemFetcherRow>();
-			ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
-			
-			if(gr.getComp()!=null) {
-				p_tmp = Pattern.compile(".* "+gr.getComp()+" .*");
-			}
-			final Pattern p = p_tmp;
-			gr.matched=false;
-			
-			itemStream.parallelStream().forEach(row->{
-				if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
-					String[] itemRule = new String [] {null,null};
-					itemRule[0]= ((ItemFetcherRow) row).getItem_id();
-					itemRule[1]= gr.toString();
-					itemRuleMap.add(itemRule);
-					
-					GenericClassRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
-					if(finalRule!=null) {
-						itemsToUpdate.put(((ItemFetcherRow) row), finalRule);
-					}else {
-						itemsToBlank.add(((ItemFetcherRow) row));
-					}
-					
+			try {
+				Pattern p_tmp = null;
+				HashMap<ItemFetcherRow, GenericClassRule> itemsToUpdate= new HashMap<ItemFetcherRow,GenericClassRule>();
+				ArrayList<ItemFetcherRow> itemsToBlank= new ArrayList<ItemFetcherRow>();
+				ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
+				
+				if(gr.getComp()!=null) {
+					p_tmp = Pattern.compile(".* "+gr.getComp()+" .*");
 				}
-			});
+				final Pattern p = p_tmp;
+				gr.matched=false;
+				
+				itemStream.parallelStream().forEach(row->{
+					if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
+						String[] itemRule = new String [] {null,null};
+						itemRule[0]= ((ItemFetcherRow) row).getItem_id();
+						itemRule[1]= gr.toString();
+						itemRuleMap.add(itemRule);
+						
+						GenericClassRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
+						if(finalRule!=null) {
+							itemsToUpdate.put(((ItemFetcherRow) row), finalRule);
+						}else {
+							itemsToBlank.add(((ItemFetcherRow) row));
+						}
+						
+					}
+				});
+				
+				gr.matched=true;
+				
+				List<ItemFetcherRow> databaseSyncList = fireRuleClassChange(itemsToUpdate,account);
+				databaseSyncList.addAll( fireRuleClassBlank(itemsToBlank) );
+				
+				databaseSyncLists.addAll(databaseSyncList);
+				grs.add(gr);
+				itemRuleMaps.add(itemRuleMap);
+				activeStatuses.add(true);
+				METHODS.add(DataInputMethods.USER_CLASSIFICATION_RULE);	
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
+			}
 			
-			gr.matched=true;
-			
-			List<ItemFetcherRow> databaseSyncList = fireRuleClassChange(itemsToUpdate,account);
-			databaseSyncList.addAll( fireRuleClassBlank(itemsToBlank) );
-			
-			databaseSyncLists.addAll(databaseSyncList);
-			grs.add(gr);
-			itemRuleMaps.add(itemRuleMap);
-			activeStatuses.add(true);
-			METHODS.add(DataInputMethods.USER_CLASSIFICATION_RULE);
 		});
 	}
 
@@ -605,7 +611,7 @@ public class ManualRuleServices {
 				((ItemFetcherRow)row).setRule_description_Rules(null);
 				((ItemFetcherRow)row).setSource_Rules(null);
 			}catch(Exception V) {
-				V.printStackTrace(System.err);
+				
 			}
 			
 		});
