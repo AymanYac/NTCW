@@ -22,7 +22,8 @@ public class GenericClassRule {
 	   public static HashMap<String,Integer> typeScoreSchema;
 	   public Boolean active;
 	   public Boolean matched=false;
-
+	   String source_project_id;
+	   
 	public GenericClassRule() {
 		classif.add(null);
 		classif.add(null);
@@ -244,6 +245,17 @@ public class GenericClassRule {
 	}
 	public void setPc(String pc) {
 		this.pc = pc;
+	}
+
+	
+
+	public String getSource_project_id() {
+		return source_project_id;
+	}
+
+
+	public void setSource_project_id(String source_project_id) {
+		this.source_project_id = source_project_id;
 	}
 
 

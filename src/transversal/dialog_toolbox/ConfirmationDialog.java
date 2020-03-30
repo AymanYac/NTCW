@@ -1,5 +1,7 @@
 package transversal.dialog_toolbox;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import controllers.Auto_classification_progress;
@@ -11,6 +13,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseEvent;
+import model.GenericClassRule;
+import model.ItemFetcherRow;
+import model.UserAccount;
+import transversal.generic.Tools;
 public class ConfirmationDialog {
 	
 	public static void show(String title,String header,String yes,String no, Project_parameters parent, boolean confirmed) {
@@ -207,6 +213,35 @@ public class ConfirmationDialog {
 		alert.showAndWait();
 		
 	}
+	
+	
+	public static void showRuleImportConfirmation(String title,String header,String yes,String no, Project_parameters parent, UserAccount account, ArrayList<GenericClassRule> grs, ArrayList<ArrayList<String[]>> itemRuleMaps, ArrayList<Boolean> activeStatuses, ArrayList<String> METHODS, List<ItemFetcherRow> databaseSyncLists, String datainputmethod) {
+		
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		
+		ButtonType yesButton = new ButtonType(yes);
+        ButtonType noButton = new ButtonType(no);
+ 
+		
+        alert.getButtonTypes().setAll(yesButton, noButton);
+	
+		Optional<ButtonType> option = alert.showAndWait();
+		 if (option.get() == null) {
+	         //this.label.setText("No selection!");
+	      } else if (option.get() == yesButton) {
+	    	  Tools.StoreRules(account, grs, itemRuleMaps, activeStatuses, METHODS);
+			  Tools.ItemFetcherRow2ClassEvent(databaseSyncLists,account,datainputmethod);	
+	         //this.label.setText("File deleted!");
+	      } else if (option.get() == noButton) {
+	    	  ;
+	         //this.label.setText("Cancelled!");
+	      } else {
+	    	  ;
+	         //this.label.setText("-");
+	      }
+	   }
 
 	
 		

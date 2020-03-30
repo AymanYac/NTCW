@@ -34,7 +34,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Screen;
 import model.GlobalConstants;
 import model.DataInputMethods;
-import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.ManualClassProposition;
 import model.ObservableDeque;
@@ -674,67 +673,9 @@ public class TablePane_ManualClassif {
 		Parent.propose(proposer.propositions,null,null,null,null);
 	}
 	
-	public List<ItemFetcherRow> fireRuleClassBlank(ArrayList<ItemFetcherRow> itemsToBlank) {
-		
-		itemsToBlank.stream().forEach(row->{
-			((ItemFetcherRow)row).setReviewer_Rules(null);
-			//((ItemFetcherRow)row).setNew_segment_id(null);
-			//((ItemFetcherRow)row).setNew_segment_name(null);
-			((ItemFetcherRow)row).setRule_Segment_id(null);
-			((ItemFetcherRow)row).setRule_Segment_name(null);
-			((ItemFetcherRow)row).setRule_Segment_number(null);
-			((ItemFetcherRow)row).setRule_description_Rules(null);
-			((ItemFetcherRow)row).setSource_Rules(null);
-		});
-		
-		return itemsToBlank;
-		
-	}
 	
-	public List<ItemFetcherRow> fireRuleClassChange(HashMap<ItemFetcherRow, GenericClassRule> itemsToUpdate) {
-		
-		itemsToUpdate.entrySet().stream().forEach( e ->{
-			GenericClassRule gr = e.getValue();
-			ItemFetcherRow row = e.getKey();
-			
-			((ItemFetcherRow)row).setReviewer_Rules(account.getUser_name());
-			try{
-				((ItemFetcherRow)row).setRule_Segment_id(gr.classif.get(0));
-				((ItemFetcherRow)row).setRule_Segment_name(gr.classif.get(2));
-				if(UUID2CID!=null) {
-					
-				}else {
-					UUID2CID = Tools.UUID2CID(account.getActive_project());
-					System.out.println(UUID2CID);
-					System.out.println(gr.classif.get(0));
-					System.out.println(gr.classif.get(1));
-					System.out.println(gr.classif.get(2));
-					System.out.println(UUID2CID.get(gr.classif.get(0)));
-					
-				}
-				((ItemFetcherRow)row).setRule_Segment_number(UUID2CID.get(gr.classif.get(0)));
-				((ItemFetcherRow)row).setRule_description_Rules(gr.toString());
-				((ItemFetcherRow)row).setRule_id_Rules((gr.toString()));
-			}catch(Exception V) {
-				V.printStackTrace(System.err);
-				//((ItemFetcherRow)row).setNew_segment_id(null);
-				//((ItemFetcherRow)row).setNew_segment_name(null);
-				((ItemFetcherRow)row).setRule_Segment_id(null);
-				((ItemFetcherRow)row).setRule_Segment_name(null);
-				((ItemFetcherRow)row).setRule_Segment_number(null);
-				((ItemFetcherRow)row).setRule_description_Rules(null);
-				((ItemFetcherRow)row).setRule_id_Rules(null);
-				
-			}
-			((ItemFetcherRow)row).setSource_Rules(DataInputMethods.USER_CLASSIFICATION_RULE);
-			
-			
-			
-		});
-		
-		return new ArrayList<ItemFetcherRow>(itemsToUpdate.keySet());
-		
-	}
+	
+	
 	
 	public void fireManualClassChange(String result,boolean jumpNext) {
 		

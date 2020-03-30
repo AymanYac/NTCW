@@ -49,6 +49,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
@@ -938,7 +939,7 @@ public class Tools {
 				final PreparedStatement ps = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_rules(" + 
 						"            rule_id, main, application, complement, material_group," + 
 						"            pre_classification, drawing, class_id, rule_source, rule_type," + 
-						"            user_id, rule_date, active_status)" + 
+						"            user_id, rule_date, active_status,source_project_id)" + 
 						"    VALUES (?, ?, ?, ?, ?," + 
 						"            ?, ?, ?, ?, ?," + 
 						"            ?, clock_timestamp() ,?) on conflict(rule_id) do update set active_status = EXCLUDED.active_status, class_id = EXCLUDED.class_id;");
@@ -969,6 +970,7 @@ public class Tools {
 					ps.setString(11, account.getUser_id());
 					//ps.setDate(12, x);
 					ps.setBoolean(12, active);
+					ps.setString(13, account.getActive_project());
 					ps.addBatch();
 					
 					
@@ -1043,7 +1045,7 @@ public class Tools {
 				PreparedStatement ps = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_rules(" + 
 						"            rule_id, main, application, complement, material_group," + 
 						"            pre_classification, drawing, class_id, rule_source, rule_type," + 
-						"            user_id, rule_date, active_status)" + 
+						"            user_id, rule_date, active_status,source_project_id)" + 
 						"    VALUES (?, ?, ?, ?, ?," + 
 						"            ?, ?, ?, ?, ?," + 
 						"            ?, clock_timestamp() ,?) on conflict(rule_id) do update set active_status = EXCLUDED.active_status, class_id = EXCLUDED.class_id;");
@@ -1062,6 +1064,7 @@ public class Tools {
 				ps.setString(11, account.getUser_id());
 				//ps.setDate(12, x);
 				ps.setBoolean(12, active);
+				ps.setString(13, gr.getSource_project_id());
 				ps.execute();
 				ps.close();
 				
@@ -1132,7 +1135,7 @@ public class Tools {
 				PreparedStatement ps = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_rules(" + 
 						"            rule_id, main, application, complement, material_group," + 
 						"            pre_classification, drawing, class_id, rule_source, rule_type," + 
-						"            user_id, rule_date, active_status)" + 
+						"            user_id, rule_date, active_status,source_project_id)" + 
 						"    VALUES (?, ?, ?, ?, ?," + 
 						"            ?, ?, ?, ?, ?," + 
 						"            ?, clock_timestamp() ,?) on conflict(rule_id) do "
@@ -1154,6 +1157,7 @@ public class Tools {
 					ps.setString(11, account.getUser_id());
 					//ps.setDate(12, x);
 					ps.setBoolean(12, ISCLASSIF);
+					ps.setString(13, account.getActive_project());
 					ps.addBatch();
 				}
 					ps.executeBatch();
@@ -1399,5 +1403,17 @@ public class Tools {
 	    } else {
 	        Collections.rotate(list.subList(targetIndex, sourceIndex + 1), 1);
 	    }
+	}
+
+
+
+	public static void setRuleStreamProgress(double progress, Object progressUIElement, String progressSyntax) {
+		if(progressUIElement instanceof MenuItem) {
+			((MenuItem) progressUIElement).setText(progressSyntax.replace("XX", String.valueOf(progress)));
+			return;
+		}
+		if(progressUIElement instanceof ProgressBar) {
+			((ProgressBar) progressUIElement).setProgress(progress*0.01);
+		}
 	}
 }

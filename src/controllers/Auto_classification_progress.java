@@ -1803,9 +1803,9 @@ public class Auto_classification_progress {
 		    	Statement st = conn.createStatement();
 		    	
 		    	ResultSet rs = st.executeQuery("select rule_id, main, application, complement, material_group," + 
-						"pre_classification, drawing, class_id, active_status from "+pid+".project_rules");
+						"pre_classification, drawing, class_id, active_status, source_project_id from "+pid+".project_rules");
 				System.out.println("select rule_id, main, application, complement, material_group," + 
-						"pre_classification, drawing, class_id, active_status from "+pid+".project_rules");
+						"pre_classification, drawing, class_id, active_status, source_project_id from "+pid+".project_rules");
 				while(rs.next()) {
 					GenericClassRule gr = new GenericClassRule();
 					gr.setMain(rs.getString("main"));
@@ -1816,6 +1816,7 @@ public class Auto_classification_progress {
 					gr.setDwg(rs.getBoolean("drawing"));
 					gr.classif=new ArrayList<> ( Arrays.asList( rs.getString("class_id").split("&&&") ) );
 					gr.active=rs.getBoolean("active_status");
+					gr.setSource_project_id(rs.getString("source_project_id"));
 					staticRules.put(gr.toString(), gr);
 				}
 				rs.close();

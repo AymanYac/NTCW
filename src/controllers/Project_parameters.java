@@ -15,12 +15,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -52,11 +55,16 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import model.DataInputMethods;
+import model.GenericClassRule;
 import model.GlobalConstants;
+import model.ItemFetcherRow;
 import model.Project;
 import model.ProjectTemplate;
 import model.RuleSet;
 import model.UserAccount;
+import service.ItemFetcher;
+import service.ManualRuleServices;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.data_exchange_toolbox.SpreadsheetUpload;
 import transversal.dialog_toolbox.ConfirmationDialog;
@@ -110,7 +118,7 @@ public class Project_parameters {
 	//Binds to the screen's classficiation check box column
 	private TableColumn<?, ?> Classification_checkboxColumn;
 	@FXML private ProgressIndicator ruleLoadingIndicator;
-	@FXML private ProgressIndicator itemLoadingIndicator;
+	@FXML private ProgressIndicator ruleApplyIndicator;
 	@FXML private Label ruleApplyLabel;
 	@FXML private Button ruleApplyButton;
 	@FXML private ProgressBar ruleApplyProgress;
@@ -1142,13 +1150,87 @@ public class Project_parameters {
 		Platform.runLater(()->{
 			try {
 				if(save_data()) {
+					reEvaluateClassifRules();
 					ACCORDION.setExpandedPane(SPECIAL);
 				};
-			} catch (SQLException e) {
+			} catch (SQLException | ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		});
+	}
+	private void reEvaluateClassifRules() throws ClassNotFoundException, SQLException {
+		account.setActive_project(this.prj.getPid());
+		boolean reevaluateClassifiedItems = false;
+		ArrayList<GenericClassRule> newImportedRules = SpreadsheetUpload.getKnownClassificationRules(this.prj.getPid());
+		System.out.println("Applying "+String.valueOf(newImportedRules.size())+" known rules");
+		if(newImportedRules.size()>0) {
+			ItemFetcher ftc = new ItemFetcher(this.prj.getPid(),null);
+			if(ftc.currentList_STATIC.size()>0) {
+				
+				List<ItemFetcherRow> databaseSyncLists = new ArrayList<ItemFetcherRow>();
+				ArrayList<GenericClassRule> grs = new ArrayList<GenericClassRule>();
+				ArrayList<ArrayList<String[]>> itemRuleMaps = new ArrayList<ArrayList<String[]>>();
+				ArrayList<Boolean> activeStatuses = new ArrayList<Boolean>();
+				ArrayList<String> METHODS = new ArrayList<String>();
+				ManualRuleServices.i = 0.0;
+				Task<Void> task = new Task<Void>() {
+				    
+					@Override
+				    protected Void call() throws Exception {
+
+						
+						double ruleNumber = newImportedRules.parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()).size();
+						
+						ManualRuleServices.StreamRulesOnItemFetcherRows(ruleNumber, newImportedRules,
+								ftc.currentList_STATIC.parallelStream()
+								.filter(row -> reevaluateClassifiedItems || !(((ItemFetcherRow) row).getDisplay_segment_id()!=null) ).collect(Collectors.toList())
+								,ruleApplyProgress,
+								null
+								,account
+								,databaseSyncLists
+								,grs
+								,itemRuleMaps
+								,activeStatuses
+								,METHODS);
+								
+						
+						
+						return null;
+					}
+					};
+				task.setOnSucceeded(e -> {
+					;
+					
+					ConfirmationDialog.showRuleImportConfirmation("Confirm rule application", String.valueOf(databaseSyncLists.size())+" of the new uploaded items have been classified. Do you wish to save?", "Yes, save classes", "No, discard", this, account, grs, itemRuleMaps, activeStatuses, METHODS, databaseSyncLists,DataInputMethods.USER_CLASSIFICATION_RULE);
+					
+					});
+
+				task.setOnFailed(e -> {
+				    Throwable problem = task.getException();
+				    /* code to execute if task throws exception */
+				    problem.printStackTrace(System.err);
+				    
+				    
+				});
+
+				task.setOnCancelled(e -> {
+				    /* task was cancelled */
+					
+					;
+				});
+					
+					Thread thread = new Thread(task);; thread.setDaemon(true);
+					thread.setName("Reevaluating rules");
+					thread.start();
+			}else {
+				
+			}
+			
+				
+		}else {
+			
+		}
 	}
 	//Action triggered when the user clicks the "Apply" Button in the special section. Deprecated as of February 26 (replaced by the calls to update_user_and_specials on the buttons)
 	@FXML public void apply_special() {
@@ -1394,7 +1476,6 @@ public class Project_parameters {
 	
 	@SuppressWarnings("deprecation")
 	protected void refreshRuleSet(boolean knownTaxoChosen) {
-		System.out.println("Refreshing rule set "+String.valueOf(knownTaxoChosen));
 		//Set column 1 to point to the project_name field in the RULES data structure
 		Classification_projectColumn.setCellValueFactory(new PropertyValueFactory<>("project_name"));
 		//Set column 2 to point to the language field in the RULES data structure
@@ -1415,68 +1496,81 @@ public class Project_parameters {
 			Task<Void> executeAppTask = new Task<Void>() {
 			    @Override
 			    protected Void call() throws Exception {
-
+			    	ruleLoadingIndicator.setVisible(true);
+					System.out.println("Refreshing rule set "+String.valueOf(knownTaxoChosen));
 					Connection conn;
 					conn = Tools.spawn_connection();
 					Statement ps = conn.createStatement();
-					ResultSet rs = ps.executeQuery("select * from administration.projects where classification_system_name = '"+taxoName.getValue()+"' and (not suppression_status or suppression_status is null) and project_id is not null and project_id !='"+account.getActive_project()+"'");
+					ResultSet rs = ps.executeQuery("select * from administration.projects where classification_system_name = '"+taxoName.getValue()+"' and (not suppression_status or suppression_status is null) and project_id is not null");
 					System.out.println("select * from administration.projects where classification_system_name = '"+taxoName.getValue()+"' and (not suppression_status or suppression_status is null) and project_id is not null and project_id !='"+account.getActive_project()+"'");
 					Connection conn2 = Tools.spawn_connection();
 					Statement ps2 = conn2.createStatement();
 					//For every known projects
 					while(rs.next()) {
-						//	Create a RuleSet data structure
-						RuleSet tmp = new RuleSet();
-						if(!(rs.getString("classification_system_name")!=null)) {
-							continue;
-						}
-						//	Set the project's id
-						//	Set the project's name
-						//	Set the project's language id
-						//	Set the project's language
-						//	Set the project's classification system id
-						//	Set the project's classification system name
-						//	Set the project's cardinality
-						//	Set the project's granularity
-						//	Set the project's combo box
-						
-						String SUMquery = "select sum(count) from ("
-								+QueryFormater.FetchClassifProgresionByDateByUser(rs.getString("project_id"))
-								+") progress";
-						int sum = 0;
-						ResultSet rs2 = ps2.executeQuery(SUMquery);
-						//ResultSet rs2 = ps2.executeQuery("select count(*) from (select item_id , level_4_number,level_1_name_translated,level_2_name_translated,level_3_name_translated,level_4_name_translated from  ( select item_id, segment_id from ( select item_id, segment_id, local_rn, max(local_rn) over (partition by  item_id) as max_rn from ( select item_id, segment_id, row_number() over (partition by item_id order by global_rn asc ) as local_rn from  ( SELECT  item_id,segment_id, row_number() over ( order by (select 0) ) as global_rn  FROM "+rs.getString("project_id")+".project_classification_event where item_id in (select distinct item_id from "+rs.getString("project_id")+".project_items) ) as global_rank ) as ranked_events ) as maxed_events where local_rn = max_rn ) as latest_events left join  "+rs.getString("project_id")+".project_segments on project_segments.segment_id = latest_events.segment_id ) as rich_events left join "+rs.getString("project_id")+".project_items on rich_events.item_id = project_items.item_id");
-						
-						while(rs2.next()) {
-							sum+=rs2.getInt(1);
-						};
-						tmp.setProject_id(rs.getString("project_id"));
-						tmp.setProject_name(rs.getString("project_name"));
-						tmp.setLanguage_id(rs.getString("data_language"));
-						tmp.setLanguage(LANGUAGES.entrySet().stream().filter(e->e.getValue().equals(tmp.getLanguage_id())).findAny().get().getKey());
-						tmp.setTaxoid(rs.getString("classification_system_name"));
-						tmp.setClassifcation_system(tmp.getTaxoid());
-						
-						
-						tmp.setNo_items(Tools.formatThounsands(sum));
-						
-						rs2 = ps2.executeQuery("SELECT COUNT(DISTINCT rule_id) FROM "+rs.getString("project_id")+".project_rules where active_status");
-						rs2.next();
-						if(rs2.getInt(1)==0) {
-							//The reference project has no classified items
+						try {
+							//	Create a RuleSet data structure
+							RuleSet tmp = new RuleSet();
+							if(!(rs.getString("classification_system_name")!=null)) {
+								continue;
+							}
+							//	Set the project's id
+							//	Set the project's name
+							//	Set the project's language id
+							//	Set the project's language
+							//	Set the project's classification system id
+							//	Set the project's classification system name
+							//	Set the project's cardinality
+							//	Set the project's granularity
+							//	Set the project's combo box
+							
+							String SUMquery = "select sum(count) from ("
+									+QueryFormater.FetchClassifProgresionByDateByUser(rs.getString("project_id"))
+									+") progress";
+							int sum = 0;
+							ResultSet rs2 = ps2.executeQuery(SUMquery);
+							//ResultSet rs2 = ps2.executeQuery("select count(*) from (select item_id , level_4_number,level_1_name_translated,level_2_name_translated,level_3_name_translated,level_4_name_translated from  ( select item_id, segment_id from ( select item_id, segment_id, local_rn, max(local_rn) over (partition by  item_id) as max_rn from ( select item_id, segment_id, row_number() over (partition by item_id order by global_rn asc ) as local_rn from  ( SELECT  item_id,segment_id, row_number() over ( order by (select 0) ) as global_rn  FROM "+rs.getString("project_id")+".project_classification_event where item_id in (select distinct item_id from "+rs.getString("project_id")+".project_items) ) as global_rank ) as ranked_events ) as maxed_events where local_rn = max_rn ) as latest_events left join  "+rs.getString("project_id")+".project_segments on project_segments.segment_id = latest_events.segment_id ) as rich_events left join "+rs.getString("project_id")+".project_items on rich_events.item_id = project_items.item_id");
+							
+							while(rs2.next()) {
+								sum+=rs2.getInt(1);
+							};
+							tmp.setProject_id(rs.getString("project_id"));
+							tmp.setProject_name(rs.getString("project_name"));
+							tmp.setLanguage_id(rs.getString("data_language"));
+							tmp.setLanguage(LANGUAGES.entrySet().stream().filter(e->e.getValue().equals(tmp.getLanguage_id())).findAny().get().getKey());
+							tmp.setTaxoid(rs.getString("classification_system_name"));
+							tmp.setClassifcation_system(tmp.getTaxoid());
+							
+							
+							tmp.setNo_items(Tools.formatThounsands(sum));
+							
+							rs2 = ps2.executeQuery("SELECT COUNT(DISTINCT rule_id) FROM "+rs.getString("project_id")+".project_rules where active_status");
+							rs2.next();
+							if(rs2.getInt(1)==0) {
+								//The reference project has no classified items
+								rs2.close();
+								continue;
+							}
+							tmp.setNo_rules(Tools.formatThounsands(rs2.getInt(1)));
+							tmp.setGranularity(rs.getInt("number_of_levels"));
+							CheckBox cb = new CheckBox();
+							cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
+	
+								@Override
+								public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
+									ruleApplyLabel.setVisible(false);
+									ruleApplyProgress.setVisible(false);
+									ruleApplyIndicator.setVisible(false);
+									ruleApplyButton.setVisible(rules_table.getItems().stream().anyMatch(r->r.getReferentData().isSelected()));
+								}
+								
+							});
+							tmp.setReferentData(cb);
+							rules_table.getItems().add(tmp);
+							//Close the connection
 							rs2.close();
-							continue;
+						}catch(Exception V) {
+							
 						}
-						tmp.setNo_rules(Tools.formatThounsands(rs2.getInt(1)));
-						tmp.setGranularity(rs.getInt("number_of_levels"));
-						CheckBox cb = new CheckBox();
-						//	If the project uses the same classification system (it can be used for classification)
-						
-						//Add the project to the known reference projects
-						tmp.setReferentData(cb);
-						rules_table.getItems().add(tmp);
-						//Close the connection
-						rs2.close();
 					};
 					
 					rs.close();
@@ -1489,6 +1583,17 @@ public class Project_parameters {
 			    }
 			};
 			
+			executeAppTask.setOnSucceeded(new EventHandler<WorkerStateEvent>()
+			{
+			    @Override
+			    public void handle(WorkerStateEvent t){
+			    	System.out.println("refresh Rule Set success");
+			    	ruleLoadingIndicator.setVisible(false);
+			    }
+			});
+			
+			
+			
 			
 			RuleRefreshthread = new Thread(executeAppTask);; RuleRefreshthread.setDaemon(true);
 			RuleRefreshthread.setName("Refreshing rule set from chosen taxo");
@@ -1498,7 +1603,127 @@ public class Project_parameters {
 		}else {
 			rules_table.getItems().clear();
 		}
+		
 	}
+	
+	@FXML void importCharRules() throws ClassNotFoundException, SQLException {
+		account.setActive_project(this.prj.getPid());
+		rules_table.getItems().forEach(r->r.getReferentData().setDisable(true));
+		boolean reevaluateClassifiedItems = false;
+		ArrayList<GenericClassRule> newImportedRules = new ArrayList<GenericClassRule>();
+		ruleApplyLabel.setVisible(true);
+		ruleApplyIndicator.setVisible(true);
+		ruleApplyLabel.setText("Replicating rules ...");
+		rules_table.getItems().stream().forEach(r->{
+			try {
+				newImportedRules.addAll(SpreadsheetUpload.importClassRules(r.getProject_id(),this.prj.getPid()));
+			} catch (ClassNotFoundException | SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		});
+		System.out.println("Applying "+String.valueOf(newImportedRules.size())+" new imported rules");
+		if(newImportedRules.size()>0) {
+			ruleApplyLabel.setText("Loading project items ...");
+			ItemFetcher ftc = new ItemFetcher(this.prj.getPid(),null);
+			if(ftc.currentList_STATIC.size()>0) {
+				ruleApplyProgress.setVisible(true);
+				ruleApplyLabel.setText("Applying "+String.valueOf(newImportedRules.size())+" new imported rules on "+String.valueOf(ftc.currentList_STATIC.size())+" items.");
+				
+				List<ItemFetcherRow> databaseSyncLists = new ArrayList<ItemFetcherRow>();
+				ArrayList<GenericClassRule> grs = new ArrayList<GenericClassRule>();
+				ArrayList<ArrayList<String[]>> itemRuleMaps = new ArrayList<ArrayList<String[]>>();
+				ArrayList<Boolean> activeStatuses = new ArrayList<Boolean>();
+				ArrayList<String> METHODS = new ArrayList<String>();
+				ManualRuleServices.i = 0.0;
+				Task<Void> task = new Task<Void>() {
+				    
+					@Override
+				    protected Void call() throws Exception {
+
+						
+						double ruleNumber = newImportedRules.parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()).size();
+						
+						ManualRuleServices.StreamRulesOnItemFetcherRows(ruleNumber, newImportedRules,
+								ftc.currentList_STATIC.parallelStream()
+								.filter(row -> reevaluateClassifiedItems || !(((ItemFetcherRow) row).getDisplay_segment_id()!=null) ).collect(Collectors.toList())
+								,ruleApplyProgress,
+								null
+								,account
+								,databaseSyncLists
+								,grs
+								,itemRuleMaps
+								,activeStatuses
+								,METHODS);
+								
+						
+						
+						return null;
+					}
+					};
+				task.setOnSucceeded(e -> {
+					;
+					
+					Platform.runLater(new Runnable() {
+
+						@Override
+						public void run() {
+							ruleApplyProgress.setProgress(1);
+							ruleApplyIndicator.setVisible(false);
+							ruleApplyLabel.setText("Import success.");
+							rules_table.getItems().forEach(r->r.getReferentData().setDisable(false));
+							
+						}
+						
+					});
+					ConfirmationDialog.showRuleImportConfirmation("Confirm rule import", String.valueOf(databaseSyncLists.size())+" previously unclassified items have been classified. Do you wish to save?", "Yes, save results", "No, discard", this, account, grs, itemRuleMaps, activeStatuses, METHODS, databaseSyncLists,DataInputMethods.IMPORTED_CLASSIFICATION_RULE);
+					
+					});
+
+				task.setOnFailed(e -> {
+				    Throwable problem = task.getException();
+				    /* code to execute if task throws exception */
+				    problem.printStackTrace(System.err);
+				    ruleApplyProgress.setProgress(1);
+					ruleApplyIndicator.setVisible(false);
+					ruleApplyLabel.setText("Import failed.");
+					rules_table.getItems().forEach(r->r.getReferentData().setDisable(false));
+				    
+				});
+
+				task.setOnCancelled(e -> {
+				    /* task was cancelled */
+					ruleApplyProgress.setProgress(1);
+					ruleApplyIndicator.setVisible(false);
+					ruleApplyLabel.setText("Import failed.");
+					rules_table.getItems().forEach(r->r.getReferentData().setDisable(false));
+					;
+				});
+					
+					Thread thread = new Thread(task);; thread.setDaemon(true);
+					thread.setName("Importing rules");
+					thread.start();
+			}else {
+				//No items
+				ruleApplyProgress.setProgress(1);
+				ruleApplyIndicator.setVisible(false);
+				ruleApplyLabel.setText("No items in project.");
+				rules_table.getItems().forEach(r->r.getReferentData().setDisable(false));
+			}
+			
+				
+		}else {
+			//No rules
+			ruleApplyProgress.setProgress(1);
+			ruleApplyIndicator.setVisible(false);
+			ruleApplyLabel.setText("No new rules to apply.");
+			rules_table.getItems().forEach(r->r.getReferentData().setDisable(false));
+		}
+		
+	}
+	
+	
 	//Adds to a specific button a listener that keeps it disabled until all its dependency text fields are filled
 	private void ADD_FILL_LISTENER(Button target,boolean isTaxo) {
 		//Initialize the button to disabled at first

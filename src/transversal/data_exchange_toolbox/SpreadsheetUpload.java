@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,6 +30,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.monitorjbl.xlsx.StreamingReader;
 
 import model.DataInputMethods;
+import model.GenericClassRule;
 import model.UserAccount;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
@@ -426,6 +428,62 @@ public class SpreadsheetUpload {
 			e.printStackTrace();
 		}
 		
+	}
+
+
+	public static ArrayList<GenericClassRule> importClassRules(String source, String target) throws ClassNotFoundException, SQLException {
+		
+		ArrayList<GenericClassRule> newImportedRules = new ArrayList<GenericClassRule>();
+		Connection conn = Tools.spawn_connection();
+		Statement stmt = conn.createStatement();
+		stmt.execute("CREATE TEMP table IF NOT EXISTS rules_temp_view as select * from "+source+".project_rules limit 0");
+		stmt.execute("delete from rules_temp_view");
+		stmt.execute("insert into rules_temp_view select * from "+source+".project_rules where active_status");
+		stmt.execute("update rules_temp_view set source_project_id = '"+source+"'");
+		ResultSet rs = stmt.executeQuery("insert into "+target+".project_rules select * from rules_temp_view on conflict(rule_id) do nothing returning *;");
+		while(rs.next()) {
+			GenericClassRule gr = new GenericClassRule();
+			gr.setMain(rs.getString("main"));
+			gr.setApp(rs.getString("application"));
+			gr.setComp(rs.getString("complement"));
+			gr.setMg(rs.getString("material_group"));
+			gr.setPc(rs.getString("pre_classification"));
+			gr.setDwg(rs.getBoolean("drawing"));
+			gr.classif=new ArrayList<> ( Arrays.asList( rs.getString("class_id").split("&&&") ) );
+			gr.active=rs.getBoolean("active_status");
+			gr.setSource_project_id(rs.getString("source_project_id"));
+			newImportedRules.add(gr);
+		}
+		rs.close();
+		stmt.execute("drop table rules_temp_view");
+		stmt.close();
+		conn.close();
+		return newImportedRules;
+	}
+
+
+	public static ArrayList<GenericClassRule> getKnownClassificationRules(String pid) throws ClassNotFoundException, SQLException {
+		ArrayList<GenericClassRule> knownRules = new ArrayList<GenericClassRule>();
+		Connection conn = Tools.spawn_connection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("select * from "+pid+".project_rules");
+		while(rs.next()) {
+			GenericClassRule gr = new GenericClassRule();
+			gr.setMain(rs.getString("main"));
+			gr.setApp(rs.getString("application"));
+			gr.setComp(rs.getString("complement"));
+			gr.setMg(rs.getString("material_group"));
+			gr.setPc(rs.getString("pre_classification"));
+			gr.setDwg(rs.getBoolean("drawing"));
+			gr.classif=new ArrayList<> ( Arrays.asList( rs.getString("class_id").split("&&&") ) );
+			gr.active=rs.getBoolean("active_status");
+			gr.setSource_project_id(rs.getString("source_project_id"));
+			knownRules.add(gr);
+		}
+		rs.close();
+		stmt.close();
+		conn.close();
+		return knownRules;
 	}
 	
 }

@@ -19,12 +19,14 @@ import model.DataInputMethods;
 import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.RulePaneRow;
+import model.UserAccount;
 import transversal.generic.Tools;
 
 public class ManualRuleServices {
 
 	static long tickTime;
-	private static double i;
+	public static double i;
+	private static HashMap<String, String> UUID2CID;
 
 	public static void benchmark(GenericClassRule gr, Manual_classif manualClassifController) {
 		
@@ -67,63 +69,19 @@ public class ManualRuleServices {
 				i = 0.0;
 				double ruleNumber = ItemFetcherRow.staticRules.values().parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()).size();
 				
-				
-				
-				ItemFetcherRow.staticRules.values().stream().filter(gr->gr.active&&gr.classif.get(0)!=null)
-				.forEach(gr -> {
-					i+=1;
-					if(i%100==0) {
-						Platform.runLater(new Runnable() {
-
-							@Override
-							public void run() {
-								menu.setText(originalMenuText+"("+Math.floor(100 * i/ruleNumber)+"%)");
-							}
-							
-						});
+				StreamRulesOnItemFetcherRows(ruleNumber, ItemFetcherRow.staticRules.values().parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()),
+						(List<ItemFetcherRow>) manualClassifController.tableController.tableGrid.getItems().parallelStream()
+						.filter(row -> reevaluateClassifiedItems || !(((ItemFetcherRow) row).getDisplay_segment_id()!=null) ).collect(Collectors.toList())
+						,menu,
+						originalMenuText+"(XX%)"
+						,manualClassifController.account
+						,databaseSyncLists
+						,grs
+						,itemRuleMaps
+						,activeStatuses
+						,METHODS);
 						
-					}
-					Pattern p_tmp = null;
-					HashMap<ItemFetcherRow, GenericClassRule> itemsToUpdate= new HashMap<ItemFetcherRow,GenericClassRule>();
-					ArrayList<ItemFetcherRow> itemsToBlank= new ArrayList<ItemFetcherRow>();
-					ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
-					
-					if(gr.getComp()!=null) {
-						p_tmp = Pattern.compile(".* "+gr.getComp()+" .*");
-					}
-					final Pattern p = p_tmp;
-					gr.matched=false;
-					
-					manualClassifController.tableController.tableGrid.getItems().parallelStream()
-					.filter(row -> reevaluateClassifiedItems || !(((ItemFetcherRow) row).getDisplay_segment_id()!=null) )
-					.forEach(row->{
-						if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
-							String[] itemRule = new String [] {null,null};
-							itemRule[0]= ((ItemFetcherRow) row).getItem_id();
-							itemRule[1]= gr.toString();
-							itemRuleMap.add(itemRule);
-							
-							GenericClassRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
-							if(finalRule!=null) {
-								itemsToUpdate.put(((ItemFetcherRow) row), finalRule);
-							}else {
-								itemsToBlank.add(((ItemFetcherRow) row));
-							}
-							
-						}
-					});
-					
-					gr.matched=true;
-					
-					List<ItemFetcherRow> databaseSyncList = manualClassifController.tableController.fireRuleClassChange(itemsToUpdate);
-					databaseSyncList.addAll( manualClassifController.tableController.fireRuleClassBlank(itemsToBlank) );
-					
-					databaseSyncLists.addAll(databaseSyncList);
-					grs.add(gr);
-					itemRuleMaps.add(itemRuleMap);
-					activeStatuses.add(true);
-					METHODS.add(DataInputMethods.USER_CLASSIFICATION_RULE);
-				});
+				
 				
 				return null;
 			}
@@ -167,6 +125,54 @@ public class ManualRuleServices {
 	}
 	
 	
+	public static void StreamRulesOnItemFetcherRows(double ruleNumber, List<GenericClassRule> ruleStream, List<ItemFetcherRow> itemStream, Object progressUIElement, String progressSyntax, UserAccount account, List<ItemFetcherRow> databaseSyncLists, ArrayList<GenericClassRule> grs, ArrayList<ArrayList<String[]>> itemRuleMaps, ArrayList<Boolean> activeStatuses, ArrayList<String> METHODS) {
+		ruleStream.stream().forEach(gr -> {
+			i+=1;
+			if(i%100==0) {
+				Tools.setRuleStreamProgress(Math.floor(100 * i/ruleNumber),progressUIElement,progressSyntax);
+				
+			}
+			Pattern p_tmp = null;
+			HashMap<ItemFetcherRow, GenericClassRule> itemsToUpdate= new HashMap<ItemFetcherRow,GenericClassRule>();
+			ArrayList<ItemFetcherRow> itemsToBlank= new ArrayList<ItemFetcherRow>();
+			ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
+			
+			if(gr.getComp()!=null) {
+				p_tmp = Pattern.compile(".* "+gr.getComp()+" .*");
+			}
+			final Pattern p = p_tmp;
+			gr.matched=false;
+			
+			itemStream.parallelStream().forEach(row->{
+				if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
+					String[] itemRule = new String [] {null,null};
+					itemRule[0]= ((ItemFetcherRow) row).getItem_id();
+					itemRule[1]= gr.toString();
+					itemRuleMap.add(itemRule);
+					
+					GenericClassRule finalRule = EvaluateItemRules((ItemFetcherRow) row);
+					if(finalRule!=null) {
+						itemsToUpdate.put(((ItemFetcherRow) row), finalRule);
+					}else {
+						itemsToBlank.add(((ItemFetcherRow) row));
+					}
+					
+				}
+			});
+			
+			gr.matched=true;
+			
+			List<ItemFetcherRow> databaseSyncList = fireRuleClassChange(itemsToUpdate,account);
+			databaseSyncList.addAll( fireRuleClassBlank(itemsToBlank) );
+			
+			databaseSyncLists.addAll(databaseSyncList);
+			grs.add(gr);
+			itemRuleMaps.add(itemRuleMap);
+			activeStatuses.add(true);
+			METHODS.add(DataInputMethods.USER_CLASSIFICATION_RULE);
+		});
+	}
+
 	private static boolean tryRuleOnItem(GenericClassRule gr, ItemFetcherRow row, Pattern compiledCompPattern) {
 		if(gr.matched) {
 			return row.itemRules.contains(gr.toString());
@@ -293,8 +299,8 @@ public class ManualRuleServices {
 		}*/
 		gr.matched=true;
 		
-		List<ItemFetcherRow> databaseSyncList = manualClassifController.tableController.fireRuleClassChange(itemsToUpdate);
-		databaseSyncList.addAll( manualClassifController.tableController.fireRuleClassBlank(itemsToBlank) );
+		List<ItemFetcherRow> databaseSyncList = fireRuleClassChange(itemsToUpdate,manualClassifController.account);
+		databaseSyncList.addAll( fireRuleClassBlank(itemsToBlank) );
 		Tools.ItemFetcherRow2ClassEvent(databaseSyncList,manualClassifController.account,DataInputMethods.USER_CLASSIFICATION_RULE);
 		
 		Tools.StoreRule(manualClassifController.account,gr,itemRuleMap,false,DataInputMethods.USER_CLASSIFICATION_RULE);
@@ -391,8 +397,8 @@ public class ManualRuleServices {
 		}*/
 		gr.matched=true;
 		
-		List<ItemFetcherRow> databaseSyncList = manualClassifController.tableController.fireRuleClassChange(itemsToUpdate);
-		databaseSyncList.addAll( manualClassifController.tableController.fireRuleClassBlank(itemsToBlank) );
+		List<ItemFetcherRow> databaseSyncList = fireRuleClassChange(itemsToUpdate,manualClassifController.account);
+		databaseSyncList.addAll( fireRuleClassBlank(itemsToBlank) );
 		Tools.ItemFetcherRow2ClassEvent(databaseSyncList,manualClassifController.account,DataInputMethods.USER_CLASSIFICATION_RULE);
 		Tools.StoreRule(manualClassifController.account,gr,itemRuleMap,true,DataInputMethods.USER_CLASSIFICATION_RULE);
 		
@@ -541,9 +547,72 @@ public class ManualRuleServices {
 			
 		}
 
-	
+
 
 	
+	
+
+	public static List<ItemFetcherRow> fireRuleClassChange(HashMap<ItemFetcherRow, GenericClassRule> itemsToUpdate,UserAccount account) {
+		
+		itemsToUpdate.entrySet().stream().forEach( e ->{
+			GenericClassRule gr = e.getValue();
+			ItemFetcherRow row = e.getKey();
+			
+			((ItemFetcherRow)row).setReviewer_Rules(account.getUser_name());
+			try{
+				((ItemFetcherRow)row).setRule_Segment_id(gr.classif.get(0));
+				((ItemFetcherRow)row).setRule_Segment_name(gr.classif.get(2));
+				if(UUID2CID!=null) {
+					
+				}else {
+					UUID2CID = Tools.UUID2CID(account.getActive_project());
+					
+				}
+				((ItemFetcherRow)row).setRule_Segment_number(UUID2CID.get(gr.classif.get(0)));
+				((ItemFetcherRow)row).setRule_description_Rules(gr.toString());
+				((ItemFetcherRow)row).setRule_id_Rules((gr.toString()));
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
+				//((ItemFetcherRow)row).setNew_segment_id(null);
+				//((ItemFetcherRow)row).setNew_segment_name(null);
+				((ItemFetcherRow)row).setRule_Segment_id(null);
+				((ItemFetcherRow)row).setRule_Segment_name(null);
+				((ItemFetcherRow)row).setRule_Segment_number(null);
+				((ItemFetcherRow)row).setRule_description_Rules(null);
+				((ItemFetcherRow)row).setRule_id_Rules(null);
+				
+			}
+			((ItemFetcherRow)row).setSource_Rules(DataInputMethods.USER_CLASSIFICATION_RULE);
+			
+			
+			
+		});
+		
+		return new ArrayList<ItemFetcherRow>(itemsToUpdate.keySet());
+		
+	}
+	
+	public static List<ItemFetcherRow> fireRuleClassBlank(ArrayList<ItemFetcherRow> itemsToBlank) {
+		
+		itemsToBlank.stream().forEach(row->{
+			try{
+				((ItemFetcherRow)row).setReviewer_Rules(null);
+				//((ItemFetcherRow)row).setNew_segment_id(null);
+				//((ItemFetcherRow)row).setNew_segment_name(null);
+				((ItemFetcherRow)row).setRule_Segment_id(null);
+				((ItemFetcherRow)row).setRule_Segment_name(null);
+				((ItemFetcherRow)row).setRule_Segment_number(null);
+				((ItemFetcherRow)row).setRule_description_Rules(null);
+				((ItemFetcherRow)row).setSource_Rules(null);
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
+			}
+			
+		});
+		
+		return itemsToBlank;
+		
+	}
 
 	
 }

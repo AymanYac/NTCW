@@ -40,6 +40,7 @@ public class ItemFetcher {
 	private List<String> dw_words;
 	private List<String> for_words;
 	private HashMap<String, ArrayList<String>> items_x_rules;
+	private ManualClassifProposer proposer;
 	
 	
 	
@@ -62,7 +63,12 @@ public class ItemFetcher {
 		if(GlobalConstants.MANUAL_FETCH_ALL ) {
 			
 			currentList_STATIC = new ArrayList<ItemFetcherRow>(projectCardinality);
-			fill_array( currentList_STATIC,parent_controller);
+			try{
+				this.proposer = parent_controller.proposer;
+			}catch(Exception V) {
+				
+			}
+			fill_array( currentList_STATIC);
 			
 		}else if(GlobalConstants.MANUAL_PREORDER) {
 			topList = new ArrayList<ItemFetcherRow>(GlobalConstants.MANUAL_SEGMENT_SIZE);
@@ -83,13 +89,20 @@ public class ItemFetcher {
 	}
 	
 	
-	private void fill_array(ArrayList<ItemFetcherRow> targetList, Manual_classif parent_controller) throws ClassNotFoundException, SQLException {
+	private void fill_array(ArrayList<ItemFetcherRow> targetList) throws ClassNotFoundException, SQLException {
 		
 		for_words = Tools.get_project_for_words(active_project);
 		dw_words = Tools.get_project_dw_words(active_project);
 		
-		parent_controller.proposer.for_words = for_words;
-		parent_controller.proposer.dw_words = dw_words;
+		try{
+			proposer.for_words = for_words;
+			proposer.dw_words = dw_words;
+		}catch(Exception V) {
+			
+		}
+		
+		
+		
 		
 		Connection conn = Tools.spawn_connection();
 		Statement stmt = conn.createStatement();
@@ -188,13 +201,22 @@ public class ItemFetcher {
 					key = tmp.getShort_description().split(" ")[0];
 				}
 				String val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
-				parent_controller.proposer.addClassifiedFW(key,val);
+				try{
+					proposer.addClassifiedFW(key,val);
+				}catch(Exception V) {
+					
+				}
 				
 				
 				if(tmp.getMaterial_group()!=null) {
 					key = tmp.getMaterial_group();
 					val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
-				parent_controller.proposer.addClassifiedMG(key,val);
+					try{
+						proposer.addClassifiedMG(key,val);
+					}catch(Exception V) {
+						
+					}
+				
 				}
 				
 				
@@ -227,7 +249,12 @@ public class ItemFetcher {
 					tmp.addF1(key.split(" ")[0].toUpperCase());//#
 					tmp.addF1F2(key.toUpperCase());//#
 					val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
-					parent_controller.proposer.addClassifiedFor(key,val);
+					try{
+						proposer.addClassifiedFor(key,val);
+					}catch(Exception V) {
+						
+					}
+					
 					
 				}catch(Exception V) {
 					continue;
@@ -239,7 +266,12 @@ public class ItemFetcher {
 						if(desc.toUpperCase().contains(dw.toUpperCase())){
 							tmp.setDWG(true);//#
 							val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
-							parent_controller.proposer.addClassifiedDW(dw,val);
+							try{
+								proposer.addClassifiedDW(dw,val);
+							}catch(Exception V) {
+								
+							}
+							
 							
 						}else {
 							continue;
@@ -539,9 +571,9 @@ public class ItemFetcher {
 		rs.close();
 		
 		rs = st.executeQuery("select rule_id, main, application, complement, material_group," + 
-				"pre_classification, drawing, class_id, active_status from "+active_project+".project_rules");
+				"pre_classification, drawing, class_id, active_status,source_project_id from "+active_project+".project_rules");
 		System.out.println("select rule_id, main, application, complement, material_group," + 
-				"pre_classification, drawing, class_id, active_status from "+active_project+".project_rules");
+				"pre_classification, drawing, class_id, active_status,source_project_id from "+active_project+".project_rules");
 		while(rs.next()) {
 			GenericClassRule gr = new GenericClassRule();
 			gr.setMain(rs.getString("main"));
@@ -552,6 +584,7 @@ public class ItemFetcher {
 			gr.setDwg(rs.getBoolean("drawing"));
 			gr.classif=new ArrayList<> ( Arrays.asList( rs.getString("class_id").split("&&&") ) );
 			gr.active=rs.getBoolean("active_status");
+			gr.setSource_project_id(rs.getString("source_project_id"));
 			ItemFetcherRow.staticRules.put(gr.toString(), gr);
 			if(rs.getString("rule_id").equals("CLAPET (PILOTE)")) {
 				System.out.println(rs.getString("item_id"));
