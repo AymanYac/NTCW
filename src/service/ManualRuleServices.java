@@ -601,18 +601,14 @@ public class ManualRuleServices {
 	public static List<ItemFetcherRow> fireRuleClassBlank(ArrayList<ItemFetcherRow> itemsToBlank) {
 		
 		itemsToBlank.stream().forEach(row->{
-			try{
-				((ItemFetcherRow)row).setReviewer_Rules(null);
-				//((ItemFetcherRow)row).setNew_segment_id(null);
-				//((ItemFetcherRow)row).setNew_segment_name(null);
-				((ItemFetcherRow)row).setRule_Segment_id(null);
-				((ItemFetcherRow)row).setRule_Segment_name(null);
-				((ItemFetcherRow)row).setRule_Segment_number(null);
-				((ItemFetcherRow)row).setRule_description_Rules(null);
-				((ItemFetcherRow)row).setSource_Rules(null);
-			}catch(Exception V) {
-				
-			}
+			((ItemFetcherRow)row).setReviewer_Rules(null);
+			//((ItemFetcherRow)row).setNew_segment_id(null);
+			//((ItemFetcherRow)row).setNew_segment_name(null);
+			((ItemFetcherRow)row).setRule_Segment_id(null);
+			((ItemFetcherRow)row).setRule_Segment_name(null);
+			((ItemFetcherRow)row).setRule_Segment_number(null);
+			((ItemFetcherRow)row).setRule_description_Rules(null);
+			((ItemFetcherRow)row).setSource_Rules(null);
 			
 		});
 		
