@@ -164,10 +164,9 @@ public class SpreadsheetUpload {
 	}
 
 	
-	public static void streamSheetInDatabase(String tableName, String inputFile, LinkedHashMap<String,String> columnMap, boolean replace, String CIDColumn, Integer granularity, HashSet<String> failedcid, UserAccount account) throws ClassNotFoundException, SQLException, FileNotFoundException, IOException {
+	public static ArrayList<String> streamSheetInDatabase(String tableName, String inputFile, LinkedHashMap<String,String> columnMap, boolean replace, String CIDColumn, Integer granularity, HashSet<String> failedcid, UserAccount account) throws ClassNotFoundException, SQLException, FileNotFoundException, IOException {
         
-		
-
+		ArrayList<String> affectedItemIDs = new ArrayList<String>();
 		InputStream is = new FileInputStream(new File(inputFile));
 		Workbook workbook = StreamingReader.builder()
 		        .rowCacheSize(100)    // number of rows to keep in memory (defaults to 10)
@@ -342,7 +341,7 @@ public class SpreadsheetUpload {
            	
             	
             ps.setString(1,row_id);
-            
+            affectedItemIDs.add(row_id);
             int i;
       	    for(i =2; i <= headers.size(); i++){
       	      try{
@@ -407,7 +406,8 @@ public class SpreadsheetUpload {
     ps2.close();
     conn.close();
     conn2.close();
-    ;
+    System.out.println("Upserted "+String.valueOf(affectedItemIDs.size())+" items");
+    return affectedItemIDs;
 }
 	
 	public static void CopySheetFromDatabase(String source, String target) {

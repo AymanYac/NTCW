@@ -1140,26 +1140,23 @@ public class Project_parameters {
 		
 	}
 	//Action triggered when the user clicks the "Apply" Button in the item upload section
-	@FXML public void apply_data() {
+	@FXML public void apply_data() throws ClassNotFoundException, SQLException {
 	//Switch the active accordion pane to special
 		if(!newdata) {
 			return;
 		}
 		//Call the routine (save_data())
 		//Set the dataID field in the ProjectTemplate data structure to the return value of the (save_data()) routine
+		ArrayList<String> affectedItemIDs = save_data();
+		reEvaluateClassifRules(affectedItemIDs);
+		
 		Platform.runLater(()->{
-			try {
-				if(save_data()) {
-					reEvaluateClassifRules();
-					ACCORDION.setExpandedPane(SPECIAL);
-				};
-			} catch (SQLException | ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(affectedItemIDs!=null) {
+				ACCORDION.setExpandedPane(RULES);
 			}
 		});
 	}
-	private void reEvaluateClassifRules() throws ClassNotFoundException, SQLException {
+	private void reEvaluateClassifRules(ArrayList<String> affectedItemIDs) throws ClassNotFoundException, SQLException {
 		account.setActive_project(this.prj.getPid());
 		boolean reevaluateClassifiedItems = false;
 		ArrayList<GenericClassRule> newImportedRules = SpreadsheetUpload.getKnownClassificationRules(this.prj.getPid());
@@ -1184,6 +1181,7 @@ public class Project_parameters {
 						
 						ManualRuleServices.StreamRulesOnItemFetcherRows(ruleNumber, newImportedRules.parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()),
 								ftc.currentList_STATIC.parallelStream()
+								.filter(row -> affectedItemIDs.contains(row.getItem_id()))
 								.filter(row -> reevaluateClassifiedItems || !(((ItemFetcherRow) row).getDisplay_segment_id()!=null) ).collect(Collectors.toList())
 								,ruleApplyProgress,
 								null
@@ -1201,8 +1199,8 @@ public class Project_parameters {
 					};
 				task.setOnSucceeded(e -> {
 					;
-					
-					ConfirmationDialog.showRuleImportConfirmation("Confirm rule application", String.valueOf(databaseSyncLists.size())+" of the new uploaded items have been classified. Do you wish to save?", "Yes, save classes", "No, discard", this, account, grs, itemRuleMaps, activeStatuses, METHODS, databaseSyncLists,DataInputMethods.USER_CLASSIFICATION_RULE);
+					int no_classified_items = itemRuleMaps.stream().flatMap(m->m.stream()).filter(m->m!=null).map(m->m[0]).collect(Collectors.toSet()).size();
+					ConfirmationDialog.showRuleImportConfirmation("Confirm rule application", String.valueOf(no_classified_items)+" of "+String.valueOf(affectedItemIDs.size())+" newly uploaded items have been classified. Do you wish to save?", "Yes, save classes", "No, discard", this, account, grs, itemRuleMaps, activeStatuses, METHODS, databaseSyncLists,DataInputMethods.USER_CLASSIFICATION_RULE);
 					
 					});
 
@@ -2700,18 +2698,18 @@ public class Project_parameters {
 
 
 	//Stores the uploaded item file as the items corresponding to the current project
-	private Boolean save_data() throws SQLException {
-		
+	private ArrayList<String> save_data() throws SQLException {
+		ArrayList<String> affectedItemIDs = new ArrayList<String>();
 		//If the CIDColumn text field is not empty and no granularity selected, stop upload
 		try {
 			if(CIDColumn.getText().length()>0 && (Integer.parseInt(classificationLevels.getValue())<1 || Integer.parseInt(classificationLevels.getValue())>4) ) {
 				ExceptionDialog.show("Project classification levels not defined", "To be able to upload item classes, you first have to define the project's classification system levels", "");
-				return false;
+				return null;
 			}
 		}catch(Exception V) {
 			if(CIDColumn.getText().length()>0 ) {
 				ExceptionDialog.show("Project classification levels not defined", "To be able to upload item classes, you first have to define the project's classification system levels", "");
-				return false;
+				return null;
 			}
 		}
 		
@@ -2720,12 +2718,12 @@ public class Project_parameters {
 		try {
 			if(CIDColumn.getText().length()>0 && !(this.prj.getTaxoName().length()>0) ) {
 				ExceptionDialog.show("Project classification system not defined", "To be able to upload item classes, you first have to define the project's classification system", "");
-				return false;
+				return null;
 			}
 		}catch(Exception V) {
 			if(CIDColumn.getText().length()>0 ) {
 				ExceptionDialog.show("Project classification system not defined", "To be able to upload item classes, you first have to define the project's classification system", "");
-				return false;
+				return null;
 			}
 		}
 		
@@ -2752,7 +2750,8 @@ public class Project_parameters {
 				
 			}
 			HashSet<String> failedcid = new HashSet<String>();
-			SpreadsheetUpload.streamSheetInDatabase(tableName, DATAFILE.getAbsolutePath(), DataColumnMap,keep_data_button.isSelected(),cidcolumn,granularity,failedcid,	account);
+			affectedItemIDs = SpreadsheetUpload.streamSheetInDatabase(tableName, DATAFILE.getAbsolutePath(), DataColumnMap,keep_data_button.isSelected(),cidcolumn,granularity,failedcid,	account);
+			failedcid = new HashSet<String>(failedcid.stream().filter(c->c!=null).collect(Collectors.toSet()));
 			if(failedcid.size()>0) {
 				ExceptionDialog.show("Unknown classification numbers", "There's a total of "+String.valueOf(failedcid.size())+" classes that are not known in the classification system ", String.join("\n", failedcid));
 			}
@@ -2765,7 +2764,7 @@ public class Project_parameters {
 			ExceptionDialog.show("IO000 permission_error", "IO000 permission_error", "IO000 permission_error");
 		}
 		//Return an operation status to confirm success otherwise throw error dialog
-		return true;
+		return affectedItemIDs;
 		
 	}
 

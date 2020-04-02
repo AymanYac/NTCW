@@ -212,8 +212,8 @@ public class Tools {
 	}
 
 	public static String load_ip() {
-		return "localhost";
-		//return "82.66.148.154";//"88.190.148.154";
+		//return "localhost";
+		return "82.66.148.154";//"88.190.148.154";
 		//return "192.168.0.25";
 	}
 	public static String load_port() {
@@ -942,7 +942,7 @@ public class Tools {
 						"            user_id, rule_date, active_status,source_project_id)" + 
 						"    VALUES (?, ?, ?, ?, ?," + 
 						"            ?, ?, ?, ?, ?," + 
-						"            ?, clock_timestamp() ,?) on conflict(rule_id) do update set active_status = EXCLUDED.active_status, class_id = EXCLUDED.class_id;");
+						"            ?, clock_timestamp() ,?,?) on conflict(rule_id) do update set active_status = EXCLUDED.active_status, class_id = EXCLUDED.class_id;");
 				
 				final PreparedStatement ps2 = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_items_x_rules(" + 
 						"            item_id, rule_id)" + 
@@ -1048,7 +1048,7 @@ public class Tools {
 						"            user_id, rule_date, active_status,source_project_id)" + 
 						"    VALUES (?, ?, ?, ?, ?," + 
 						"            ?, ?, ?, ?, ?," + 
-						"            ?, clock_timestamp() ,?) on conflict(rule_id) do update set active_status = EXCLUDED.active_status, class_id = EXCLUDED.class_id;");
+						"            ?, clock_timestamp() ,?,?) on conflict(rule_id) do update set active_status = EXCLUDED.active_status, class_id = EXCLUDED.class_id;");
 				ps.setString(1, gr.toString());
 				ps.setString(2, gr.getMain());
 				ps.setString(3, gr.getApp());
@@ -1138,7 +1138,7 @@ public class Tools {
 						"            user_id, rule_date, active_status,source_project_id)" + 
 						"    VALUES (?, ?, ?, ?, ?," + 
 						"            ?, ?, ?, ?, ?," + 
-						"            ?, clock_timestamp() ,?) on conflict(rule_id) do "
+						"            ?, clock_timestamp() ,?,?) on conflict(rule_id) do "
 						+ (ISCLASSIF?"update set active_status = EXCLUDED.active_status, class_id = EXCLUDED.class_id;":"nothing"));
 				
 				for(GenericClassRule gr:grs) {
