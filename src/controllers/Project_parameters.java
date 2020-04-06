@@ -69,6 +69,7 @@ import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.data_exchange_toolbox.SpreadsheetUpload;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.ExceptionDialog;
+import transversal.dialog_toolbox.ItemUploadDialog;
 import transversal.generic.AutoCompleteComboBoxListener;
 import transversal.generic.Tools;
 
@@ -96,7 +97,8 @@ public class Project_parameters {
 	private HashMap<String,String> CREDENTIALS = new HashMap<String,String>();
 	
 	@FXML MenuBar menubar;
-	@FXML Accordion ACCORDION;
+	@FXML
+	public Accordion ACCORDION;
 	@FXML TitledPane GENERAL;
 	@FXML TitledPane CLASSIF;
 	@FXML TitledPane DATA;
@@ -123,7 +125,8 @@ public class Project_parameters {
 	@FXML private Button ruleApplyButton;
 	@FXML private ProgressBar ruleApplyProgress;
 	
-	@FXML TitledPane RULES;
+	@FXML
+	public TitledPane RULES;
 	@FXML TitledPane USERS;
 	
 	
@@ -209,7 +212,7 @@ public class Project_parameters {
 	private HashMap<Button,ArrayList<TextField>> DEPENDENT_FIELDS = new HashMap<Button,ArrayList<TextField>>();
 	private boolean DATA_FILE_MISSING = true;
 	private boolean TAXO_FILE_MISSING = true;
-	private UserAccount account;
+	public UserAccount account;
 
 	private boolean REUSING_OLD_TAXO;
 
@@ -1147,87 +1150,77 @@ public class Project_parameters {
 		}
 		//Call the routine (save_data())
 		//Set the dataID field in the ProjectTemplate data structure to the return value of the (save_data()) routine
-		ArrayList<String> affectedItemIDs = save_data();
-		reEvaluateClassifRules(affectedItemIDs);
+		ItemUploadDialog.uploadItems(this);
 		
-		Platform.runLater(()->{
-			if(affectedItemIDs!=null) {
-				ACCORDION.setExpandedPane(RULES);
-			}
-		});
 	}
-	private void reEvaluateClassifRules(ArrayList<String> affectedItemIDs) throws ClassNotFoundException, SQLException {
+	public boolean reEvaluateClassifRules(ArrayList<String> affectedItemIDs, Label progressStage, ProgressBar progressBar,ArrayList<GenericClassRule> grs, ArrayList<ArrayList<String[]>> itemRuleMaps, ArrayList<Boolean> activeStatuses, ArrayList<String> METHODS, List<ItemFetcherRow> databaseSyncLists, String datainputmethod) throws ClassNotFoundException, SQLException {
 		account.setActive_project(this.prj.getPid());
-		boolean reevaluateClassifiedItems = false;
+		boolean reevaluateClassifiedItems = GlobalConstants.REFRESH_ALL_RULE_ITEMS_ON_UPLOAD;
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				progressStage.setText("Loading active project rules");
+				progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+			}});
 		ArrayList<GenericClassRule> newImportedRules = SpreadsheetUpload.getKnownClassificationRules(this.prj.getPid());
-		System.out.println("Applying "+String.valueOf(newImportedRules.size())+" known rules");
 		if(newImportedRules.size()>0) {
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					progressStage.setText("Loading project items");
+					progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+				}});
+			
 			ItemFetcher ftc = new ItemFetcher(this.prj.getPid(),null);
 			if(ftc.currentList_STATIC.size()>0) {
-				
-				List<ItemFetcherRow> databaseSyncLists = new ArrayList<ItemFetcherRow>();
-				ArrayList<GenericClassRule> grs = new ArrayList<GenericClassRule>();
-				ArrayList<ArrayList<String[]>> itemRuleMaps = new ArrayList<ArrayList<String[]>>();
-				ArrayList<Boolean> activeStatuses = new ArrayList<Boolean>();
-				ArrayList<String> METHODS = new ArrayList<String>();
-				ManualRuleServices.i = 0.0;
-				Task<Void> task = new Task<Void>() {
-				    
+				Platform.runLater(new Runnable() {
 					@Override
-				    protected Void call() throws Exception {
-
-						
-						double ruleNumber = newImportedRules.parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()).size();
-						
-						ManualRuleServices.StreamRulesOnItemFetcherRows(ruleNumber, newImportedRules.parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()),
-								ftc.currentList_STATIC.parallelStream()
-								.filter(row -> affectedItemIDs.contains(row.getItem_id()))
-								.filter(row -> reevaluateClassifiedItems || !(((ItemFetcherRow) row).getDisplay_segment_id()!=null) ).collect(Collectors.toList())
-								,ruleApplyProgress,
-								null
-								,account
-								,databaseSyncLists
-								,grs
-								,itemRuleMaps
-								,activeStatuses
-								,METHODS);
-								
-						
-						
-						return null;
-					}
-					};
-				task.setOnSucceeded(e -> {
-					;
-					int no_classified_items = itemRuleMaps.stream().flatMap(m->m.stream()).filter(m->m!=null).map(m->m[0]).collect(Collectors.toSet()).size();
-					ConfirmationDialog.showRuleImportConfirmation("Confirm rule application", String.valueOf(no_classified_items)+" of "+String.valueOf(affectedItemIDs.size())+" newly uploaded items have been classified. Do you wish to save?", "Yes, save classes", "No, discard", this, account, grs, itemRuleMaps, activeStatuses, METHODS, databaseSyncLists,DataInputMethods.USER_CLASSIFICATION_RULE);
-					
-					});
-
-				task.setOnFailed(e -> {
-				    Throwable problem = task.getException();
-				    /* code to execute if task throws exception */
-				    problem.printStackTrace(System.err);
-				    
-				    
-				});
-
-				task.setOnCancelled(e -> {
-				    /* task was cancelled */
-					
-					;
-				});
-					
-					Thread thread = new Thread(task);; thread.setDaemon(true);
-					thread.setName("Reevaluating rules");
-					thread.start();
-			}else {
+					public void run() {
+						progressStage.setText("Applying "+String.valueOf(newImportedRules.size())+" active rules on "+String.valueOf(affectedItemIDs.size())+" updated items");
+					}});
+				ManualRuleServices.i = 0.0;
 				
+				double ruleNumber = newImportedRules.parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()).size();
+				
+				ManualRuleServices.StreamRulesOnItemFetcherRows(ruleNumber, newImportedRules.parallelStream().filter(gr->gr.active&&gr.classif.get(0)!=null).collect(Collectors.toList()),
+						ftc.currentList_STATIC.parallelStream()
+						.filter(row -> affectedItemIDs.contains(row.getItem_id()))
+						.filter(row -> reevaluateClassifiedItems || !(((ItemFetcherRow) row).getDisplay_segment_id()!=null) ).collect(Collectors.toList())
+						,progressBar,
+						null
+						,account
+						,databaseSyncLists
+						,grs
+						,itemRuleMaps
+						,activeStatuses
+						,METHODS);
+						
+				
+				
+				return true;
+				
+				
+			}else {
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						progressStage.setText("Project has no items");
+						progressBar.setVisible(false);
+					}});
+				
+				return false;
 			}
 			
 				
 		}else {
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					progressStage.setText("Project has no active rules");
+					progressBar.setVisible(false);
+				}});
 			
+			return false;
 		}
 	}
 	//Action triggered when the user clicks the "Apply" Button in the special section. Deprecated as of February 26 (replaced by the calls to update_user_and_specials on the buttons)
@@ -2698,7 +2691,8 @@ public class Project_parameters {
 
 
 	//Stores the uploaded item file as the items corresponding to the current project
-	private ArrayList<String> save_data() throws SQLException {
+	public ArrayList<String> save_data(ProgressBar progressBar) throws SQLException {
+		System.out.println("saving items");
 		ArrayList<String> affectedItemIDs = new ArrayList<String>();
 		//If the CIDColumn text field is not empty and no granularity selected, stop upload
 		try {
@@ -2750,7 +2744,7 @@ public class Project_parameters {
 				
 			}
 			HashSet<String> failedcid = new HashSet<String>();
-			affectedItemIDs = SpreadsheetUpload.streamSheetInDatabase(tableName, DATAFILE.getAbsolutePath(), DataColumnMap,keep_data_button.isSelected(),cidcolumn,granularity,failedcid,	account);
+			affectedItemIDs = SpreadsheetUpload.streamSheetInDatabase(tableName, DATAFILE.getAbsolutePath(), DataColumnMap,keep_data_button.isSelected(),cidcolumn,granularity,failedcid,	account,progressBar);
 			failedcid = new HashSet<String>(failedcid.stream().filter(c->c!=null).collect(Collectors.toSet()));
 			if(failedcid.size()>0) {
 				ExceptionDialog.show("Unknown classification numbers", "There's a total of "+String.valueOf(failedcid.size())+" classes that are not known in the classification system ", String.join("\n", failedcid));
@@ -2786,7 +2780,7 @@ public class Project_parameters {
 		
 		//Call the transversal.data_exchange_toolbox.SpreadsheetUpload.loadSheetInDatabase
 		try {
-			SpreadsheetUpload.streamSheetInDatabase(tableName, taxoFile.getText(), TaxoColumnMap,false,null, Integer.MIN_VALUE,null,account);
+			SpreadsheetUpload.streamSheetInDatabase(tableName, taxoFile.getText(), TaxoColumnMap,false,null, Integer.MIN_VALUE,null,account,null);
 		} catch (ClassNotFoundException e) {
 			ExceptionDialog.show("PG000 db_error", "PG000 db_error", "PG000 db_error");
 		} catch (FileNotFoundException e) {

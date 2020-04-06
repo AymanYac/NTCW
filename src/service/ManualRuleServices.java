@@ -130,8 +130,6 @@ public class ManualRuleServices {
 			i+=1;
 			if(i%100==0) {
 				Tools.setRuleStreamProgress(Math.floor(100 * i/ruleNumber),progressUIElement,progressSyntax);
-				System.out.println(":::::::: "+String.valueOf(Math.floor(100 * i/ruleNumber))+" ::::::::");
-				
 			}
 			try {
 				Pattern p_tmp = null;

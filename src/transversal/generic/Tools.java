@@ -36,6 +36,7 @@ import java.util.stream.IntStream;
 
 import org.apache.poi.util.IOUtils;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -212,8 +213,8 @@ public class Tools {
 	}
 
 	public static String load_ip() {
-		//return "localhost";
-		return "82.66.148.154";//"88.190.148.154";
+		return "localhost";
+		//return "82.66.148.154";//"88.190.148.154";
 		//return "192.168.0.25";
 	}
 	public static String load_port() {
@@ -1409,11 +1410,23 @@ public class Tools {
 
 	public static void setRuleStreamProgress(double progress, Object progressUIElement, String progressSyntax) {
 		if(progressUIElement instanceof MenuItem) {
-			((MenuItem) progressUIElement).setText(progressSyntax.replace("XX", String.valueOf(progress)));
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					((MenuItem) progressUIElement).setText(progressSyntax.replace("XX", String.valueOf(progress)));
+					
+				}
+			});
 			return;
 		}
 		if(progressUIElement instanceof ProgressBar) {
-			((ProgressBar) progressUIElement).setProgress(progress*0.01);
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					((ProgressBar) progressUIElement).setProgress(progress*0.01);
+				}
+			});
+			return;
 		}
 	}
 }

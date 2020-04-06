@@ -19,7 +19,9 @@ public class ExceptionDialog {
 		alert.setTitle(title);
 		alert.setHeaderText(header);
 		alert.setContentText(content);
-	
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+		
 		Exception ex = new FileNotFoundException(content);
 	
 		// Create expandable Exception.

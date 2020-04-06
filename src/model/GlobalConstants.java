@@ -100,6 +100,7 @@ public class GlobalConstants {
 	public static final boolean MANUAL_CLASSIF_LOAD_LATEST_WITH_UPLOAD_PRIORITY = true;
 	public static final int CHAR_DESC_PATTERN_SELECTION_PHRASE_THRES = 4;
 	public static final double MAX_UOM_MULTIPLIER_TOLERANCE = 0.05;
+	public static final boolean REFRESH_ALL_RULE_ITEMS_ON_UPLOAD = true;
 	
 	
 }

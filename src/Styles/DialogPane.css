@@ -1,0 +1,26 @@
+.label{
+	-fx-font-family:Calibri;
+	-fx-font-weight:bold;
+	-fx-font-size:14px;
+	-fx-text-fill:white;
+	-fx-padding:5 0 0.0 0;
+	}
+	
+.customDialog{
+	-fx-background-color:#445469;
+	-fx-background-size:0 0;
+	-fx-border-color:transparent;
+}
+
+.customDialog:header .header-panel {
+  -fx-background-color:#445469;
+}
+
+.customDialog:header .header-panel .label{
+	-fx-background-color:#445469;
+	-fx-font-family:Calibri;
+	-fx-font-weight:bold;
+	-fx-font-size:14px;
+	-fx-text-fill:white;
+	-fx-padding:5 0 0.0 0;
+}

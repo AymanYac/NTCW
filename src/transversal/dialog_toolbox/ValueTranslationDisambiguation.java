@@ -20,6 +20,9 @@ public class ValueTranslationDisambiguation {
 	public static Boolean promptTranslationUpdate(Char_description parent,CharValueTextSuggestion result, String otherText) {
 		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+		
 		alert.setOnCloseRequest(new EventHandler<DialogEvent>() {
 	        @Override
 	        public void handle(DialogEvent event) {
@@ -58,6 +61,9 @@ public class ValueTranslationDisambiguation {
 			String otherText) {
 		
 		Alert alert = new Alert(AlertType.WARNING);
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+		
 		alert.setOnCloseRequest(new EventHandler<DialogEvent>() {
 	        @Override
 	        public void handle(DialogEvent event) {
@@ -98,6 +104,9 @@ public class ValueTranslationDisambiguation {
 			CharValueTextSuggestion otherResult) {
 		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+		
 		alert.setOnCloseRequest(new EventHandler<DialogEvent>() {
 	        @Override
 	        public void handle(DialogEvent event) {
@@ -143,6 +152,9 @@ public class ValueTranslationDisambiguation {
 			String otherText) {
 		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+		
 		alert.setOnCloseRequest(new EventHandler<DialogEvent>() {
 	        @Override
 	        public void handle(DialogEvent event) {
@@ -211,6 +223,9 @@ public class ValueTranslationDisambiguation {
 	public static Boolean promptTranslationDeletion(Char_description parent, CharValueTextSuggestion result) {
 		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+		
 		alert.setOnCloseRequest(new EventHandler<DialogEvent>() {
 	        @Override
 	        public void handle(DialogEvent event) {
@@ -250,6 +265,9 @@ public class ValueTranslationDisambiguation {
 	public static Boolean promptTranslationUpdate(String text, String text2) {
 
 		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+		
 		alert.setOnCloseRequest(new EventHandler<DialogEvent>() {
 	        @Override
 	        public void handle(DialogEvent event) {
@@ -288,6 +306,9 @@ public class ValueTranslationDisambiguation {
 	public static Boolean promptTranslationWarning(String text, CharValueTextSuggestion otherResult) {
 
 		Alert alert = new Alert(AlertType.WARNING);
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+		
 		alert.setOnCloseRequest(new EventHandler<DialogEvent>() {
 	        @Override
 	        public void handle(DialogEvent event) {

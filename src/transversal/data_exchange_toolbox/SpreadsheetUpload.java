@@ -29,6 +29,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.monitorjbl.xlsx.StreamingReader;
 
+import javafx.scene.control.ProgressBar;
 import model.DataInputMethods;
 import model.GenericClassRule;
 import model.UserAccount;
@@ -164,7 +165,7 @@ public class SpreadsheetUpload {
 	}
 
 	
-	public static ArrayList<String> streamSheetInDatabase(String tableName, String inputFile, LinkedHashMap<String,String> columnMap, boolean replace, String CIDColumn, Integer granularity, HashSet<String> failedcid, UserAccount account) throws ClassNotFoundException, SQLException, FileNotFoundException, IOException {
+	public static ArrayList<String> streamSheetInDatabase(String tableName, String inputFile, LinkedHashMap<String,String> columnMap, boolean replace, String CIDColumn, Integer granularity, HashSet<String> failedcid, UserAccount account, ProgressBar progressBar) throws ClassNotFoundException, SQLException, FileNotFoundException, IOException {
         
 		ArrayList<String> affectedItemIDs = new ArrayList<String>();
 		InputStream is = new FileInputStream(new File(inputFile));
@@ -176,7 +177,7 @@ public class SpreadsheetUpload {
 		
         // Get first sheet from the workbook
         Sheet sheet = workbook.getSheetAt(0);
-
+        int number_of_rows = sheet.getLastRowNum();
         Row row;
         Cell cell;
 
@@ -233,9 +234,18 @@ public class SpreadsheetUpload {
 	    
 	    
 	    
-	    new ArrayList<ArrayList<String>>();
-	    
+	    int current_row = -1;
+	    System.out.println("Number of rows in excel "+number_of_rows);
         while (rowIterator.hasNext()) {
+        	current_row+=1;
+        	try{
+        		if(Math.floorMod(current_row, Math.floorDiv(number_of_rows, 20))==0) {
+        			System.out.println("current row "+current_row);
+        		progressBar.setProgress(Math.floor(0.01*current_row/number_of_rows));
+        		}
+        	}catch(Exception V) {
+        		
+        	}
             row = rowIterator.next();
             if (parsedHeaders) {
                 rowValues = new ArrayList <String> ();
@@ -466,7 +476,7 @@ public class SpreadsheetUpload {
 		ArrayList<GenericClassRule> knownRules = new ArrayList<GenericClassRule>();
 		Connection conn = Tools.spawn_connection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("select * from "+pid+".project_rules");
+		ResultSet rs = stmt.executeQuery("select * from "+pid+".project_rules where active_status");
 		while(rs.next()) {
 			GenericClassRule gr = new GenericClassRule();
 			gr.setMain(rs.getString("main"));

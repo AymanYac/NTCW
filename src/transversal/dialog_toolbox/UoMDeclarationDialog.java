@@ -52,7 +52,9 @@ public class UoMDeclarationDialog {
 		Dialog<UnitOfMeasure> dialog = new Dialog<>();
 		dialog.setTitle("New unit of measure declaration");
 		dialog.setHeaderText("Defining a new unit of measure");
-
+		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStyleClass().add("customDialog");
+		
 		// Set the button types.
 		ButtonType validateButtonType = new ButtonType("Store new unit", ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(validateButtonType, ButtonType.CANCEL);
@@ -111,7 +113,9 @@ public class UoMDeclarationDialog {
 		Dialog<UnitOfMeasure> dialog = new Dialog<>();
 		dialog.setTitle("New unit of measure declaration");
 		dialog.setHeaderText("Defining a new unit of measure");
-
+		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStyleClass().add("customDialog");
+		
 		// Set the button types.
 		ButtonType validateButtonType = new ButtonType("Store new unit", ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().addAll(validateButtonType, ButtonType.CANCEL);
