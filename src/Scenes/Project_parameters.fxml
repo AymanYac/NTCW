@@ -336,8 +336,8 @@
                               <ProgressBar fx:id="ruleApplyProgress" prefWidth="4000.0" progress="0.41" stylesheets="@../Styles/ProgressBarDarkOrangeShadow.css" visible="false" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                               <Button fx:id="ruleApplyButton" mnemonicParsing="false" onAction="#importCharRules" stylesheets="@../Styles/ButtonOrange.css" text="Import Rules" visible="false" GridPane.columnIndex="6" GridPane.rowIndex="1" />
                               <ProgressIndicator fx:id="ruleLoadingIndicator" maxHeight="20.0" maxWidth="20.0" visible="false" GridPane.columnIndex="3" GridPane.halignment="RIGHT" />
-                              <ProgressIndicator fx:id="ruleApplyIndicator" maxHeight="20.0" maxWidth="20.0" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-                              <Label fx:id="ruleApplyLabel" text="Label" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="1" />
+                              <ProgressIndicator fx:id="ruleApplyIndicator" maxHeight="20.0" maxWidth="20.0" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="1" />
+                              <Label fx:id="ruleApplyLabel" prefHeight="22.0" prefWidth="634.0" text="Label" visible="false" GridPane.columnIndex="5" GridPane.columnSpan="2147483647" GridPane.halignment="LEFT" GridPane.rowIndex="3" />
                            </children>
                         </GridPane>
                      </content>

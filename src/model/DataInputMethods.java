@@ -7,7 +7,6 @@ public class DataInputMethods {
 	
 	public static final String BINARY_CLASSIFICATION = "AUTO";
 	public static final String USER_CLASSIFICATION_RULE = "SEMI-MANUAL";
-	public static final String IMPORTED_CLASSIFICATION_RULE = "IMPORTED-RULE";
 	
 	public static final String AUTO_CHAR_DESC = "AUTO";
 	public static final String SEMI_CHAR_DESC = "SEMI-AUTO";

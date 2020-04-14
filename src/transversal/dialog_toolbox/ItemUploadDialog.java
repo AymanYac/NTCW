@@ -55,10 +55,8 @@ public class ItemUploadDialog {
 		dialog.show();
 		//Upsert the items
 		progressStage.setText("Uploading");
-		progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
 		progressStage.setVisible(true);
 		progressBar.setProgress(0);
-		progressBar.setVisible(true);
 		ArrayList<String> affectedItemIDs = parent.save_data(progressBar);
 		if(affectedItemIDs!=null) {
 			if(affectedItemIDs.size()>0) {
@@ -82,7 +80,7 @@ public class ItemUploadDialog {
 					};
 				task.setOnSucceeded(e -> {
 					if(ruleApplySucess) {
-						int no_classified_items = itemRuleMaps.stream().flatMap(m->m.stream()).filter(m->m!=null).map(m->m[0]).collect(Collectors.toSet()).size();
+						int no_classified_items = itemRuleMaps.stream().flatMap(m->m.stream()).filter(m->m!=null).filter(ir -> ir[1]!=null).map(m->m[0]).collect(Collectors.toSet()).size();
 						progressStage.setText(String.valueOf(no_classified_items)+" of "+String.valueOf(affectedItemIDs.size())+" newly uploaded items have been classified. Do you wish to save?");
 						progressBar.setProgress(1);
 						// Set the button types.
@@ -101,6 +99,14 @@ public class ItemUploadDialog {
 							dialog.close();
 						});
 						
+					}else {
+						progressBar.setProgress(1);
+						ButtonType discardClasses = new ButtonType("Close", ButtonData.CANCEL_CLOSE);
+						dialog.getDialogPane().getButtonTypes().addAll(discardClasses);
+						Button cancelButton = (Button)dialog.getDialogPane().lookupButton(discardClasses);
+						cancelButton.setOnAction(a->{
+							dialog.close();
+						});
 					}
 					
 					});

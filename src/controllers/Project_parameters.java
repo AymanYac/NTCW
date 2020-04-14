@@ -1205,7 +1205,6 @@ public class Project_parameters {
 					@Override
 					public void run() {
 						progressStage.setText("Project has no items");
-						progressBar.setVisible(false);
 					}});
 				
 				return false;
@@ -1217,7 +1216,6 @@ public class Project_parameters {
 				@Override
 				public void run() {
 					progressStage.setText("Project has no active rules");
-					progressBar.setVisible(false);
 				}});
 			
 			return false;
@@ -1668,7 +1666,9 @@ public class Project_parameters {
 						}
 						
 					});
-					ConfirmationDialog.showRuleImportConfirmation("Confirm rule import", String.valueOf(databaseSyncLists.size())+" previously unclassified items have been classified. Do you wish to save?", "Yes, save results", "No, discard", this, account, grs, itemRuleMaps, activeStatuses, METHODS, databaseSyncLists,DataInputMethods.IMPORTED_CLASSIFICATION_RULE);
+					int no_classified = itemRuleMaps.stream().flatMap(m->m.stream()).filter(m->m!=null).filter(ir -> ir[1]!=null).map(m->m[0]).collect(Collectors.toSet()).size();
+					
+					ConfirmationDialog.showRuleImportConfirmation("Confirm rule import", String.valueOf(no_classified)+" previously unclassified items have been classified. Do you wish to save?", "Yes, save results", "No, discard", this, account, grs, itemRuleMaps, activeStatuses, METHODS, databaseSyncLists,DataInputMethods.USER_CLASSIFICATION_RULE);
 					
 					});
 

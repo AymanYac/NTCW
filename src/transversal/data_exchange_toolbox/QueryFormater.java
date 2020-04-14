@@ -41,22 +41,7 @@ public class QueryFormater {
 		
 	}
 	
-	public static String ManualFetchClassifiedItems_OLD(Integer projectGranularity,String active_project) {
-		
-		return "select extract.item_id, level_"+projectGranularity+"_number, level_"+projectGranularity+"_name_translated, classification_method, user_id,segment_id from (select project_items.item_id,"
-				+ "level_"+projectGranularity+"_number,level_"+projectGranularity+"_name_translated, segment_id, classification_method, user_id from"
-				+ " (select item_id, level_"+projectGranularity+"_number, level_"+projectGranularity+"_name_translated, latest_events.segment_id, classification_method, user_id from "
-				+ "( select item_id, segment_id, classification_method, user_id from ( "
-				+ "select item_id, segment_id, classification_method, user_id, local_rn, max(local_rn) over (partition by  item_id) as max_rn from "
-				+ "( select item_id, segment_id, classification_method, user_id, row_number() over (partition by item_id order by global_rn asc ) as local_rn from  "
-				+ "( SELECT  item_id,segment_id, classification_method, user_id, row_number() over ( order by (select 0) ) as global_rn  from"
-				+ " "+active_project+".project_classification_event where item_id in (select distinct item_id from "
-				+ ""+active_project+".project_items ) ) as global_rank ) as ranked_events ) as maxed_events "
-				+ "where local_rn = max_rn ) as latest_events left join  "+active_project+".project_segments "
-				+ "on project_segments.segment_id = latest_events.segment_id ) as rich_events right join"
-				+ " "+active_project+".project_items on rich_events.item_id = project_items.item_id ) as extract";
-		
-	}
+	
 	
 	public static String FetchItemsClassifiedBlanks(String active_project) {
 		return "select item_id from (SELECT item_id,classification_method,user_id,segment_id FROM ( SELECT DISTINCT ON (item_id) * FROM "+active_project+".project_classification_event  ORDER BY item_id, classification_time DESC ) tmp ORDER BY classification_time DESC) as latest_events where segment_id is null or length(segment_id) = 0";
