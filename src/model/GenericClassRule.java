@@ -3,11 +3,15 @@ package model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import transversal.language_toolbox.Unidecode;
 
 public class GenericClassRule {
 	
@@ -23,6 +27,7 @@ public class GenericClassRule {
 	   public Boolean active;
 	   public Boolean matched=false;
 	   String source_project_id;
+	   private Unidecode unidecode;
 	   
 	public GenericClassRule() {
 		classif.add(null);
@@ -284,6 +289,24 @@ public class GenericClassRule {
 			
 		}
 		return score;
+	}
+
+
+	public boolean isSubRule(HashSet<GenericClassRule> SearchRules) {
+		if(this.getType().contains("MAIN")) {
+			return SearchRules.stream().filter(sr->sr.getType().contains("MAIN"))
+			.anyMatch(sr->this.isSubBlockOf(sr));
+		}
+		return false;
+	}
+
+
+	private boolean isSubBlockOf(GenericClassRule sr) {
+		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
+		String thisBlock = unidecode.decodeAndTrim(getMain());
+		String targetBlock = unidecode.decodeAndTrim(sr.getMain());
+		return targetBlock.length()>thisBlock.length() && StringUtils.containsIgnoreCase(targetBlock, thisBlock);
+	
 	}
 	
 	

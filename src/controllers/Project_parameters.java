@@ -1490,8 +1490,7 @@ public class Project_parameters {
 					Connection conn;
 					conn = Tools.spawn_connection();
 					Statement ps = conn.createStatement();
-					ResultSet rs = ps.executeQuery("select * from administration.projects where classification_system_name = '"+taxoName.getValue()+"' and (not suppression_status or suppression_status is null) and project_id is not null");
-					System.out.println("select * from administration.projects where classification_system_name = '"+taxoName.getValue()+"' and (not suppression_status or suppression_status is null) and project_id is not null and project_id !='"+account.getActive_project()+"'");
+					ResultSet rs = ps.executeQuery("select * from administration.projects where classification_system_name = '"+taxoName.getValue()+"' and (not suppression_status or suppression_status is null) and project_id is not null and project_id !='"+prj.getPid()+"'");
 					Connection conn2 = Tools.spawn_connection();
 					Statement ps2 = conn2.createStatement();
 					//For every known projects

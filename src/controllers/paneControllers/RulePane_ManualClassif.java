@@ -174,9 +174,15 @@ public class RulePane_ManualClassif {
 		String desc = row.getLong_description().length()>0 ? row.getLong_description() : row.getShort_description();
 		desc = desc.toUpperCase();
 		String w1w2 = WordUtils.getSearchWords(desc);
-		String w1 = desc.split(" ")[0];
+		//Split w1 at first non alphanum except apostrophe and underscore
+		String w1 = desc.split("[^\\w']+")[0];
 		String mg = row.getMaterial_group();
 		String pc = row.getPreclassifiation();
+		try{
+			pc=(pc.length()>0)?pc:null;
+		}catch(Exception V) {
+			
+		}
 		String f1f2 = null;
 		String f1 =null;
 		boolean dwg = false;

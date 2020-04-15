@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import transversal.language_toolbox.Unidecode;
+import transversal.language_toolbox.WordUtils;
 
 import java.awt.AWTException;
 import java.awt.Robot;
@@ -124,7 +125,7 @@ public class AutoCompleteBox_ManualClassification extends TextField
         } else
         {
           LinkedList<String> searchResult = new LinkedList<>();
-          final List<String> filteredEntries = entries.stream().filter(e -> unidecode.decodeAndTrim(e).toLowerCase().contains(unidecode.decodeAndTrim(getText()).toLowerCase())).collect(Collectors.toList());
+          final List<String> filteredEntries = entries.stream().filter(e->WordUtils.filterClassNameAutoCompelete(e,getText())).collect(Collectors.toList());
           searchResult.addAll(filteredEntries);
           //searchResult.addAll(entries.subSet(getText(), getText() + Character.MAX_VALUE));
           if (entries.size() > 0)

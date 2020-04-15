@@ -1,6 +1,7 @@
 package service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +22,7 @@ import model.ItemFetcherRow;
 import model.RulePaneRow;
 import model.UserAccount;
 import transversal.generic.Tools;
+import transversal.language_toolbox.WordUtils;
 
 public class ManualRuleServices {
 
@@ -36,7 +38,7 @@ public class ManualRuleServices {
 		
 		Pattern p = null;
 		if(gr.getComp()!=null) {
-			p = Pattern.compile(".* "+gr.getComp()+" .*");
+			p = Pattern.compile(".*[^\\w]+"+gr.getComp()+"[^\\w].*");
 		}
 		for ( Object row:manualClassifController.tableController.tableGrid.getItems()){
 			k+=1;
@@ -138,7 +140,7 @@ public class ManualRuleServices {
 				ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
 				
 				if(gr.getComp()!=null) {
-					p_tmp = Pattern.compile(".* "+gr.getComp()+" .*");
+					p_tmp = Pattern.compile(".*[^\\w]+"+gr.getComp()+"[^\\w].*");
 				}
 				final Pattern p = p_tmp;
 				gr.matched=false;
@@ -184,7 +186,13 @@ public class ManualRuleServices {
 		try {
 			
 			if(gr.getMain()!=null) {
-				if( ((ItemFetcherRow) row).getLong_description().toUpperCase().startsWith(gr.getMain()) ||  ((ItemFetcherRow) row).getShort_description().toUpperCase().startsWith(gr.getMain()) ) {
+				String sd = " "+((ItemFetcherRow) row).getLong_description()+" ";
+				String ld = " "+((ItemFetcherRow) row).getShort_description()+" ";
+				List<String> sd_array = Arrays.asList(sd.split("[^\\w]+"));
+				List<String> ld_array = Arrays.asList(ld.split("[^\\w]+"));
+				List<String> main_array = Arrays.asList(gr.getMain().split("[^\\w]+"));
+				
+				if(WordUtils.startsWithIgnoreCase(main_array, sd_array) || WordUtils.startsWithIgnoreCase(main_array, ld_array)){
 					
 				}else {
 					return false;
@@ -193,11 +201,11 @@ public class ManualRuleServices {
 			
 
 			if(compiledCompPattern!=null) {
-				Matcher matcher = compiledCompPattern.matcher(((ItemFetcherRow) row).getLong_description().toUpperCase());
+				Matcher matcher = compiledCompPattern.matcher(" "+((ItemFetcherRow) row).getLong_description()+" ".toUpperCase());
 				if(matcher.matches()) {
 					
 				}else {
-					matcher = compiledCompPattern.matcher(((ItemFetcherRow) row).getShort_description().toUpperCase());
+					matcher = compiledCompPattern.matcher(" "+((ItemFetcherRow) row).getShort_description()+" ".toUpperCase());
 					if(matcher.matches()) {
 						
 					}else {
@@ -265,7 +273,7 @@ public class ManualRuleServices {
 		ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
 		
 		if(gr.getComp()!=null) {
-			tmp_p = Pattern.compile(".* "+gr.getComp()+" .*");
+			tmp_p = Pattern.compile(".*[^\\w]+"+gr.getComp()+"[^\\w].*");
 		}
 		
 		final Pattern p = tmp_p;
@@ -321,7 +329,7 @@ public class ManualRuleServices {
 		
 		
 		if(gr.getComp()!=null) {
-			p = Pattern.compile(".* "+gr.getComp()+" .*");
+			p = Pattern.compile(".*[^\\w]+"+gr.getComp()+"[^\\w].*");
 		}
 		for ( Object row:manualClassifController.tableController.tableGrid.getItems()){
 			if(tryRuleOnItem(gr,(ItemFetcherRow) row,p)) {
@@ -361,7 +369,7 @@ public class ManualRuleServices {
 		ArrayList<String[]> itemRuleMap = new ArrayList<String[]>();
 		
 		if(gr.getComp()!=null) {
-			p_tmp = Pattern.compile(".* "+gr.getComp()+" .*");
+			p_tmp = Pattern.compile(".*[^\\w]+"+gr.getComp()+"[^\\w].*");
 		}
 		final Pattern p = p_tmp;
 		
@@ -440,13 +448,14 @@ public class ManualRuleServices {
 
 	public static GenericClassRule manageRuleDisambiguation(HashSet<GenericClassRule> bestRules) {
 		//Check for conflict
-		Set<String> bestClassNumbers = bestRules.stream().map(e->e.classif.get(1)).collect(Collectors.toSet());
+		HashSet<GenericClassRule> nonSubRules = new HashSet<GenericClassRule>(bestRules.stream().filter(r->!r.isSubRule(bestRules)).collect(Collectors.toList()));
+		Set<String> bestClassNumbers = nonSubRules.stream().map(e->e.classif.get(1)).collect(Collectors.toSet());
 		if(bestClassNumbers.size()>1) {
 			//Conflict, do nothing
 			return null;
 		}else if(bestClassNumbers.size()==1) {
 			//No conflict
-			Optional<GenericClassRule> bestRule = bestRules.stream().findAny();
+			Optional<GenericClassRule> bestRule = nonSubRules.stream().findAny();
 			if(bestRule.isPresent()) {
 				return bestRule.get();
 			}

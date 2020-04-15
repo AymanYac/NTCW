@@ -12,6 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
+
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import model.BinaryClassificationParameters;
@@ -25,6 +27,7 @@ public class WordUtils {
 	
 	private static String ruleString;
 	private static int textIdx;
+	private static Unidecode unidecode;
 
 
 	public static String getSearchWords(String description) {
@@ -630,5 +633,32 @@ public class WordUtils {
 		public static String quote(String ruleMarker) {
 			String q = Pattern.quote(ruleMarker);
 			return q.substring(2).substring(0,q.length()-4);
+		}
+
+
+		public static boolean startsWithIgnoreCase(List<String> sub, List<String> supp) {
+			unidecode=(unidecode!=null)?unidecode:Unidecode.toAscii();
+			for(int idx=0;idx<sub.size();idx++) {
+				String elem = sub.get(idx);
+				try {
+					if(!StringUtils.equalsIgnoreCase(unidecode.decodeAndTrim(elem),
+													unidecode.decodeAndTrim(supp.get(idx+1))
+													)){
+						return false;
+					}
+				}catch(Exception V) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+
+		public static boolean filterClassNameAutoCompelete(String className, String typedText) {
+			unidecode=(unidecode!=null)?unidecode:Unidecode.toAscii();
+			if(typedText.chars().mapToObj(c->(char)c).anyMatch(c->Character.isLetter(c))) {
+				return unidecode.decodeAndTrim(className).toLowerCase().contains(unidecode.decodeAndTrim(typedText).toLowerCase());
+			}
+			return className.split("&&&")[1].contains(typedText);
 		}
 }

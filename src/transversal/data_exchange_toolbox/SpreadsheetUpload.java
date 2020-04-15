@@ -240,8 +240,6 @@ public class SpreadsheetUpload {
         	current_row+=1;
         	try{
         		if(Math.floorMod(current_row, Math.floorDiv(number_of_rows, 20))==0) {
-        			System.out.println("current row "+current_row);
-        			System.out.println(progressBar.getProgress());
         			progressBar.setProgress(current_row*1.0/number_of_rows*1.0);
         		}
         	}catch(Exception V) {
