@@ -81,6 +81,8 @@ public class ItemUploadDialog {
 				task.setOnSucceeded(e -> {
 					if(ruleApplySucess) {
 						int no_classified_items = itemRuleMaps.stream().flatMap(m->m.stream()).filter(m->m!=null).filter(ir -> ir[1]!=null).map(m->m[0]).collect(Collectors.toSet()).size();
+						itemRuleMaps.stream().flatMap(m->m.stream()).filter(m->m!=null).filter(ir -> ir[1]!=null);
+						
 						progressStage.setText(String.valueOf(no_classified_items)+" of "+String.valueOf(affectedItemIDs.size())+" newly uploaded items have been classified. Do you wish to save?");
 						progressBar.setProgress(1);
 						// Set the button types.

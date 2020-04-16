@@ -241,9 +241,11 @@ public class SpreadsheetUpload {
         	try{
         		if(Math.floorMod(current_row, Math.floorDiv(number_of_rows, 20))==0) {
         			progressBar.setProgress(current_row*1.0/number_of_rows*1.0);
+        			System.out.println("current row "+current_row);
+        			System.out.println(progressBar.getProgress());
         		}
         	}catch(Exception V) {
-        		V.printStackTrace(System.err);
+        		
         	}
             row = rowIterator.next();
             if (parsedHeaders) {

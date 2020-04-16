@@ -657,7 +657,7 @@ public class WordUtils {
 		public static boolean filterClassNameAutoCompelete(String className, String typedText) {
 			unidecode=(unidecode!=null)?unidecode:Unidecode.toAscii();
 			if(typedText.chars().mapToObj(c->(char)c).anyMatch(c->Character.isLetter(c))) {
-				return unidecode.decodeAndTrim(className).toLowerCase().contains(unidecode.decodeAndTrim(typedText).toLowerCase());
+				return unidecode.decodeAndTrim(className.split("&&&")[1]).toLowerCase().contains(unidecode.decodeAndTrim(typedText).toLowerCase());
 			}
 			return className.split("&&&")[1].contains(typedText);
 		}

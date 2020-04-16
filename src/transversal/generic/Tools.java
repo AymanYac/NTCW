@@ -213,8 +213,8 @@ public class Tools {
 	}
 
 	public static String load_ip() {
-		return "localhost";
-		//return "82.66.148.154";//"88.190.148.154";
+		//return "localhost";
+		return "82.66.148.154";//"88.190.148.154";
 		//return "192.168.0.25";
 	}
 	public static String load_port() {
@@ -975,16 +975,16 @@ public class Tools {
 					ps.addBatch();
 					
 					
-					itemRuleMap.forEach((A)->{
-						String item_id = A[0];
-						String rule_id = A[1];
+					itemRuleMap.stream().filter(A->A!=null).forEach((A)->{
 						try {
+							String item_id = A[0];
+							String rule_id = A[1];
 							ps2.setString(1, item_id);
 							ps2.setString(2, rule_id);
 							ps2.addBatch();
 						} catch (SQLException e) {
 							// TODO Auto-generated catch block
-							e.printStackTrace();
+							
 						}
 					});
 					
@@ -1018,6 +1018,7 @@ public class Tools {
 		    /* code to execute if task throws exception */
 		    System.err.println("failed to sync rules ");
 		    //System.err.println(ExceptionUtils.getRootCauseMessage( problem ))	;
+		    problem.printStackTrace();
 		    problem.printStackTrace(System.err);
 		    
 		    
@@ -1072,7 +1073,7 @@ public class Tools {
 				final PreparedStatement ps2 = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_items_x_rules(" + 
 						"            item_id, rule_id)" + 
 						"    VALUES (?, ?) on conflict(item_id,rule_id) do nothing;");
-				itemRuleMap.forEach((A)->{
+				itemRuleMap.stream().filter(A->A!=null).forEach((A)->{
 					String item_id = A[0];
 					String rule_id = A[1];
 					try {
