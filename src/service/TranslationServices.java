@@ -67,8 +67,8 @@ public class TranslationServices {
 		try{
 			String active_class = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0];
 			int active_idx = parent.tableController.selected_col;
-			active_idx%=parent.tableController.active_characteristics.get(active_class).size();
-			ClassCharacteristic active_char = parent.tableController.active_characteristics.get(active_class).get(active_idx);
+			active_idx%=CharValuesLoader.active_characteristics.get(active_class).size();
+			ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(active_class).get(active_idx);
 			return new ArrayList<CharValueTextSuggestion>(
 					textEntries.get(active_char.getCharacteristic_id()).parallelStream().filter(
 							s->s.hasSourceValue(isDataField)).collect(Collectors.toList()));

@@ -112,6 +112,7 @@ public class CharClassifProposer {
 				btn.setOpacity(1.0);
 				btn.setOnAction((event) -> {
 					CharDescriptionExportServices.addCharDataToPush(row, segment, char_idx,charIdxSize);
+					CharDescriptionExportServices.flushToDB(parent.account);
 					CharValuesLoader.updateRuntimeDataForItem(row,segment,char_idx,e.getValue().getActionValue());
 					clearPropButtons();
 					row.getRulePropositions().get(segment).get(char_idx).clear();

@@ -2637,7 +2637,7 @@ public class CharPatternServices {
 		
 		if(!(charIdArrays!=null)) {
 			charIdArrays = new HashMap<String,List<String>>();
-			parent.tableController.active_characteristics.forEach((k,v)->{
+			CharValuesLoader.active_characteristics.forEach((k,v)->{
 			charIdArrays.put(k, v.stream().map(c->c.getCharacteristic_id()).collect(Collectors.toList()));	
 			});
 		}
@@ -2648,13 +2648,13 @@ public class CharPatternServices {
 		if(activeRule!=null && activeRule.replaceAll(" ", "").length()>0) {
 			String activeClass = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0];
 			int activeCharIndex = parent.tableController.selected_col;
-			ArrayList<ClassCharacteristic> activeChars = parent.tableController.active_characteristics.get(activeClass);
+			ArrayList<ClassCharacteristic> activeChars = CharValuesLoader.active_characteristics.get(activeClass);
 			ClassCharacteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
 			GenericCharRule activeCharRule = new GenericCharRule(activeClass,activeChar,activeRule);
 			if(activeCharRule.parseSuccess()) {
 				System.out.println("Trying rule "+activeCharRule.getRuleMarker());
 				Pattern regexPattern = Pattern.compile("["+GenericCharRule.SEP_CLASS+"]"+activeCharRule.getRegexMarker()+"["+GenericCharRule.SEP_CLASS+"]",Pattern.CASE_INSENSITIVE);
-				List<String> targetClasses = parent.tableController.active_characteristics
+				List<String> targetClasses = CharValuesLoader.active_characteristics
 						.entrySet().stream().filter(
 								e->e.getValue().stream().anyMatch(a->a.getCharacteristic_id().equals(activeChar.getCharacteristic_id())))
 						.map(e->e.getKey()).collect(Collectors.toList());
@@ -2666,7 +2666,7 @@ public class CharPatternServices {
 			
 		}
 		
-		
+		CharDescriptionExportServices.flushToDB(parent.account);
 	}
 
 	private static void tryRuleOnItem(CharDescriptionRow r, GenericCharRule activeCharRule, Pattern regexPattern, List<String> targetClasses, Char_description parent) {
@@ -2694,7 +2694,7 @@ public class CharPatternServices {
 					);
 		}
 		matchingSegments.forEach(segment->r.reEvaluateCharRules(segment,charIdArrays.get(segment).size()));
-		CharDescriptionExportServices.flushToDB(parent.account);
+		
 	}
 
 	private static ArrayList<String> addCharResult2Row(CharDescriptionRow matchedRow, GenericCharRule matchedRule, String matchedText,
@@ -2712,10 +2712,10 @@ public class CharPatternServices {
 			.forEach(charIdx->{
 				if(!(matchedRow.getData(segment)[charIdx]!=null)) {
 					matchedRow.getData(segment)[charIdx] = new CharacteristicValue();
-					matchedRow.getData(segment)[charIdx].setParentChar(parent.tableController.active_characteristics.get(segment).get(charIdx));
+					matchedRow.getData(segment)[charIdx].setParentChar(CharValuesLoader.active_characteristics.get(segment).get(charIdx));
 				}
 				
-				CharRuleResult newMatch = new CharRuleResult(matchedRule,matchedText,matchedGroup,parent.tableController.active_characteristics.get(segment).get(charIdx));
+				CharRuleResult newMatch = new CharRuleResult(matchedRule,matchedText,matchedGroup,CharValuesLoader.active_characteristics.get(segment).get(charIdx));
 				newMatch.ruleActionToValue(parent);
 				matchedRow.addCharRuleResult(newMatch,segment,charIdx,charIdArrays.get(segment).size());
 				matchingSegments.add(segment);

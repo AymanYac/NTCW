@@ -44,10 +44,10 @@ public class ClassCharacteristicsLoader {
 		
 		while(rs.next()) {
 			String loop_class_id = rs.getString("segment_id");
-			if(tablePane_CharClassif.active_characteristics.containsKey(loop_class_id)) {
+			if(CharValuesLoader.active_characteristics.containsKey(loop_class_id)) {
 				
 			}else {
-				tablePane_CharClassif.active_characteristics.put(loop_class_id, new ArrayList<ClassCharacteristic>());
+				CharValuesLoader.active_characteristics.put(loop_class_id, new ArrayList<ClassCharacteristic>());
 			}
 			ClassCharacteristic tmp = new ClassCharacteristic();
 			tmp.setCharacteristic_id(rs.getString("characteristic_id"));
@@ -68,7 +68,7 @@ public class ClassCharacteristicsLoader {
 			tmp.setIsNumeric(rs.getBoolean("isNumeric"));
 			tmp.setIsTranslatable(rs.getBoolean("isTranslatable"));
 			
-			tablePane_CharClassif.active_characteristics.get(loop_class_id).add(tmp);
+			CharValuesLoader.active_characteristics.get(loop_class_id).add(tmp);
 			
 			
 			

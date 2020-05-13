@@ -58,6 +58,7 @@ import javafx.stage.Stage;
 import model.DataInputMethods;
 import model.GenericClassRule;
 import model.GlobalConstants;
+import model.ImportTaxoRow;
 import model.ItemFetcherRow;
 import model.Project;
 import model.ProjectTemplate;
@@ -65,6 +66,7 @@ import model.RuleSet;
 import model.UserAccount;
 import service.ItemFetcher;
 import service.ManualRuleServices;
+import transversal.data_exchange_toolbox.CharDescriptionImportServices;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.data_exchange_toolbox.SpreadsheetUpload;
 import transversal.dialog_toolbox.ConfirmationDialog;
@@ -2770,7 +2772,19 @@ public class Project_parameters {
 			return this.prj.getPid()+".project_segments";
 		}
 		
-		
+		if(GlobalConstants.USE_TAXOIMPORT_NEW_SCHEMA) {
+			try {
+				ImportTaxoRow.setProjectGranularity(Integer.parseInt(classificationLevels.getValue()));
+				ImportTaxoRow.setColumnMap();
+				ImportTaxoRow.loadTaxoDS();
+				CharDescriptionImportServices.upsertTaxoAndChar(taxoFile.getText(),"TAXO","ITEMS");
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return this.prj.getPid()+".project_segments";
+			
+		}
 		
 		
 		//Call the get_taxo_column_map procedure

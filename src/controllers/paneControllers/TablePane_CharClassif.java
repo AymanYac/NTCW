@@ -37,6 +37,7 @@ import model.DataInputMethods;
 import model.UserAccount;
 import service.CharAdvancementUpdater;
 import service.CharItemFetcher;
+import service.CharValuesLoader;
 import service.ClassCharacteristicsLoader;
 import service.TableViewExtra;
 import service.TranslationServices;
@@ -57,7 +58,7 @@ public class TablePane_CharClassif {
 	protected String translated_ld;
 	private UserAccount account;
 	private CharAdvancementUpdater advancement;
-	public HashMap<String,ArrayList<ClassCharacteristic>> active_characteristics = new HashMap<String,ArrayList<ClassCharacteristic>>();
+	//public HashMap<String,ArrayList<ClassCharacteristic>> active_characteristics = new HashMap<String,ArrayList<ClassCharacteristic>>();
 
 
 
@@ -324,17 +325,17 @@ public class TablePane_CharClassif {
 						//Fresh value loaded during values assignement by new class
 					}else {
 						//Try to allign the new empty value on the old one
-						ClassCharacteristic new_char = active_characteristics.get(row.getClass_segment().split("&&&")[0]).get(idx);
+						ClassCharacteristic new_char = CharValuesLoader.active_characteristics.get(row.getClass_segment().split("&&&")[0]).get(idx);
 						//Search for an old char with the same name
-						for(int idx2=0;idx2<active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).size();idx2++ ) {
-							ClassCharacteristic old_char = active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).get(idx2);
+						for(int idx2=0;idx2<CharValuesLoader.active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).size();idx2++ ) {
+							ClassCharacteristic old_char = CharValuesLoader.active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).get(idx2);
 							if(
 									old_char.getCharacteristic_name().toLowerCase().equals(new_char.getCharacteristic_name().toLowerCase())
 									||
 									old_char.getCharacteristic_name_translated().toLowerCase().equals(new_char.getCharacteristic_name_translated().toLowerCase()
 							)) {
 								row.getData(row.getClass_segment().split("&&&")[0])[idx]=row.getData(itemPreviousClasses.get(row).split("&&&")[0])[idx2];
-								CharDescriptionExportServices.addCharDataToPush(row,row.getClass_segment().split("&&&")[0],idx,active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
+								CharDescriptionExportServices.addCharDataToPush(row,row.getClass_segment().split("&&&")[0],idx,CharValuesLoader.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
 								break;
 							}
 						}
@@ -545,8 +546,8 @@ public class TablePane_CharClassif {
 
 	@SuppressWarnings("rawtypes")
 	private void selectChartAtIndex(int i,boolean collapsedView) {
-		int selected_col = Math.floorMod(i,this.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size());
-		List<String> char_headers = this.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
+		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size());
+		List<String> char_headers = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
 		for( Object col:this.tableGrid.getColumns()) {
 			int idx = char_headers.indexOf(((TableColumn)col).getText());
 			if(idx!=selected_col ) {
@@ -653,8 +654,8 @@ public class TablePane_CharClassif {
         descriptionColumn.setResizable(false);
         descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
         
-        for(int i=0;i<this.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size();i++) {
-            ClassCharacteristic characteristic = this.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).get(i);
+        for(int i=0;i<CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size();i++) {
+            ClassCharacteristic characteristic = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).get(i);
             final int dataIndex = i;
             TableColumn col = new TableColumn<>(characteristic.getCharacteristic_name());
             col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {

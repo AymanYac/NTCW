@@ -170,7 +170,7 @@ public class ItemFetcher {
 					tmp.setManual_segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
 					tmp.setSource_Manual(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
 					tmp.setAuthor_Manual(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
-					
+					tmp.setReviewer_Manual(tmp.getAuthor_Manual());
 				}
 				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(DataInputMethods.PROJECT_SETUP_UPLOAD)){
 					tmp.setUpload_segment_number( classifiedItems.get(tmp.getItem_id()).split("&&&")[0] );
@@ -178,7 +178,7 @@ public class ItemFetcher {
 					tmp.setUpload_segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
 					tmp.setSource_Upload(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
 					tmp.setAuthor_Upload(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
-					
+					tmp.setReviewer_Upload(tmp.getAuthor_Upload());
 				}
 				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(DataInputMethods.USER_CLASSIFICATION_RULE)
 						||
@@ -188,6 +188,7 @@ public class ItemFetcher {
 					tmp.setRule_Segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
 					tmp.setSource_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
 					tmp.setAuthor_Rules(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
+					tmp.setReviewer_Rules(tmp.getAuthor_Rules());
 					tmp.setRule_id_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[5]);
 					tmp.setRule_description_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[5]);
 					QueryFormater.ADD_UPLOAD_ITEM_CLASS(tmp, projectGranularity, active_project);

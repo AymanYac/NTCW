@@ -89,7 +89,7 @@ public class CharItemFetcher {
 		
 		indexedRowItems.entrySet().parallelStream().filter(e->itemListIDs.contains(e.getKey()))
 		.forEach(e->{
-			allRowItems.get(e.getValue()).allocateDataField(target_class_id,tablePane_CharClassif.active_characteristics.get(target_class_id).size());
+			allRowItems.get(e.getValue()).allocateDataField(target_class_id,CharValuesLoader.active_characteristics.get(target_class_id).size());
 		});
 		
 		System.out.println("Class change :: allocated data fields for "+itemList.size()+" items");
@@ -99,7 +99,7 @@ public class CharItemFetcher {
 		System.out.println("Initializing all data fields");
 		allRowItems.forEach(r->{
 			String item_class_id = classifiedItems.get(r.getItem_id()).split("&&&")[4];
-			r.allocateDataField(item_class_id,tablePane_CharClassif.active_characteristics.get(item_class_id).size());
+			r.allocateDataField(item_class_id,CharValuesLoader.active_characteristics.get(item_class_id).size());
 			
 		});
 	}

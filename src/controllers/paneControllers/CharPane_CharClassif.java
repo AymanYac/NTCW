@@ -11,6 +11,7 @@ import model.CharDescriptionRow;
 import model.CharPaneRow;
 import model.ClassCharacteristic;
 import model.mouseHoverTableCell;
+import service.CharValuesLoader;
 
 public class CharPane_CharClassif {
 
@@ -34,8 +35,8 @@ public class CharPane_CharClassif {
 			
 		}
 		if(this.selected_row!=null) {
-			for(int i=0;i<this.parent.tableController.active_characteristics.get(selected_row.getClass_segment().split("&&&")[0]).size();i++) {
-				ClassCharacteristic carac = this.parent.tableController.active_characteristics.get(selected_row.getClass_segment().split("&&&")[0]).get(i);
+			for(int i=0;i<CharValuesLoader.active_characteristics.get(selected_row.getClass_segment().split("&&&")[0]).size();i++) {
+				ClassCharacteristic carac = CharValuesLoader.active_characteristics.get(selected_row.getClass_segment().split("&&&")[0]).get(i);
 				CharPaneRow tmp = new CharPaneRow(this.parent);
 				tmp.setChar_index(i);
 				tmp.setCarac(carac);
@@ -48,7 +49,7 @@ public class CharPane_CharClassif {
 		
 		try {
 			triggerItemTableRefresh = false;
-			this.tableGrid.getSelectionModel().select(Math.floorMod(this.parent.tableController.selected_col,this.parent.tableController.active_characteristics.get(selected_row.getClass_segment().split("&&&")[0]).size()));
+			this.tableGrid.getSelectionModel().select(Math.floorMod(this.parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(selected_row.getClass_segment().split("&&&")[0]).size()));
 			triggerItemTableRefresh = true;
 		}catch(Exception V) {
 			

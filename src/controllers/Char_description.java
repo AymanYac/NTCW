@@ -485,8 +485,8 @@ public class Char_description {
 		}
 	}
 	private Boolean CheckForTranslationValidity() {
-		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
-		ClassCharacteristic active_char = this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
+		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+		ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
 		.get(active_char_index);
 		if(active_char.getIsTranslatable()) {
 			if(value_field.isFocused() && value_field.getText()!=null && value_field.getText().length()>0) {
@@ -571,9 +571,9 @@ public class Char_description {
 		
 		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
-			int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0]).size());
+			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0]).size());
 			CharPatternServices.scanSelectionForPatternDetection(this,
-					this.tableController.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0])
+					CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0])
 					.get(active_char_index));
 		}
 		
@@ -680,8 +680,8 @@ public class Char_description {
 	private Node validateDataFields() {
 		CharDescriptionRow row = tableController.tableGrid.getSelectionModel().getSelectedItem();
 		String selectedRowClass = row.getClass_segment().split("&&&")[0];
-		int active_char_index = Math.floorMod(tableController.selected_col,tableController.active_characteristics.get(selectedRowClass).size());
-		ClassCharacteristic active_char = tableController.active_characteristics.get(selectedRowClass).get(active_char_index);
+		int active_char_index = Math.floorMod(tableController.selected_col,CharValuesLoader.active_characteristics.get(selectedRowClass).size());
+		ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(selectedRowClass).get(active_char_index);
 		
 		if(validateValueField(active_char,value_field) && value_field.isVisible()) {
 			return value_field;
@@ -751,7 +751,7 @@ public class Char_description {
 			Optional<UnitOfMeasure> matchinguom = UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->u.toString().equals(uomFieldText)).findAny();
 			if(matchinguom.isPresent()) {
 				
-				if(UnitOfMeasure.ConversionPathExists(matchinguom.get(), tableController.active_characteristics.get(row_class_id).get(active_char_index).getAllowedUoms())) {
+				if(UnitOfMeasure.ConversionPathExists(matchinguom.get(), CharValuesLoader.active_characteristics.get(row_class_id).get(active_char_index).getAllowedUoms())) {
 					return false;
 				}else {
 					
@@ -994,7 +994,7 @@ public class Char_description {
 		
 		
 		//this.UOMS = Tools.get_units_of_measures(user_language_gcode);
-		UnitOfMeasure.RunTimeUOMS = UnitOfMeasure.get_units_of_measures("en");
+		UnitOfMeasure.RunTimeUOMS = UnitOfMeasure.fetch_units_of_measures("en");
 		
 		//classification tmp.setNew_segment_name( CID2NAME,j,parent_controller);
 		classification = new AutoCompleteBox_CharClassification(this,classification_style.getStyle(),account);
@@ -1291,10 +1291,10 @@ public class Char_description {
 			return;
 		}
 		try {
-			int selected_col = Math.floorMod(tableController.selected_col, tableController.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
-			ClassCharacteristic active_char = tableController.active_characteristics.get(row.getClass_segment().split("&&&")[0]).get(selected_col);
-			proposer.loadCharRuleProps(row,row.getClass_segment().split("&&&")[0],selected_col,tableController.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
-			CharDescriptionExportServices.flushToDB(account);
+			int selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
+			ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(row.getClass_segment().split("&&&")[0]).get(selected_col);
+			proposer.loadCharRuleProps(row,row.getClass_segment().split("&&&")[0],selected_col,CharValuesLoader.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
+			
 			if(active_char.getIsNumeric()) {
 				if( (active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0)) {
 					
@@ -1610,15 +1610,15 @@ public class Char_description {
 	public void AssignValueOnSelectedItems(CharacteristicValue value) {
 
 		//uiDirectValueRefresh(pattern_value);
-		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
 		List<String> targetItemsIDs = tableController.tableGrid.getSelectionModel().getSelectedItems().stream().map(i->i.getItem_id()).collect(Collectors.toList());
 		CharItemFetcher.allRowItems.parallelStream().filter(e->targetItemsIDs.contains(e.getItem_id()))
 						.forEach(r->{
-							CharDescriptionExportServices.addCharDataToPush(r, this.classCombo.getValue().getClassSegment(), active_char_index,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+							CharDescriptionExportServices.addCharDataToPush(r, this.classCombo.getValue().getClassSegment(), active_char_index,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
 							CharValuesLoader.updateRuntimeDataForItem(r,this.classCombo.getValue().getClassSegment(),active_char_index,value);
 						});
 		CharDescriptionExportServices.flushToDB(account);
-		TranslationServices.beAwareOfNewValue(value, tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index));
+		TranslationServices.beAwareOfNewValue(value, CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index));
 		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index),true);
 		
 		refresh_ui_display();
@@ -1630,8 +1630,8 @@ public class Char_description {
 		pattern_value.setSource(DataInputMethods.SEMI_CHAR_DESC);
 		pattern_value.setAuthor(account.getUser_id());
 		
-		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
-		ClassCharacteristic active_char = this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
+		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+		ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
 		.get(active_char_index);
 		
 		if(active_char.getIsNumeric()) {
@@ -1663,8 +1663,8 @@ public class Char_description {
 	
 	@SuppressWarnings("unused")
 	private void uiDirectValueRefresh(CharacteristicValue pattern_value) {
-		int active_char_index = Math.floorMod(this.tableController.selected_col,this.tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
-		ClassCharacteristic active_char = this.tableController.active_characteristics.get(classCombo.getValue().getClassSegment())
+		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+		ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
 		.get(active_char_index);
 		
 		if(active_char.getIsNumeric()) {

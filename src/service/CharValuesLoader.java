@@ -23,6 +23,7 @@ public class CharValuesLoader {
 	
 	static ArrayList<CharacteristicValue> knownValues;
 	static HashMap<String,Integer> indexedKnownValues = new HashMap<String,Integer>();
+	public static HashMap<String,ArrayList<ClassCharacteristic>> active_characteristics = new HashMap<String,ArrayList<ClassCharacteristic>>();
 	public static void loadAllKnownValuesAssociated2Items(String active_project,TablePane_CharClassif tablePane_CharClassif) throws SQLException, ClassNotFoundException {
 		if(knownValues!=null) {
 			return;
@@ -41,7 +42,7 @@ public class CharValuesLoader {
 			System.out.println(stmt.toString());
 			rs = stmt.executeQuery();
 			HashMap<String, List<String>> charIdArrays = new HashMap<String,List<String>>();
-			tablePane_CharClassif.active_characteristics.forEach((k,v)->{
+			CharValuesLoader.active_characteristics.forEach((k,v)->{
 			charIdArrays.put(k, v.stream().map(c->c.getCharacteristic_id()).collect(Collectors.toList()));	
 			});
 			int i=-1;
@@ -56,7 +57,7 @@ public class CharValuesLoader {
 				val.setValue_id(rs.getString("value_id"));
 				val.setDataLanguageValue(rs.getString("text_value_data_language"));
 				val.setUserLanguageValue(rs.getString("text_value_user_language"));
-				TranslationServices.beAwareOfNewValue(val,tablePane_CharClassif.active_characteristics.get(loop_class_id).get(charIdArrays.get(loop_class_id).indexOf(characteristic_id)));
+				TranslationServices.beAwareOfNewValue(val,CharValuesLoader.active_characteristics.get(loop_class_id).get(charIdArrays.get(loop_class_id).indexOf(characteristic_id)));
 				val.setNominal_value(rs.getString("nominal_value"));
 				val.setMin_value(rs.getString("min_value"));
 				val.setMax_value(rs.getString("max_value"));
@@ -68,7 +69,7 @@ public class CharValuesLoader {
 				val.setUrl(rs.getString("url_link"));
 				
 				try{
-					val.setParentChar(tablePane_CharClassif.active_characteristics.get(loop_class_id).get(charIdArrays.get(loop_class_id).indexOf(characteristic_id)));
+					val.setParentChar(CharValuesLoader.active_characteristics.get(loop_class_id).get(charIdArrays.get(loop_class_id).indexOf(characteristic_id)));
 				}catch(Exception V) {
 					System.out.println("Couldn't set parent for char "+characteristic_id+" in class "+loop_class_id);
 				}
@@ -146,7 +147,7 @@ public class CharValuesLoader {
 	public static void storeItemDatafromScreen(int idx, Char_description parent) {
 		CharDescriptionRow row = parent.tableController.itemArray.get(idx);
 		String class_id = row.getClass_segment().split("&&&")[0];
-		ArrayList<ClassCharacteristic> chars = parent.tableController.active_characteristics.get(class_id);
+		ArrayList<ClassCharacteristic> chars = CharValuesLoader.active_characteristics.get(class_id);
 		ClassCharacteristic active_char = chars.get(parent.tableController.selected_col%chars.size());
 		
 		CharacteristicValue tmp = new CharacteristicValue();

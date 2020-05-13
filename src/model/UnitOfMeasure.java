@@ -94,7 +94,7 @@ public class UnitOfMeasure {
 		return this.getUom_symbol()+" ("+this.getUom_name()+")";
 		
 	}
-	public static  HashMap<String, UnitOfMeasure> get_units_of_measures(String language_code) throws ClassNotFoundException, SQLException {
+	public static  HashMap<String, UnitOfMeasure> fetch_units_of_measures(String language_code) throws ClassNotFoundException, SQLException {
 		HashMap<String,UnitOfMeasure> ret = new HashMap<String,UnitOfMeasure>();
 		Connection conn = Tools.spawn_connection();
 		Statement stmt = conn.createStatement();

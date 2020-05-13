@@ -3,7 +3,10 @@ package model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javafx.util.Pair;
 
 public class ClassCharacteristic {
 	//Char fields
@@ -116,4 +119,19 @@ public class ClassCharacteristic {
 	public int hashCode() {
 		return getCharacteristic_id().hashCode();
 	}
+	
+	
+	public Pair<String,String> attemptUomSymbolInterpretationCorrection(String uomFalse){
+		HashSet<String> fs = new HashSet<String>(UnitOfMeasure.RunTimeUOMS.get(uomFalse).getUom_symbols());
+		
+		Optional<String> match = allowedUoms.parallelStream()
+		.filter(uid->!(new HashSet<String>(UnitOfMeasure.RunTimeUOMS.get(uid).getUom_symbols()).addAll(fs)))
+		.findAny();
+		
+		if(match.isPresent()) {
+			return new Pair<String,String>(uomFalse,match.get().getClass().toString());
+		}
+		return null;
+	}
+	
 }

@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -22,19 +25,25 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 
 import controllers.Char_description;
+import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
+import javafx.util.Pair;
 import model.CharDescriptionRow;
+import model.CharacteristicValue;
 import model.ClassCharacteristic;
 import model.UnitOfMeasure;
 import model.UserAccount;
 import service.CharItemFetcher;
+import service.CharValuesLoader;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
+
 
 public class CharDescriptionExportServices {
 
 	private static int reviewRowIdx;
 	private static int baseRowIdx;
+	public static ConcurrentLinkedQueue<Pair<String, Pair<CharacteristicValue,ClassCharacteristic>>> characDBBuffer = new ConcurrentLinkedQueue<Pair<String, Pair<CharacteristicValue,ClassCharacteristic>>>();
 	
 	public static void ExportItemDataForClass(String targetClass, Char_description parent) throws ClassNotFoundException, SQLException, IOException {
 		
@@ -60,7 +69,7 @@ public class CharDescriptionExportServices {
         	if(targetClass!=null && !targetClass.equals(itemClass)) {
         		continue;
         	}
-        	ArrayList<ClassCharacteristic> itemChars = parent.tableController.active_characteristics.get(item.getClass_segment().split("&&&")[0]);
+        	ArrayList<ClassCharacteristic> itemChars = CharValuesLoader.active_characteristics.get(item.getClass_segment().split("&&&")[0]);
         	if(itemChars.size()>reviewCharCardinality) {
         		reviewCharCardinality = itemChars.size();
         	}
@@ -98,7 +107,7 @@ public class CharDescriptionExportServices {
 		reviewSheet.setColumnWidth(3,256*15);
 		reviewSheet.setColumnWidth(4,256*25);
 		reviewSheet.setColumnWidth(5,256*35);
-		for(int i=0;i<parent.tableController.active_characteristics.values().parallelStream()
+		for(int i=0;i<CharValuesLoader.active_characteristics.values().parallelStream()
 				.map(a->a.size()).max(Integer::compare).get();i++) {
 			reviewSheet.setColumnWidth(6+2*i,256*20);
 			reviewSheet.setColumnWidth(7+2*i,256*20);
@@ -287,7 +296,7 @@ public class CharDescriptionExportServices {
 						IndexedColors.SEA_GREEN
 				});
 		completeReviewHeaderRow(wb,reviewHeader,
-				parent.tableController.active_characteristics.values().parallelStream()
+				CharValuesLoader.active_characteristics.values().parallelStream()
 				.map(a->a.size()).max(Integer::compare).get());
 		
 		
@@ -420,15 +429,107 @@ public class CharDescriptionExportServices {
 	}
 
 
-	public static void addCharDataToPush(CharDescriptionRow matchedRow, String segment, int charIdx, int charIdxSize) {
-		matchedRow.reEvaluateCharRules(segment, charIdxSize);
-		
+	public static void addCharDataToPush(CharDescriptionRow row, String segment, int charIdx, int charIdxSize) {
+		CharacteristicValue val = row.getData(segment)[charIdx];
+		ClassCharacteristic carac = CharValuesLoader.active_characteristics.get(segment).get(charIdx);
+		Pair<CharacteristicValue,ClassCharacteristic> valCaracPair = new Pair<CharacteristicValue,ClassCharacteristic>(val,carac);
+		Pair<String, Pair<CharacteristicValue,ClassCharacteristic>> queueItem = new Pair<String, Pair<CharacteristicValue,ClassCharacteristic>>(row.getItem_id(),valCaracPair);
+		characDBBuffer.add(queueItem);
 	}
 
 
 	public static void flushToDB(UserAccount account) {
-		// TODO Auto-generated method stub
-		
+		if(characDBBuffer.peek()!=null) {
+			Task<Void> dbFlushTask = new Task<Void>() {
+			    
+				@Override
+			    protected Void call() throws Exception {
+					Connection conn = Tools.spawn_connection();
+					Connection conn2 = Tools.spawn_connection();
+					Connection conn3 = Tools.spawn_connection();
+					PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_values values(?,?,?,?,?,?,?,?)");
+					PreparedStatement stmt2 = conn2.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values values (?,?,?,?,clock_timestamp(),?,?,?) on conflict (item_id,characteristic_id) do update set user_id = excluded.user_id, description_method = excluded.description_method, description_time=excluded.description_time, value_id = excluded.value_id, description_rule_id=excluded.description_rule_id,url_link = excluded.url_link");
+					PreparedStatement stmt3 = conn3.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values_history values (?,?,?,?,clock_timestamp(),?,?,?)");
+					while(characDBBuffer.peek()!=null) {
+						try {
+							Pair<String, Pair<CharacteristicValue, ClassCharacteristic>> elem = characDBBuffer.poll();
+							String item_id = elem.getKey();
+							CharacteristicValue val = elem.getValue().getKey();
+							ClassCharacteristic carac = elem.getValue().getValue();
+
+							stmt.setString(1, val.getValue_id());
+							stmt.setString(2, val.getDataLanguageValue());
+							stmt.setString(3, val.getUserLanguageValue());
+							stmt.setString(4, val.getNominal_value());
+							stmt.setString(5, val.getMin_value());
+							stmt.setString(6, val.getMax_value());
+							stmt.setString(7, val.getNote());
+							stmt.setString(8, val.getUom_id());
+							System.out.println(stmt.toString());
+							//stmt.addBatch();
+							
+							stmt2.setString(1, item_id);
+							stmt2.setString(2, carac.getCharacteristic_id());
+							stmt2.setString(3, account.getUser_id());
+							stmt2.setString(4, val.getSource());
+							stmt2.setString(5, val.getValue_id());
+							stmt2.setString(6, val.getRule_id());
+							stmt2.setString(7, val.getUrl());
+							System.out.println(stmt2.toString());
+							//stmt2.addBatch();
+							
+							stmt3.setString(1, item_id);
+							stmt3.setString(2, carac.getCharacteristic_id());
+							stmt3.setString(3, account.getUser_id());
+							stmt3.setString(4, val.getSource());
+							stmt3.setString(5, val.getValue_id());
+							stmt3.setString(6, val.getRule_id());
+							stmt3.setString(7, val.getUrl());
+							System.out.println(stmt3.toString());
+							//stmt3.addBatch();
+							
+						}catch(Exception V) {
+							V.printStackTrace(System.err);
+						}
+					}
+					stmt.executeBatch();
+					stmt2.executeBatch();
+					stmt3.executeBatch();
+					
+					stmt.clearBatch();
+					stmt.close();
+					stmt2.clearBatch();
+					stmt2.close();
+					stmt3.clearBatch();
+					stmt3.close();
+					
+					conn.close();
+					conn2.close();
+					conn3.close();
+			    	return null;
+			    }
+			};
+			dbFlushTask.setOnSucceeded(e -> {
+				
+				
+				});
+			dbFlushTask.setOnFailed(e -> {
+			    Throwable problem = dbFlushTask.getException();
+			    /* code to execute if task throws exception */
+			    problem.printStackTrace(System.err);
+			});
+
+			dbFlushTask.setOnCancelled(e -> {
+			    /* task was cancelled */
+				
+			});
+			
+			Thread dbFlushThread = new Thread(dbFlushTask);; dbFlushThread.setDaemon(true);
+			dbFlushThread.setName("CharacDBFlush");
+			dbFlushThread.start();
+			
+		}
+		return;
 	}
 
 	
