@@ -124,12 +124,14 @@ public class ClassCharacteristic {
 	public Pair<String,String> attemptUomSymbolInterpretationCorrection(String uomFalse){
 		HashSet<String> fs = new HashSet<String>(UnitOfMeasure.RunTimeUOMS.get(uomFalse).getUom_symbols());
 		
-		Optional<String> match = allowedUoms.parallelStream()
-		.filter(uid->!(new HashSet<String>(UnitOfMeasure.RunTimeUOMS.get(uid).getUom_symbols()).addAll(fs)))
+		Optional<String> match = 
+		UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->UnitOfMeasure.ConversionPathExists(u, allowedUoms)).map(u->u.getUom_id())
+		//allowedUoms.stream()
+		.filter(uid->new HashSet<String>(UnitOfMeasure.RunTimeUOMS.get(uid).getUom_symbols()).removeAll(fs))
 		.findAny();
 		
 		if(match.isPresent()) {
-			return new Pair<String,String>(uomFalse,match.get().getClass().toString());
+			return new Pair<String,String>(uomFalse,match.get());
 		}
 		return null;
 	}

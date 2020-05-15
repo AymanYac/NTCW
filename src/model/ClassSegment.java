@@ -1,15 +1,27 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.stream.IntStream;
 
 public class ClassSegment {
 	int segmentGranularity;
 	String segmentId;
-	ArrayList<String> levelNumbers = new ArrayList<String>(4);
-	ArrayList<String> levelNames = new ArrayList<String>(4);
-	ArrayList<String> levelNamesTranslated = new ArrayList<String>(4);
+	ArrayList<String> levelNumbers;
+	ArrayList<String> levelNames;
+	ArrayList<String> levelNamesTranslated;
 	
 	
+	public ClassSegment() {
+		super();
+		levelNumbers = new ArrayList<String>(4);
+		levelNames = new ArrayList<String>(4);
+		levelNamesTranslated = new ArrayList<String>(4);
+		IntStream.range(0,4).forEach(level->{
+			levelNumbers.add(null);
+			levelNames.add(null);
+			levelNamesTranslated.add(null);
+		});
+	}
 	public int getSegmentGranularity() {
 		return segmentGranularity;
 	}

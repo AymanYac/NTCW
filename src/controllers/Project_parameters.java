@@ -2777,8 +2777,8 @@ public class Project_parameters {
 				ImportTaxoRow.setProjectGranularity(Integer.parseInt(classificationLevels.getValue()));
 				ImportTaxoRow.setColumnMap();
 				ImportTaxoRow.loadTaxoDS();
-				CharDescriptionImportServices.upsertTaxoAndChar(taxoFile.getText(),"TAXO","ITEMS");
-			} catch (FileNotFoundException e) {
+				CharDescriptionImportServices.upsertTaxoAndChar(taxoFile.getText(),"TAXO","ITEMS",this.prj.getPid());
+			} catch (FileNotFoundException | ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

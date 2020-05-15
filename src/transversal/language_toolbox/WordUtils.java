@@ -436,8 +436,7 @@ public class WordUtils {
 		}
 
 		
-		public static ArrayList<UnitOfMeasure> parseKnownUoMs(String selected_text) {
-			
+		public static ArrayList<UnitOfMeasure> parseKnownUoMsFollowingDecimal(String selected_text) {
 			String pattern = "(-?\\d+(\\.\\d+)?)";
 		    String patternPlusOverLaps = pattern+"(?=(" + "(.*)" + ")).";
 		    Pattern p = Pattern.compile(patternPlusOverLaps);
