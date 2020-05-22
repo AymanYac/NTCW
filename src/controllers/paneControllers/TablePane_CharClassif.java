@@ -31,9 +31,10 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import model.AutoCompleteBox_CharValue;
 import model.CharDescriptionRow;
-import model.CharacteristicValue;
-import model.ClassCharacteristic;
+import model.CaracteristicValue;
+import model.ClassCaracteristic;
 import model.DataInputMethods;
+import model.GlobalConstants;
 import model.UserAccount;
 import service.CharAdvancementUpdater;
 import service.CharItemFetcher;
@@ -130,7 +131,7 @@ public class TablePane_CharClassif {
 	@SuppressWarnings("deprecation")
 	private void item_selection_routine(CharDescriptionRow tmp)  {
 		this.Parent.CHANGING_CLASS=true;
-		this.Parent.classification.setText(tmp.getClass_segment().split("&&&")[1]);
+		this.Parent.classification.setText(tmp.getClass_segment_string().split("&&&")[1]);
 		this.Parent.CHANGING_CLASS=false;
 		if(tmp.getLong_desc().length()>0) {
 			Parent.search_text.setText(WordUtils.getSearchWords(tmp.getLong_desc()));
@@ -263,12 +264,12 @@ public class TablePane_CharClassif {
 		HashMap<CharDescriptionRow,String> itemPreviousClasses = new HashMap<CharDescriptionRow,String>();
 		for( Integer idx: (List<Integer>) tableGrid.getSelectionModel().getSelectedIndices()) {
 			CharDescriptionRow item = ((TableView<CharDescriptionRow>) this.tableGrid).getItems().get(idx);
-			itemPreviousClasses.put(item, item.getClass_segment());
+			itemPreviousClasses.put(item, item.getClass_segment_string());
 			
 			try{
 				//item.setClass_segment(result);
 				//tmp.setClass_segment(loop_class_id+"&&&"+loop_class_name+"&&&"+loop_class_number);
-				item.setClass_segment(result);
+				item.setClass_segment_string(result);
 				String[] resultSplit = result.split("&&&");
 				CharItemFetcher.classifiedItems.put(item.getItem_id(),
 						resultSplit[2]+"&&&"
@@ -277,7 +278,7 @@ public class TablePane_CharClassif {
 						+account.getUser_id()+"&&&"
 						+resultSplit[0]);
 			}catch(Exception V) {
-				item.setClass_segment(null);
+				item.setClass_segment_string(null);
 				CharItemFetcher.classifiedItems.put(item.getItem_id(), null);
 				V.printStackTrace(System.err);
 			}
@@ -316,26 +317,26 @@ public class TablePane_CharClassif {
 	}
 	private void allignEmptyNewValuesOnOldClassOnes(HashMap<CharDescriptionRow, String> itemPreviousClasses) {
 		for(CharDescriptionRow row:itemPreviousClasses.keySet()) {
-			if(row.getClass_segment().equals(itemPreviousClasses.get(row))) {
+			if(row.getClass_segment_string().equals(itemPreviousClasses.get(row))) {
 				//No class change
 			}else {
-				for(int idx=0;idx<row.getData(row.getClass_segment().split("&&&")[0]).length;idx++) {
-					CharacteristicValue value = row.getData(row.getClass_segment().split("&&&")[0])[idx];
+				for(int idx=0;idx<row.getData(row.getClass_segment_string().split("&&&")[0]).length;idx++) {
+					CaracteristicValue value = row.getData(row.getClass_segment_string().split("&&&")[0])[idx];
 					if(value!=null) {
 						//Fresh value loaded during values assignement by new class
 					}else {
 						//Try to allign the new empty value on the old one
-						ClassCharacteristic new_char = CharValuesLoader.active_characteristics.get(row.getClass_segment().split("&&&")[0]).get(idx);
+						ClassCaracteristic new_char = CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(idx);
 						//Search for an old char with the same name
 						for(int idx2=0;idx2<CharValuesLoader.active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).size();idx2++ ) {
-							ClassCharacteristic old_char = CharValuesLoader.active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).get(idx2);
+							ClassCaracteristic old_char = CharValuesLoader.active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).get(idx2);
 							if(
 									old_char.getCharacteristic_name().toLowerCase().equals(new_char.getCharacteristic_name().toLowerCase())
 									||
 									old_char.getCharacteristic_name_translated().toLowerCase().equals(new_char.getCharacteristic_name_translated().toLowerCase()
 							)) {
-								row.getData(row.getClass_segment().split("&&&")[0])[idx]=row.getData(itemPreviousClasses.get(row).split("&&&")[0])[idx2];
-								CharDescriptionExportServices.addCharDataToPush(row,row.getClass_segment().split("&&&")[0],idx,CharValuesLoader.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
+								row.getData(row.getClass_segment_string().split("&&&")[0])[idx]=row.getData(itemPreviousClasses.get(row).split("&&&")[0])[idx2];
+								CharDescriptionExportServices.addItemCharDataToPush(row,row.getClass_segment_string().split("&&&")[0],idx,CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
 								break;
 							}
 						}
@@ -344,7 +345,7 @@ public class TablePane_CharClassif {
 					}
 				}
 			}
-			CharDescriptionExportServices.flushToDB(account);
+			CharDescriptionExportServices.flushItemDataToDB(account);
 		}
 	}
 	private void jumpNext() {
@@ -376,28 +377,46 @@ public class TablePane_CharClassif {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void refresh_table_with_segment(String active_class) throws ClassNotFoundException, SQLException {
 		
-		System.out.println("Refreshing table with segment "+active_class);
+		if(!active_class.equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+			Parent.charButton.setDisable(false);
+			System.out.println("Refreshing table with segment "+active_class);
 			
-		tvX = new TableViewExtra(tableGrid);
+			tvX = new TableViewExtra(tableGrid);
+			
+			this.classItems = getActiveItemsID(active_class);
+			
+			CharItemFetcher.fetchAllItems(account.getActive_project(),this);
+			ClassCharacteristicsLoader.loadAllClassCharacteristic(this,account.getActive_project());
+			CharItemFetcher.initClassDataFields(this);
+			ClassCharacteristicsLoader.loadKnownValuesAssociated2Items(account.getActive_project());
+			CharItemFetcher.generateItemArray(classItems,this);
+			
+			//Not needed any more loadAllClassCharWithKnownValues calls loadAllKnownValuesAssociated2Items
+			//assignValuesToItemsByClass_V2(active_class,this.Parent.classCombo.getSelectionModel().getSelectedItem().getclassName(),classItems);
+			
+			
+			
+			
+			fillTable(false);
+			selectFirstItem();
+			this.selected_col = -1;
+			nextChar();
+		}else {
+			try {
+				Parent.charPaneController.PaneClose();
+			}catch(Exception V) {
+				
+			}
+			Parent.charButton.setDisable(true);
+			
+			CharItemFetcher.generateDefaultCharEditingItems(this);
+			
+			fillTable(true);
+			selectFirstItem();
+			this.selected_col = 0;
+			Parent.refresh_ui_display();
+		}
 		
-		this.classItems = getActiveItemsID(active_class);
-		
-		CharItemFetcher.fetchAllItems(account.getActive_project(),this);
-		ClassCharacteristicsLoader.loadAllClassCharacteristic(this,account.getActive_project());
-		CharItemFetcher.initClassDataFields(this);
-		ClassCharacteristicsLoader.loadKnownValuesAssociated2Items(this,account.getActive_project());
-		CharItemFetcher.loadItemArray(classItems,this);
-		
-		//Not needed any more loadAllClassCharWithKnownValues calls loadAllKnownValuesAssociated2Items
-		//assignValuesToItemsByClass_V2(active_class,this.Parent.classCombo.getSelectionModel().getSelectedItem().getclassName(),classItems);
-		
-		
-		
-		
-		fillTable();
-		this.selected_col = -1;
-		selectedLatestEditedItem();
-		nextChar();
 	}
 	
 	
@@ -536,10 +555,16 @@ public class TablePane_CharClassif {
 	*/
 	
 	public void nextChar() {
+		if(Parent.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+			return;
+		}
 		this.selected_col+=1;
 		selectChartAtIndex(selected_col,this.Parent.charButton.isSelected());
 	}
 	public void previousChar() {
+		if(Parent.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+			return;
+		}
 		this.selected_col-=1;
 		selectChartAtIndex(selected_col,this.Parent.charButton.isSelected());
 	}
@@ -605,97 +630,124 @@ public class TablePane_CharClassif {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void fillTable() {
+	private void fillTable(boolean charClassActive) {
 		this.tableGrid.getItems().clear();
         this.tableGrid.getColumns().clear();
-        for(String colname : this.collapsedViewColumns) {
-        	TableColumn tmp = new TableColumn<>(colname);
-        	tmp.setCellValueFactory(new PropertyValueFactory<>(colname.replace(" ", "")));
-            tmp.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
-            tmp.setResizable(false);
-            tmp.setVisible(false);
-            this.tableGrid.getColumns().add(tmp);
+        
+        if(!charClassActive) {
+        	
+        	for(String colname : this.collapsedViewColumns) {
+            	TableColumn tmp = new TableColumn<>(colname);
+            	tmp.setCellValueFactory(new PropertyValueFactory<>(colname.replace(" ", "")));
+                tmp.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
+                tmp.setResizable(false);
+                tmp.setVisible(false);
+                this.tableGrid.getColumns().add(tmp);
+                
+            }
             
-        }
-        
-        TableColumn classNameColumn = new TableColumn<>("Class Name");
-        classNameColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
-             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                 
-                 return new ReadOnlyObjectWrapper(r.getValue().getClass_segment().split("&&&")[1]);
-             }
-          });
-        this.tableGrid.getColumns().add(classNameColumn);
-        classNameColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.085));;
-        classNameColumn.setResizable(false);
-        classNameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
-        
-        
-        
-        
-        
-        
-        
-        TableColumn descriptionColumn = new TableColumn<>("Description");
-        descriptionColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
-             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                 if(r.getValue().getLong_desc()!=null && r.getValue().getLong_desc().length()>0) {
-                     return new ReadOnlyObjectWrapper(r.getValue().getLong_desc());
-                 }
-                 try{
-                	 return new ReadOnlyObjectWrapper(r.getValue().getShort_desc());
-                 }catch(Exception V) {
-                	 return new ReadOnlyObjectWrapper("");
-                 }
-             }
-          });
-        this.tableGrid.getColumns().add(descriptionColumn);
-        descriptionColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.4));;
-        descriptionColumn.setResizable(false);
-        descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
-        
-        for(int i=0;i<CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size();i++) {
-            ClassCharacteristic characteristic = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).get(i);
-            final int dataIndex = i;
-            TableColumn col = new TableColumn<>(characteristic.getCharacteristic_name());
-            col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+            TableColumn classNameColumn = new TableColumn<>("Class Name");
+            classNameColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
                  public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                    try{
-                        return new ReadOnlyObjectWrapper(r.getValue().getData(Parent.classCombo.getSelectionModel().getSelectedItem().getClassSegment())[dataIndex].getDisplayValue(Parent));
-                    }catch(Exception V) {
-                        //Object has null data at daataIndex
-                        return new ReadOnlyObjectWrapper("");
-                    }
+                     
+                     return new ReadOnlyObjectWrapper(r.getValue().getClass_segment_string().split("&&&")[1]);
                  }
               });
-            col.setVisible(false);
-            col.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
-            col.setResizable(false);
+            this.tableGrid.getColumns().add(classNameColumn);
+            classNameColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.085));;
+            classNameColumn.setResizable(false);
+            classNameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
             
-            this.tableGrid.getColumns().add(col);
+            
+            
+            
+            
+            
+            
+            TableColumn descriptionColumn = new TableColumn<>("Description");
+            descriptionColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+                 public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+                     if(r.getValue().getLong_desc()!=null && r.getValue().getLong_desc().length()>0) {
+                         return new ReadOnlyObjectWrapper(r.getValue().getLong_desc());
+                     }
+                     try{
+                    	 return new ReadOnlyObjectWrapper(r.getValue().getShort_desc());
+                     }catch(Exception V) {
+                    	 return new ReadOnlyObjectWrapper("");
+                     }
+                 }
+              });
+            this.tableGrid.getColumns().add(descriptionColumn);
+            descriptionColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.4));;
+            descriptionColumn.setResizable(false);
+            descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
+            
+        	
+        	for(int i=0;i<CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size();i++) {
+                ClassCaracteristic characteristic = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).get(i);
+                final int dataIndex = i;
+                TableColumn col = new TableColumn<>(characteristic.getCharacteristic_name());
+                col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+                     public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+                        try{
+                            return new ReadOnlyObjectWrapper(r.getValue().getData(Parent.classCombo.getSelectionModel().getSelectedItem().getClassSegment())[dataIndex].getDisplayValue(Parent));
+                        }catch(Exception V) {
+                            //Object has null data at daataIndex
+                            return new ReadOnlyObjectWrapper("");
+                        }
+                     }
+                  });
+                col.setVisible(false);
+                col.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
+                col.setResizable(false);
+                
+                this.tableGrid.getColumns().add(col);
+            }
+        	
+        	TableColumn linkColumn = new TableColumn<>("Link");
+            //linkColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
+            linkColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+                public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+                    try{
+                    	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment_string().split("&&&")[0])[selected_col].getUrl());
+                    }catch(Exception V) {
+                   	 return new ReadOnlyObjectWrapper("");
+                    }
+                }
+             });
+            linkColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
+            linkColumn.setResizable(false);
+            this.tableGrid.getColumns().add(linkColumn);
+            
+        	Parent.classification.setEditable(true);
+        	Parent.classification.setDisable(false);
+        }else {
+        	Parent.classification.setEditable(false);
+        	Parent.classification.setDisable(true);
+        	
+        	TableColumn CaracNameColumn = new TableColumn<>("Caracteristic name");
+        	CaracNameColumn.setCellValueFactory(new PropertyValueFactory<>("Short_desc"));
+        	CaracNameColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.3));;
+        	CaracNameColumn.setResizable(false);
+            this.tableGrid.getColumns().add(CaracNameColumn);
+            
+            TableColumn CaracValueColumn = new TableColumn<>("Caracteristic value");
+            CaracValueColumn.setCellValueFactory(new PropertyValueFactory<>("Long_desc"));
+            CaracValueColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.3));;
+            CaracValueColumn.setResizable(false);
+            this.tableGrid.getColumns().add(CaracValueColumn);
+            
+            
         }
         
-        TableColumn linkColumn = new TableColumn<>("Link");
-        //linkColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
-        linkColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
-            public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                try{
-                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment().split("&&&")[0])[selected_col].getUrl());
-                }catch(Exception V) {
-               	 return new ReadOnlyObjectWrapper("");
-                }
-            }
-         });
-        linkColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
-        linkColumn.setResizable(false);
-        this.tableGrid.getColumns().add(linkColumn);
+        
         
         TableColumn sourceColumn = new TableColumn<>("Source");
         //sourceColumn.setCellValueFactory(new PropertyValueFactory<>("source"));
         sourceColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                 try{
-                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment().split("&&&")[0])[selected_col].getSource());
+                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment_string().split("&&&")[0])[selected_col].getSource());
                 }catch(Exception V) {
                	 return new ReadOnlyObjectWrapper("");
                 }
@@ -711,7 +763,7 @@ public class TablePane_CharClassif {
         ruleColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                 try{
-                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment().split("&&&")[0])[selected_col].getRule_id());
+                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment_string().split("&&&")[0])[selected_col].getRule_id());
                 }catch(Exception V) {
                	 return new ReadOnlyObjectWrapper("");
                 }
@@ -727,7 +779,7 @@ public class TablePane_CharClassif {
         authorColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                 try{
-                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment().split("&&&")[0])[selected_col].getAuthorName());
+                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment_string().split("&&&")[0])[selected_col].getAuthorName());
                 }catch(Exception V) {
                	 return new ReadOnlyObjectWrapper("");
                 }
@@ -769,7 +821,7 @@ public class TablePane_CharClassif {
 		
 		
 		tableGrid.getSelectionModel().setSelectionMode(
-			    SelectionMode.MULTIPLE
+			    SelectionMode.SINGLE
 			);
 		
 		
@@ -823,7 +875,7 @@ public class TablePane_CharClassif {
 	}
 	
 	
-	private void selectedLatestEditedItem() {
+	private void selectFirstItem() {
 		//Temporary : select first item
 		this.tableGrid.getSelectionModel().select(0);
 	}

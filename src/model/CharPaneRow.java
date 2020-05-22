@@ -17,8 +17,8 @@ import javafx.scene.text.TextFlow;
 public class CharPaneRow {
 
 	private int char_index;
-	private CharacteristicValue value;
-	private ClassCharacteristic carac;
+	private CaracteristicValue value;
+	private ClassCaracteristic carac;
 	private static Char_description parent;
 	
 	public StackPane getCriticality() {
@@ -48,10 +48,10 @@ public class CharPaneRow {
 	public CharPaneRow(Char_description parent) {
 		CharPaneRow.parent = parent;
 	}
-	public ClassCharacteristic getCarac() {
+	public ClassCaracteristic getCarac() {
 		return carac;
 	}
-	public void setCarac(ClassCharacteristic carac) {
+	public void setCarac(ClassCaracteristic carac) {
 		this.carac = carac;
 	}
 	public int getChar_index() {
@@ -72,10 +72,10 @@ public class CharPaneRow {
 	public ArrayList<String> getAllowed_uom() {
 		return carac.getAllowedUoms();
 	}
-	public CharacteristicValue getValue() {
+	public CaracteristicValue getValue() {
 		return value;
 	}
-	public void setValue(CharacteristicValue value) {
+	public void setValue(CaracteristicValue value) {
 		this.value = value;
 	}
 	

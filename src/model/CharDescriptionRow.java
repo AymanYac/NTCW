@@ -34,13 +34,15 @@ public class CharDescriptionRow {
 		String long_desc_translated;
 		String long_desc_corrected;
 		String material_group;
+		String preclassification;
 		
 		String client_item_number;
 		String item_id;
-		private HashMap<String,CharacteristicValue[]> data = new HashMap<String,CharacteristicValue[]>();
+		private HashMap<String,CaracteristicValue[]> data = new HashMap<String,CaracteristicValue[]>();
 		private HashMap<String, ArrayList<CharRuleResult>[]> ruleResults = new HashMap<String,ArrayList<CharRuleResult>[]>();
 		private HashMap<String, ArrayList<HashMap<String, CharRuleResult>>> rulePropositions = new HashMap<String, ArrayList<HashMap<String, CharRuleResult>>>();
-		String class_segment;
+		String class_segment_string;
+		ClassSegment class_segment;
 		
 		public void setParent(Char_description parent) {
 			this.parent = parent;
@@ -49,7 +51,7 @@ public class CharDescriptionRow {
 			if(this.data.containsKey(target_class)) {
 				//This item class has already been initalized with the target class
 			}else {
-				this.data.put(target_class, new CharacteristicValue[data_length]);
+				this.data.put(target_class, new CaracteristicValue[data_length]);
 			}
 			return;
 		}
@@ -103,6 +105,12 @@ public class CharDescriptionRow {
 			this.material_group = material_group;
 		}
 		
+		public String getPreclassif() {
+			return preclassification;
+		}
+		public void setPreclassif(String preclassif) {
+			this.preclassification = preclassif;
+		}
 		
 		public Boolean getCompletionStatus() {
 			return completionStatus;
@@ -123,7 +131,7 @@ public class CharDescriptionRow {
 		public void setClient_item_number(String client_item_number) {
 			this.client_item_number = client_item_number;
 		}
-		public CharacteristicValue[] getData(String segment_id) {
+		public CaracteristicValue[] getData(String segment_id) {
 			return data.get(segment_id);
 		}
 		
@@ -131,15 +139,27 @@ public class CharDescriptionRow {
 		public HashMap<String, ArrayList<HashMap<String, CharRuleResult>>> getRulePropositions() {
 			return rulePropositions;
 		}
-		public HashMap<String, CharacteristicValue[]> getData() {
+		public HashMap<String, CaracteristicValue[]> getData() {
 			return data;
 		}
-		public String getClass_segment() {
+		public String getClass_segment_string() {
+			return class_segment_string;
+		}
+		public void setClass_segment_string(String class_segment_string) {
+			this.class_segment_string = class_segment_string;
+		}
+		public ClassSegment getClass_segment() {
 			return class_segment;
 		}
-		public void setClass_segment(String class_segment) {
+		public void setClass_segment(ClassSegment class_segment) {
+			try {
+				this.class_segment_string=class_segment.getSegmentId()+"&&&"+class_segment.getClassName()+"&&&"+class_segment.getClassNumber();
+			}catch(Exception V) {
+				
+			}
 			this.class_segment = class_segment;
 		}
+		
 		public boolean hasDataInSegments(List<String> targetClasses) {
 			return targetClasses.stream().anyMatch(s->hasDataDataInSegment(s));
 		}
@@ -248,7 +268,7 @@ public class CharDescriptionRow {
 						
 					}
 					getData(segment)[charIdx] = distinctResultsLeft.values().stream().findFirst().get().getActionValue();
-					CharDescriptionExportServices.addCharDataToPush(this,segment,charIdx,charIdxSize);
+					CharDescriptionExportServices.addItemCharDataToPush(this,segment,charIdx,charIdxSize);
 				}else {
 					setCharProp(segment,charIdx,distinctResultsLeft,charIdxSize);
 				}

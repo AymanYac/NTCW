@@ -19,8 +19,8 @@ import controllers.Char_description;
 import model.GenericCharRule;
 import model.CharDescriptionRow;
 import model.CharRuleResult;
-import model.CharacteristicValue;
-import model.ClassCharacteristic;
+import model.CaracteristicValue;
+import model.ClassCaracteristic;
 import model.GlobalConstants;
 import model.UnitOfMeasure;
 import model.UserAccount;
@@ -34,7 +34,7 @@ public class CharPatternServices {
 	private static HashMap<String,LinkedHashSet<String>> specialwords;
 	private static HashMap<String, List<String>> charIdArrays;
 
-	public static void scanSelectionForPatternDetection(Char_description parent, ClassCharacteristic active_char) {
+	public static void scanSelectionForPatternDetection(Char_description parent, ClassCaracteristic active_char) {
 		parent.refresh_ui_display();
 		Unidecode unidecode = Unidecode.toAscii();
 		String selected_text = "";
@@ -72,7 +72,7 @@ public class CharPatternServices {
 		//Let's clean the selection from all separators and do the same thing for the known values
 		String[] SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 		System.out.println("Trying to match the selection with known values");
-		for(CharacteristicValue known_value:active_char.getKnownValues()) {
+		for(CaracteristicValue known_value:active_char.getKnownValues()) {
 			System.out.println("We know value "+known_value.getStdValue());
 			String separator_free_known = known_value.getDataLanguageValue();
 			String separator_free_selected = corrected_text;
@@ -119,7 +119,7 @@ public class CharPatternServices {
 					String corrected_part_after_identifier = WordUtils.CORRECT(part_after_identifier);
 					SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 					System.out.println("Trying to match the after :/= segment with known values");
-					for(CharacteristicValue known_value:active_char.getKnownValues()) {
+					for(CaracteristicValue known_value:active_char.getKnownValues()) {
 						System.out.println("We know value "+known_value.getDataLanguageValue());
 						String separator_free_known = known_value.getDataLanguageValue();
 						String separator_free_selected = corrected_part_after_identifier;
@@ -144,8 +144,8 @@ public class CharPatternServices {
 //							The correction of the part of the selection after the ":" or "=" is included in one and only one of the values already listed ("VAL") for this characteristic (independent terms, modulo separators)?						
 							corrected_part_after_identifier = WordUtils.CORRECT(part_after_identifier);
 							SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
-							HashSet<CharacteristicValue> VALUES_CONTAINING_AFTER_IDENTIFIER = new HashSet<CharacteristicValue>();
-							for(CharacteristicValue known_value:active_char.getKnownValues()) {
+							HashSet<CaracteristicValue> VALUES_CONTAINING_AFTER_IDENTIFIER = new HashSet<CaracteristicValue>();
+							for(CaracteristicValue known_value:active_char.getKnownValues()) {
 								System.out.println("We know value "+known_value.getDataLanguageValue());
 								/*
 								String separator_free_known = known_value.getDataLanguageValue();
@@ -183,8 +183,8 @@ public class CharPatternServices {
 								System.out.println("Trying to match the after :/= segment with a subsegment of known values in pivot language");
 								corrected_part_after_identifier = WordUtils.CORRECT(part_after_identifier);
 								SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
-								VALUES_CONTAINING_AFTER_IDENTIFIER = new HashSet<CharacteristicValue>();
-								for(CharacteristicValue known_value:active_char.getKnownValues()) {
+								VALUES_CONTAINING_AFTER_IDENTIFIER = new HashSet<CaracteristicValue>();
+								for(CaracteristicValue known_value:active_char.getKnownValues()) {
 									System.out.println("We know value "+known_value.getUserLanguageValue());
 									/*String separator_free_known = known_value.getUserLanguageValue();
 									String separator_free_selected = corrected_part_after_identifier;
@@ -218,7 +218,7 @@ public class CharPatternServices {
 									System.out.println("There are no/too many potential matches");
 //									If NO			
 //										Value = Correction ("iron steel")
-									CharacteristicValue new_value = new CharacteristicValue();;;; new_value.setParentChar(active_char);
+									CaracteristicValue new_value = new CaracteristicValue();;;; new_value.setParentChar(active_char);
 									new_value.setDataLanguageValue(corrected_part_after_identifier);
 
 									parent.sendPatternValue(new_value);
@@ -238,8 +238,8 @@ public class CharPatternServices {
 				System.out.println("Trying to match the selection with subsegments of known values");
 				corrected_text = WordUtils.CORRECT(selected_text);
 				SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
-				HashSet<CharacteristicValue> VALUES_CONTAINING_SELECTION = new HashSet<CharacteristicValue>();
-				for(CharacteristicValue known_value:active_char.getKnownValues()) {
+				HashSet<CaracteristicValue> VALUES_CONTAINING_SELECTION = new HashSet<CaracteristicValue>();
+				for(CaracteristicValue known_value:active_char.getKnownValues()) {
 					System.out.println("we known value "+known_value.getDataLanguageValue());
 					for(String known_value_sub_element:known_value.getDataLanguageValue().split(String.join("|", SEPARATORS))) {
 						if( unidecode.decode(known_value_sub_element).toUpperCase().equals(
@@ -266,8 +266,8 @@ public class CharPatternServices {
 					System.out.println("Trying to match the selection with subsegments of known values in pivot language");
 					corrected_text = WordUtils.CORRECT(selected_text);
 					SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
-					VALUES_CONTAINING_SELECTION = new HashSet<CharacteristicValue>();
-					for(CharacteristicValue known_value:active_char.getKnownValues()) {
+					VALUES_CONTAINING_SELECTION = new HashSet<CaracteristicValue>();
+					for(CaracteristicValue known_value:active_char.getKnownValues()) {
 						System.out.println("we know value "+known_value.getUserLanguageValue());
 						String[] subelements;
 						try{
@@ -297,7 +297,7 @@ public class CharPatternServices {
 						System.out.println("We have no/too many potential matches");
 //						If NO					
 //						Value = Correction (Selection)
-						CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+						CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 						tmp.setDataLanguageValue(corrected_text);
 
 						parent.sendPatternValue(tmp);
@@ -325,7 +325,7 @@ public class CharPatternServices {
 					System.out.println("The selection includes :");
 //					If YES							
 //					Value = ef12-gh34-ij56
-					CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+					CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 					tmp.setTXTValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1].trim()));
 
 					parent.sendPatternValue(tmp);
@@ -352,7 +352,7 @@ public class CharPatternServices {
 					System.out.println("The selectin includes =");
 //					If YES							
 //					Value = ef12-gh34-ij56
-					CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+					CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 					tmp.setTXTValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1].trim()));
 
 					parent.sendPatternValue(tmp);
@@ -383,7 +383,7 @@ public class CharPatternServices {
 //					The first terms or their corrections are stop words? (e.g. "abcd ef12-gh34-ij56" with abcd or its correction declared as a STOP word)						
 //						If YES
 //							Value = ef12-gh34-ij56	
-						CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+						CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 						tmp.setTXTValue(WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1].trim()));
 
 						parent.sendPatternValue(tmp);
@@ -407,7 +407,7 @@ public class CharPatternServices {
 						System.out.println("The selection doesn't start with a stop word");
 //						If NO (e.g. "ab8cd9 ef12-gh34")					
 //							Value = ab8cd9 ef12-gh34
-						CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+						CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 						tmp.setTXTValue(selected_text);
 
 						parent.sendPatternValue(tmp);
@@ -431,8 +431,8 @@ public class CharPatternServices {
 				System.out.println("Trying to find a subsegment in known values _ data language");
 				corrected_text = WordUtils.CORRECT(selected_text);
 				SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
-				HashSet<CharacteristicValue> VALUES_CONTAINING_SELECTION = new HashSet<CharacteristicValue>();
-				for(CharacteristicValue known_value:active_char.getKnownValues()) {
+				HashSet<CaracteristicValue> VALUES_CONTAINING_SELECTION = new HashSet<CaracteristicValue>();
+				for(CaracteristicValue known_value:active_char.getKnownValues()) {
 					System.out.println("We known value "+known_value.getDataLanguageValue());
 					/*
 					String separator_free_known = known_value.getDataLanguageValue();
@@ -467,8 +467,8 @@ public class CharPatternServices {
 //							The correction of the selection includes one and only one of the values already listed ("VAL") for this characteristic (independent terms, modulo separators)?						
 						corrected_text = WordUtils.CORRECT(selected_text);
 						SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
-						HashSet<CharacteristicValue> VALUES_CONTAINED_IN_SELECTION = new HashSet<CharacteristicValue>();
-						for(CharacteristicValue known_value:active_char.getKnownValues()) {
+						HashSet<CaracteristicValue> VALUES_CONTAINED_IN_SELECTION = new HashSet<CaracteristicValue>();
+						for(CaracteristicValue known_value:active_char.getKnownValues()) {
 							System.out.println("We know value "+known_value.getDataLanguageValue());
 							/*
 							String separator_free_known = known_value.getDataLanguageValue();
@@ -504,7 +504,7 @@ public class CharPatternServices {
 										System.out.println("the selection contains : or =");
 //										If YES			
 //										Value = Correction (efgh)
-										CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+										CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 
 										try{
 											tmp.setTXTValue(WordUtils.CORRECT(selected_text.split(":")[1]));
@@ -531,7 +531,7 @@ public class CharPatternServices {
 //											
 //											If YES	
 //												Value = Correction (efgh)
-											CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+											CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 											tmp.setTXTValue(selected_text.split(sw_splitter)[1]);
 
 											parent.sendPatternValue(tmp);
@@ -545,7 +545,7 @@ public class CharPatternServices {
 											System.out.println("The selected text doesn't start with a stop word");
 //											If NO	
 //												Value = Correction (Selection)
-											CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+											CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 											tmp.setTXTValue(corrected_text);
 
 											parent.sendPatternValue(tmp);
@@ -589,7 +589,7 @@ public class CharPatternServices {
 							if(selected_text.toLowerCase().contains("max")) {
 //								The selection contains "MAX"? (e.g. "Temp. Max.=50°C")
 								System.out.println("The selection contains \"MAX\" (e.g. \"Temp. Max.=50°C\")");
-								CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+								CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 
 								tmp.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 								tmp.setUom_id(following_uom.getUom_id());
@@ -616,7 +616,7 @@ public class CharPatternServices {
 								Propsed bypass: allow "MIN" contained in text if unit of measure is not "minutes"
 */
 								System.out.println("The selection contains \"MIN\" before the numerical value (e.g. \"Minimum voltage=12V\")");
-								CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+								CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 
 								tmp.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 								tmp.setUom_id(following_uom.getUom_id());
@@ -636,7 +636,7 @@ public class CharPatternServices {
 								return;
 							}else {
 								System.out.println("The selection does not contain \"MIN\" nor \"MAX\"  (e.g. \"LZ= 1160 MM\")");
-								CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+								CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 
 								tmp.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 								tmp.setUom_id(following_uom.getUom_id());
@@ -669,7 +669,7 @@ public class CharPatternServices {
 									if(selected_text.toLowerCase().contains("max")) {
 //										The selection contains "MAX"?  (e.g. "Puissance Max=2000")
 										System.out.println("The selection contains \"MAX\"  (e.g. \"Puissance Max=2000\")");
-										CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+										CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 
 										tmp.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										tmp.setUom_id(infered_uom.getUom_id());
@@ -690,7 +690,7 @@ public class CharPatternServices {
 										Propsed bypass: allow "MIN" contained in text if unit of measure is not "minutes"
 	*/
 										System.out.println("The selection contains \"MIN\" before the numerical value (e.g. \"Minimum voltage=12\")");
-										CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+										CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 
 										tmp.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										tmp.setUom_id(infered_uom.getUom_id());
@@ -704,7 +704,7 @@ public class CharPatternServices {
 										return;
 									}else {
 										System.out.println("The selection does not contain \"MIN\" nor \"MAX\"  (e.g. \"LZ= 1160\")");
-										CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+										CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 
 										tmp.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										tmp.setUom_id(infered_uom.getUom_id());
@@ -728,7 +728,7 @@ public class CharPatternServices {
 									if(selected_text.toLowerCase().contains("max")) {
 	//									The selection contains "MAX"?  (e.g. "Long. Max=1160")
 										System.out.println("The selection contains \"MAX\"  (e.g. \"Long. Max=1160\")");
-										CharacteristicValue preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										CaracteristicValue preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 
 										preparedValue.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										preparedValue.setUom_id(loop_uom.getUom_id());
@@ -748,7 +748,7 @@ public class CharPatternServices {
 										Propsed bypass: allow "MIN" contained in text if unit of measure is not "minutes"
 	*/
 										System.out.println("The selection contains \"MIN\" before the numerical value  (e.g. \"Long. Mini=1160\")");
-										CharacteristicValue preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										CaracteristicValue preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										preparedValue.setUom_id(loop_uom.getUom_id());
 										
@@ -760,7 +760,7 @@ public class CharPatternServices {
 										continue;
 									}else {
 										System.out.println("The selection does not contain \"MIN\" nor \"MAX\"  (e.g. \"LZ=1160\")");
-										CharacteristicValue preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										CaracteristicValue preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										preparedValue.setUom_id(loop_uom.getUom_id());
 	
@@ -789,7 +789,7 @@ public class CharPatternServices {
 								if(selected_text.toLowerCase().contains("max")) {
 //									The selection contains "MAX"?  (e.g. "Long. Max=1160")
 									System.out.println("The selection contains \"MAX\"  (e.g. \"Long. Max=1160\")");
-									CharacteristicValue preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									CaracteristicValue preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedValue.setUom_id(loop_uom.getUom_id());
 									System.out.println(selected_text);
@@ -812,7 +812,7 @@ public class CharPatternServices {
 									Propsed bypass: allow "MIN" contained in text if unit of measure is not "minutes"
 */
 									System.out.println("The selection contains \"MIN\" before the numerical value  (e.g. \"Long. Mini=1160\")");
-									CharacteristicValue preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									CaracteristicValue preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedValue.setUom_id(loop_uom.getUom_id());
 									
@@ -827,7 +827,7 @@ public class CharPatternServices {
 									continue;
 								}else {
 									System.out.println("The selection does not contain \"MIN\" nor \"MAX\"  (e.g. \"LZ=1160\")");
-									CharacteristicValue preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									CaracteristicValue preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedValue.setUom_id(loop_uom.getUom_id());
 
@@ -848,7 +848,7 @@ public class CharPatternServices {
 								if(selected_text.toLowerCase().contains("max")) {
 //									The selection contains "MAX"?  (e.g. "Long. Max=1160")
 									System.out.println("The selection contains \"MAX\"  (e.g. \"Long. Max=1160\")");
-									CharacteristicValue preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									CaracteristicValue preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedValue.setUom_id("$$$UOM_ID$$$");
 									
@@ -870,7 +870,7 @@ public class CharPatternServices {
 									Propsed bypass: allow "MIN" contained in text if unit of measure is not "minutes"
 */
 									System.out.println("The selection contains \"MIN\" before the numerical value  (e.g. \"Long. Mini=1160\")");
-									CharacteristicValue preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									CaracteristicValue preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedValue.setUom_id("$$$UOM_ID$$$");
 									
@@ -885,7 +885,7 @@ public class CharPatternServices {
 									return;
 								}else {
 									System.out.println("The selection does not contain \"MIN\" nor \"MAX\"  (e.g. \"LZ=1160\")");
-									CharacteristicValue preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									CaracteristicValue preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedValue.setUom_id("$$$UOM_ID$$$");
 
@@ -911,7 +911,7 @@ public class CharPatternServices {
 //							Only 1 UoM is declared for the characteristic? (e.g. "MM")
 							System.out.println("Only 1 UoM is declared for the characteristic? (e.g. \"MM\")");
 							UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0));
-								CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+								CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 								tmp.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 								tmp.setUom_id(infered_uom.getUom_id());
 								parent.sendPatternValue(tmp);
@@ -922,7 +922,7 @@ public class CharPatternServices {
 								for(int i=0;i<active_char.getAllowedUoms().size();i++) {
 									String loop_uom_id = active_char.getAllowedUoms().get(i);
 									UnitOfMeasure loop_uom = UnitOfMeasure.RunTimeUOMS.get(loop_uom_id);
-									CharacteristicValue preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									CaracteristicValue preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedValue.setUom_id(loop_uom.getUom_id());
 									/*
@@ -964,7 +964,7 @@ public class CharPatternServices {
 							if(uomsInSelection.get(1)!=null) {
 							//The 2nd numerical value is followed by a known unit of measure?
 								System.out.println("The 2nd numerical value is followed by a known unit of measure");
-								CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+								CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 								preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
 								preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 								String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -976,7 +976,7 @@ public class CharPatternServices {
 								parent.preparePatternProposition(0, preparedValue1.getNominal_value_truncated()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue1, preparedRule1, active_char);
 								
 								
-								CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+								CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 								preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
 								preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 								preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -998,7 +998,7 @@ public class CharPatternServices {
 										System.out.println("Only 1 UoM is declared for the characteristic");
 										UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0));
 
-										CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
+										CaracteristicValue preparedValue3 = new CaracteristicValue();;;; preparedValue3.setParentChar(active_char);
 										preparedValue3.setUom_id(infered_uom.getUom_id());
 										preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1006,7 +1006,7 @@ public class CharPatternServices {
 												+"<NOM %1><UOM \""+infered_uom.getUom_symbol()+"\">";
 										parent.preparePatternProposition(0, preparedValue3.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
 										
-										CharacteristicValue preparedValue4 = new CharacteristicValue();;;; preparedValue4.setParentChar(active_char);
+										CaracteristicValue preparedValue4 = new CaracteristicValue();;;; preparedValue4.setParentChar(active_char);
 										preparedValue4.setUom_id(infered_uom.getUom_id());
 										preparedValue4.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										String preparedRule4 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1015,7 +1015,7 @@ public class CharPatternServices {
 										parent.preparePatternProposition(1, preparedValue4.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue4, preparedRule4, active_char);
 
 										
-										CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+										CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 										preparedValue1.setUom_id(infered_uom.getUom_id());
 										preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1024,7 +1024,7 @@ public class CharPatternServices {
 										parent.preparePatternProposition(2, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
-										CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+										CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 										preparedValue2.setUom_id(infered_uom.getUom_id());
 										preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1042,7 +1042,7 @@ public class CharPatternServices {
 										for(i=0;i<active_char.getAllowedUoms().size();i++) {
 											String infered_uom_id = active_char.getAllowedUoms().get(i);
 											UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
-											CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+											CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 											preparedValue1.setUom_id(infered_uom.getUom_id());
 											preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1051,7 +1051,7 @@ public class CharPatternServices {
 											parent.preparePatternProposition(2*i, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 											
 											
-											CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+											CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 											preparedValue2.setUom_id(infered_uom.getUom_id());
 											preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1069,7 +1069,7 @@ public class CharPatternServices {
 									for(i=0;i<active_char.getAllowedUoms().size();i++) {
 										String infered_uom_id = active_char.getAllowedUoms().get(i);
 										UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
-										CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+										CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 										preparedValue1.setUom_id(infered_uom.getUom_id());
 										preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1081,7 +1081,7 @@ public class CharPatternServices {
 										parent.preparePatternProposition(2*i, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
-										CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+										CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 										preparedValue2.setUom_id(infered_uom.getUom_id());
 										preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1097,7 +1097,7 @@ public class CharPatternServices {
 									}
 									String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf("%2")
 											+"%2".length()).trim();
-									CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+									CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 									preparedValue1.setUom_id("$$$UOM_ID$$$");
 									preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 									String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1109,7 +1109,7 @@ public class CharPatternServices {
 									parent.preparePatternProposition(2*i, preparedValue1.getNominal_value_truncated()+" \""+UOM_INFERED_NAME+"\"", preparedValue1, preparedRule1, active_char);
 									
 									
-									CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+									CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 									preparedValue2.setUom_id("$$$UOM_ID$$$");
 									preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1143,7 +1143,7 @@ public class CharPatternServices {
 								//The 2nd numerical value is followed by a known unit of measure?
 									System.out.println("The 2nd numerical value is followed by a known unit of measure");
 									
-									CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+									CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 										preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
 										preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1155,7 +1155,7 @@ public class CharPatternServices {
 										parent.preparePatternProposition(0, preparedValue1.getNominal_value_truncated()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
-										CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+										CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 										preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
 										preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1169,7 +1169,7 @@ public class CharPatternServices {
 										
 										
 
-										CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
+										CaracteristicValue preparedValue3 = new CaracteristicValue();;;; preparedValue3.setParentChar(active_char);
 										preparedValue3.setUom_id(uomsInSelection.get(1).getUom_id());
 										preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1190,7 +1190,7 @@ public class CharPatternServices {
 										for(i=0;i<active_char.getAllowedUoms().size();i++) {
 											String infered_uom_id = active_char.getAllowedUoms().get(i);
 											UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
-											CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+											CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 											preparedValue1.setUom_id(infered_uom.getUom_id());
 											preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1199,7 +1199,7 @@ public class CharPatternServices {
 											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 											
 											
-											CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+											CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 											preparedValue2.setUom_id(infered_uom.getUom_id());
 											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1210,7 +1210,7 @@ public class CharPatternServices {
 											
 											
 
-											CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
+											CaracteristicValue preparedValue3 = new CaracteristicValue();;;; preparedValue3.setParentChar(active_char);
 											preparedValue3.setUom_id(infered_uom.getUom_id());
 											preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 											String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1227,7 +1227,7 @@ public class CharPatternServices {
 										for(i=0;i<active_char.getAllowedUoms().size();i++) {
 											String infered_uom_id = active_char.getAllowedUoms().get(i);
 											UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
-											CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+											CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 											preparedValue1.setUom_id(infered_uom.getUom_id());
 											preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1239,7 +1239,7 @@ public class CharPatternServices {
 											parent.preparePatternProposition(3*i, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 											
 											
-											CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+											CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 											preparedValue2.setUom_id(infered_uom.getUom_id());
 											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1253,7 +1253,7 @@ public class CharPatternServices {
 											
 											
 
-											CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
+											CaracteristicValue preparedValue3 = new CaracteristicValue();;;; preparedValue3.setParentChar(active_char);
 											preparedValue3.setUom_id(infered_uom.getUom_id());
 											preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 											String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1271,7 +1271,7 @@ public class CharPatternServices {
 										
 										String UOM_INFERED_NAME=selected_text.substring(selected_text.replace(",", ".").indexOf("%2")
 												+"%2".length()).trim();
-										CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+										CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 										preparedValue1.setUom_id("$$$UOM_ID$$$");
 										preparedValue1.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1283,7 +1283,7 @@ public class CharPatternServices {
 										parent.preparePatternProposition(3*i, preparedValue1.getNominal_value_truncated()+" \""+UOM_INFERED_NAME, preparedValue1, preparedRule1, active_char);
 										
 										
-										CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+										CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 										preparedValue2.setUom_id("$$$UOM_ID$$$");
 										preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1297,7 +1297,7 @@ public class CharPatternServices {
 										
 										
 
-										CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
+										CaracteristicValue preparedValue3 = new CaracteristicValue();;;; preparedValue3.setParentChar(active_char);
 										preparedValue3.setUom_id("$$$UOM_ID$$$");
 										preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 										String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1334,7 +1334,7 @@ public class CharPatternServices {
 									//The 2nd numerical value is followed by a known unit of measure?
 										System.out.println("The 2nd numerical value is followed by a known unit of measure");
 										
-										CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+										CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 										preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
 										preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1359,7 +1359,7 @@ public class CharPatternServices {
 												UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0));
 													
 												
-												CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+												CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 												preparedValue2.setUom_id(infered_uom.getUom_id());
 												preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 												preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1378,7 +1378,7 @@ public class CharPatternServices {
 													UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
 														
 													
-													CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+													CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 													preparedValue2.setUom_id(infered_uom.getUom_id());
 													preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 													preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1398,7 +1398,7 @@ public class CharPatternServices {
 												UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
 													
 												
-												CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+												CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 												preparedValue2.setUom_id(infered_uom.getUom_id());
 												preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 												preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1416,7 +1416,7 @@ public class CharPatternServices {
 													+"%2".length()).trim();
 											
 											
-											CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+											CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 											preparedValue2.setUom_id("$$$UOM_ID$$$");
 											preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1447,7 +1447,7 @@ public class CharPatternServices {
 									if(uomsInSelection.get(1)!=null) {
 									//The 2nd numerical value is followed by a known unit of measure
 										System.out.println("The 2nd numerical value is followed by a known unit of measure");
-										CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+										CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 										preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										preparedValue1.setUom_id(uomsInSelection.get(1).getUom_id());
@@ -1461,7 +1461,7 @@ public class CharPatternServices {
 										parent.preparePatternProposition(0, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" "+uomsInSelection.get(1).getUom_symbol()+" ("+uomsInSelection.get(1).getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
-										CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+										CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 										preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
 										String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1477,7 +1477,7 @@ public class CharPatternServices {
 										if(uomsInSelection.get(0)!=null) {
 											//The 1st numerical value is followed by a known unit of measure
 											System.out.println("The 1st numerical value is followed by a known unit of measure");
-											CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+											CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
 											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1497,7 +1497,7 @@ public class CharPatternServices {
 											for(i=0;i<active_char.getAllowedUoms().size();i++) {
 												String infered_uom_id = active_char.getAllowedUoms().get(i);
 												UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(infered_uom_id);
-												CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+												CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 												preparedValue1.setUom_id(infered_uom.getUom_id());
 												preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 												preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1512,7 +1512,7 @@ public class CharPatternServices {
 												parent.preparePatternProposition(3*i, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 												
 												
-												CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+												CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 												preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 												preparedValue2.setUom_id(infered_uom.getUom_id());
 												String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1524,7 +1524,7 @@ public class CharPatternServices {
 														+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
 												parent.preparePatternProposition(3*i+1, preparedValue2.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 												
-												CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
+												CaracteristicValue preparedValue3 = new CaracteristicValue();;;; preparedValue3.setParentChar(active_char);
 												preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 												preparedValue3.setUom_id(infered_uom.getUom_id());
 												String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
@@ -1577,7 +1577,7 @@ public class CharPatternServices {
 								UnitOfMeasure infered_uom = uomsInSelection.get(2);
 								
 
-								CharacteristicValue preparedValueA = new CharacteristicValue();;;; preparedValueA.setParentChar(active_char);
+								CaracteristicValue preparedValueA = new CaracteristicValue();;;; preparedValueA.setParentChar(active_char);
 								preparedValueA.setUom_id(infered_uom.getUom_id());
 								preparedValueA.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 								
@@ -1592,7 +1592,7 @@ public class CharPatternServices {
 								parent.preparePatternProposition(0, preparedValueA.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValueA, preparedRuleA, active_char);
 								
 								
-								CharacteristicValue preparedValueB = new CharacteristicValue();;;; preparedValueB.setParentChar(active_char);
+								CaracteristicValue preparedValueB = new CaracteristicValue();;;; preparedValueB.setParentChar(active_char);
 								preparedValueB.setUom_id(infered_uom.getUom_id());
 								preparedValueB.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 								
@@ -1606,7 +1606,7 @@ public class CharPatternServices {
 										+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
 								parent.preparePatternProposition(1, preparedValueB.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValueB, preparedRuleB, active_char);
 								
-								CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
+								CaracteristicValue preparedValue3 = new CaracteristicValue();;;; preparedValue3.setParentChar(active_char);
 								preparedValue3.setUom_id(infered_uom.getUom_id());
 								preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 								
@@ -1623,7 +1623,7 @@ public class CharPatternServices {
 								
 								
 								
-								CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+								CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 								preparedValue1.setUom_id(infered_uom.getUom_id());
 								preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 								preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
@@ -1638,7 +1638,7 @@ public class CharPatternServices {
 										+"\""+"<MINMAX %1><MINMAX %3><UOM \""+infered_uom+"\">";
 								parent.preparePatternProposition(3, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 								
-								CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+								CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 								preparedValue2.setUom_id(infered_uom.getUom_id());
 								preparedValue2.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 								preparedValue2.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
@@ -1663,7 +1663,7 @@ public class CharPatternServices {
 									
 									UnitOfMeasure infered_uom = uomsInSelection.get(1);
 									
-									CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+									CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 									preparedValue1.setUom_id(infered_uom.getUom_id());
 									preparedValue1.setMin_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedValue1.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
@@ -1679,7 +1679,7 @@ public class CharPatternServices {
 									parent.preparePatternProposition(0, preparedValue1.getMin_value()+" to "+preparedValue1.getMax_value()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 									
 									
-									CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
+									CaracteristicValue preparedValue3 = new CaracteristicValue();;;; preparedValue3.setParentChar(active_char);
 									preparedValue3.setUom_id(infered_uom.getUom_id());
 									preparedValue3.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 									
@@ -1704,7 +1704,7 @@ public class CharPatternServices {
 											System.out.println("The values 2 and 3 are separated by \"(|+0)/(|+0)\"");
 											
 											UnitOfMeasure infered_uom = uomsInSelection.get(0);
-											CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
+											CaracteristicValue preparedValue3 = new CaracteristicValue();;;; preparedValue3.setParentChar(active_char);
 											preparedValue3.setUom_id(infered_uom.getUom_id());
 											preparedValue3.setNominal_value(WordUtils.DoubleToString(
 													numValuesInSelection.get(0)+
@@ -1727,7 +1727,7 @@ public class CharPatternServices {
 										}else {
 											
 											UnitOfMeasure infered_uom = uomsInSelection.get(0);
-											CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
+											CaracteristicValue preparedValue3 = new CaracteristicValue();;;; preparedValue3.setParentChar(active_char);
 											preparedValue3.setUom_id(infered_uom.getUom_id());
 											preparedValue3.setNominal_value(WordUtils.DoubleToString(
 													numValuesInSelection.get(0)
@@ -1750,7 +1750,7 @@ public class CharPatternServices {
 									}else {
 										UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0));
 										
-										CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
+										CaracteristicValue preparedValue1 = new CaracteristicValue();;;; preparedValue1.setParentChar(active_char);
 										preparedValue1.setUom_id(infered_uom.getUom_id());
 										preparedValue1.setNominal_value(WordUtils.DoubleToString(
 												numValuesInSelection.get(0)
@@ -1768,7 +1768,7 @@ public class CharPatternServices {
 										parent.preparePatternProposition(0, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
 										
 										
-										CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
+										CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 										preparedValue2.setUom_id(infered_uom.getUom_id());
 										preparedValue2.setNominal_value(WordUtils.DoubleToString(
 												numValuesInSelection.get(1)
@@ -1786,7 +1786,7 @@ public class CharPatternServices {
 										parent.preparePatternProposition(1, preparedValue2.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
 										
 										
-										CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
+										CaracteristicValue preparedValue3 = new CaracteristicValue();;;; preparedValue3.setParentChar(active_char);
 										preparedValue3.setUom_id(infered_uom.getUom_id());
 										preparedValue3.setNominal_value(WordUtils.DoubleToString(
 												numValuesInSelection.get(2)
@@ -1914,7 +1914,7 @@ public class CharPatternServices {
 							UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0));
 							
 							for(int i=0;i<numValuesInSelection.size();i++) {
-								CharacteristicValue preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+								CaracteristicValue preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 								preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(i)));
 								preparedValue.setUom_id(infered_uom.getUom_id());
 								String preparedRule = WordUtils.generateRuleSyntax(
@@ -1947,7 +1947,7 @@ public class CharPatternServices {
 				textBetweenNumbers.add("\""+textBetweenNumberstmp[i]+"\"");
 			}
 			
-			CharacteristicValue preparedValue;
+			CaracteristicValue preparedValue;
 			String preparedRule;
 			
 			if(number_of_digits>0) {
@@ -1956,7 +1956,7 @@ public class CharPatternServices {
 					System.out.println("The selection includes no more than one numeric value");
 					if(number_of_chars>0) {
 						System.out.println("The selection includes at least one alphabetic char");
-						CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+						CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 						tmp.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 						parent.sendPatternValue(tmp);
 						parent.sendPatternRule(WordUtils.generateRuleSyntax(
@@ -1967,7 +1967,7 @@ public class CharPatternServices {
 								));
 					}else {
 						System.out.println("No letter in selection");
-						CharacteristicValue tmp = new CharacteristicValue();;;; tmp.setParentChar(active_char);
+						CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 						tmp.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 						parent.sendPatternValue(tmp);
 						parent.sendPatternRule(null);
@@ -1982,21 +1982,21 @@ public class CharPatternServices {
 							
 							System.out.println("The 2 numerical values are separated by \"X\" or \"*\"? More precisely: the selection follows the pattern (X+0)%(|+0)\"X\"(|+0)%(X+0) where \"X\" can also be replaced by \"*\" (e.g.  \"CONDUCTORS: 5x1.50 SQMM\")");
 							
-							preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+							preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 							preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 							preparedRule = WordUtils.generateRuleSyntax(
 									textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 							parent.preparePatternProposition(
 									preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 							
-							preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+							preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 							preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 							preparedRule = WordUtils.generateRuleSyntax(
 									textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 							parent.preparePatternProposition(
 									preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 							
-							preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+							preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 							preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)));
 							preparedRule = WordUtils.generateRuleSyntax(
 									textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2"}, null);
@@ -2007,21 +2007,21 @@ public class CharPatternServices {
 								
 								System.out.println("The 2 numerical values are separated by \"+\" ?");
 								
-								preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+								preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 								preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 								preparedRule = WordUtils.generateRuleSyntax(
 										textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 								parent.preparePatternProposition(
 										preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 								
-								preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+								preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 								preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 								preparedRule = WordUtils.generateRuleSyntax(
 										textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 								parent.preparePatternProposition(
 										preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 								
-								preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+								preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 								preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 								preparedRule = WordUtils.generateRuleSyntax(
 										textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2"}, null);
@@ -2033,21 +2033,21 @@ public class CharPatternServices {
 									
 									System.out.println("The 2 numerical values are separated by \"/\" ?");
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1/%2"}, null);
@@ -2056,35 +2056,35 @@ public class CharPatternServices {
 								}else {
 									System.out.println("The 2 numerical values are not separated by + or / or *");
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1/%2"}, null);
@@ -2107,28 +2107,28 @@ public class CharPatternServices {
 									||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "*")) {
 									System.out.println("The numerical values 2 and 3 are separated by *");
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)*numValuesInSelection.get(2)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2*%3"}, null);
@@ -2139,21 +2139,21 @@ public class CharPatternServices {
 								}else {
 									if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "+")){
 										System.out.println("Num 2 and 3 are separated by +");
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(2)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%3"}, null);
 										parent.preparePatternProposition(
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)+numValuesInSelection.get(2)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2+%3"}, null);
 										parent.preparePatternProposition(
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)+numValuesInSelection.get(2)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2+%3"}, null);
@@ -2162,28 +2162,28 @@ public class CharPatternServices {
 										
 									}else {
 										System.out.println("Num 2 and 3 are not separated by +");
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 										parent.preparePatternProposition(
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 										parent.preparePatternProposition(
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
 										parent.preparePatternProposition(
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2"}, null);
@@ -2191,7 +2191,7 @@ public class CharPatternServices {
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)+numValuesInSelection.get(2)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2+%3"}, null);
@@ -2206,21 +2206,21 @@ public class CharPatternServices {
 											||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "X")
 											||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "*")) {
 										System.out.println("The numerical values 2 and 3 are separated by *");
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2"}, null);
 										parent.preparePatternProposition(
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(2)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%3"}, null);
 										parent.preparePatternProposition(
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)*numValuesInSelection.get(2)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2*%3"}, null);
@@ -2230,28 +2230,28 @@ public class CharPatternServices {
 									}else {
 										if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "+")){
 											System.out.println("Num 2 and 3 are separated with +");
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 											parent.preparePatternProposition(
 													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 											parent.preparePatternProposition(
 													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
 											parent.preparePatternProposition(
 													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)+numValuesInSelection.get(2)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2+%3"}, null);
@@ -2261,28 +2261,28 @@ public class CharPatternServices {
 										}else {
 											System.out.println("Num val 2 and 3 not separted by +");
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 											parent.preparePatternProposition(
 													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 											parent.preparePatternProposition(
 													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
 											parent.preparePatternProposition(
 													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2"}, null);
@@ -2290,7 +2290,7 @@ public class CharPatternServices {
 													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 											
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)+numValuesInSelection.get(2)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2+%3"}, null);
@@ -2303,28 +2303,28 @@ public class CharPatternServices {
 									if(WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), "/")
 											||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(1), ":")){
 										System.out.println("Num values 1 and 2 separated by /");
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 										parent.preparePatternProposition(
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 										parent.preparePatternProposition(
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
 										parent.preparePatternProposition(
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1/%2"}, null);
@@ -2332,7 +2332,7 @@ public class CharPatternServices {
 												preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 										
 										
-										preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+										preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 										preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)/numValuesInSelection.get(1)+numValuesInSelection.get(2)));
 										preparedRule = WordUtils.generateRuleSyntax(
 												textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1/%2+%3"}, null);
@@ -2346,28 +2346,28 @@ public class CharPatternServices {
 												||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "*")) {
 											System.out.println("The numerical values 2 and 3 are separated by *");
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 											parent.preparePatternProposition(
 													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 											parent.preparePatternProposition(
 													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
 											parent.preparePatternProposition(
 													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)*numValuesInSelection.get(2)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2*%3"}, null);
@@ -2375,7 +2375,7 @@ public class CharPatternServices {
 													preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 											
 											
-											preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+											preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 											preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)*numValuesInSelection.get(2)));
 											preparedRule = WordUtils.generateRuleSyntax(
 													textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2*%3"}, null);
@@ -2388,28 +2388,28 @@ public class CharPatternServices {
 													||WordUtils.FreeRuleSyntaxContainsSep(textBetweenNumbers.get(2), "/")){
 												System.out.println("Num values 2 and 3 are separated by /");
 												
-												preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+												preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 												preparedRule = WordUtils.generateRuleSyntax(
 														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 												parent.preparePatternProposition(
 														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 												
-												preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+												preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 												preparedRule = WordUtils.generateRuleSyntax(
 														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 												parent.preparePatternProposition(
 														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 												
-												preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+												preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 												preparedRule = WordUtils.generateRuleSyntax(
 														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
 												parent.preparePatternProposition(
 														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 												
-												preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+												preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)/numValuesInSelection.get(2)));
 												preparedRule = WordUtils.generateRuleSyntax(
 														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2/%3"}, null);
@@ -2417,7 +2417,7 @@ public class CharPatternServices {
 														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 												
 												
-												preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+												preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)/numValuesInSelection.get(2)));
 												preparedRule = WordUtils.generateRuleSyntax(
 														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2/%3"}, null);
@@ -2425,35 +2425,35 @@ public class CharPatternServices {
 														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 												
 											}else {
-												preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+												preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 												preparedRule = WordUtils.generateRuleSyntax(
 														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 												parent.preparePatternProposition(
 														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 												
-												preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+												preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 												preparedRule = WordUtils.generateRuleSyntax(
 														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 												parent.preparePatternProposition(
 														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 												
-												preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+												preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 												preparedRule = WordUtils.generateRuleSyntax(
 														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
 												parent.preparePatternProposition(
 														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 												
-												preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+												preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(1)+numValuesInSelection.get(2)));
 												preparedRule = WordUtils.generateRuleSyntax(
 														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%2+%3"}, null);
 												parent.preparePatternProposition(
 														preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 												
-												preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+												preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 												preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)*numValuesInSelection.get(2)));
 												preparedRule = WordUtils.generateRuleSyntax(
 														textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2*%3"}, null);
@@ -2484,14 +2484,14 @@ public class CharPatternServices {
 										) {
 									System.out.println("The values are separated respectively by \"X\" or \"*\", \"+\" and \"X\" or \"*\"");
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)+numValuesInSelection.get(2)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1+%3"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)*numValuesInSelection.get(1)+numValuesInSelection.get(2)*numValuesInSelection.get(3)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1*%2+%3*%4"}, null);
@@ -2500,28 +2500,28 @@ public class CharPatternServices {
 									
 									
 								}else {
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%1"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(1)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%2"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(2)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%3"}, null);
 									parent.preparePatternProposition(
 											preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 									
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(3)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%4"}, null);
@@ -2533,7 +2533,7 @@ public class CharPatternServices {
 								System.out.println("There are more than 4 numerical values");
 								
 								for(int i=0;i<numValuesInSelection.size();i++) {
-									preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+									preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 									preparedValue.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(i)));
 									preparedRule = WordUtils.generateRuleSyntax(
 											textBetweenNumbers, new String[] {"NOM"}, new String [] {"%"+String.valueOf(i+1)}, null);
@@ -2551,7 +2551,7 @@ public class CharPatternServices {
 			}else {
 				System.out.println("There are no numeric values in selection");
 				for(int i=0;i<5;i++) {
-					preparedValue = new CharacteristicValue();;;; preparedValue.setParentChar(active_char);
+					preparedValue = new CaracteristicValue();;;; preparedValue.setParentChar(active_char);
 					preparedValue.setNominal_value(String.valueOf(i+1));
 					preparedRule = WordUtils.generateRuleSyntax(
 							textBetweenNumbers, new String[] {""}, new String [] {String.valueOf(i+1)+" "}, null);
@@ -2564,7 +2564,7 @@ public class CharPatternServices {
 		}
 	}
 
-	private static String beginsWithStopWords(String selected_text,UserAccount account, ClassCharacteristic active_char) {
+	private static String beginsWithStopWords(String selected_text,UserAccount account, ClassCaracteristic active_char) {
 		if(specialwords!=null) {
 			
 		}else {
@@ -2646,10 +2646,10 @@ public class CharPatternServices {
 		System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 		String activeRule = parent.rule_field.getText();
 		if(activeRule!=null && activeRule.replaceAll(" ", "").length()>0) {
-			String activeClass = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0];
+			String activeClass = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
 			int activeCharIndex = parent.tableController.selected_col;
-			ArrayList<ClassCharacteristic> activeChars = CharValuesLoader.active_characteristics.get(activeClass);
-			ClassCharacteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
+			ArrayList<ClassCaracteristic> activeChars = CharValuesLoader.active_characteristics.get(activeClass);
+			ClassCaracteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
 			GenericCharRule activeCharRule = new GenericCharRule(activeClass,activeChar,activeRule);
 			if(activeCharRule.parseSuccess()) {
 				System.out.println("Trying rule "+activeCharRule.getRuleMarker());
@@ -2666,7 +2666,7 @@ public class CharPatternServices {
 			
 		}
 		
-		CharDescriptionExportServices.flushToDB(parent.account);
+		CharDescriptionExportServices.flushItemDataToDB(parent.account);
 	}
 
 	private static void tryRuleOnItem(CharDescriptionRow r, GenericCharRule activeCharRule, Pattern regexPattern, List<String> targetClasses, Char_description parent) {
@@ -2711,7 +2711,7 @@ public class CharPatternServices {
 			IntStream.range(0, charIdArrays.get(segment).size()).filter(i -> charIdArrays.get(segment).get(i).equals(matchedRule.getSourceChar().getCharacteristic_id()))
 			.forEach(charIdx->{
 				if(!(matchedRow.getData(segment)[charIdx]!=null)) {
-					matchedRow.getData(segment)[charIdx] = new CharacteristicValue();
+					matchedRow.getData(segment)[charIdx] = new CaracteristicValue();
 					matchedRow.getData(segment)[charIdx].setParentChar(CharValuesLoader.active_characteristics.get(segment).get(charIdx));
 				}
 				

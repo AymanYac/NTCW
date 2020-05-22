@@ -17,7 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import model.BinaryClassificationParameters;
-import model.ClassCharacteristic;
+import model.ClassCaracteristic;
 import model.DescriptionType;
 import model.GlobalConstants;
 import model.UnitOfMeasure;
@@ -412,7 +412,7 @@ public class WordUtils {
 
 
 
-		public static ArrayList<UnitOfMeasure> parseCompatibleUoMs(String selected_text, ClassCharacteristic active_char) {
+		public static ArrayList<UnitOfMeasure> parseCompatibleUoMs(String selected_text, ClassCaracteristic active_char) {
 			
 			//~ is used to escape intext quotes so as not to be mistaken with rule syntax quotes
 			selected_text = selected_text.replace("~\"","\"");

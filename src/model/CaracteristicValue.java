@@ -14,10 +14,10 @@ import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
-public class CharacteristicValue {
+public class CaracteristicValue {
 	public boolean ManualValueReviewed=false;
 	
-	public static HashMap<String,HashSet<CharacteristicValue>> loadedValues;
+	public static HashMap<String,HashSet<CaracteristicValue>> loadedValues;
 	
 	private String value_id;
 	private String dataLanguageValue;
@@ -34,17 +34,21 @@ public class CharacteristicValue {
 	private String url;
 	
 	
-	private ClassCharacteristic parentChar;
+	private ClassCaracteristic parentChar;
 
 	
 	
 	
 	
-	public CharacteristicValue() {
+	public CaracteristicValue() {
 		super();
 		this.value_id = Tools.generate_uuid();
 	}
 	public String getValue_id() {
+		if(value_id!=null) {
+			return value_id;
+		}
+		value_id = Tools.generate_uuid();
 		return value_id;
 	}
 	public void setValue_id(String value_id) {
@@ -110,7 +114,7 @@ public class CharacteristicValue {
 		return ret;
 	}
 	
-	public Pair<ArrayList<String>, TextFlow> getFormatedDisplayAndUomPair(Char_description parent,ClassCharacteristic parentChar) {
+	public Pair<ArrayList<String>, TextFlow> getFormatedDisplayAndUomPair(Char_description parent,ClassCaracteristic parentChar) {
 		ArrayList<Text> textes = new ArrayList<Text>();
 		String local_uom_symbol="";
 		UnitOfMeasure local_uom = null;
@@ -390,34 +394,34 @@ public class CharacteristicValue {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	public void setParentChar(ClassCharacteristic classCharacteristic) {
+	public void setParentChar(ClassCaracteristic classCharacteristic) {
 		this.parentChar=classCharacteristic;
 		addThisValuetoKnownValuesForCharacteristic(parentChar);
 	}
 
-	public void addThisValuetoKnownValuesForCharacteristic(ClassCharacteristic classCharacteristic) {
+	public void addThisValuetoKnownValuesForCharacteristic(ClassCaracteristic classCharacteristic) {
 		if(classCharacteristic.getIsNumeric()) {
 			return;
 		}
 		try {
 			if(loadedValues.containsKey(classCharacteristic.getCharacteristic_id())) {
-				HashSet<CharacteristicValue> tmp = loadedValues.get(classCharacteristic.getCharacteristic_id());
+				HashSet<CaracteristicValue> tmp = loadedValues.get(classCharacteristic.getCharacteristic_id());
 				tmp.add(this);
 				loadedValues.put(classCharacteristic.getCharacteristic_id(), tmp);
 			}else {
-				HashSet<CharacteristicValue> tmp = new HashSet<CharacteristicValue>();
+				HashSet<CaracteristicValue> tmp = new HashSet<CaracteristicValue>();
 				tmp.add(this);
 				loadedValues.put(classCharacteristic.getCharacteristic_id(), tmp);
 			}
 			
 		}catch(Exception V) {
-			loadedValues = new HashMap<String,HashSet<CharacteristicValue>>();
+			loadedValues = new HashMap<String,HashSet<CaracteristicValue>>();
 			if(loadedValues.containsKey(classCharacteristic.getCharacteristic_id())) {
-				HashSet<CharacteristicValue> tmp = loadedValues.get(classCharacteristic.getCharacteristic_id());
+				HashSet<CaracteristicValue> tmp = loadedValues.get(classCharacteristic.getCharacteristic_id());
 				tmp.add(this);
 				loadedValues.put(classCharacteristic.getCharacteristic_id(), tmp);
 			}else {
-				HashSet<CharacteristicValue> tmp = new HashSet<CharacteristicValue>();
+				HashSet<CaracteristicValue> tmp = new HashSet<CaracteristicValue>();
 				tmp.add(this);
 				loadedValues.put(classCharacteristic.getCharacteristic_id(), tmp);
 			}
@@ -446,8 +450,8 @@ public class CharacteristicValue {
 	     if (this == o) {
 	         return true;
 	     }
-	     if (o instanceof CharacteristicValue) {
-	    	 CharacteristicValue p = (CharacteristicValue) o;
+	     if (o instanceof CaracteristicValue) {
+	    	 CaracteristicValue p = (CaracteristicValue) o;
 	         return p.hashCode()==this.hashCode();
 	     }
 	     return false;

@@ -11,7 +11,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import controllers.paneControllers.TablePane_CharClassif;
+import javafx.util.Pair;
+import model.CaracteristicValue;
 import model.CharDescriptionRow;
+import model.ClassCaracteristic;
+import model.GlobalConstants;
 import transversal.generic.Tools;
 
 public class CharItemFetcher {
@@ -19,7 +23,9 @@ public class CharItemFetcher {
 	public static ArrayList<CharDescriptionRow> allRowItems;
 	public static HashMap<String,Integer> indexedRowItems = new HashMap<String,Integer>();
 	public static HashMap<String, String> classifiedItems;
-	
+	private static int fakeItemIdx;
+	public static ArrayList<Pair<ClassCaracteristic,CaracteristicValue>> defaultCharValues;
+
 	
 	public static void fetchAllItems(String active_project, TablePane_CharClassif tablePane_CharClassif) throws ClassNotFoundException, SQLException {
 		if(allRowItems!=null) {
@@ -32,33 +38,41 @@ public class CharItemFetcher {
 			PreparedStatement stmt;
 			ResultSet rs;
 			
-			stmt = conn.prepareStatement("select item_id, client_item_number, short_description,short_description_translated, long_description,long_description_translated,material_group from "+active_project+".project_items");
+			stmt = conn.prepareStatement("select item_id, client_item_number, short_description,short_description_translated, long_description,long_description_translated,material_group,pre_classification from "+active_project+".project_items");
 			rs = stmt.executeQuery();
 			
 			int i=-1;
 			while(rs.next()) {
-				//We don't have the associated char data length yet
-				//String loop_class_id = tablePane_CharClassif.classifiedItems.get(rs.getString("item_id")).split("&&&")[4];
-				//CharDescriptionRow tmp = new CharDescriptionRow(loop_class_id,tablePane_CharClassif.active_characteristics.get(loop_class_id).size());
-				CharDescriptionRow tmp = new CharDescriptionRow();
-				tmp.setParent(tablePane_CharClassif.Parent);
-				tmp.setItem_id(rs.getString("item_id"));
-				i+=1;
-				indexedRowItems.put(tmp.getItem_id(), i);
-				tmp.setClient_item_number(rs.getString("client_item_number"));
-				tmp.setShort_desc(rs.getString("short_description"));
-				tmp.setShort_desc_translated(rs.getString("short_description_translated"));
-				tmp.setLong_desc(rs.getString("long_description"));
-				tmp.setLong_desc_translated(rs.getString("long_description_translated"));
-				tmp.setMaterial_group(rs.getString("material_group"));
+				try {
+					//We don't have the associated char data length yet
+					//String loop_class_id = tablePane_CharClassif.classifiedItems.get(rs.getString("item_id")).split("&&&")[4];
+					//CharDescriptionRow tmp = new CharDescriptionRow(loop_class_id,tablePane_CharClassif.active_characteristics.get(loop_class_id).size());
+					CharDescriptionRow tmp = new CharDescriptionRow();
+					tmp.setParent(tablePane_CharClassif.Parent);
+					tmp.setItem_id(rs.getString("item_id"));
+					i+=1;
+					indexedRowItems.put(tmp.getItem_id(), i);
+					tmp.setClient_item_number(rs.getString("client_item_number"));
+					tmp.setShort_desc(rs.getString("short_description"));
+					tmp.setShort_desc_translated(rs.getString("short_description_translated"));
+					tmp.setLong_desc(rs.getString("long_description"));
+					tmp.setLong_desc_translated(rs.getString("long_description_translated"));
+					tmp.setMaterial_group(rs.getString("material_group"));
+					tmp.setPreclassif(rs.getString("pre_classification"));
+					
+					System.out.println(CharItemFetcher.classifiedItems);
+					String loop_class_segment = CharItemFetcher.classifiedItems.get(rs.getString("item_id"));
+					System.out.println("******"+loop_class_segment+"********");
+					String loop_class_id = loop_class_segment.split("&&&")[4];
+					String loop_class_name = loop_class_segment.split("&&&")[1];
+					String loop_class_number = loop_class_segment.split("&&&")[0];
+					tmp.setClass_segment_string(loop_class_id+"&&&"+loop_class_name+"&&&"+loop_class_number);
+					
+					allRowItems.add(tmp);
+				}catch(Exception V) {
+					V.printStackTrace(System.err);
+				}
 				
-				String loop_class_segment = CharItemFetcher.classifiedItems.get(rs.getString("item_id"));
-				String loop_class_id = loop_class_segment.split("&&&")[4];
-				String loop_class_name = loop_class_segment.split("&&&")[1];
-				String loop_class_number = loop_class_segment.split("&&&")[0];
-				tmp.setClass_segment(loop_class_id+"&&&"+loop_class_name+"&&&"+loop_class_number);
-				
-				allRowItems.add(tmp);
 			}
 			rs.close();
 			stmt.close();
@@ -66,8 +80,39 @@ public class CharItemFetcher {
 		}
 			
 	}
-
-	public static void loadItemArray(List<String> classItemIDs, TablePane_CharClassif tablePane_CharClassif) {
+	
+	public static void generateDefaultCharEditingItems(TablePane_CharClassif tableController) throws ClassNotFoundException, SQLException {
+		if(CharItemFetcher.defaultCharValues!=null) {
+			
+		}else{
+			CharValuesLoader.fetchDefaultCharValues(tableController.Parent.account.getActive_project());
+		}
+		System.out.println("Generating fake items ");
+		try {
+			tableController.itemArray.clear();
+			System.gc();
+		}catch(Exception V) {
+			tableController.itemArray = new ArrayList<CharDescriptionRow>();
+			System.gc();
+		}
+		fakeItemIdx = 0;
+		CharItemFetcher.defaultCharValues.forEach(p->{
+			fakeItemIdx+=1;
+			CharDescriptionRow fakeItem = new CharDescriptionRow();
+			fakeItem.setItem_id(p.getValue().getValue_id());
+			fakeItem.setClient_item_number("Dummy_item_"+String.valueOf(fakeItemIdx));
+			fakeItem.setClass_segment_string(GlobalConstants.DEFAULT_CHARS_CLASS+"&&&"+GlobalConstants.DEFAULT_CHARS_CLASS+"&&&"+GlobalConstants.DEFAULT_CHARS_CLASS);
+			fakeItem.setShort_desc(p.getKey().getCharacteristic_name());
+			fakeItem.setLong_desc(p.getValue().getDisplayValue(tableController.Parent));
+			fakeItem.setParent(tableController.Parent);
+			fakeItem.allocateDataField(GlobalConstants.DEFAULT_CHARS_CLASS, 1);
+			fakeItem.getData(GlobalConstants.DEFAULT_CHARS_CLASS)[0] = p.getValue();
+			tableController.itemArray.add(fakeItem);
+			
+		});
+		
+	}
+	public static void generateItemArray(List<String> classItemIDs, TablePane_CharClassif tablePane_CharClassif) {
 		System.out.println("Retrieving "+classItemIDs.size());
 		try {
 			tablePane_CharClassif.itemArray.clear();
@@ -104,5 +149,6 @@ public class CharItemFetcher {
 		});
 	}
 
+	
 	
 }

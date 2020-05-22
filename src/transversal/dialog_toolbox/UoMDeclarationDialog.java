@@ -21,8 +21,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import model.AutoCompleteBox_UnitOfMeasure;
-import model.CharacteristicValue;
-import model.ClassCharacteristic;
+import model.CaracteristicValue;
+import model.ClassCaracteristic;
 import model.UnitOfMeasure;
 import model.UomClassComboRow;
 import service.CharClassifProposer;
@@ -43,7 +43,7 @@ public class UoMDeclarationDialog {
 	
 
 	public static void UomDeclarationPopUp(Char_description parent, String proposedUomSymbol,
-			AutoCompleteBox_UnitOfMeasure uom_field, ClassCharacteristic active_char) {
+			AutoCompleteBox_UnitOfMeasure uom_field, ClassCaracteristic active_char) {
 		
 		proposedUomSymbol  = proposedUomSymbol.trim();
 		CharUomFamily = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0)).getUom_base_id();
@@ -101,12 +101,12 @@ public class UoMDeclarationDialog {
 
 	
 	public static void UomDeclarationPopUpFromPropButton(Char_description parent, String proposedUomSymbol, int activeButtonIndex,
-			ClassCharacteristic active_char) {
+			ClassCaracteristic active_char) {
 		proposedUomSymbol  = proposedUomSymbol.trim();
 		CharUomFamily = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0)).getUom_base_id();
 		
 		//Get the corresponding rule and value
-		CharacteristicValue preparedValue=CharClassifProposer.getValueForButton(activeButtonIndex);
+		CaracteristicValue preparedValue=CharClassifProposer.getValueForButton(activeButtonIndex);
 		String preparedRule=CharClassifProposer.getRuleForButton(activeButtonIndex);
 		
 		// Create the custom dialog.
@@ -161,7 +161,7 @@ public class UoMDeclarationDialog {
 		
 	}
 
-	private static void setFieldListeners(Dialog<UnitOfMeasure> dialog, ButtonType validateButtonType,String proposedUomSymbol,ClassCharacteristic active_char) {
+	private static void setFieldListeners(Dialog<UnitOfMeasure> dialog, ButtonType validateButtonType,String proposedUomSymbol,ClassCaracteristic active_char) {
 		// Enable/Disable validation button depending on whether all fields were entered.
 		validationButton = dialog.getDialogPane().lookupButton(validateButtonType);
 		validationButton.setDisable(true);
@@ -230,7 +230,7 @@ public class UoMDeclarationDialog {
 		
 	}
 
-	private static void focusState(Boolean uomMultiplierInFocus, String proposedUomSymbol, ClassCharacteristic active_char, Dialog<UnitOfMeasure> dialog, ButtonType validateButtonType) {
+	private static void focusState(Boolean uomMultiplierInFocus, String proposedUomSymbol, ClassCaracteristic active_char, Dialog<UnitOfMeasure> dialog, ButtonType validateButtonType) {
 		if (uomMultiplierInFocus) {
 	        
 	    }
@@ -288,7 +288,7 @@ public class UoMDeclarationDialog {
 		}
 	}
 
-	private static void clear_fields(String proposedUomSymbol,ClassCharacteristic active_char) {
+	private static void clear_fields(String proposedUomSymbol,ClassCaracteristic active_char) {
 		
 		grid.setHgap(10);
 		grid.setVgap(10);

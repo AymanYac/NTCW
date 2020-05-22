@@ -5,8 +5,8 @@ import controllers.Char_description;
 import javafx.scene.control.Button;
 import javafx.util.Pair;
 import model.CharDescriptionRow;
-import model.CharacteristicValue;
-import model.ClassCharacteristic;
+import model.CaracteristicValue;
+import model.ClassCaracteristic;
 import model.UnitOfMeasure;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.UoMDeclarationDialog;
@@ -18,7 +18,7 @@ public class CharClassifProposer {
 	private static int lastestActiveSAIndex = -1;
 	private static int lastestActiveCRIndex = -1;
 	
-	private static HashMap<Integer,Pair<CharacteristicValue,String>> buttonToData = new HashMap<Integer,Pair<CharacteristicValue,String>>();
+	private static HashMap<Integer,Pair<CaracteristicValue,String>> buttonToData = new HashMap<Integer,Pair<CaracteristicValue,String>>();
 	
 	public CharClassifProposer(Char_description parent) {
 		CharClassifProposer.parent = parent;
@@ -36,8 +36,8 @@ public class CharClassifProposer {
 		}
 	}
 
-	public void addSemiAutoProposition(String buttonText, CharacteristicValue preparedValue, String preparedRule,
-			ClassCharacteristic active_char) {
+	public void addSemiAutoProposition(String buttonText, CaracteristicValue preparedValue, String preparedRule,
+			ClassCaracteristic active_char) {
 		
 		for(int i=0;i<=lastestActiveSAIndex;i++) {
 			Button loopBtn = parent.propButtons.get(i);
@@ -66,7 +66,7 @@ public class CharClassifProposer {
 				UoMDeclarationDialog.UomDeclarationPopUpFromPropButton(parent,buttonText.split("\"")[1],currentLoopButtonIndex,active_char);
 				
 			}else {
-				CharacteristicValue val = getValueForButton(currentLoopButtonIndex);
+				CaracteristicValue val = getValueForButton(currentLoopButtonIndex);
 				String rule = getRuleForButton(currentLoopButtonIndex);
 				parent.sendSemiAutoPattern(val, rule);
 				
@@ -75,7 +75,7 @@ public class CharClassifProposer {
 		});
 		
 		System.out.println("Putting in prop "+lastestActiveSAIndex+" rule "+preparedRule);
-		Pair<CharacteristicValue,String> data = new Pair<CharacteristicValue,String>(preparedValue, preparedRule);
+		Pair<CaracteristicValue,String> data = new Pair<CaracteristicValue,String>(preparedValue, preparedRule);
 		buttonToData.put(lastestActiveSAIndex, data);
 		
 		
@@ -83,10 +83,10 @@ public class CharClassifProposer {
 
 	private static void clearRulefromButton(int i) {
 		System.out.println("Disabling rule on button "+String.valueOf(i));
-		buttonToData.put(i, new Pair<CharacteristicValue,String>(buttonToData.get(i).getKey(),null));
+		buttonToData.put(i, new Pair<CaracteristicValue,String>(buttonToData.get(i).getKey(),null));
 	}
 
-	public static CharacteristicValue getValueForButton(int currentLoopButtonIndex) {
+	public static CaracteristicValue getValueForButton(int currentLoopButtonIndex) {
 		System.out.println("*GETTING VALUE*");
 		System.out.println(currentLoopButtonIndex);
 		System.out.println(buttonToData.get(currentLoopButtonIndex).getKey());
@@ -111,9 +111,9 @@ public class CharClassifProposer {
 				btn.setText(e.getKey());
 				btn.setOpacity(1.0);
 				btn.setOnAction((event) -> {
-					CharDescriptionExportServices.addCharDataToPush(row, segment, char_idx,charIdxSize);
-					CharDescriptionExportServices.flushToDB(parent.account);
 					CharValuesLoader.updateRuntimeDataForItem(row,segment,char_idx,e.getValue().getActionValue());
+					CharDescriptionExportServices.addItemCharDataToPush(row, segment, char_idx,charIdxSize);
+					CharDescriptionExportServices.flushItemDataToDB(parent.account);
 					clearPropButtons();
 					row.getRulePropositions().get(segment).get(char_idx).clear();
 				});

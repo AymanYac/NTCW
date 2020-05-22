@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 
-public class ClassCharacteristic {
+public class ClassCaracteristic {
 	//Char fields
 	private String characteristic_id;
 	private String characteristic_name;
@@ -68,12 +68,12 @@ public class ClassCharacteristic {
 	public ArrayList<String> getAllowedValues() {
 		return allowedValues;
 	}
-	public HashSet<CharacteristicValue> getKnownValues(){
-		HashSet<CharacteristicValue> ret = CharacteristicValue.loadedValues.get(this.getCharacteristic_id());
+	public HashSet<CaracteristicValue> getKnownValues(){
+		HashSet<CaracteristicValue> ret = CaracteristicValue.loadedValues.get(this.getCharacteristic_id());
 		if(ret!=null) {
 			return ret;
 		}
-		return new HashSet<CharacteristicValue>();
+		return new HashSet<CaracteristicValue>();
 	}
 	public void setAllowedValues(ArrayList<String> allowedValues) {
 		this.allowedValues = allowedValues;
@@ -109,8 +109,8 @@ public class ClassCharacteristic {
 	     if (this == o) {
 	         return true;
 	     }
-	     if (o instanceof ClassCharacteristic) {
-	    	 ClassCharacteristic p = (ClassCharacteristic) o;
+	     if (o instanceof ClassCaracteristic) {
+	    	 ClassCaracteristic p = (ClassCaracteristic) o;
 	         return p.hashCode()==this.hashCode();
 	     }
 	     return false;

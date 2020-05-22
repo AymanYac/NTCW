@@ -19,12 +19,12 @@ public class CharRuleResult {
 	private GenericCharRule genericCharRule;
 	private String matchedText;
 	private String matchedBlock;
-	private CharacteristicValue actionValue;
+	private CaracteristicValue actionValue;
 	private ArrayList<CharRuleResult> superRules= new ArrayList<CharRuleResult>();
-	private ClassCharacteristic parentChar;
+	private ClassCaracteristic parentChar;
 	private static Unidecode unidecode;
 
-	public CharRuleResult(GenericCharRule matchedRule, String matchedText, String matchedGroup, ClassCharacteristic parentChar) {
+	public CharRuleResult(GenericCharRule matchedRule, String matchedText, String matchedGroup, ClassCaracteristic parentChar) {
 		this.genericCharRule = matchedRule;
 		this.matchedText = matchedText;
 		this.matchedBlock = matchedGroup;
@@ -56,12 +56,12 @@ public class CharRuleResult {
 	}
 	
 
-	public CharacteristicValue getActionValue() {
+	public CaracteristicValue getActionValue() {
 		return actionValue;
 	}
 
 	public void ruleActionToValue(Char_description parent) {
-		actionValue = new CharacteristicValue();
+		actionValue = new CaracteristicValue();
 		actionValue.setParentChar(parentChar);
 		for(String action:genericCharRule.getRuleActions()) {
 			if(action.startsWith("DL ")) {

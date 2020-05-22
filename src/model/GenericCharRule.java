@@ -11,7 +11,7 @@ public class GenericCharRule {
 	private String ruleMarker;
 	private ArrayList<String> ruleActions;
 	private String sourceClass;
-	private ClassCharacteristic sourceChar;
+	private ClassCaracteristic sourceChar;
 	private String regexMarker;
 	private Boolean parseFailed;
 	public static String SEP_CLASS;
@@ -30,7 +30,7 @@ public class GenericCharRule {
 		return sourceClass;
 	}
 
-	public ClassCharacteristic getSourceChar() {
+	public ClassCaracteristic getSourceChar() {
 		return sourceChar;
 	}
 
@@ -42,7 +42,7 @@ public class GenericCharRule {
 		return (parseFailed!=null)?!parseFailed:null;
 	}
 	
-	public GenericCharRule(String active_class, ClassCharacteristic active_char, String active_rule) {
+	public GenericCharRule(String active_class, ClassCaracteristic active_char, String active_rule) {
 		//SEP_CLASS = " \\.,;:-=/";
 		SEP_CLASS = " [.],;:-[+]=/";
 		sourceClass = active_class;

@@ -9,7 +9,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.CharDescriptionRow;
 import model.CharPaneRow;
-import model.ClassCharacteristic;
+import model.ClassCaracteristic;
 import model.mouseHoverTableCell;
 import service.CharValuesLoader;
 
@@ -35,12 +35,12 @@ public class CharPane_CharClassif {
 			
 		}
 		if(this.selected_row!=null) {
-			for(int i=0;i<CharValuesLoader.active_characteristics.get(selected_row.getClass_segment().split("&&&")[0]).size();i++) {
-				ClassCharacteristic carac = CharValuesLoader.active_characteristics.get(selected_row.getClass_segment().split("&&&")[0]).get(i);
+			for(int i=0;i<CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).size();i++) {
+				ClassCaracteristic carac = CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).get(i);
 				CharPaneRow tmp = new CharPaneRow(this.parent);
 				tmp.setChar_index(i);
 				tmp.setCarac(carac);
-				tmp.setValue(selected_row.getData(selected_row.getClass_segment().split("&&&")[0])[i]);
+				tmp.setValue(selected_row.getData(selected_row.getClass_segment_string().split("&&&")[0])[i]);
 				this.paneRows.add(tmp);
 			}
 		}
@@ -49,7 +49,7 @@ public class CharPane_CharClassif {
 		
 		try {
 			triggerItemTableRefresh = false;
-			this.tableGrid.getSelectionModel().select(Math.floorMod(this.parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(selected_row.getClass_segment().split("&&&")[0]).size()));
+			this.tableGrid.getSelectionModel().select(Math.floorMod(this.parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).size()));
 			triggerItemTableRefresh = true;
 		}catch(Exception V) {
 			

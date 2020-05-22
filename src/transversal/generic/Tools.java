@@ -1315,12 +1315,12 @@ public class Tools {
 				stmt.setString(1, eventid);
 				stmt.setString(2, tmp.getItem_id());
 				//Only possible branch : the user changed the manual classification
-				stmt.setString(3, tmp.getClass_segment().split("&&&")[0]);
+				stmt.setString(3, tmp.getClass_segment_string().split("&&&")[0]);
 				stmt.setString(4, METHOD);
 				stmt.setString(5, null);
 				stmt.setString(6, account.getUser_id());
 				stmt.setDate(7, new java.sql.Date((new java.util.Date()).getTime()));
-				;
+				System.out.println(stmt.toString());;
 				stmt.addBatch();
 				
 				

@@ -102,6 +102,7 @@ public class GlobalConstants {
 	public static final int CHAR_DESC_PATTERN_SELECTION_PHRASE_THRES = 4;
 	public static final double MAX_UOM_MULTIPLIER_TOLERANCE = 0.05;
 	public static final boolean REFRESH_ALL_RULE_ITEMS_ON_UPLOAD = true;
+	public static final String DEFAULT_CHARS_CLASS = "DEFAULT_CHARS_CLASS_ID";
 	
 	
 }

@@ -54,8 +54,8 @@ import model.AutoCompleteBox_CharValue;
 import model.AutoCompleteBox_UnitOfMeasure;
 import model.CharDescClassComboRow;
 import model.CharDescriptionRow;
-import model.CharacteristicValue;
-import model.ClassCharacteristic;
+import model.CaracteristicValue;
+import model.ClassCaracteristic;
 import model.DataInputMethods;
 import model.UserAccount;
 import service.CharClassifProposer;
@@ -476,7 +476,11 @@ public class Char_description {
 			try{
 				int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
 				if(TranslationProcessResult!=null) {
-					CharValuesLoader.storeItemDatafromScreen(idx,this);
+					if(classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+						CharValuesLoader.updateDefaultCharValue(idx,this);
+					}else {
+						CharValuesLoader.storeItemDatafromScreen(idx,this);
+					}
 				}
 				tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
 			}catch(Exception V) {
@@ -485,9 +489,16 @@ public class Char_description {
 		}
 	}
 	private Boolean CheckForTranslationValidity() {
-		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
-		ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
-		.get(active_char_index);
+		ClassCaracteristic active_char;
+		if(this.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+			active_char = CharItemFetcher.defaultCharValues.get(tableController.tableGrid.getSelectionModel().getSelectedIndex()).getKey();
+			 
+		}else {
+			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+			active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
+					.get(active_char_index);
+		}
+		
 		if(active_char.getIsTranslatable()) {
 			if(value_field.isFocused() && value_field.getText()!=null && value_field.getText().length()>0) {
 				return valueAutoComplete.processValueOnFocusLost(true);
@@ -571,9 +582,9 @@ public class Char_description {
 		
 		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
-			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0]).size());
+			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
 			CharPatternServices.scanSelectionForPatternDetection(this,
-					CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0])
+					CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
 					.get(active_char_index));
 		}
 		
@@ -679,9 +690,17 @@ public class Char_description {
 
 	private Node validateDataFields() {
 		CharDescriptionRow row = tableController.tableGrid.getSelectionModel().getSelectedItem();
-		String selectedRowClass = row.getClass_segment().split("&&&")[0];
-		int active_char_index = Math.floorMod(tableController.selected_col,CharValuesLoader.active_characteristics.get(selectedRowClass).size());
-		ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(selectedRowClass).get(active_char_index);
+		String selectedRowClass = row.getClass_segment_string().split("&&&")[0];
+		ClassCaracteristic active_char;
+		int active_char_index;
+		if(this.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+			active_char_index = 0;
+			active_char = CharItemFetcher.defaultCharValues.get(tableController.tableGrid.getSelectionModel().getSelectedIndex()).getKey();
+			 
+		}else {
+			active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(selectedRowClass).size());
+			active_char = CharValuesLoader.active_characteristics.get(selectedRowClass).get(active_char_index);
+		}
 		
 		if(validateValueField(active_char,value_field) && value_field.isVisible()) {
 			return value_field;
@@ -700,7 +719,7 @@ public class Char_description {
 			return max_field_uom;
 		};
 		
-		if(validateUomField(row,selectedRowClass,active_char_index) && uom_field.isVisible()) {
+		if(validateUomField(row,active_char_index) && uom_field.isVisible()) {
 			uom_field.setUom(uom_field.getEntries().get(0));
 			if(active_char.getAllowedUoms().size()>1){
 				return uom_field;
@@ -744,10 +763,10 @@ public class Char_description {
 		*/
 		return null;
 	}
-	private boolean validateUomField(CharDescriptionRow row, String selectedRowClass, int active_char_index) {
+	private boolean validateUomField(CharDescriptionRow row, int active_char_index) {
 		String uomFieldText = uom_field.getText();
 		if(uomFieldText!=null && uomFieldText.length()>0) {
-			String row_class_id = row.getClass_segment().split("&&&")[0];
+			String row_class_id = row.getClass_segment_string().split("&&&")[0];
 			Optional<UnitOfMeasure> matchinguom = UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->u.toString().equals(uomFieldText)).findAny();
 			if(matchinguom.isPresent()) {
 				
@@ -767,7 +786,7 @@ public class Char_description {
 		}
 		return uom_field.isVisible();
 	}
-	private boolean validateValueField(ClassCharacteristic active_char,TextField target_field) {
+	private boolean validateValueField(ClassCaracteristic active_char,TextField target_field) {
 		String originalValue = target_field.getText();
 		if(!(originalValue!=null) || originalValue.length()==0) {
 			return false;
@@ -1042,6 +1061,9 @@ public class Char_description {
 			
 		}
 		
+		CharDescClassComboRow tmp = new CharDescClassComboRow(GlobalConstants.DEFAULT_CHARS_CLASS,GlobalConstants.DEFAULT_CHARS_CLASS);
+		classCombo.getItems().add(tmp);
+		
 		classCombo.getItems().sort(new Comparator<CharDescClassComboRow>(){
 
 			@Override
@@ -1291,9 +1313,18 @@ public class Char_description {
 			return;
 		}
 		try {
-			int selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
-			ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(row.getClass_segment().split("&&&")[0]).get(selected_col);
-			proposer.loadCharRuleProps(row,row.getClass_segment().split("&&&")[0],selected_col,CharValuesLoader.active_characteristics.get(row.getClass_segment().split("&&&")[0]).size());
+			
+			ClassCaracteristic active_char = null;
+			int selected_col = 0;
+			if(!this.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+				selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
+				active_char = CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col);
+				proposer.loadCharRuleProps(row,row.getClass_segment_string().split("&&&")[0],selected_col,CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
+				
+			}else {
+				active_char = CharItemFetcher.defaultCharValues.get(tableController.tableGrid.getSelectionModel().getSelectedIndex()).getKey();
+				
+			}
 			
 			if(active_char.getIsNumeric()) {
 				if( (active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0)) {
@@ -1304,7 +1335,7 @@ public class Char_description {
 					String local_min = null;
 					String local_max = null;
 					
-					CharacteristicValue val = row.getData(row.getClass_segment().split("&&&")[0])[selected_col];
+					CaracteristicValue val = row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col];
 					try{
 						Pair<ArrayList<String>, TextFlow> tmp = val.getFormatedDisplayAndUomPair(this, active_char);
 						local_uom = UnitOfMeasure.RunTimeUOMS.get(tmp.getKey().get(0));
@@ -1335,7 +1366,7 @@ public class Char_description {
 						if(!conversionToggle.isSelected()) {
 							value_field.setText(local_nom);
 						}else {
-							value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNominal_value());
+							value_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getNominal_value());
 						}
 					}catch(Exception V) {
 						
@@ -1348,7 +1379,7 @@ public class Char_description {
 						if(!conversionToggle.isSelected()) {
 							uom_field.setUom(local_uom);
 						}else{
-							uom_field.setUom(UnitOfMeasure.RunTimeUOMS.get( row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUom_id() ));
+							uom_field.setUom(UnitOfMeasure.RunTimeUOMS.get( row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getUom_id() ));
 						}
 						//uom_field.setText(UnitOfMeasure.RunTimeUOMS.get( row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUom_id() ).getUom_symbol());
 					}catch(Exception V) {
@@ -1382,7 +1413,7 @@ public class Char_description {
 						if(!conversionToggle.isSelected()) {
 							min_field_uom.setText(local_min);
 						}else{
-							min_field_uom.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getMin_value());
+							min_field_uom.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getMin_value());
 						}
 					}catch(Exception V) {
 						
@@ -1396,7 +1427,7 @@ public class Char_description {
 						if(!conversionToggle.isSelected()) {
 							max_field_uom.setText(local_max);
 						}else{
-							max_field_uom.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getMax_value());
+							max_field_uom.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getMax_value());
 						}
 					}catch(Exception V) {
 						
@@ -1408,7 +1439,7 @@ public class Char_description {
 					custom_label_22.setTranslateX(0.5*(rule_field.getWidth()+(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					custom_label_22.setVisible(true);
 					try {
-						note_field_uom.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNote());
+						note_field_uom.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getNote());
 					}catch(Exception V) {
 						
 					}
@@ -1418,7 +1449,7 @@ public class Char_description {
 					rule_label.setText("Rule");
 					rule_label.setVisible(true);
 					try{
-						rule_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getRule_id());
+						rule_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getRule_id());
 					}catch(Exception V) {
 						
 					}
@@ -1428,7 +1459,7 @@ public class Char_description {
 					value_label.setText("Nominal value");
 					value_label.setVisible(true);
 					try{
-						value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNominal_value());
+						value_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getNominal_value());
 					}catch(Exception V) {
 						
 					}
@@ -1438,7 +1469,7 @@ public class Char_description {
 					custom_label_11.setTranslateX(+RIGHT_TRANSLATE);
 					custom_label_11.setVisible(true);
 					try{
-						min_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getMin_value());
+						min_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getMin_value());
 					}catch(Exception V) {
 						
 					}
@@ -1450,7 +1481,7 @@ public class Char_description {
 					custom_label_12.setTranslateX(0.5*(rule_field.getWidth()+(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					custom_label_12.setVisible(true);
 					try{
-						max_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getMax_value());
+						max_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getMax_value());
 					}catch(Exception V) {
 						
 					}
@@ -1460,7 +1491,7 @@ public class Char_description {
 					note_label.setText("Note");
 					note_label.setVisible(true);
 					try {
-						note_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNote());
+						note_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getNote());
 					}catch(Exception V) {
 						
 					}
@@ -1469,7 +1500,7 @@ public class Char_description {
 					rule_label.setText("Rule");
 					rule_label.setVisible(true);
 					try{
-						rule_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getRule_id());
+						rule_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getRule_id());
 					}catch(Exception V) {
 						
 					}
@@ -1482,7 +1513,7 @@ public class Char_description {
 					value_label.setText("Value ("+this.data_language_gcode.toUpperCase()+")");
 					value_label.setVisible(true);
 					try{
-						value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getDataLanguageValue());
+						value_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getDataLanguageValue());
 					}catch(Exception V) {
 						
 					}
@@ -1492,7 +1523,7 @@ public class Char_description {
 					custom_label_value.setVisible(true);
 					try{
 						//translated_value_field.setText(this.tableController.translate2UserLanguage(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNominal_value()));
-						translated_value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getUserLanguageValue());
+						translated_value_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getUserLanguageValue());
 						
 					}catch(Exception V) {
 						
@@ -1502,7 +1533,7 @@ public class Char_description {
 					note_label.setText("Note");
 					note_label.setVisible(true);
 					try {
-						note_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNote());
+						note_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getNote());
 					}catch(Exception V) {
 						
 					}
@@ -1511,7 +1542,7 @@ public class Char_description {
 					rule_label.setText("Rule");
 					rule_label.setVisible(true);
 					try{
-						rule_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getRule_id());
+						rule_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getRule_id());
 					}catch(Exception V) {
 						
 					}
@@ -1521,7 +1552,7 @@ public class Char_description {
 					value_label.setText("Value");
 					value_label.setVisible(true);
 					try{
-						value_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getDataLanguageValue());
+						value_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getDataLanguageValue());
 					}catch(Exception V) {
 						
 					}
@@ -1531,7 +1562,7 @@ public class Char_description {
 					note_label.setText("Note");
 					note_label.setVisible(true);
 					try {
-						note_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getNote());
+						note_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getNote());
 					}catch(Exception V) {
 						
 					}
@@ -1540,7 +1571,7 @@ public class Char_description {
 					rule_label.setText("Rule");
 					rule_label.setVisible(true);
 					try{
-						rule_field.setText(row.getData(row.getClass_segment().split("&&&")[0])[selected_col].getRule_id());
+						rule_field.setText(row.getData(row.getClass_segment_string().split("&&&")[0])[selected_col].getRule_id());
 					}catch(Exception V) {
 						
 					}
@@ -1607,17 +1638,18 @@ public class Char_description {
 		translated_value_field.setText("");	
 	}
 	
-	public void AssignValueOnSelectedItems(CharacteristicValue value) {
+	public void AssignValueOnSelectedItems(CaracteristicValue value) {
 
 		//uiDirectValueRefresh(pattern_value);
 		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
 		List<String> targetItemsIDs = tableController.tableGrid.getSelectionModel().getSelectedItems().stream().map(i->i.getItem_id()).collect(Collectors.toList());
 		CharItemFetcher.allRowItems.parallelStream().filter(e->targetItemsIDs.contains(e.getItem_id()))
 						.forEach(r->{
-							CharDescriptionExportServices.addCharDataToPush(r, this.classCombo.getValue().getClassSegment(), active_char_index,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
 							CharValuesLoader.updateRuntimeDataForItem(r,this.classCombo.getValue().getClassSegment(),active_char_index,value);
+							CharDescriptionExportServices.addItemCharDataToPush(r, this.classCombo.getValue().getClassSegment(), active_char_index,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+							
 						});
-		CharDescriptionExportServices.flushToDB(account);
+		CharDescriptionExportServices.flushItemDataToDB(account);
 		TranslationServices.beAwareOfNewValue(value, CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index));
 		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index),true);
 		
@@ -1625,13 +1657,13 @@ public class Char_description {
 		tableController.tableGrid.refresh();
 		
 	}
-	public void sendSemiAutoPattern(CharacteristicValue pattern_value, String ruleString) {
+	public void sendSemiAutoPattern(CaracteristicValue pattern_value, String ruleString) {
 		
 		pattern_value.setSource(DataInputMethods.SEMI_CHAR_DESC);
 		pattern_value.setAuthor(account.getUser_id());
 		
 		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
-		ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
+		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
 		.get(active_char_index);
 		
 		if(active_char.getIsNumeric()) {
@@ -1658,13 +1690,13 @@ public class Char_description {
 	public void sendPatternRule(String ruleString) {
 	}
 	
-	public void sendPatternValue(CharacteristicValue pattern_value) {	
+	public void sendPatternValue(CaracteristicValue pattern_value) {	
 	}
 	
 	@SuppressWarnings("unused")
-	private void uiDirectValueRefresh(CharacteristicValue pattern_value) {
+	private void uiDirectValueRefresh(CaracteristicValue pattern_value) {
 		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
-		ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
+		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
 		.get(active_char_index);
 		
 		if(active_char.getIsNumeric()) {
@@ -1701,8 +1733,8 @@ public class Char_description {
 			}
 		}
 	}
-	public void preparePatternProposition(int i, String buttonText, CharacteristicValue preparedValue,
-			String preparedRule, ClassCharacteristic active_char) {
+	public void preparePatternProposition(int i, String buttonText, CaracteristicValue preparedValue,
+			String preparedRule, ClassCaracteristic active_char) {
 		
 		preparedRule=WordUtils.reducePatternRuleSeparators(preparedRule);
 		try{
@@ -1712,8 +1744,8 @@ public class Char_description {
 		}
 		
 	}
-	public void preparePatternProposition(String buttonText, CharacteristicValue preparedValue,
-			String preparedRule, ClassCharacteristic active_char) {
+	public void preparePatternProposition(String buttonText, CaracteristicValue preparedValue,
+			String preparedRule, ClassCaracteristic active_char) {
 		if(active_char.getIsNumeric()) {
 			preparedRule=WordUtils.reducePatternRuleSeparators(preparedRule);
 		}

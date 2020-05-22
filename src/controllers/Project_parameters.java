@@ -58,7 +58,6 @@ import javafx.stage.Stage;
 import model.DataInputMethods;
 import model.GenericClassRule;
 import model.GlobalConstants;
-import model.ImportTaxoRow;
 import model.ItemFetcherRow;
 import model.Project;
 import model.ProjectTemplate;
@@ -2774,10 +2773,7 @@ public class Project_parameters {
 		
 		if(GlobalConstants.USE_TAXOIMPORT_NEW_SCHEMA) {
 			try {
-				ImportTaxoRow.setProjectGranularity(Integer.parseInt(classificationLevels.getValue()));
-				ImportTaxoRow.setColumnMap();
-				ImportTaxoRow.loadTaxoDS();
-				CharDescriptionImportServices.upsertTaxoAndChar(taxoFile.getText(),"TAXO","ITEMS",this.prj.getPid());
+				CharDescriptionImportServices.upsertTaxoAndChar(taxoFile.getText(),"TAXO","ITEMS",this.prj.getPid(),Integer.parseInt(classificationLevels.getValue()),account);
 			} catch (FileNotFoundException | ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

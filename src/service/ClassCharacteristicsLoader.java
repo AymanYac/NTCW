@@ -6,16 +6,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import controllers.paneControllers.TablePane_CharClassif;
-import model.ClassCharacteristic;
+import model.ClassCaracteristic;
 import transversal.generic.Tools;
 
 public class ClassCharacteristicsLoader {
 
-	public static void loadKnownValuesAssociated2Items(TablePane_CharClassif tablePane_CharClassif, String active_project) throws ClassNotFoundException, SQLException {
+	public static void loadKnownValuesAssociated2Items(String active_project) throws ClassNotFoundException, SQLException {
 		
 		
 		//CharValuesLoader.loadAllKnownValues(active_project);
-		CharValuesLoader.loadAllKnownValuesAssociated2Items(active_project, tablePane_CharClassif);
+		CharValuesLoader.fetchAllKnownValuesAssociated2Items(active_project);
 		/*HashSet<ClassCharacteristic> knownChars = new HashSet<ClassCharacteristic>();
 		tablePane_CharClassif.active_characteristics.forEach((k,v)->{
 			v.forEach(e -> knownChars.add(e));
@@ -36,7 +36,7 @@ public class ClassCharacteristicsLoader {
 		PreparedStatement stmt = conn.prepareStatement(
 				"select * from ("
 				+ "select segment_id,characteristic_id,sequence,isCritical,allowedValues,allowedUoms,isActive from "
-						+active_project+".project_characteristics_x_segments ) chars inner join "
+						+active_project+".project_characteristics_x_segments where isActive ) chars inner join "
 				+active_project+".project_characteristics on chars.characteristic_id = project_characteristics.characteristic_id order by sequence asc");
 		System.out.println("Loading all chars");
 		System.out.println(stmt.toString());
@@ -47,9 +47,9 @@ public class ClassCharacteristicsLoader {
 			if(CharValuesLoader.active_characteristics.containsKey(loop_class_id)) {
 				
 			}else {
-				CharValuesLoader.active_characteristics.put(loop_class_id, new ArrayList<ClassCharacteristic>());
+				CharValuesLoader.active_characteristics.put(loop_class_id, new ArrayList<ClassCaracteristic>());
 			}
-			ClassCharacteristic tmp = new ClassCharacteristic();
+			ClassCaracteristic tmp = new ClassCaracteristic();
 			tmp.setCharacteristic_id(rs.getString("characteristic_id"));
 			tmp.setSequence(rs.getInt("sequence"));
 			tmp.setIsCritical(rs.getBoolean("isCritical"));

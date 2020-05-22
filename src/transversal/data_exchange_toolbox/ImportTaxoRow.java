@@ -1,4 +1,4 @@
-package model;
+package transversal.data_exchange_toolbox;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,28 +13,33 @@ import java.util.stream.IntStream;
 import org.apache.poi.ss.usermodel.Row;
 
 import javafx.util.Pair;
+import model.CaracteristicValue;
+import model.ClassCaracteristic;
+import model.ClassSegment;
+import model.DataInputMethods;
+import model.UnitOfMeasure;
+import model.UserAccount;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
 public class ImportTaxoRow {
-	public static int projectGranularity;
-	private static boolean forceUpdate;
-	private static boolean accumulateUoMs;
-	private static HashMap<String, Integer> columnMap;
-    public static ArrayList<Pair<Row,String>> rejectedRows = new ArrayList<Pair<Row,String>>();
-    public static HashMap<String, ClassSegment> sid2Segment;
-    public static HashMap<String, ClassCharacteristic> chid2Carac;
-    
+
 	ClassSegment segment;
-	ClassCharacteristic carac;
+	ClassCaracteristic carac;
 	private boolean segmentParseFail;
 	private boolean caracParseFail;
+	private static HashMap<String, Integer> columnMap;
+    
+	public static ArrayList<Pair<Row,String>> rejectedRows = new ArrayList<Pair<Row,String>>();
+    
+	private static boolean forceUpdate;
+	private static boolean accumulateUoMs;
 	
 	
 	public ClassSegment getSegment() {
 		return segment;
 	}
-	public ClassCharacteristic getCarac() {
+	public ClassCaracteristic getCarac() {
 		return carac;
 	}
 	
@@ -44,28 +49,28 @@ public class ImportTaxoRow {
 		if(segmentParseHasFailed()) {
 			return null;
 		}
-		if(projectGranularity!=(tmpSegment.getSegmentGranularity())) {
-			Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Segment granularity ("+tmpSegment.getSegmentGranularity()+") is not the same as the project's("+projectGranularity+")");
+		if(CharDescriptionImportServices.projectGranularity!=(tmpSegment.getSegmentGranularity())) {
+			Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Segment granularity ("+tmpSegment.getSegmentGranularity()+") is not the same as the project's("+CharDescriptionImportServices.projectGranularity+")");
 			rejectedRows.add(rejectedRow);
 			return null;
 		}
-		Optional<ClassSegment> segmentMatch = sid2Segment.values().stream().filter(s->s.hasSameClassNumbersAsSegment(tmpSegment)).findAny();
+		Optional<ClassSegment> segmentMatch = CharDescriptionImportServices.sid2Segment.values().stream().filter(s->s.hasSameClassNumbersAsSegment(tmpSegment)).findAny();
 		if(segmentMatch.isPresent()) {
 			//The segment is already known on all levels
 			tmpSegment.setSegmentId(segmentMatch.get().getSegmentId());
 		}else {
 			//At least an unknown level on this segment with the correct lineage
 			tmpSegment.setSegmentId(Tools.generate_uuid());
-			sid2Segment.put(tmpSegment.getSegmentId(), tmpSegment);
+			CharDescriptionImportServices.sid2Segment.put(tmpSegment.getSegmentId(), tmpSegment);
 		}
 		return tmpSegment;
 	}
 	
 	
-	private ClassCharacteristic setCarac(Row current_row) {
-		ClassCharacteristic tmpCarac;
+	private ClassCaracteristic setCarac(Row current_row, String current_segment_id) {
+		ClassCaracteristic tmpCarac;
 		String row_char_id = current_row.getCell(columnMap.get("charId"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
-		ClassCharacteristic knownCarac = chid2Carac.get(row_char_id);
+		ClassCaracteristic knownCarac = CharDescriptionImportServices.chid2Carac.get(row_char_id);
 		if(knownCarac!=null) {
 			//The char is known
 			tmpCarac = parseCarac(current_row);
@@ -75,7 +80,7 @@ public class ImportTaxoRow {
 					
 				}else {
 					if(forceUpdate) {
-						chid2Carac.get(row_char_id).setCharacteristic_name(tmpCarac.getCharacteristic_name());
+						CharDescriptionImportServices.chid2Carac.get(row_char_id).setCharacteristic_name(tmpCarac.getCharacteristic_name());
 					}else {
 						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong name: "+tmpCarac.getCharacteristic_name()+", expected: "+knownCarac.getCharacteristic_name());
 						rejectedRows.add(rejectedRow);
@@ -87,7 +92,7 @@ public class ImportTaxoRow {
 					
 				}else {
 					if(forceUpdate) {
-						chid2Carac.get(row_char_id).setCharacteristic_name_translated(tmpCarac.getCharacteristic_name_translated());
+						CharDescriptionImportServices.chid2Carac.get(row_char_id).setCharacteristic_name_translated(tmpCarac.getCharacteristic_name_translated());
 					}else {
 						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong translated name: "+tmpCarac.getCharacteristic_name_translated()+", expected: "+knownCarac.getCharacteristic_name_translated());
 						rejectedRows.add(rejectedRow);
@@ -95,27 +100,37 @@ public class ImportTaxoRow {
 						return null;
 					}
 				}
-				
-				if(tmpCarac.getIsCritical().equals(knownCarac.getIsCritical())) {
-					
+				ClassCaracteristic knownTemplate = CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id);
+				boolean creatingNewTemplate=false;
+				if(!(knownTemplate!=null)) {
+					//No known template
+					creatingNewTemplate=true;
+					CharDescriptionImportServices.classSpecificFields.get(row_char_id).put(current_segment_id, new ClassCaracteristic());
+					CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setIsCritical(tmpCarac.getIsCritical());
+				}else if(tmpCarac.getIsCritical().equals(knownTemplate.getIsCritical())) {
+					//Known template with no conflict
 				}else {
+					//Known template with conflict
 					if(forceUpdate) {
-						chid2Carac.get(row_char_id).setIsCritical(tmpCarac.getIsCritical());
+						CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setIsCritical(tmpCarac.getIsCritical());
 					}else {
-						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong criticality: "+tmpCarac.getIsCritical()+", expected: "+knownCarac.getIsCritical());
+						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong criticality: "+tmpCarac.getIsCritical()+", expected: "+knownTemplate.getIsCritical());
 						rejectedRows.add(rejectedRow);
 						caracParseFail();
 						return null;
 					}
 				}
-
-				if(tmpCarac.getSequence() == knownCarac.getSequence()) {
-					
+				if(creatingNewTemplate) {
+					//No known template
+					CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setSequence(tmpCarac.getSequence());
+				}else if(tmpCarac.getSequence() == knownTemplate.getSequence()) {
+					//Known template with no conflict
 				}else {
+					//Known template with conflicts
 					if(forceUpdate) {
-						chid2Carac.get(row_char_id).setSequence(tmpCarac.getSequence());
+						CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setSequence(tmpCarac.getSequence());
 					}else {
-						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong sequnece: "+tmpCarac.getSequence()+", expected: "+knownCarac.getSequence());
+						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong sequnece: "+tmpCarac.getSequence()+", expected: "+knownTemplate.getSequence());
 						rejectedRows.add(rejectedRow);
 						caracParseFail();
 						return null;
@@ -140,17 +155,20 @@ public class ImportTaxoRow {
 					return null;
 				}
 				
-				if(knownCarac.getAllowedUoms()!=null) {
-					//The known carac has uoms
+				if(creatingNewTemplate) {
+					//No known template
+					CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setAllowedUoms(tmpCarac.getAllowedUoms());
+				}else if(knownTemplate.getAllowedUoms()!=null) {
+					//The known template has uoms
 					if(tmpCarac.getAllowedUoms()!=null) {
 						//The row carac has uoms
-						List<String> undeclaredUomIds = tmpCarac.getAllowedUoms().stream().filter(uid->!knownCarac.getAllowedUoms().contains(uid)).collect(Collectors.toList());
+						List<String> undeclaredUomIds = tmpCarac.getAllowedUoms().stream().filter(uid->!knownTemplate.getAllowedUoms().contains(uid)).collect(Collectors.toList());
 						if(undeclaredUomIds.size()==0) {
-							//All row uoms included in the known carac
+							//All row uoms included in the known template
 						}else {
-							//There's at least a uom not included in the known carac.
+							//There's at least a uom not included in the known template.
 							//Check if the symbol has been misinterpreted and should be a convertible uom to it
-							List<Pair<String, String>> reInterpredUoms = undeclaredUomIds.stream().map(uid-> knownCarac.attemptUomSymbolInterpretationCorrection(uid))
+							List<Pair<String, String>> reInterpredUoms = undeclaredUomIds.stream().map(uid-> knownTemplate.attemptUomSymbolInterpretationCorrection(uid))
 							.filter(pair->pair!=null).collect(Collectors.toList());
 							tmpCarac.setAllowedUoms(new ArrayList<String> (tmpCarac.getAllowedUoms().stream()
 									.map(u->reInterpredUoms.stream().filter(i->i.getKey().equals(u)).findAny().get().getValue()).collect(Collectors.toList())));
@@ -158,12 +176,12 @@ public class ImportTaxoRow {
 							if(undeclaredUomIds.size() == reInterpredUoms.size()) {
 								//All uoms were misrepresented
 								if(forceUpdate) {
-									chid2Carac.get(row_char_id).setAllowedUoms(tmpCarac.getAllowedUoms());
+									CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setAllowedUoms(tmpCarac.getAllowedUoms());
 								}else {
 									if(accumulateUoMs) {
-										ArrayList<String> tmpUoms = knownCarac.getAllowedUoms();
+										ArrayList<String> tmpUoms = knownTemplate.getAllowedUoms();
 										tmpUoms.addAll(tmpCarac.getAllowedUoms());
-										chid2Carac.get(row_char_id).setAllowedUoms(new ArrayList<String>(new HashSet<String>(tmpUoms)));
+										CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setAllowedUoms(new ArrayList<String>(new HashSet<String>(tmpUoms)));
 									}else {
 										Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong uom(s) :"+
 										String.join(",",reInterpredUoms.stream().map(
@@ -192,18 +210,18 @@ public class ImportTaxoRow {
 					}else {
 						//The row lacks declared uoms
 						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with undeclared uom(s), excpected: "+
-						String.join(",",knownCarac.getAllowedUoms().stream().map(id->UnitOfMeasure.RunTimeUOMS.get(id).toString()).collect(Collectors.toList())));
+						String.join(",",knownTemplate.getAllowedUoms().stream().map(id->UnitOfMeasure.RunTimeUOMS.get(id).toString()).collect(Collectors.toList())));
 						rejectedRows.add(rejectedRow);
 						caracParseFail();
 						return null;
 					}
 				}else {
-					//The char has no declared uoms
+					//The template has no declared uoms
 					if(tmpCarac.getAllowedUoms()!=null) {
 						//The row declares uoms
-						if(forceUpdate) {
+						if(forceUpdate || accumulateUoMs) {
 							ArrayList<String> tmpUoms = tmpCarac.getAllowedUoms();
-							chid2Carac.get(row_char_id).setAllowedUoms(new ArrayList<String>(new HashSet<String>(tmpUoms)));
+							CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setAllowedUoms(new ArrayList<String>(new HashSet<String>(tmpUoms)));
 						}else {
 							Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+". Expected no uom");
 							rejectedRows.add(rejectedRow);
@@ -215,8 +233,6 @@ public class ImportTaxoRow {
 						//Pass
 					}
 				}
-				
-				
 				
 				return knownCarac;
 			}else {
@@ -230,7 +246,8 @@ public class ImportTaxoRow {
 			if(tmpCarac!=null) {
 				//The carac was properly parsed
 				tmpCarac.setCharacteristic_id(row_char_id);
-				chid2Carac.put(tmpCarac.getCharacteristic_id(), tmpCarac);
+				CharDescriptionImportServices.chid2Carac.put(tmpCarac.getCharacteristic_id(), tmpCarac);
+				setClassSpecificCharFields(tmpCarac,current_segment_id);
 				return tmpCarac;
 			}
 			//The carac was not properly parsed
@@ -238,8 +255,25 @@ public class ImportTaxoRow {
 		}
 		
 	}
-	private ClassCharacteristic parseCarac(Row current_row) {
-		ClassCharacteristic tmpCarac = new ClassCharacteristic();
+	private void setClassSpecificCharFields(ClassCaracteristic tmpCarac, String current_segment_id) {
+		ClassCaracteristic classCaracTemplate = new ClassCaracteristic();
+		classCaracTemplate.setSequence(tmpCarac.getSequence());
+		classCaracTemplate.setIsCritical(tmpCarac.getIsCritical());
+		classCaracTemplate.setAllowedUoms(tmpCarac.getAllowedUoms());
+		try {
+			CharDescriptionImportServices.classSpecificFields.get(tmpCarac.getCharacteristic_id()).put(current_segment_id, classCaracTemplate);
+		}catch(Exception V) {
+			CharDescriptionImportServices.classSpecificFields.put(tmpCarac.getCharacteristic_id(), new HashMap<String,ClassCaracteristic>());
+			CharDescriptionImportServices.classSpecificFields.get(tmpCarac.getCharacteristic_id()).put(current_segment_id, classCaracTemplate);
+		}
+		
+		
+		
+		
+		
+	}
+	private ClassCaracteristic parseCarac(Row current_row) {
+		ClassCaracteristic tmpCarac = new ClassCaracteristic();
 		try{
 			tmpCarac.setCharacteristic_name(current_row.getCell(columnMap.get("charName"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue());
 		}catch(NullPointerException V) {
@@ -348,14 +382,45 @@ public class ImportTaxoRow {
 	}
 	
 	
-	public void parseTaxoRow(Row current_row) {
+	public void parseTaxoRow(Row current_row, UserAccount account) {
 		segment = setSegment(current_row);
 		if(!segmentParseHasFailed() && rowHasCharNumber(current_row)) {
-			carac = setCarac(current_row);
+			carac = setCarac(current_row,segment.getClassNumber());
 		}
-		
+		if(!caracParseHasFailed()) {
+			parseValue(current_row,account);
+			
+		}
 	}
 	
+	private void parseValue(Row current_row, UserAccount account) {
+		if(carac!=null && !carac.getIsNumeric()) {
+			String dl=null;
+			String ul=null;
+			try {
+				dl = current_row.getCell(columnMap.get("value_DL")).getStringCellValue();
+			}catch(Exception V) {
+				
+			}
+			try {
+				ul = current_row.getCell(columnMap.get("value_UL")).getStringCellValue();
+				
+			}catch(Exception V) {
+				
+			}
+			
+			CaracteristicValue val = new CaracteristicValue();
+			val.setValue_id(Tools.generate_uuid());
+			val.setParentChar(carac);
+			val.setDataLanguageValue(dl);
+			val.setUserLanguageValue(ul);
+			val.setSource(DataInputMethods.PROJECT_SETUP_UPLOAD);
+			val.setAuthor(account.getUser_id());
+			
+			CharDescriptionExportServices.addCaracDefaultDataToPush(segment.getSegmentId(), carac, val);
+			
+		}
+	}
 	private boolean rowHasCharNumber(Row current_row) {
 		try{
 			return current_row.getCell(columnMap.get("charId"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue().length()>0;
@@ -366,7 +431,7 @@ public class ImportTaxoRow {
 	
 	private ClassSegment parseSegment(Row current_row) {
 		ClassSegment tmpSegment = new ClassSegment();
-		IntStream.range(0,projectGranularity).forEach(level->{
+		IntStream.range(0,CharDescriptionImportServices.projectGranularity).forEach(level->{
 			parseSegmentLevel(level,current_row,tmpSegment);
 		});
 		return tmpSegment;
@@ -383,6 +448,7 @@ public class ImportTaxoRow {
 		}
 		try{
 			tmpSegment.setLevelName(level,  current_row.getCell(columnMap.get("name_"+String.valueOf(level)),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue());
+			tmpSegment.setLevelNameTranslated(level, tmpSegment.getLevelName(level));
 		}catch(NullPointerException V) {
 			Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Level name"+String.valueOf(level+1)+" is not a valid character chain");
 			rejectedRows.add(rejectedRow);
@@ -392,7 +458,7 @@ public class ImportTaxoRow {
 		
 		tmpSegment.setSegmentGranularity(level+1);
 		
-		Optional<Entry<String, ClassSegment>> lineage = sid2Segment.entrySet().stream().filter(e->e.getValue().getLevelNumber(level)!=null).filter(e->e.getValue().getLevelNumber(level).equals(tmpSegment.getLevelNumber(level))).findAny();
+		Optional<Entry<String, ClassSegment>> lineage = CharDescriptionImportServices.sid2Segment.entrySet().stream().filter(e->e.getValue().getLevelNumber(level)!=null).filter(e->e.getValue().getLevelNumber(level).equals(tmpSegment.getLevelNumber(level))).findAny();
 		if(lineage.isPresent()) {
 			//The level number is known
 			if(level==0 || lineage.get().getValue().getLevelNumber(level-1).equals(tmpSegment.getLevelNumber(level-1))) {
@@ -409,7 +475,7 @@ public class ImportTaxoRow {
 			}else {
 				String oldName = lineage.get().getValue().getLevelName(level);
 				if(forceUpdate) {
-					sid2Segment.get(lineage.get().getKey()).setLevelName(level, tmpSegment.getLevelName(level));
+					CharDescriptionImportServices.sid2Segment.get(lineage.get().getKey()).setLevelName(level, tmpSegment.getLevelName(level));
 					lineage.get().getValue().setLevelName(level, tmpSegment.getLevelName(level));
 				}else {
 					Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Level name"+String.valueOf(level+1)+" is wrong, expected: "+oldName);
@@ -434,9 +500,6 @@ public class ImportTaxoRow {
 		this.caracParseFail = true;
 	}
 	
-	public static void setProjectGranularity(int granularity) {
-		projectGranularity = granularity;
-	}
 	public static void setColumnMap() {
 		columnMap = new HashMap<String,Integer>();
 		columnMap.put("number_0", 0);
@@ -461,11 +524,13 @@ public class ImportTaxoRow {
 	}
 	
     public static void loadTaxoDS() {
-    	//Segment id to segment
-    	sid2Segment = new HashMap<String,ClassSegment>();
     	forceUpdate = false;
     	accumulateUoMs = true;
-    	chid2Carac = new HashMap<String,ClassCharacteristic>();
+    	
+    	CharDescriptionImportServices.sid2Segment = new HashMap<String,ClassSegment>();
+    	CharDescriptionImportServices.chid2Carac = new HashMap<String,ClassCaracteristic>();
+    	CharDescriptionImportServices.classSpecificFields = new HashMap<String, HashMap<String,ClassCaracteristic>>();
+    	
     	try {
 			UnitOfMeasure.RunTimeUOMS = UnitOfMeasure.fetch_units_of_measures("en");
 		} catch (ClassNotFoundException | SQLException e) {

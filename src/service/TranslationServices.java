@@ -15,8 +15,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import controllers.Char_description;
 import model.CharValueTextSuggestion;
-import model.CharacteristicValue;
-import model.ClassCharacteristic;
+import model.CaracteristicValue;
+import model.ClassCaracteristic;
 import model.GlobalConstants;
 import transversal.language_toolbox.Unidecode;
 
@@ -29,15 +29,16 @@ public class TranslationServices {
 	private static HashMap<String,String> Data2UserTermsDico;
 	private static HashMap<String,String> User2DataTermsDico;
 
-	private static HashMap<String,ArrayList<CharacteristicValue>> Data2ValuesDico;
-	private static HashMap<String,ArrayList<CharacteristicValue>> User2ValuesDico;
+	private static HashMap<String,ArrayList<CaracteristicValue>> Data2ValuesDico;
+	private static HashMap<String,ArrayList<CaracteristicValue>> User2ValuesDico;
 	
 	
 	
     public static String webTranslate(String langFrom, String langTo, String text) throws IOException {
         
     	try{
-    		int script_url_choice =  Math.random()>0.5?0:0;
+    		//int script_url_choice =  Math.random()>0.5?0:0;
+    		int script_url_choice =  0;
     		String urlStr = GlobalConstants.GOOGLE_TRANSLATE_SCRIPTS[script_url_choice] +
                     "?q=" + URLEncoder.encode(text, "UTF-8") +
                     "&target=" + langTo +
@@ -49,7 +50,7 @@ public class TranslationServices {
             
     		
     		
-        	BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+        	 BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
         	 String inputLine;
              while ((inputLine = in.readLine()) != null) {
                  response.append(inputLine);
@@ -65,10 +66,10 @@ public class TranslationServices {
 	public static ArrayList<CharValueTextSuggestion> getTextEntriesForActiveCharOnLanguages(Char_description parent, boolean isDataField) {
 		
 		try{
-			String active_class = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment().split("&&&")[0];
+			String active_class = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
 			int active_idx = parent.tableController.selected_col;
 			active_idx%=CharValuesLoader.active_characteristics.get(active_class).size();
-			ClassCharacteristic active_char = CharValuesLoader.active_characteristics.get(active_class).get(active_idx);
+			ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(active_class).get(active_idx);
 			return new ArrayList<CharValueTextSuggestion>(
 					textEntries.get(active_char.getCharacteristic_id()).parallelStream().filter(
 							s->s.hasSourceValue(isDataField)).collect(Collectors.toList()));
@@ -80,7 +81,7 @@ public class TranslationServices {
 	}
 
 
-	public static void beAwareOfNewValue(CharacteristicValue pattern_value, ClassCharacteristic charac) {
+	public static void beAwareOfNewValue(CaracteristicValue pattern_value, ClassCaracteristic charac) {
 		if(charac.getIsNumeric()) {
 			return;
 		}
@@ -125,24 +126,24 @@ public class TranslationServices {
 		
 	}
 
-	private static void addToUserValues(String userVal, Unidecode unidecode, CharacteristicValue pattern_value) {
+	private static void addToUserValues(String userVal, Unidecode unidecode, CaracteristicValue pattern_value) {
 		
-		User2ValuesDico = (User2ValuesDico!=null)?User2ValuesDico:new HashMap<String,ArrayList<CharacteristicValue>>();
+		User2ValuesDico = (User2ValuesDico!=null)?User2ValuesDico:new HashMap<String,ArrayList<CaracteristicValue>>();
 		try {
 			User2ValuesDico.get(unidecode.decode(userVal.toLowerCase())).add(pattern_value);
 		}catch(Exception V) {
-			ArrayList<CharacteristicValue> tmp = new ArrayList<CharacteristicValue>();
+			ArrayList<CaracteristicValue> tmp = new ArrayList<CaracteristicValue>();
 			tmp.add(pattern_value);
 			User2ValuesDico.put(unidecode.decode(userVal.toLowerCase()), tmp);
 		}
 	}
 
-	private static void addToDataValues(String dataVal,Unidecode unidecode, CharacteristicValue pattern_value) {
-		Data2ValuesDico = (Data2ValuesDico!=null)?Data2ValuesDico:new HashMap<String,ArrayList<CharacteristicValue>>();
+	private static void addToDataValues(String dataVal,Unidecode unidecode, CaracteristicValue pattern_value) {
+		Data2ValuesDico = (Data2ValuesDico!=null)?Data2ValuesDico:new HashMap<String,ArrayList<CaracteristicValue>>();
 		try {
 			Data2ValuesDico.get(unidecode.decode(dataVal.toLowerCase())).add(pattern_value);
 		}catch(Exception V) {
-			ArrayList<CharacteristicValue> tmp = new ArrayList<CharacteristicValue>();
+			ArrayList<CaracteristicValue> tmp = new ArrayList<CaracteristicValue>();
 			tmp.add(pattern_value);
 			Data2ValuesDico.put(unidecode.decode(dataVal.toLowerCase()), tmp);
 		}
@@ -152,17 +153,17 @@ public class TranslationServices {
 		
 		Unidecode unidec = Unidecode.toAscii();
 		
-		User2ValuesDico = (User2ValuesDico!=null)?User2ValuesDico:new HashMap<String,ArrayList<CharacteristicValue>>();
+		User2ValuesDico = (User2ValuesDico!=null)?User2ValuesDico:new HashMap<String,ArrayList<CaracteristicValue>>();
 		User2ValuesDico.replaceAll((k,v)->cleanUserValueArray(v,k,unidec));
 		
-		Data2ValuesDico = (Data2ValuesDico!=null)?Data2ValuesDico:new HashMap<String,ArrayList<CharacteristicValue>>();
+		Data2ValuesDico = (Data2ValuesDico!=null)?Data2ValuesDico:new HashMap<String,ArrayList<CaracteristicValue>>();
 		Data2ValuesDico.replaceAll((k,v)->cleanDataValueArray(v,k,unidec));
 	}
 
-	private static ArrayList<CharacteristicValue> cleanDataValueArray(ArrayList<CharacteristicValue> v, String k, Unidecode unidec) {
+	private static ArrayList<CaracteristicValue> cleanDataValueArray(ArrayList<CaracteristicValue> v, String k, Unidecode unidec) {
 		
 		final String key = unidec.decodeAndTrim(k).toLowerCase();
-		return new ArrayList<CharacteristicValue>(
+		return new ArrayList<CaracteristicValue>(
 				v.parallelStream().filter(cv->ValueisCleanWithRespectToKey(cv.getDataLanguageValue(),unidec,key)).collect(Collectors.toList())
 				);
 	}
@@ -175,14 +176,14 @@ public class TranslationServices {
 		}
 	}
 
-	private static ArrayList<CharacteristicValue> cleanUserValueArray(ArrayList<CharacteristicValue> v, String k, Unidecode unidec) {
+	private static ArrayList<CaracteristicValue> cleanUserValueArray(ArrayList<CaracteristicValue> v, String k, Unidecode unidec) {
 		final String key = unidec.decodeAndTrim(k).toLowerCase();
-		return new ArrayList<CharacteristicValue>(
+		return new ArrayList<CaracteristicValue>(
 				v.parallelStream().filter(cv->ValueisCleanWithRespectToKey(cv.getUserLanguageValue(),unidec,key)).collect(Collectors.toList())
 				);
 	}
 
-	public static void addThisValueToTheCharKnownSets(CharacteristicValue pattern_value, ClassCharacteristic charac , boolean logUserLanguageValue) {
+	public static void addThisValueToTheCharKnownSets(CaracteristicValue pattern_value, ClassCaracteristic charac , boolean logUserLanguageValue) {
 		CharValueTextSuggestion tmp = new CharValueTextSuggestion("DATA","USER");
 		tmp.addValueInLanguage("DATA", pattern_value.getDataLanguageValue());
 		tmp.addValueInLanguage("USER", pattern_value.getUserLanguageValue());
@@ -211,7 +212,7 @@ public class TranslationServices {
 		
 	}
 
-	private static Boolean createDicoTranslationLink(String dataVal, String userVal, boolean forceUpdate) {
+	public static Boolean createDicoTranslationLink(String dataVal, String userVal, boolean forceUpdate) {
 		Data2UserTermsDico = (Data2UserTermsDico!=null)?Data2UserTermsDico:new HashMap<String,String>();
 		User2DataTermsDico = (User2DataTermsDico!=null)?User2DataTermsDico:new HashMap<String,String>();
 		

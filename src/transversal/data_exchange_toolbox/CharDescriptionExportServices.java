@@ -29,8 +29,8 @@ import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
 import model.CharDescriptionRow;
-import model.CharacteristicValue;
-import model.ClassCharacteristic;
+import model.CaracteristicValue;
+import model.ClassCaracteristic;
 import model.UnitOfMeasure;
 import model.UserAccount;
 import service.CharItemFetcher;
@@ -43,8 +43,8 @@ public class CharDescriptionExportServices {
 
 	private static int reviewRowIdx;
 	private static int baseRowIdx;
-	public static ConcurrentLinkedQueue<Pair<String, Pair<CharacteristicValue,ClassCharacteristic>>> characDBBuffer = new ConcurrentLinkedQueue<Pair<String, Pair<CharacteristicValue,ClassCharacteristic>>>();
-	
+	public static ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>> itemDataBuffer = new ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>>();
+	public static ConcurrentLinkedQueue<Pair<CaracteristicValue,ClassCaracteristic>> caracDataBuffer = new ConcurrentLinkedQueue<Pair<CaracteristicValue,ClassCaracteristic>>();
 	public static void ExportItemDataForClass(String targetClass, Char_description parent) throws ClassNotFoundException, SQLException, IOException {
 		
 		File file = openExportFile(parent);
@@ -65,11 +65,11 @@ public class CharDescriptionExportServices {
         baseRowIdx = 0;
         int reviewCharCardinality=0;
         for(CharDescriptionRow item:CharItemFetcher.allRowItems) {
-        	String itemClass = item.getClass_segment().split("&&&")[0];
+        	String itemClass = item.getClass_segment_string().split("&&&")[0];
         	if(targetClass!=null && !targetClass.equals(itemClass)) {
         		continue;
         	}
-        	ArrayList<ClassCharacteristic> itemChars = CharValuesLoader.active_characteristics.get(item.getClass_segment().split("&&&")[0]);
+        	ArrayList<ClassCaracteristic> itemChars = CharValuesLoader.active_characteristics.get(item.getClass_segment_string().split("&&&")[0]);
         	if(itemChars.size()>reviewCharCardinality) {
         		reviewCharCardinality = itemChars.size();
         	}
@@ -135,10 +135,10 @@ public class CharDescriptionExportServices {
 		baseSheet.createFreezePane(0, 1);
 	}
 
-	private static void appendBaseItem(CharDescriptionRow item, Sheet baseSheet, ArrayList<ClassCharacteristic> itemChars, Char_description parent) {
+	private static void appendBaseItem(CharDescriptionRow item, Sheet baseSheet, ArrayList<ClassCaracteristic> itemChars, Char_description parent) {
 		
 		for(int i=0;i<itemChars.size();i++) {
-			if(item.getData(item.getClass_segment().split("&&&")[0])!=null) {
+			if(item.getData(item.getClass_segment_string().split("&&&")[0])!=null) {
 				baseRowIdx+=1;
 				Row row = baseSheet.createRow(baseRowIdx);
 				Cell loopCell = row.createCell(0);
@@ -161,7 +161,7 @@ public class CharDescriptionExportServices {
 				(itemChars.get(i).getIsTranslatable()?"TXT translatable":"TXT non translatable")
 					);
 				
-				String itemClass = item.getClass_segment().split("&&&")[0];
+				String itemClass = item.getClass_segment_string().split("&&&")[0];
 				loopCell = row.createCell(5);
 				try{
 					loopCell.setCellValue(item.getData(itemClass)[i].getStdValue());
@@ -240,7 +240,7 @@ public class CharDescriptionExportServices {
 		
 	}
 
-	private static void appendReviewItem(CharDescriptionRow item, Sheet reviewSheet, ArrayList<ClassCharacteristic> itemChars, Char_description parent) {
+	private static void appendReviewItem(CharDescriptionRow item, Sheet reviewSheet, ArrayList<ClassCaracteristic> itemChars, Char_description parent) {
 		reviewRowIdx+=1;
 		Row row = reviewSheet.createRow(reviewRowIdx);
 		Cell loopCell;
@@ -258,17 +258,17 @@ public class CharDescriptionExportServices {
 		loopCell.setCellValue(item.getMaterial_group());
 		
 		loopCell = row.createCell(4);
-		loopCell.setCellValue(item.getClass_segment().split("&&&")[2]);
+		loopCell.setCellValue(item.getClass_segment_string().split("&&&")[2]);
 		
 		loopCell = row.createCell(5);
-		loopCell.setCellValue(item.getClass_segment().split("&&&")[1]);
+		loopCell.setCellValue(item.getClass_segment_string().split("&&&")[1]);
 		
 		for(int i=0;i<itemChars.size();i++) {
 			loopCell = row.createCell(6+2*i);
 			loopCell.setCellValue(itemChars.get(i).getCharacteristic_name());
 			loopCell = row.createCell(7+2*i);
 			try{
-				loopCell.setCellValue(item.getData(item.getClass_segment().split("&&&")[0])[i].getDisplayValue(parent/*,itemChars.get(i)*/));
+				loopCell.setCellValue(item.getData(item.getClass_segment_string().split("&&&")[0])[i].getDisplayValue(parent/*,itemChars.get(i)*/));
 			}catch(Exception V) {
 				
 			}
@@ -428,34 +428,109 @@ public class CharDescriptionExportServices {
 		return headerRow;
 	}
 
-
-	public static void addCharDataToPush(CharDescriptionRow row, String segment, int charIdx, int charIdxSize) {
-		CharacteristicValue val = row.getData(segment)[charIdx];
-		ClassCharacteristic carac = CharValuesLoader.active_characteristics.get(segment).get(charIdx);
-		Pair<CharacteristicValue,ClassCharacteristic> valCaracPair = new Pair<CharacteristicValue,ClassCharacteristic>(val,carac);
-		Pair<String, Pair<CharacteristicValue,ClassCharacteristic>> queueItem = new Pair<String, Pair<CharacteristicValue,ClassCharacteristic>>(row.getItem_id(),valCaracPair);
-		characDBBuffer.add(queueItem);
+	public static void addItemCharDataToPush(CharDescriptionRow row, CaracteristicValue val, ClassCaracteristic carac) {
+		Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
+		Pair<String, Pair<CaracteristicValue,ClassCaracteristic>> queueItem = new Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>(row.getItem_id(),valCaracPair);
+		itemDataBuffer.add(queueItem);
 	}
 
+	public static void addItemCharDataToPush(CharDescriptionRow row, String segment, int charIdx, int charIdxSize) {
+		CaracteristicValue val = row.getData(segment)[charIdx];
+		ClassCaracteristic carac = CharValuesLoader.active_characteristics.get(segment).get(charIdx);
+		Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
+		Pair<String, Pair<CaracteristicValue,ClassCaracteristic>> queueItem = new Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>(row.getItem_id(),valCaracPair);
+		itemDataBuffer.add(queueItem);
+	}
+	
+	public static void addCaracDefaultDataToPush(String segment, ClassCaracteristic carac, CaracteristicValue val) {
+		Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
+		caracDataBuffer.add(valCaracPair);
+	}
+	
+	public static void updateDBCaracValuesInPlace(ArrayList<CaracteristicValue> valuesToUpdate,String active_project) {
+		Task<Void> dbFlushTask = new Task<Void>() {
+		    
+			@Override
+		    protected Void call() throws Exception {
+				Connection conn = Tools.spawn_connection();
+				//value_id,text_value_data_language,text_value_user_language,nominal_value,min_value,max_value,note,uom_id
+				PreparedStatement stmt = conn.prepareStatement("update "+active_project+".project_values set "
+						+ "text_value_data_language = ?,"
+						+ "text_value_user_language = ?,"
+						+ "nominal_value = ?,"
+						+ "min_value = ?,"
+						+ "max_value = ?,"
+						+ "note = ?,"
+						+ "uom_id = ? where value_id = ?");
+				valuesToUpdate.stream().forEach(val->{	
+					try {
+						stmt.setString(1, val.getDataLanguageValue());
+						stmt.setString(2, val.getUserLanguageValue());
+						stmt.setString(3, val.getNominal_value());
+						stmt.setString(4, val.getMin_value());
+						stmt.setString(5, val.getMax_value());
+						stmt.setString(6, val.getNote());
+						stmt.setString(7, val.getUom_id());
+						stmt.setString(8, val.getValue_id());
+						
+						System.out.println(stmt.toString());
+						stmt.addBatch();
+						
+					}catch(Exception V) {
+						V.printStackTrace(System.err);
+					}
+				});
+				stmt.execute();
+				stmt.clearBatch();
+				stmt.close();
+				conn.close();
+				
+				return null;
+		    }
+		};
+		dbFlushTask.setOnSucceeded(e -> {
+			
+			
+			});
+		dbFlushTask.setOnFailed(e -> {
+		    Throwable problem = dbFlushTask.getException();
+		    /* code to execute if task throws exception */
+		    problem.printStackTrace(System.err);
+		});
 
-	public static void flushToDB(UserAccount account) {
-		if(characDBBuffer.peek()!=null) {
+		dbFlushTask.setOnCancelled(e -> {
+		    /* task was cancelled */
+			
+		});
+		
+		Thread dbFlushThread = new Thread(dbFlushTask);; dbFlushThread.setDaemon(true);
+		dbFlushThread.setName("CharacDBUpdate");
+		dbFlushThread.start();
+			
+	}
+	
+	public static void flushDefaultCaracDataToDB(UserAccount account, String active_project) {
+		if(caracDataBuffer.peek()!=null) {
 			Task<Void> dbFlushTask = new Task<Void>() {
 			    
 				@Override
 			    protected Void call() throws Exception {
 					Connection conn = Tools.spawn_connection();
 					Connection conn2 = Tools.spawn_connection();
-					Connection conn3 = Tools.spawn_connection();
-					PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_values values(?,?,?,?,?,?,?,?)");
-					PreparedStatement stmt2 = conn2.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values values (?,?,?,?,clock_timestamp(),?,?,?) on conflict (item_id,characteristic_id) do update set user_id = excluded.user_id, description_method = excluded.description_method, description_time=excluded.description_time, value_id = excluded.value_id, description_rule_id=excluded.description_rule_id,url_link = excluded.url_link");
-					PreparedStatement stmt3 = conn3.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values_history values (?,?,?,?,clock_timestamp(),?,?,?)");
-					while(characDBBuffer.peek()!=null) {
+					PreparedStatement stmt = conn.prepareStatement("delete from "+active_project+".project_values");
+					PreparedStatement stmt2 = conn.prepareStatement("delete from "+active_project+".project_characteristics_x_values");
+					stmt.execute();
+					stmt2.execute();
+					stmt.close();
+					stmt2.close();
+					
+					stmt = conn.prepareStatement("insert into "+active_project+".project_values values(?,?,?,?,?,?,?,?)");
+					stmt2 = conn2.prepareStatement("insert into "+active_project+".project_characteristics_x_values values (?,?,?,clock_timestamp(),?,?,?)");
+					while(caracDataBuffer.peek()!=null) {
 						try {
-							Pair<String, Pair<CharacteristicValue, ClassCharacteristic>> elem = characDBBuffer.poll();
-							String item_id = elem.getKey();
-							CharacteristicValue val = elem.getValue().getKey();
-							ClassCharacteristic carac = elem.getValue().getValue();
+							Pair<CaracteristicValue, ClassCaracteristic> elem = caracDataBuffer.poll();
+							CaracteristicValue val = elem.getKey();
+							ClassCaracteristic carac = elem.getValue();
 
 							stmt.setString(1, val.getValue_id());
 							stmt.setString(2, val.getDataLanguageValue());
@@ -466,7 +541,88 @@ public class CharDescriptionExportServices {
 							stmt.setString(7, val.getNote());
 							stmt.setString(8, val.getUom_id());
 							System.out.println(stmt.toString());
-							//stmt.addBatch();
+							stmt.addBatch();
+							
+							stmt2.setString(1, carac.getCharacteristic_id());
+							stmt2.setString(2, account.getUser_id());
+							stmt2.setString(3, val.getSource());
+							stmt2.setString(4, val.getValue_id());
+							stmt2.setString(5, val.getRule_id());
+							stmt2.setString(6, val.getUrl());
+							System.out.println(stmt2.toString());
+							stmt2.addBatch();
+							
+							
+						}catch(Exception V) {
+							V.printStackTrace(System.err);
+						}
+					}
+					stmt.executeBatch();
+					stmt2.executeBatch();
+					
+					stmt.clearBatch();
+					stmt.close();
+					stmt2.clearBatch();
+					stmt2.close();
+					
+					conn.close();
+					conn2.close();
+					
+					return null;
+			    }
+			};
+			dbFlushTask.setOnSucceeded(e -> {
+				
+				
+				});
+			dbFlushTask.setOnFailed(e -> {
+			    Throwable problem = dbFlushTask.getException();
+			    /* code to execute if task throws exception */
+			    problem.printStackTrace(System.err);
+			});
+
+			dbFlushTask.setOnCancelled(e -> {
+			    /* task was cancelled */
+				
+			});
+			
+			Thread dbFlushThread = new Thread(dbFlushTask);; dbFlushThread.setDaemon(true);
+			dbFlushThread.setName("CharacDBFlush");
+			dbFlushThread.start();
+			
+		}
+		return;
+	}
+
+	public static void flushItemDataToDB(UserAccount account) {
+		if(itemDataBuffer.peek()!=null) {
+			Task<Void> dbFlushTask = new Task<Void>() {
+			    
+				@Override
+			    protected Void call() throws Exception {
+					Connection conn = Tools.spawn_connection();
+					Connection conn2 = Tools.spawn_connection();
+					Connection conn3 = Tools.spawn_connection();
+					PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_values values(?,?,?,?,?,?,?,?)");
+					PreparedStatement stmt2 = conn2.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values values (?,?,?,?,clock_timestamp(),?,?,?) on conflict (item_id,characteristic_id) do update set user_id = excluded.user_id, description_method = excluded.description_method, description_time=excluded.description_time, value_id = excluded.value_id, description_rule_id=excluded.description_rule_id,url_link = excluded.url_link");
+					PreparedStatement stmt3 = conn3.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values_history values (?,?,?,?,clock_timestamp(),?,?,?)");
+					while(itemDataBuffer.peek()!=null) {
+						try {
+							Pair<String, Pair<CaracteristicValue, ClassCaracteristic>> elem = itemDataBuffer.poll();
+							String item_id = elem.getKey();
+							CaracteristicValue val = elem.getValue().getKey();
+							ClassCaracteristic carac = elem.getValue().getValue();
+
+							stmt.setString(1, val.getValue_id());
+							stmt.setString(2, val.getDataLanguageValue());
+							stmt.setString(3, val.getUserLanguageValue());
+							stmt.setString(4, val.getNominal_value());
+							stmt.setString(5, val.getMin_value());
+							stmt.setString(6, val.getMax_value());
+							stmt.setString(7, val.getNote());
+							stmt.setString(8, val.getUom_id());
+							System.out.println(stmt.toString());
+							stmt.addBatch();
 							
 							stmt2.setString(1, item_id);
 							stmt2.setString(2, carac.getCharacteristic_id());
@@ -476,7 +632,7 @@ public class CharDescriptionExportServices {
 							stmt2.setString(6, val.getRule_id());
 							stmt2.setString(7, val.getUrl());
 							System.out.println(stmt2.toString());
-							//stmt2.addBatch();
+							stmt2.addBatch();
 							
 							stmt3.setString(1, item_id);
 							stmt3.setString(2, carac.getCharacteristic_id());
@@ -486,7 +642,7 @@ public class CharDescriptionExportServices {
 							stmt3.setString(6, val.getRule_id());
 							stmt3.setString(7, val.getUrl());
 							System.out.println(stmt3.toString());
-							//stmt3.addBatch();
+							stmt3.addBatch();
 							
 						}catch(Exception V) {
 							V.printStackTrace(System.err);

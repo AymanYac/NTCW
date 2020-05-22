@@ -203,7 +203,11 @@ public class Project_selection {
 			if(prj.getPid().equals(selected_pid)) {
 				this.activated_project = prj;
 				//set the cardinality of the activated project to the cardinality of the loop project
-				this.target_desc_cardinality=1000*Integer.parseInt(prj.getNoItems().split(" ")[0])+Integer.parseInt(prj.getNoItems().split(" ")[1]);
+				try{
+					this.target_desc_cardinality=1000*Integer.parseInt(prj.getNoItems().split(" ")[0])+Integer.parseInt(prj.getNoItems().split(" ")[1]);
+				}catch(Exception V) {
+					this.target_desc_cardinality=Integer.parseInt(prj.getNoItems().replace(" ", ""));
+				}
 				//set the desired quality of the activated project to the desired qualit of the loop project
 				this.target_desc_accuracy=Double.valueOf(prj.getDesiredQuality());
 				
