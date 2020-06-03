@@ -1,3 +1,11 @@
+.menu-item:focused .label
+{
+  -fx-text-fill: white;
+}
+.menu-item .label
+{
+  -fx-text-fill: black;
+}
 .label{
 	-fx-font-family:Calibri;
 	-fx-font-weight:bold;

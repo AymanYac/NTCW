@@ -59,11 +59,11 @@ public class CustomKeyboardListener<KeyCode, Boolean> implements Map<KeyCode, Bo
 	public Boolean put(KeyCode key, Boolean value) {
 		Boolean ret = delegatee.put(key, value);
 		try {
-			if(key.equals(javafx.scene.input.KeyCode.DOWN) && (boolean) delegatee.get(javafx.scene.input.KeyCode.UP)) {
+			if(key.equals(javafx.scene.input.KeyCode.DOWN) &&  (java.lang.Boolean) delegatee.get(javafx.scene.input.KeyCode.UP)) {
 				delegatee.put((KeyCode) javafx.scene.input.KeyCode.UP,null);
 				;
 			}
-			if(key.equals(javafx.scene.input.KeyCode.UP) && (boolean) delegatee.get(javafx.scene.input.KeyCode.DOWN)) {
+			if(key.equals(javafx.scene.input.KeyCode.UP) &&  (java.lang.Boolean) delegatee.get(javafx.scene.input.KeyCode.DOWN)) {
 				delegatee.put((KeyCode) javafx.scene.input.KeyCode.DOWN,null);
 				;
 			}

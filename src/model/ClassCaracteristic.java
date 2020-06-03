@@ -125,7 +125,7 @@ public class ClassCaracteristic {
 		HashSet<String> fs = new HashSet<String>(UnitOfMeasure.RunTimeUOMS.get(uomFalse).getUom_symbols());
 		
 		Optional<String> match = 
-		UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->UnitOfMeasure.ConversionPathExists(u, allowedUoms)).map(u->u.getUom_id())
+		UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->UnitOfMeasure.ConversionPathExists(u, allowedUoms)).map(UnitOfMeasure::getUom_id)
 		//allowedUoms.stream()
 		.filter(uid->new HashSet<String>(UnitOfMeasure.RunTimeUOMS.get(uid).getUom_symbols()).removeAll(fs))
 		.findAny();
@@ -137,7 +137,17 @@ public class ClassCaracteristic {
 	}
 	
 	public boolean matchesTemplates(ArrayList<ClassCaracteristic> templates) {
-		return false;
+		boolean ret =  templates.stream()
+				.filter(t->t.getCharacteristic_id().equals(this.getCharacteristic_id()))
+				.filter(t->t.getSequence().equals(this.getSequence()))
+				.filter(t->t.getIsCritical().equals(this.getIsCritical()))
+				.anyMatch(t->  ( t.getAllowedUoms()!=null && this.getAllowedUoms()!=null && t.getAllowedUoms().equals(this.allowedUoms) )
+							|| ( !(t.getAllowedUoms()!=null) && !(this.getAllowedUoms()!=null) )
+				);
+		if(!ret){
+			templates.add(this);
+		}
+		return ret;
 	}
 	
 }

@@ -1,13 +1,17 @@
 package transversal.dialog_toolbox;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
@@ -24,10 +28,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
-import model.AutoCompleteBox_CharDeclarationName;
-import model.ClassCaracteristic;
-import model.ClassSegmentClusterComboRow;
-import model.UomClassComboRow;
+import javafx.util.Pair;
+import model.*;
 import service.CharValuesLoader;
 import transversal.generic.Tools;
 
@@ -42,8 +44,10 @@ public class CaracDeclarationDialog {
 	private static ComboBox<ClassSegmentClusterComboRow> charClassLink;
 	private static ComboBox<Integer> sequence;
 	private static ComboBox<String> criticality;
-	private static ComboBox<UomClassComboRow> uom1;
-	private static ComboBox<UomClassComboRow> uom2;
+	private static Label uom1Label;
+	private static AutoCompleteBox_UnitOfMeasure uom1;
+	private static Label uom2Label;
+	private static AutoCompleteBox_UnitOfMeasure uom2;
 	private static Label detailsLabel;
 	private static CheckBox sequenceCB;
 	private static CheckBox criticalityCB;
@@ -52,7 +56,7 @@ public class CaracDeclarationDialog {
 	private static ButtonType validateButtonType;
 	
 	@SuppressWarnings("static-access")
-	public static void CaracDeclarationPopUp() {
+	public static void CaracDeclarationPopUp(UserAccount account, ClassSegment itemSegment) throws SQLException, ClassNotFoundException {
 		// Create the custom dialog.
 		create_dialog();
 		
@@ -63,7 +67,7 @@ public class CaracDeclarationDialog {
 		set_fields_layout();
 				
 		//Set fields behavior
-		set_fields_behavior(dialog,validateButtonType);
+		set_fields_behavior(dialog,validateButtonType,account,itemSegment);
 				
 				
 		dialog.getDialogPane().setContent(grid);
@@ -94,16 +98,68 @@ public class CaracDeclarationDialog {
 		return null;
 	}
 
-	private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType) {
+	private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType, UserAccount account, ClassSegment itemSegment) throws SQLException, ClassNotFoundException {
+		//Fill the carac name field
 		ArrayList<ClassCaracteristic> uniqueCharTemplate = new ArrayList<ClassCaracteristic>();
+		HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(account);
 		CharValuesLoader.active_characteristics.entrySet().stream()
 		.map(e-> new Pair<String,ArrayList<ClassCaracteristic>>
 				(e.getKey(),
 				new ArrayList<ClassCaracteristic>(e.getValue().stream().filter(
 						c->!c.matchesTemplates(uniqueCharTemplate)).collect(Collectors.toList()))
 				)
-			);
-		
+			).flatMap(p->p.getValue().stream().map(c->new Pair<ClassSegment,ClassCaracteristic>(sid2Segment.get(p.getKey()),c)))
+				.forEach(p2->charName.entries.add(p2));
+			//.forEach(p2->System.out.println(p2.getValue().getCharacteristic_name()+"["+p2.getKey().getClassName()+"]"));
+
+		charNameTranslated.disableProperty().bind(charName.textProperty().length().isEqualTo(0));
+		charType.disableProperty().bind(charNameTranslated.textProperty().length().isEqualTo(0));
+		charTranslability.disableProperty().bind(charType.valueProperty().isNull());
+		charClassLink.disableProperty().bind(charTranslability.valueProperty().isNull());
+		sequence.disableProperty().bind(charClassLink.valueProperty().isNull());
+		sequenceCB.disableProperty().bind(sequence.valueProperty().isNull());
+		criticality.disableProperty().bind(charClassLink.valueProperty().isNull());
+		criticalityCB.disableProperty().bind(criticality.valueProperty().isNull());
+		uom1.disableProperty().bind(charClassLink.valueProperty().isNull());
+		uom1CB.disableProperty().bind(uom1.textProperty().length().isEqualTo(0));
+		uom2.disableProperty().bind(charClassLink.valueProperty().isNull());
+		uom2CB.disableProperty().bind(uom2.textProperty().length().isEqualTo(0));
+		uom1.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
+		uom1CB.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
+		uom1Label.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
+		uom2.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
+		uom2CB.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
+		uom2Label.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
+
+		charType.getItems().add("Numeric");
+		charType.getItems().add("Text");
+		charType.valueProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if(newValue.equals("Numeric")){
+					charTranslability.getItems().clear();
+					charTranslability.getItems().add("N/A");
+					charTranslability.getSelectionModel().select(0);
+					charTranslability.setDisable(true);
+				}else{
+					charTranslability.getItems().clear();
+					charTranslability.getItems().add("Translatable");
+					charTranslability.getItems().add("Not translatable");
+					charTranslability.getSelectionModel().clearSelection();
+					charTranslability.setDisable(false);
+				}
+			}
+		});
+		IntStream.range(0,itemSegment.getSegmentGranularity()).forEach(lvl->{
+			ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(lvl, itemSegment,sid2Segment);
+			charClassLink.getItems().add(cc);
+		});
+		Collections.reverse(charClassLink.getItems());
+		ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(sid2Segment);
+		charClassLink.getItems().add(cc);
+
+
+
 	}
 
 	private static void create_dialog() {
@@ -121,8 +177,8 @@ public class CaracDeclarationDialog {
 	@SuppressWarnings("static-access")
 	private static void create_dialog_fields() {
 		grid = new GridPane();
+		charName = new AutoCompleteBox_CharDeclarationName();
 		charNameTranslated = new TextField();
-		charName = new AutoCompleteBox_CharDeclarationName(charNameTranslated.getStyle());
 		charType = new ComboBox<String>();
 		charType.setMaxWidth(Integer.MAX_VALUE);
 		charTranslability = new ComboBox<String>();
@@ -134,9 +190,11 @@ public class CaracDeclarationDialog {
 		sequence.setMaxWidth(Integer.MAX_VALUE);
 		criticality = new ComboBox<String>();
 		criticality.setMaxWidth(Integer.MAX_VALUE);
-		uom1 = new ComboBox<UomClassComboRow>();
+		uom1 = new AutoCompleteBox_UnitOfMeasure();
+		uom1.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values());
 		uom1.setMaxWidth(Integer.MAX_VALUE);
-		uom2 = new ComboBox<UomClassComboRow>();
+		uom2 = new AutoCompleteBox_UnitOfMeasure();
+		uom2.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values());
 		uom2.setMaxWidth(Integer.MAX_VALUE);
 		
 		
@@ -214,8 +272,10 @@ public class CaracDeclarationDialog {
 		
 		grid.add(new Label("Sequence"), 1, 11);
 		grid.add(new Label("Criticality"), 1, 12);
-		grid.add(new Label("Prefered unit of measure"), 1, 13);
-		grid.add(new Label("Alternative unit of measure"), 1, 14);
+		uom1Label = new Label("Prefered unit of measure");
+		grid.add(uom1Label, 1, 13);
+		uom2Label = new Label("Alternative unit of measure");
+		grid.add(uom2Label, 1, 14);
 		
 		
 		grid.add(charName, 3, 2);

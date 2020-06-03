@@ -29,13 +29,11 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
   private ContextMenu entriesPopup;
   private Map<Integer, UnitOfMeasure> RESULTMAP;
   protected boolean PopupIsVisible=false;
-  
-  /** Construct a new AutoCompleteTextField. 
- * @param char_description 
- * @param style 
- * @param account 
- * @param rowIndex */
-  public AutoCompleteBox_UnitOfMeasure(String style, UserAccount account) {
+  public UnitOfMeasure selectedUom;
+
+    /** Construct a new AutoCompleteTextField.
+ *  */
+  public AutoCompleteBox_UnitOfMeasure() {
     super();
     entries = new ArrayList<UnitOfMeasure>();
     entriesPopup = new ContextMenu();
@@ -67,8 +65,8 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
           entriesPopup.hide();
         } else
         {
-        	
-        	
+
+            selectedUom=null;
           LinkedList<UnitOfMeasure> searchResult = new LinkedList<>();
           final List<UnitOfMeasure> filteredEntries = entries.stream().filter(e -> e.HasPartialUomSymbol(getText()))
         		  .collect(Collectors.toList());
@@ -102,7 +100,7 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
             try{
             	entriesPopup.getSkin().getNode().lookup(".menu-item").requestFocus();
             	entriesPopup.getSkin().getNode().lookup(".menu-item").setOnKeyPressed(ke ->{
-            		if(ke.getCode().equals(KeyCode.ENTER) && !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
+            		if(ke.getCode().equals(KeyCode.ENTER) ) {
             			print_uom_in_parent(RESULTMAP.get(0));
             		}
             	});
@@ -127,8 +125,6 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
         entriesPopup.hide();
       }
     });
-    //this.setStyle("-fx-control-inner-background: #445469");
-    this.setStyle(style);
   }
 
 
@@ -158,7 +154,7 @@ protected void check_revert_value_in_allowed_uoms() {
    */
   private void populatePopup(LinkedList<UnitOfMeasure> searchResult) {
     List<CustomMenuItem> menuItems = new LinkedList<>();
-    int maxEntries = 20;
+    int maxEntries = 6;
     int count = Math.min(searchResult.size(), maxEntries);
     
     RESULTMAP = new HashMap<Integer,UnitOfMeasure>();
@@ -184,7 +180,8 @@ protected void check_revert_value_in_allowed_uoms() {
 
 
 protected void print_uom_in_parent(UnitOfMeasure result) {
-	setText(result.toString());
+      this.selectedUom = result;
+      setText(result.toString());
 }
 
 

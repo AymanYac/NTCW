@@ -426,6 +426,7 @@ public class TablePane_CharClassif {
 			
 		}else {
 			CharItemFetcher.classifiedItems = QueryFormater.FETCH_ITEM_CLASSES_WITH_UPLOAD_PRIORITY(joinStatement,Tools.get_project_granularity(account.getActive_project()),account.getActive_project());
+			Tools.get_project_segments(account);
 		}
 		/*classifiedItems.entrySet().parallelStream().collect(
 				Collectors.groupingBy(Map.Entry::getValue,Collectors.counting()))

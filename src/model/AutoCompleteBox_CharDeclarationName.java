@@ -1,5 +1,6 @@
 package model;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,24 +20,26 @@ import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.text.Font;
+import javafx.util.Pair;
+import org.apache.commons.lang.StringUtils;
 
 public class AutoCompleteBox_CharDeclarationName extends TextField{
 
 	 /** The existing autocomplete entries. */
-	  private final List<ClassCaracteristic> entries;
+	  public final ArrayList<Pair<ClassSegment,ClassCaracteristic>> entries;
 	  /** The popup used to select an entry. */
-	  private ContextMenu entriesPopup;
-	  private Map<Integer, ClassCaracteristic> RESULTMAP;
+	  private final ContextMenu entriesPopup;
+	  private Map<Integer, Pair<ClassSegment, ClassCaracteristic>> RESULTMAP;
 	  protected boolean PopupIsVisible=false;
 	 
-	  public AutoCompleteBox_CharDeclarationName(String style) {
-		    super();
-		    entries = new ArrayList<ClassCaracteristic>();
-		    entriesPopup = new ContextMenu();
-		    
-		    
-		    
-		    textProperty().addListener(new ChangeListener<String>()
+	  public AutoCompleteBox_CharDeclarationName() {
+		super();
+		entries = new ArrayList<Pair<ClassSegment,ClassCaracteristic>>();
+		entriesPopup = new ContextMenu();
+
+
+		  textProperty().addListener(new ChangeListener<String>()
 		    {
 		      @SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
@@ -49,8 +52,8 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 		        {
 		        	
 		        	
-		          LinkedList<ClassCaracteristic> searchResult = new LinkedList<>();
-		          final List<ClassCaracteristic> filteredEntries = entries.stream().filter(e -> e.getCharacteristic_name().contains(getText()))
+		          LinkedList<Pair<ClassSegment,ClassCaracteristic>> searchResult = new LinkedList<>();
+		          final List<Pair<ClassSegment,ClassCaracteristic>> filteredEntries = entries.stream().filter(e -> StringUtils.containsIgnoreCase(e.getValue().getCharacteristic_name(),getText()))
 		        		  .collect(Collectors.toList());
 		          searchResult.addAll(filteredEntries);
 		          //searchResult.addAll(entries.subSet(getText(), getText() + Character.MAX_VALUE));
@@ -61,12 +64,9 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 
 						@Override
 						public int compare(Object o1, Object o2) {
-							int ret = (new Integer(
-									((ClassCaracteristic)o1).getCharacteristic_name().compareTo(
-									((ClassCaracteristic)o2).getCharacteristic_name())
-									));
-							
-		        	  		return ret ;
+
+							return (((Pair<ClassSegment, ClassCaracteristic>) o1).getValue().getCharacteristic_name().compareTo(
+									((Pair<ClassSegment, ClassCaracteristic>) o2).getValue().getCharacteristic_name()));
 						}
 		                 
 		        		});
@@ -108,8 +108,7 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 	        entriesPopup.hide();
 	      }
 	    });
-	    //this.setStyle("-fx-control-inner-background: #445469");
-	    this.setStyle(style);
+
 	  }
 	  
 	  
@@ -119,16 +118,16 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 
 
 
-	private void populatePopup(LinkedList<ClassCaracteristic> searchResult) {
+	private void populatePopup(LinkedList<Pair<ClassSegment, ClassCaracteristic>> searchResult) {
 		    List<CustomMenuItem> menuItems = new LinkedList<>();
 		    int maxEntries = 20;
 		    int count = Math.min(searchResult.size(), maxEntries);
 		    
-		    RESULTMAP = new HashMap<Integer,ClassCaracteristic>();
+		    RESULTMAP = new HashMap<Integer, Pair<ClassSegment, ClassCaracteristic>>();
 		    for (int i = 0; i < count; i++)
 		    {
-		      final ClassCaracteristic result = searchResult.get(i);
-		      Label entryLabel = new Label(result.toString());
+		      final Pair<ClassSegment,ClassCaracteristic> result = searchResult.get(i);
+		      Label entryLabel = new Label(result.getValue().getCharacteristic_name()+"["+result.getKey().getClassName()+"]");
 		      CustomMenuItem item = new CustomMenuItem(entryLabel, true);
 		      item.setOnAction(new EventHandler<ActionEvent>()
 		      {
@@ -145,7 +144,7 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 
 		  }
 
-	protected void processSelectedCarac(ClassCaracteristic classCaracteristic) {
+	protected void processSelectedCarac(Pair<ClassSegment, ClassCaracteristic> classCaracteristic) {
 		// TODO Auto-generated method stub
 		
 	}

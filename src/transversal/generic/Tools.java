@@ -34,6 +34,7 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
+import model.*;
 import org.apache.poi.util.IOUtils;
 
 import javafx.application.Platform;
@@ -57,19 +58,15 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import model.GlobalConstants;
-import model.BinaryClassificationParameters;
-import model.CharDescriptionRow;
-import model.DataInputMethods;
-import model.GenericClassRule;
-import model.ItemFetcherRow;
-import model.UserAccount;
 import transversal.dialog_toolbox.ExceptionDialog;
 
 
 public class Tools {
-	
-	
+
+
+	private static Integer active_project_granularity;
+	private static HashMap<String,ClassSegment> sid2Segment;
+
 	public static String RunVBS(File file) throws IOException {
 		
 		//new ProcessBuilder().inheritIO().command("cscript",file.getCanonicalPath()).start();
@@ -314,7 +311,33 @@ public class Tools {
 
 	public static HashMap<String, String> userID2Author;
 
-	public void create_project_schema(String pid) {
+    public static HashMap<String, ClassSegment> get_project_segments(UserAccount account) throws SQLException, ClassNotFoundException {
+    	if(sid2Segment!=null){
+    		return sid2Segment;
+		}
+    	sid2Segment = new HashMap<String,ClassSegment>();
+    	Connection conn = Tools.spawn_connection();
+    	Statement stmt = conn.createStatement();
+    	ResultSet rs = stmt.executeQuery("select * from "+account.getActive_project()+".project_segments");
+    	while(rs.next()){
+			ClassSegment tmp = new ClassSegment();
+			tmp.setSegmentGranularity(Tools.get_project_granularity(account.getActive_project()));
+			tmp.setSegmentId(rs.getString(1));
+			for(int lvl=0;lvl<4;lvl++){
+				tmp.setLevelNumber(lvl,rs.getString(1+lvl*3+1));
+				tmp.setLevelName(lvl,rs.getString(1+lvl*3+2));
+				tmp.setLevelNameTranslated(lvl,rs.getString(1+lvl*3+3));
+			}
+			sid2Segment.put(tmp.getSegmentId(),tmp);
+		}
+    	rs.close();
+    	stmt.close();
+    	conn.close();
+
+    	return sid2Segment;
+    }
+
+    public void create_project_schema(String pid) {
 		try {
 			String schema_creation_query = readStringFile("/scripts/project_schema_creation.sql",Charset.defaultCharset());
 			Connection conn = spawn_connection();
@@ -685,6 +708,9 @@ public class Tools {
 
 
 	public static Integer get_project_granularity(String active_project) throws ClassNotFoundException, SQLException {
+    	if(active_project_granularity!=null){
+    		return active_project_granularity;
+		}
 		Connection conn = Tools.spawn_connection();
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery("select number_of_levels from administration.projects where project_id = '"+active_project+"'");
@@ -693,6 +719,7 @@ public class Tools {
 		rs.close();
 		st.close();
 		conn.close();
+		active_project_granularity = ret;
 		return ret;
 	}
 

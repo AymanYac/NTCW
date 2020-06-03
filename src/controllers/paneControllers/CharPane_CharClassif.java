@@ -1,4 +1,5 @@
 package controllers.paneControllers;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import controllers.Char_description;
@@ -13,6 +14,7 @@ import model.ClassCaracteristic;
 import model.mouseHoverTableCell;
 import service.CharValuesLoader;
 import transversal.dialog_toolbox.CaracDeclarationDialog;
+import transversal.generic.Tools;
 
 public class CharPane_CharClassif {
 
@@ -108,8 +110,8 @@ public class CharPane_CharClassif {
 		parent.setBottomRegionColumnSpans(false);
 	}
 	
-	@FXML public void add_carac() {
-		CaracDeclarationDialog.CaracDeclarationPopUp();
+	@FXML public void add_carac() throws SQLException, ClassNotFoundException {
+		CaracDeclarationDialog.CaracDeclarationPopUp(parent.account, Tools.get_project_segments(parent.account).get(selected_row.getClass_segment_string().split("&&&")[0]));
 	}
 
 }
