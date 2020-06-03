@@ -136,4 +136,8 @@ public class ClassCaracteristic {
 		return null;
 	}
 	
+	public boolean matchesTemplates(ArrayList<ClassCaracteristic> templates) {
+		return false;
+	}
+	
 }

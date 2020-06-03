@@ -56,6 +56,6 @@
             <Insets />
          </GridPane.margin>
       </Button>
-      <Button mnemonicParsing="false" style="-fx-font-size: 10;" stylesheets="@../../Styles/ButtonBlue.css" text="Add a characteristic..." GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+      <Button mnemonicParsing="false" onAction="#add_carac" style="-fx-font-size: 10;" stylesheets="@../../Styles/ButtonBlue.css" text="Add a characteristic..." GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
    </children>
 </GridPane>

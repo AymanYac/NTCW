@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import controllers.Char_description;
-import controllers.paneControllers.TablePane_CharClassif;
 import javafx.util.Pair;
 import model.CharDescriptionRow;
 import model.CaracteristicValue;

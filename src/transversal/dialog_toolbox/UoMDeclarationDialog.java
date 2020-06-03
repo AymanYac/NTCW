@@ -292,7 +292,8 @@ public class UoMDeclarationDialog {
 		
 		grid.setHgap(10);
 		grid.setVgap(10);
-		grid.setPadding(new Insets(20, 150, 10, 10));
+		//grid.setPadding(new Insets(20, 150, 10, 10));
+		grid.setPadding(new Insets(10, 10, 10, 10));
 		
 		uomName.setText("");
 		uomSymbol.setText(proposedUomSymbol);

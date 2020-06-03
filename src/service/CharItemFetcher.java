@@ -60,9 +60,7 @@ public class CharItemFetcher {
 					tmp.setMaterial_group(rs.getString("material_group"));
 					tmp.setPreclassif(rs.getString("pre_classification"));
 					
-					System.out.println(CharItemFetcher.classifiedItems);
 					String loop_class_segment = CharItemFetcher.classifiedItems.get(rs.getString("item_id"));
-					System.out.println("******"+loop_class_segment+"********");
 					String loop_class_id = loop_class_segment.split("&&&")[4];
 					String loop_class_name = loop_class_segment.split("&&&")[1];
 					String loop_class_number = loop_class_segment.split("&&&")[0];

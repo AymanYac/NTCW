@@ -1320,7 +1320,7 @@ public class Tools {
 				stmt.setString(5, null);
 				stmt.setString(6, account.getUser_id());
 				stmt.setDate(7, new java.sql.Date((new java.util.Date()).getTime()));
-				System.out.println(stmt.toString());;
+				
 				stmt.addBatch();
 				
 				

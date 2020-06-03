@@ -19,6 +19,7 @@ import model.ClassSegment;
 import model.DataInputMethods;
 import model.UnitOfMeasure;
 import model.UserAccount;
+import service.TranslationServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -417,6 +418,7 @@ public class ImportTaxoRow {
 			val.setSource(DataInputMethods.PROJECT_SETUP_UPLOAD);
 			val.setAuthor(account.getUser_id());
 			
+			TranslationServices.beAwareOfNewValue(val,carac);
 			CharDescriptionExportServices.addCaracDefaultDataToPush(segment.getSegmentId(), carac, val);
 			
 		}

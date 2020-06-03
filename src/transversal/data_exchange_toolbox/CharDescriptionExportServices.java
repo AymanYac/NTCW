@@ -473,7 +473,7 @@ public class CharDescriptionExportServices {
 						stmt.setString(7, val.getUom_id());
 						stmt.setString(8, val.getValue_id());
 						
-						System.out.println(stmt.toString());
+						
 						stmt.addBatch();
 						
 					}catch(Exception V) {
@@ -540,7 +540,7 @@ public class CharDescriptionExportServices {
 							stmt.setString(6, val.getMax_value());
 							stmt.setString(7, val.getNote());
 							stmt.setString(8, val.getUom_id());
-							System.out.println(stmt.toString());
+							
 							stmt.addBatch();
 							
 							stmt2.setString(1, carac.getCharacteristic_id());
@@ -549,7 +549,7 @@ public class CharDescriptionExportServices {
 							stmt2.setString(4, val.getValue_id());
 							stmt2.setString(5, val.getRule_id());
 							stmt2.setString(6, val.getUrl());
-							System.out.println(stmt2.toString());
+							
 							stmt2.addBatch();
 							
 							
@@ -621,7 +621,7 @@ public class CharDescriptionExportServices {
 							stmt.setString(6, val.getMax_value());
 							stmt.setString(7, val.getNote());
 							stmt.setString(8, val.getUom_id());
-							System.out.println(stmt.toString());
+							
 							stmt.addBatch();
 							
 							stmt2.setString(1, item_id);
@@ -631,7 +631,7 @@ public class CharDescriptionExportServices {
 							stmt2.setString(5, val.getValue_id());
 							stmt2.setString(6, val.getRule_id());
 							stmt2.setString(7, val.getUrl());
-							System.out.println(stmt2.toString());
+							
 							stmt2.addBatch();
 							
 							stmt3.setString(1, item_id);
@@ -641,7 +641,6 @@ public class CharDescriptionExportServices {
 							stmt3.setString(5, val.getValue_id());
 							stmt3.setString(6, val.getRule_id());
 							stmt3.setString(7, val.getUrl());
-							System.out.println(stmt3.toString());
 							stmt3.addBatch();
 							
 						}catch(Exception V) {

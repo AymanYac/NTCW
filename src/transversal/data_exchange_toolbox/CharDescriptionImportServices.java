@@ -24,6 +24,7 @@ import model.ClassSegment;
 import model.DataInputMethods;
 import model.UserAccount;
 import service.CharValuesLoader;
+import service.TranslationServices;
 import transversal.generic.Tools;
 
 public class CharDescriptionImportServices {
@@ -49,6 +50,15 @@ public class CharDescriptionImportServices {
 		CharDescriptionImportServices.projectGranularity=projectGranularity;
 		CharValuesLoader.fetchAllKnownValuesAssociated2Items(active_project);
 		
+		System.out.println(">>>> Known translation link data language perspective");
+		try {
+			TranslationServices.Data2UserTermsDico.entrySet().forEach(e->{
+				System.out.println(e.getKey()+"<=>"+e.getValue());
+			});
+		}catch(Exception V) {
+			
+		}
+		
 		ImportTaxoRow.setColumnMap();
 		ImportTaxoRow.loadTaxoDS();
         Sheet taxoSheet = workbook.getSheet(taxoSheetName);
@@ -61,6 +71,15 @@ public class CharDescriptionImportServices {
 			processTaxoRow(rows.next(),account);
 		}
 		
+		System.out.println(">>>> Known translation link data language perspective");
+		
+		try {
+			TranslationServices.Data2UserTermsDico.entrySet().forEach(e->{
+				System.out.println(e.getKey()+"<=>"+e.getValue());
+			});
+		}catch(Exception V) {
+			
+		}
 		
 		ImportItemRow.setColumnMap();
 		ImportItemRow.loadItemDS();
@@ -74,6 +93,15 @@ public class CharDescriptionImportServices {
 			processItemRow(rows.next(),account);
 		}
 		
+		System.out.println(">>>> Known translation link data language perspective");
+		
+		try {
+			TranslationServices.Data2UserTermsDico.entrySet().forEach(e->{
+				System.out.println(e.getKey()+"<=>"+e.getValue());
+			});
+		}catch(Exception V) {
+			
+		}
 		
 		storeTaxo();
 		storeChars();
@@ -82,8 +110,12 @@ public class CharDescriptionImportServices {
 		storeItemsWithClass(account);
 		storeItemsData(account);
 		
+		
 		printRejectedTaxoRows();
+		
+		
 		printRejectedItemRows();
+		
 	}
 
 
@@ -114,7 +146,7 @@ public class CharDescriptionImportServices {
 				stmt.setString(6, r.getLong_desc_translated());
 				stmt.setString(7, r.getMaterial_group());
 				stmt.setString(8, r.getPreclassif());
-				System.out.println(stmt.toString());
+				
 				stmt.addBatch();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -165,7 +197,7 @@ public class CharDescriptionImportServices {
 				stmt.setString(3, car.getCharacteristic_name_translated());
 				stmt.setBoolean(4, car.getIsNumeric());
 				stmt.setBoolean(5, car.getIsTranslatable());
-				System.out.println(stmt.toString());
+				
 				stmt.addBatch();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -199,7 +231,7 @@ public class CharDescriptionImportServices {
 						stmt.setArray(6, null);
 					}
 					stmt.setBoolean(7, true);
-					System.out.println(stmt.toString());
+					
 					stmt.addBatch();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
@@ -248,7 +280,7 @@ public class CharDescriptionImportServices {
 						e.printStackTrace();
 					}
 				});
-				System.out.println(stmt.toString());
+				
 				stmt.addBatch();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block

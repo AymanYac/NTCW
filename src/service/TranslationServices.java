@@ -26,8 +26,8 @@ public class TranslationServices {
 	
 	public static HashMap<String,HashSet<CharValueTextSuggestion>> textEntries = new HashMap<String,HashSet<CharValueTextSuggestion>>();
 
-	private static HashMap<String,String> Data2UserTermsDico;
-	private static HashMap<String,String> User2DataTermsDico;
+	public static HashMap<String,String> Data2UserTermsDico;
+	public static HashMap<String,String> User2DataTermsDico;
 
 	private static HashMap<String,ArrayList<CaracteristicValue>> Data2ValuesDico;
 	private static HashMap<String,ArrayList<CaracteristicValue>> User2ValuesDico;
@@ -226,6 +226,7 @@ public class TranslationServices {
 			
 			try{
 				boolean matched = unidecode.decodeAndTrim(Data2UserTermsDico.get(dataValTrimmed).toLowerCase()).equals(userValTrimmed);
+				//matched = matched && unidecode.decodeAndTrim(User2DataTermsDico.get(userValTrimmed).toLowerCase()).equals(dataValTrimmed);
 				if(forceUpdate) {
 					Data2UserTermsDico.put(dataValTrimmed, userVal);
 					User2DataTermsDico.put(userValTrimmed, dataVal);

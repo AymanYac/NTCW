@@ -36,9 +36,11 @@ public class ImportItemRow {
 	public void parseItemRow(Row current_row, UserAccount account) {
 		item = setItem(current_row);
 		if(!itemParseHasFailed && item.getClass_segment()!=null && rowGetCharNumber(current_row)!=null) {
+			
 			value = setCaracValue(current_row,item,rowGetCharNumber(current_row));
 		}
 		if(!valueParseHasFailed && value!=null) {
+			
 			CharDescriptionExportServices.addItemCharDataToPush(item, value, CharDescriptionImportServices.chid2Carac.get(rowGetCharNumber(current_row)));
 		}
 	}
@@ -53,23 +55,27 @@ public class ImportItemRow {
 	}
 
 	private CaracteristicValue setCaracValue(Row current_row, CharDescriptionRow item, String charID) {
+		
+		CaracteristicValue current_value = new CaracteristicValue();
+		
 		ClassCaracteristic knownCarac = CharDescriptionImportServices.chid2Carac.get(charID);
 		if(knownCarac!=null) {
 			//The carac is known
+			
 			ClassCaracteristic knownTemplate = CharDescriptionImportServices.classSpecificFields.get(charID).get(item.getClass_segment().getClassNumber());
 			if(knownTemplate!=null) {
-				CaracteristicValue value = new CaracteristicValue();
 				if(knownCarac.getIsNumeric()) {
 					//The carac is numeric
+					
 					try {
 						String num = current_row.getCell(columnMap.get("value_nominal"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
 						if(num.length()>0) {
-							value.setNominal_value(String.valueOf(Double.valueOf(num.replace(",", "."))));
+							current_value.setNominal_value(String.valueOf(Double.valueOf(num.replace(",", "."))));
 						}
 					}catch(Exception V) {
 						try {
 							Double num = current_row.getCell(columnMap.get("value_nominal"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue();
-							value.setNominal_value(String.valueOf(num));
+							current_value.setNominal_value(String.valueOf(num));
 						}catch(Exception E) {
 							valueParseHasFailed = true;
 							rejectedRows.add(new Pair<Row,String>(current_row,"Nominal value is not a valid number"));
@@ -80,12 +86,12 @@ public class ImportItemRow {
 					try {
 						String num = current_row.getCell(columnMap.get("value_min"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
 						if(num.length()>0) {
-							value.setMin_value(String.valueOf(Double.valueOf(num.replace(",", "."))));
+							current_value.setMin_value(String.valueOf(Double.valueOf(num.replace(",", "."))));
 						}
 					}catch(Exception V) {
 						try {
 							Double num = current_row.getCell(columnMap.get("value_min"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue();
-							value.setMin_value(String.valueOf(num));
+							current_value.setMin_value(String.valueOf(num));
 						}catch(Exception E) {
 							valueParseHasFailed = true;
 							rejectedRows.add(new Pair<Row,String>(current_row,"Minimum value is not a valid number"));
@@ -96,12 +102,12 @@ public class ImportItemRow {
 					try {
 						String num = current_row.getCell(columnMap.get("value_max"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
 						if(num.length()>0) {
-							value.setMax_value(String.valueOf(Double.valueOf(num.replace(",", "."))));
+							current_value.setMax_value(String.valueOf(Double.valueOf(num.replace(",", "."))));
 						}
 					}catch(Exception V) {
 						try {
 							Double num = current_row.getCell(columnMap.get("value_max"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue();
-							value.setMax_value(String.valueOf(num));
+							current_value.setMax_value(String.valueOf(num));
 						}catch(Exception E) {
 							valueParseHasFailed = true;
 							rejectedRows.add(new Pair<Row,String>(current_row,"Maximum value is not a valid number"));
@@ -111,26 +117,34 @@ public class ImportItemRow {
 					
 					
 					if(knownTemplate.getAllowedUoms()!=null && knownTemplate.getAllowedUoms().size()>0) {
+						
 						//The carac requires uom, check for uom symbol exists in row
 						String tmpUomSymbol = current_row.getCell(columnMap.get("value_uom"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
 						if(tmpUomSymbol!=null && tmpUomSymbol.length()>0) {
+							
 							//The uom symbol exists in row
 							ArrayList<UnitOfMeasure> tmpUom = WordUtils.parseKnownUoMsFollowingDecimal("1"+tmpUomSymbol);
 							if(tmpUom.size()>0) {
+								
 								//The uom symbol is known
 								List<String> undeclaredUomIds = tmpUom.stream().map(u->u.getUom_id()).filter(uid->!knownTemplate.getAllowedUoms().contains(uid)).collect(Collectors.toList());
 								if(undeclaredUomIds.size()==0) {
+									
 									//The row uom is known in the template
-									value.setUom_id(tmpUom.get(0).getUom_id());
+									current_value.setUom_id(tmpUom.get(0).getUom_id());
 								}else {
+									
 									//The row uom is not known in the template
+									
 									//Check if the symbol has been misinterpreted and should be a convertible uom to it
 									List<Pair<String, String>> reInterpredUoms = undeclaredUomIds.stream().map(uid-> knownTemplate.attemptUomSymbolInterpretationCorrection(uid))
 									.filter(pair->pair!=null).collect(Collectors.toList());
 									if(undeclaredUomIds.size() == reInterpredUoms.size()) {
+										
 										//The uom has been corrected
-										value.setUom_id(reInterpredUoms.get(0).getValue());
+										current_value.setUom_id(reInterpredUoms.get(0).getValue());
 									}else {
+										
 										//The uom can not be corrected
 										rejectedRows.add(new Pair<Row,String>(current_row,UnitOfMeasure.RunTimeUOMS.get(undeclaredUomIds.get(0)).toString()+" can not be converted to "+String.join(",", knownTemplate.getAllowedUoms().stream().map(uid->UnitOfMeasure.RunTimeUOMS.get(uid).getUom_name()).collect(Collectors.toList()))));
 										valueParseHasFailed=true;
@@ -138,12 +152,14 @@ public class ImportItemRow {
 									}
 								}
 							}else {
+								
 								//The uom symbol is not known
 								rejectedRows.add(new Pair<Row,String>(current_row,"Uom symbol: "+tmpUomSymbol+" can not be matched to any known unit of measure"));
 								valueParseHasFailed=true;
 								return null;
 							}
 						}else {
+							
 							//The row has no uom symbol
 							rejectedRows.add(new Pair<Row,String>(current_row,"Uom is required for characteristic: "+charID));
 							valueParseHasFailed=true;
@@ -151,6 +167,7 @@ public class ImportItemRow {
 						}
 					}
 				}else {
+					
 					//The carac is not numeric
 					String dataVal = current_row.getCell(columnMap.get("value_data"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
 					dataVal = (dataVal.length()>0)?dataVal:null;
@@ -158,36 +175,48 @@ public class ImportItemRow {
 					userVal = (userVal.length()>0)?userVal:null;
 					
 					if(knownCarac.getIsTranslatable()) {
+						
+						
 						Boolean conflictingLinks = TranslationServices.createDicoTranslationLink(dataVal,userVal,false);
+						
 						if(conflictingLinks!=null && conflictingLinks) {
+							
 							//Inconsistent translation
 							rejectedRows.add(new Pair<Row,String>(current_row,"Value "+dataVal+"/"+userVal+" was not created (inconsistent translation)"));
 							valueParseHasFailed=true;
 							return null;
 							
 						}else {
-							value.setDataLanguageValue(dataVal);
-							value.setUserLanguageValue(userVal);
+							current_value.setDataLanguageValue(dataVal);
+							current_value.setUserLanguageValue(userVal);
 						}
+						
+						
+						
+						conflictingLinks = TranslationServices.createDicoTranslationLink(dataVal,userVal,false);
+						
+						
 					}else {
-						value.setDataLanguageValue(dataVal);
+						current_value.setDataLanguageValue(dataVal);
 					}
 				}
 				
 			}else {
+				
 				//The carac is not declared in this segment (unknown template)
 				rejectedRows.add(new Pair<Row,String>(current_row,"Characteristic: "+charID+" is not declared for the item's category: "+item.getClass_segment().getClassNumber()));
 				valueParseHasFailed = true;
 				return null;
 			}
 		}else {
+			
 			//The carac is not known
 			rejectedRows.add(new Pair<Row,String>(current_row,"Characteristic "+charID+" is not declared"));
 			valueParseHasFailed = true;
 			return null;
 		}
 		
-		return value;
+		return current_value;
 	}
 
 

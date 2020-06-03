@@ -12,6 +12,7 @@ import model.CharPaneRow;
 import model.ClassCaracteristic;
 import model.mouseHoverTableCell;
 import service.CharValuesLoader;
+import transversal.dialog_toolbox.CaracDeclarationDialog;
 
 public class CharPane_CharClassif {
 
@@ -105,6 +106,10 @@ public class CharPane_CharClassif {
 	public void PaneClose() {
 		parent.charButton.setSelected(false);
 		parent.setBottomRegionColumnSpans(false);
+	}
+	
+	@FXML public void add_carac() {
+		CaracDeclarationDialog.CaracDeclarationPopUp();
 	}
 
 }
