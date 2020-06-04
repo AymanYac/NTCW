@@ -871,7 +871,7 @@ public class Char_description {
 						return false;
 					}
 					if(hasFinishingText) {
-						UoMDeclarationDialog.UomDeclarationPopUp(this, finishingText, uom_field, active_char);
+						UoMDeclarationDialog.UomDeclarationPopUpAfterFailedFieldValidation(this, finishingText, uom_field, active_char);
 					}
 					return false;
 				}
@@ -885,7 +885,7 @@ public class Char_description {
 						return false;
 					}
 					if(hasFinishingText) {
-						UoMDeclarationDialog.UomDeclarationPopUp(this, finishingText, uom_field, active_char);
+						UoMDeclarationDialog.UomDeclarationPopUpAfterFailedFieldValidation(this, finishingText, uom_field, active_char);
 					}
 					return false;
 				}
@@ -1299,7 +1299,7 @@ public class Char_description {
 	}
 	
 	@SuppressWarnings("static-access")
-	public void refresh_ui_display() {
+	public  void refresh_ui_display() {
 		proposer.clearPropButtons();
 		double RIGHT_TRANSLATE = 0.0*rule_field.getWidth();
 		clear_data_fields();

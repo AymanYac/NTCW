@@ -32,8 +32,10 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 	  private final ContextMenu entriesPopup;
 	  private Map<Integer, Pair<ClassSegment, ClassCaracteristic>> RESULTMAP;
 	  protected boolean PopupIsVisible=false;
-	 
-	  public AutoCompleteBox_CharDeclarationName() {
+	  public Pair<ClassSegment,ClassCaracteristic> selectedEntry;
+	  public javafx.beans.property.BooleanProperty incompleteProperty = new javafx.beans.property.SimpleBooleanProperty();
+
+	public AutoCompleteBox_CharDeclarationName() {
 		super();
 		entries = new ArrayList<Pair<ClassSegment,ClassCaracteristic>>();
 		entriesPopup = new ContextMenu();
@@ -50,8 +52,9 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 		          entriesPopup.hide();
 		        } else
 		        {
-		        	
-		        	
+
+					selectedEntry=null;
+					incompleteProperty.setValue(true);
 		          LinkedList<Pair<ClassSegment,ClassCaracteristic>> searchResult = new LinkedList<>();
 		          final List<Pair<ClassSegment,ClassCaracteristic>> filteredEntries = entries.stream().filter(e -> StringUtils.containsIgnoreCase(e.getValue().getCharacteristic_name(),getText()))
 		        		  .collect(Collectors.toList());
@@ -144,9 +147,10 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 
 		  }
 
-	protected void processSelectedCarac(Pair<ClassSegment, ClassCaracteristic> classCaracteristic) {
-		// TODO Auto-generated method stub
-		
+	protected void processSelectedCarac(Pair<ClassSegment, ClassCaracteristic> result) {
+		setText(result.getValue().getCharacteristic_name()+"["+result.getKey().getClassName()+"]");
+		this.selectedEntry = result;
+		incompleteProperty.setValue(false);
 	}
 
 

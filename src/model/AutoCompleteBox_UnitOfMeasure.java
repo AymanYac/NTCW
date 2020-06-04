@@ -30,6 +30,7 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
   private Map<Integer, UnitOfMeasure> RESULTMAP;
   protected boolean PopupIsVisible=false;
   public UnitOfMeasure selectedUom;
+  public javafx.beans.property.BooleanProperty incompleteProperty = new javafx.beans.property.SimpleBooleanProperty();
 
     /** Construct a new AutoCompleteTextField.
  *  */
@@ -37,7 +38,7 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
     super();
     entries = new ArrayList<UnitOfMeasure>();
     entriesPopup = new ContextMenu();
-    
+    incompleteProperty.setValue(true);
     focusedProperty().addListener(new ChangeListener<Boolean>()
     {
         @Override
@@ -67,6 +68,7 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
         {
 
             selectedUom=null;
+            incompleteProperty.setValue(true);
           LinkedList<UnitOfMeasure> searchResult = new LinkedList<>();
           final List<UnitOfMeasure> filteredEntries = entries.stream().filter(e -> e.HasPartialUomSymbol(getText()))
         		  .collect(Collectors.toList());
@@ -180,8 +182,10 @@ protected void check_revert_value_in_allowed_uoms() {
 
 
 protected void print_uom_in_parent(UnitOfMeasure result) {
-      this.selectedUom = result;
       setText(result.toString());
+      this.selectedUom = result;
+      incompleteProperty.setValue(false);
+
 }
 
 

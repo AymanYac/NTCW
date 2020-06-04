@@ -40,10 +40,67 @@ public class UoMDeclarationDialog {
 	private static Node validationButton;
 	private static String CharUomFamily = "";
 	private static HashSet<String> uomCompBases;
-	
 
-	public static void UomDeclarationPopUp(Char_description parent, String proposedUomSymbol,
-			AutoCompleteBox_UnitOfMeasure uom_field, ClassCaracteristic active_char) {
+	public static void GenericUomDeclarationPopUp(String proposedUomSymbol,
+																	 AutoCompleteBox_UnitOfMeasure uom_field) {
+
+		proposedUomSymbol  = proposedUomSymbol.trim();
+
+		// Create the custom dialog.
+		Dialog<UnitOfMeasure> dialog = new Dialog<>();
+		dialog.setTitle("New unit of measure declaration");
+		dialog.setHeaderText("Defining a new unit of measure");
+		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStyleClass().add("customDialog");
+
+		// Set the button types.
+		ButtonType validateButtonType = new ButtonType("Store new unit", ButtonData.OK_DONE);
+		dialog.getDialogPane().getButtonTypes().addAll(validateButtonType, ButtonType.CANCEL);
+
+		// Create the  uom labels and fields.
+
+		grid = new GridPane();
+		uomName = new TextField();
+		uomSymbol = new TextField();
+		uomAlt = new TextField();
+		uomMultiplier = new TextField();
+		uomChoice = new ComboBox<UomClassComboRow>();
+
+		clear_fields(proposedUomSymbol,null);
+
+		setFieldListeners(dialog,validateButtonType, proposedUomSymbol, null);
+
+
+		dialog.getDialogPane().setContent(grid);
+
+		// Request focus on the multiplier field by default.
+		Platform.runLater(() -> uomMultiplier.requestFocus());
+
+
+		// Convert the result to a uom when the store button is clicked.
+		dialog.setResultConverter(dialogButton -> {
+			if (dialogButton == validateButtonType) {
+				return createUomfromField();
+			}
+			return null;
+		});
+
+		Optional<UnitOfMeasure> result = dialog.showAndWait();
+
+		result.ifPresent(newUom -> {
+			UnitOfMeasure.storeNewUom(newUom);
+			uom_field.setText(newUom.toString());
+			uom_field.selectedUom = newUom;
+			uom_field.incompleteProperty.setValue(false);
+		});
+
+
+
+	}
+
+
+	public static void UomDeclarationPopUpAfterFailedFieldValidation(Char_description parent, String proposedUomSymbol,
+																	 AutoCompleteBox_UnitOfMeasure uom_field, ClassCaracteristic active_char) {
 		
 		proposedUomSymbol  = proposedUomSymbol.trim();
 		CharUomFamily = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0)).getUom_base_id();
@@ -298,7 +355,7 @@ public class UoMDeclarationDialog {
 		uomName.setText("");
 		uomSymbol.setText(proposedUomSymbol);
 		uomChoice.getItems().setAll(UnitOfMeasure.RunTimeUOMS.values().stream()
-				.filter(u -> UnitOfMeasure.ConversionPathExists(u, active_char.getAllowedUoms()))
+				.filter( u -> (!(active_char!=null) ||UnitOfMeasure.ConversionPathExists(u, active_char.getAllowedUoms())))
 				.collect(Collectors.toSet()).stream()
 				.map(u->new UomClassComboRow(u)).collect(Collectors.toSet()));
 		uomCompBases = new HashSet<String>();
@@ -323,7 +380,11 @@ public class UoMDeclarationDialog {
 		GridPane.setColumnSpan(uomAlt, 3);
 		
 		sortUomChoiceList();
-		selectUomInComboBoxByUomId(active_char.getAllowedUoms().get(0));
+		try{
+			selectUomInComboBoxByUomId(active_char.getAllowedUoms().get(0));
+		}catch (Exception V){
+
+		}
 		check_name_and_symbol_in_alts(null);
 	}
 
@@ -332,10 +393,7 @@ public class UoMDeclarationDialog {
 
 			@Override
 			public int compare(UomClassComboRow arg0, UomClassComboRow arg1) {
-				System.out.print("Comparing "+arg0.getUnitOfMeasure().getUom_symbol()+" to "
-						+arg1.getUnitOfMeasure().getUom_symbol()+"->");
-				
-				
+
 				int nonFamilyVal = arg0.getUnitOfMeasure().getUom_base_id().equals(CharUomFamily)?500:-500;
 				int ret = arg0.getUnitOfMeasure().getUom_name().compareToIgnoreCase(
 						arg1.getUnitOfMeasure().getUom_name())
@@ -347,14 +405,12 @@ public class UoMDeclarationDialog {
 				if(uomCompBases.contains(arg0.getUnitOfMeasure().getUom_id())
 						&&
 					!arg1.getUnitOfMeasure().getUom_base_id().equals(arg0.getUnitOfMeasure().getUom_id())) {
-					System.out.print(" +500 ");
 					ret+=500;
 					
 				}
 				if(uomCompBases.contains(arg1.getUnitOfMeasure().getUom_id())
 						&&
 					!arg0.getUnitOfMeasure().getUom_base_id().equals(arg1.getUnitOfMeasure().getUom_id())) {
-					System.out.print(" -500 ");
 					ret-=500;
 				}
 				

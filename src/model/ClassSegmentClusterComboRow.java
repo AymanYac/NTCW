@@ -32,4 +32,8 @@ public class ClassSegmentClusterComboRow {
     public String toString() {
         return rowLabel;
     }
+
+    public ArrayList<ClassSegment> getRowSegments() {
+        return rowSegments;
+    }
 }

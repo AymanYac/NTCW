@@ -55,6 +55,13 @@ public class CharDescriptionRow {
 			}
 			return;
 		}
+		public void expandDataField(String target_class) {
+			CaracteristicValue[] dataField = new CaracteristicValue[this.data.get(target_class).length + 1];
+			for(int i = 0; i < this.data.get(target_class).length; ++i) {
+				dataField[i] = this.data.get(target_class)[i];
+			}
+			this.data.put(target_class, dataField);
+		}
 		public String getItem_id() {
 			return item_id;
 		}
@@ -284,5 +291,6 @@ public class CharDescriptionRow {
 			});
 		}
 
-		
+
+
 }

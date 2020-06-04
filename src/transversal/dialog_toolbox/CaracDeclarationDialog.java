@@ -1,26 +1,23 @@
 package transversal.dialog_toolbox;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import controllers.Char_description;
+import controllers.paneControllers.TablePane_CharClassif;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -30,7 +27,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Pair;
 import model.*;
+import service.CharItemFetcher;
 import service.CharValuesLoader;
+import transversal.generic.CustomKeyboardListener;
 import transversal.generic.Tools;
 
 public class CaracDeclarationDialog {
@@ -44,6 +43,8 @@ public class CaracDeclarationDialog {
 	private static ComboBox<ClassSegmentClusterComboRow> charClassLink;
 	private static ComboBox<Integer> sequence;
 	private static ComboBox<String> criticality;
+	private static Label uom0Label;
+	private static ComboBox<String> uom0;
 	private static Label uom1Label;
 	private static AutoCompleteBox_UnitOfMeasure uom1;
 	private static Label uom2Label;
@@ -51,18 +52,38 @@ public class CaracDeclarationDialog {
 	private static Label detailsLabel;
 	private static CheckBox sequenceCB;
 	private static CheckBox criticalityCB;
+	private static CheckBox uom0CB;
 	private static CheckBox uom1CB;
 	private static CheckBox uom2CB;
 	private static ButtonType validateButtonType;
-	
-	@SuppressWarnings("static-access")
+	private static HashMap<String,HashMap<String,ArrayList<UnitOfMeasure>>> templateUoMs = new HashMap<String,HashMap<String,ArrayList<UnitOfMeasure>>>();
+
+	private static void showDetailedClassClusters() {
+		System.out.println("XXXXX SHOWING DETAILS XXXXXXX");
+		Dialog dialog = new Dialog<>();
+		dialog.setTitle("Listing all impacted classes");
+		dialog.setHeaderText(null);
+		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStyleClass().add("customDialog");
+
+		// Set the button types.
+		dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(10, 10, 10, 10));
+		TableView<ClassSegmentClusterComboRow> tableview = new TableView<ClassSegmentClusterComboRow>();
+		grid.add(tableview,0,0);
+		dialog.showAndWait();
+	}
+
 	public static void CaracDeclarationPopUp(UserAccount account, ClassSegment itemSegment) throws SQLException, ClassNotFoundException {
 		// Create the custom dialog.
 		create_dialog();
 		
 		// Create the carac labels and fields.
 		create_dialog_fields();
-				
+
 		// Set fields layout
 		set_fields_layout();
 				
@@ -84,12 +105,7 @@ public class CaracDeclarationDialog {
 		    return null;
 		});
 
-		Optional<ClassCaracteristic> result = dialog.showAndWait();
-
-		result.ifPresent(carac -> {
-			carac.setCharacteristic_id(Tools.generate_uuid());
-		});
-		
+		dialog.showAndWait();
 
 	}
 
@@ -99,7 +115,7 @@ public class CaracDeclarationDialog {
 	}
 
 	private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType, UserAccount account, ClassSegment itemSegment) throws SQLException, ClassNotFoundException {
-		//Fill the carac name field
+		//Fill the carac name field and the template UoMs DS
 		ArrayList<ClassCaracteristic> uniqueCharTemplate = new ArrayList<ClassCaracteristic>();
 		HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(account);
 		CharValuesLoader.active_characteristics.entrySet().stream()
@@ -109,44 +125,107 @@ public class CaracDeclarationDialog {
 						c->!c.matchesTemplates(uniqueCharTemplate)).collect(Collectors.toList()))
 				)
 			).flatMap(p->p.getValue().stream().map(c->new Pair<ClassSegment,ClassCaracteristic>(sid2Segment.get(p.getKey()),c)))
-				.forEach(p2->charName.entries.add(p2));
-			//.forEach(p2->System.out.println(p2.getValue().getCharacteristic_name()+"["+p2.getKey().getClassName()+"]"));
+				.forEach(p2->{
+					//Add entry to charName combo
+					charName.entries.add(p2);
+					//Fill the template UoMs DS
+					if(p2.getValue().getAllowedUoms()!=null && p2.getValue().getAllowedUoms().size()>0){
+						ArrayList<UnitOfMeasure> UoMs = p2.getValue().getAllowedUoms().stream().map(uid -> UnitOfMeasure.RunTimeUOMS.get(uid)).collect(Collectors.toCollection(ArrayList::new));
+						HashMap<String, ArrayList<UnitOfMeasure>> tmp = templateUoMs.get(p2.getValue().getCharacteristic_id());
+						tmp = tmp!=null?tmp:new HashMap<String,ArrayList<UnitOfMeasure>>();
+						tmp.put(String.join(",",UoMs.stream().map(u->u.getUom_symbol()).collect(Collectors.toList())),UoMs);
+						templateUoMs.put(p2.getValue().getCharacteristic_id(),tmp);
+					}
+				});
+
+		charName.incompleteProperty.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				uom0.getItems().clear();
+				uom0.getItems().add("No unit of measure");
+				uom0.getItems().add("Other...");
+				if(!newValue){
+					ClassCaracteristic selectedCar = charName.selectedEntry.getValue();
+					charNameTranslated.setText(selectedCar.getCharacteristic_name_translated());
+					if(selectedCar.getIsNumeric()){
+						charType.getSelectionModel().select("Numeric");
+					}else{
+						charType.getSelectionModel().select("Text");
+						charTranslability.getSelectionModel().select(selectedCar.getIsTranslatable()?"Translatable":"Not translatable");
+					}
+					charClassLink.getSelectionModel().select(0);
+					int previousmaxSeq = 0;
+					try{
+						previousmaxSeq = Collections.max(sequence.getItems());
+					}catch(Exception V){
+
+					}
+					sequence.getItems().clear();
+					sequence.getItems().addAll(IntStream.range(1,Math.max(selectedCar.getSequence(),previousmaxSeq)).boxed().collect(Collectors.toList()));
+					sequence.getSelectionModel().select(selectedCar.getSequence());
+					criticality.getSelectionModel().select(selectedCar.getIsCritical()?"Critical":"Not critical");
+					//Use the template UoM DS to set the uom0 combobox
+					try{
+						Set<String> UomKS = templateUoMs.get(charName.selectedEntry.getValue().getCharacteristic_id()).keySet();
+						uom0.getItems().addAll(UomKS);
+						uom0.getSelectionModel().select(2);
+					}catch (Exception V){
+						uom0.getSelectionModel().select(0);
+					}
+
+				}else{
+					charNameTranslated.clear();
+					charType.getSelectionModel().clearSelection();
+					charTranslability.getSelectionModel().clearSelection();
+					charClassLink.getSelectionModel().clearSelection();
+					sequence.getSelectionModel().clearSelection();
+					criticality.getSelectionModel().clearSelection();
+					uom0.getSelectionModel().select("Other...");
+				}
+			}
+		});
 
 		charNameTranslated.disableProperty().bind(charName.textProperty().length().isEqualTo(0));
-		charType.disableProperty().bind(charNameTranslated.textProperty().length().isEqualTo(0));
-		charTranslability.disableProperty().bind(charType.valueProperty().isNull());
+		charType.disableProperty().bind(charNameTranslated.textProperty().length().isEqualTo(0).or(charName.incompleteProperty.not()));
+		charTranslability.disableProperty().bind(charType.valueProperty().isNull().or(charName.incompleteProperty.not()));
 		charClassLink.disableProperty().bind(charTranslability.valueProperty().isNull());
 		sequence.disableProperty().bind(charClassLink.valueProperty().isNull());
 		sequenceCB.disableProperty().bind(sequence.valueProperty().isNull());
-		criticality.disableProperty().bind(charClassLink.valueProperty().isNull());
+		criticality.disableProperty().bind(charClassLink.valueProperty().isNull().or(sequence.valueProperty().isNull()));
 		criticalityCB.disableProperty().bind(criticality.valueProperty().isNull());
-		uom1.disableProperty().bind(charClassLink.valueProperty().isNull());
-		uom1CB.disableProperty().bind(uom1.textProperty().length().isEqualTo(0));
-		uom2.disableProperty().bind(charClassLink.valueProperty().isNull());
-		uom2CB.disableProperty().bind(uom2.textProperty().length().isEqualTo(0));
-		uom1.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
-		uom1CB.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
-		uom1Label.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
-		uom2.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
-		uom2CB.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
-		uom2Label.visibleProperty().bind(charType.valueProperty().isEqualTo("Numeric"));
+		uom0.disableProperty().bind(charClassLink.valueProperty().isNull().or(criticality.valueProperty().isNull()));
+		uom0CB.disableProperty().bind(uom0.valueProperty().isNull());
+		uom1.disableProperty().bind(charClassLink.valueProperty().isNull().or(criticality.valueProperty().isNull()));
+		uom1CB.disableProperty().bind(uom1.incompleteProperty);
+		uom2.disableProperty().bind(charClassLink.valueProperty().isNull().or(criticality.valueProperty().isNull()));
+		uom2CB.disableProperty().bind(uom2.incompleteProperty);
+
+		uom0.visibleProperty().bind(charName.incompleteProperty.not().and(charType.valueProperty().isEqualTo("Numeric")).and(uom0.valueProperty().isEqualTo("Other...").not()));
+		uom0CB.visibleProperty().bind(uom0.visibleProperty());
+		uom0Label.visibleProperty().bind(uom0.visibleProperty());
+		uom1.visibleProperty().bind(uom0.valueProperty().isEqualTo("Other...").and(charType.valueProperty().isEqualTo("Numeric")));
+		uom1CB.visibleProperty().bind(uom1.visibleProperty());
+		uom1Label.visibleProperty().bind(uom1.visibleProperty());
+		uom2.visibleProperty().bind(uom0.valueProperty().isEqualTo("Other...").and(charType.valueProperty().isEqualTo("Numeric")));
+		uom2CB.visibleProperty().bind(uom2.visibleProperty());
+		uom2Label.visibleProperty().bind(uom2.visibleProperty());
 
 		charType.getItems().add("Numeric");
 		charType.getItems().add("Text");
 		charType.valueProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if(newValue.equals("Numeric")){
+				if(newValue!=null && newValue.equals("Numeric")){
 					charTranslability.getItems().clear();
 					charTranslability.getItems().add("N/A");
 					charTranslability.getSelectionModel().select(0);
-					charTranslability.setDisable(true);
+
 				}else{
 					charTranslability.getItems().clear();
 					charTranslability.getItems().add("Translatable");
 					charTranslability.getItems().add("Not translatable");
 					charTranslability.getSelectionModel().clearSelection();
-					charTranslability.setDisable(false);
+
 				}
 			}
 		});
@@ -158,8 +237,129 @@ public class CaracDeclarationDialog {
 		ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(sid2Segment);
 		charClassLink.getItems().add(cc);
 
+		sequence.getItems().addAll(IntStream.range(1,CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).size()+1).boxed().collect(Collectors.toList()));
+
+		criticality.getItems().add("Critical");
+		criticality.getItems().add("Not critical");
+
+		uom0.getItems().add("No unit of measure");
+		uom0.getItems().add("Other...");
+		uom1.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values());
+		uom2.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values());
+
+		uom1.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if(!newValue && uom1.incompleteProperty.getValue() && uom1.isVisible() && uom1.getText().replace(" ","").length()>0){
+					UoMDeclarationDialog.GenericUomDeclarationPopUp(uom1.getText(),uom1);
+				}
+			}
+		});
+		uom2.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if(!newValue && uom2.incompleteProperty.getValue() &&  uom2.isVisible() && uom2.getText().replace(" ","").length()>0){
+					UoMDeclarationDialog.GenericUomDeclarationPopUp(uom2.getText(),uom2);
+				}
+			}
+		});
+
+		detailsLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				showDetailedClassClusters();
+			}
+		});
+
+		Button validationButton = (Button) dialog.getDialogPane().lookupButton(validateButtonType);
+		validationButton.disableProperty().bind(criticalityCB.disableProperty().or(uom0CB.disableProperty().and(uom0CB.visibleProperty())).or(uom1CB.disableProperty().and(uom1CB.visibleProperty())));
+		validationButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				ClassCaracteristic newCarac = loadCaracFromDialog();
+				dispatchCaracOnClasses(newCarac);
+				dialog.close();
+			}
+		});
 
 
+	}
+
+
+	private static void dispatchCaracOnClasses(ClassCaracteristic newCarac) {
+		charClassLink.getValue().getRowSegments().parallelStream().forEach(s->{
+			Optional<ClassCaracteristic> charClassMatch = CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> c.getCharacteristic_id().equals(newCarac.getCharacteristic_id())).findAny();
+			if(charClassMatch.isPresent()){
+				ClassCaracteristic copy = newCarac;
+				if(!sequenceCB.isSelected()){
+					copy.setSequence(charClassMatch.get().getSequence());
+				}else{
+					CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> !c.getCharacteristic_id().equals(newCarac.getCharacteristic_id()))
+							.forEach(c->{
+								if(charClassMatch.get().getSequence()<=copy.getSequence()){
+									//Advancing
+									if(c.getSequence()>=charClassMatch.get().getSequence() && c.getSequence()<=copy.getSequence()){
+										c.setSequence(c.getSequence()-1);
+									}
+								}else{
+									//Regressing
+									if(c.getSequence()<=charClassMatch.get().getSequence() && c.getSequence()>=copy.getSequence()){
+										c.setSequence(c.getSequence()+1);
+									}
+								}
+							});
+				}
+				if(!criticalityCB.isSelected()){
+					copy.setIsCritical(charClassMatch.get().getIsCritical());
+				}
+				if(!uom0CB.isSelected() && uom1CB.isSelected()){
+					copy.setAllowedUoms(charClassMatch.get().getAllowedUoms());
+				}
+				int matchIndx = CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(charClassMatch);
+				CharValuesLoader.active_characteristics.get(s.getSegmentId()).set(matchIndx,copy);
+			}else{
+				//The carac is not present insert
+				CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> c.getSequence()>=newCarac.getSequence()).forEach(c->c.setSequence(c.getSequence()+1));
+				CharValuesLoader.active_characteristics.get(s.getSegmentId()).add(newCarac);
+				CharItemFetcher.allRowItems.stream().filter(r->r.getClass_segment_string().startsWith(s.getSegmentId())).forEach(r->{
+					r.expandDataField(s.getSegmentId());
+				});
+			}
+		});
+	}
+
+	private static ClassCaracteristic loadCaracFromDialog() {
+		ClassCaracteristic newCarac = new ClassCaracteristic();
+		ArrayList<String> newUoms = new ArrayList<String>();
+		if(charName.incompleteProperty.getValue()){
+			//New carac
+			newCarac = new ClassCaracteristic();
+			newCarac.setCharacteristic_id(Tools.generate_uuid());
+			newCarac.setCharacteristic_name(charName.getText());
+		}else{
+			//Old carac
+			newCarac = charName.selectedEntry.getValue();
+			if(uom0.isVisible()){
+				ArrayList<UnitOfMeasure> tmpUom = templateUoMs.get(newCarac.getCharacteristic_id()).get(uom0.getValue());
+				if(tmpUom!=null){
+					newUoms.addAll(tmpUom.stream().map(UnitOfMeasure::getUom_id).collect(Collectors.toCollection(ArrayList::new)));
+				}
+			}
+		}
+		newCarac.setCharacteristic_name_translated(charNameTranslated.getText());
+		newCarac.setIsNumeric(charType.getValue().equals("Numeric"));
+		newCarac.setIsTranslatable(charTranslability.getValue().equals("Translatable"));
+		newCarac.setSequence(sequence.getValue());
+		newCarac.setIsCritical(criticality.getValue().equals("Critical"));
+		if(uom1.isVisible() && !uom1.incompleteProperty.getValue()){
+			newUoms.add(uom1.selectedUom.getUom_id());
+		}
+		if(uom2.isVisible() && !uom2.incompleteProperty.getValue()){
+			newUoms.add(uom2.selectedUom.getUom_id());
+		}
+		newCarac.setAllowedUoms(newUoms);
+
+		return newCarac;
 	}
 
 	private static void create_dialog() {
@@ -190,11 +390,11 @@ public class CaracDeclarationDialog {
 		sequence.setMaxWidth(Integer.MAX_VALUE);
 		criticality = new ComboBox<String>();
 		criticality.setMaxWidth(Integer.MAX_VALUE);
+		uom0 = new ComboBox<String>();
+		uom0.setMaxWidth(Integer.MAX_VALUE);
 		uom1 = new AutoCompleteBox_UnitOfMeasure();
-		uom1.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values());
 		uom1.setMaxWidth(Integer.MAX_VALUE);
 		uom2 = new AutoCompleteBox_UnitOfMeasure();
-		uom2.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values());
 		uom2.setMaxWidth(Integer.MAX_VALUE);
 		
 		
@@ -202,12 +402,17 @@ public class CaracDeclarationDialog {
 		detailsLabel.setUnderline(true);
 		detailsLabel.setTextAlignment(TextAlignment.CENTER);
 		detailsLabel.setFont(Font.font(detailsLabel.getFont().getName(), FontWeight.LIGHT, FontPosture.ITALIC, detailsLabel.getFont().getSize()));
+		uom0Label = new Label("Main units of measure");
+		uom1Label = new Label("Prefered unit of measure");
+		uom2Label = new Label("Alternative unit of measure");
 		grid.setHalignment(detailsLabel, HPos.CENTER);
 		
 		sequenceCB = new CheckBox();
 		grid.setHalignment(sequenceCB, HPos.CENTER);
 		criticalityCB = new CheckBox();
 		grid.setHalignment(criticalityCB, HPos.CENTER);
+		uom0CB = new CheckBox();
+		grid.setHalignment(uom0CB,HPos.CENTER);
 		uom1CB = new CheckBox();
 		grid.setHalignment(uom1CB, HPos.CENTER);
 		uom2CB = new CheckBox();
@@ -272,9 +477,8 @@ public class CaracDeclarationDialog {
 		
 		grid.add(new Label("Sequence"), 1, 11);
 		grid.add(new Label("Criticality"), 1, 12);
-		uom1Label = new Label("Prefered unit of measure");
+		grid.add(uom0Label, 1, 13);
 		grid.add(uom1Label, 1, 13);
-		uom2Label = new Label("Alternative unit of measure");
 		grid.add(uom2Label, 1, 14);
 		
 		
@@ -294,6 +498,8 @@ public class CaracDeclarationDialog {
 		grid.setHgrow(sequence, Priority.ALWAYS);
 		grid.add(criticality, 3, 12);
 		grid.setHgrow(criticality, Priority.ALWAYS);
+		grid.add(uom0, 3, 13);
+		grid.setHgrow(uom0, Priority.ALWAYS);
 		grid.add(uom1, 3, 13);
 		grid.setHgrow(uom1, Priority.ALWAYS);
 		grid.add(uom2, 3, 14);
@@ -301,8 +507,21 @@ public class CaracDeclarationDialog {
 		
 		grid.add(sequenceCB, 5, 11);
 		grid.add(criticalityCB, 5, 12);
+		grid.add(uom0CB, 5, 13);
 		grid.add(uom1CB, 5, 13);
 		grid.add(uom2CB, 5, 14);
 	}
 
+	public static void CaracEditionPopUp(ClassCaracteristic carac, UserAccount account, TableView<CharDescriptionRow> tableGrid) throws SQLException, ClassNotFoundException {
+		ClassSegment itemSegement = Tools.get_project_segments(account).get(tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]);
+		CaracDeclarationDialog.CaracDeclarationPopUp(account, itemSegement);
+		Pair<ClassSegment, ClassCaracteristic> entry = new Pair<ClassSegment, ClassCaracteristic>(itemSegement, carac);
+		charName.setText(entry.getValue().getCharacteristic_name()+"["+entry.getKey().getClassName()+"]");
+		charName.selectedEntry = entry;
+		charName.incompleteProperty.setValue(false);
+
+	}
+
+	public static void CaracDeletion(ClassCaracteristic carac) {
+	}
 }

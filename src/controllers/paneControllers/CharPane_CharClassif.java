@@ -67,7 +67,8 @@ public class CharPane_CharClassif {
 		this.tableGrid.getItems().addAll( this.paneRows);
 		critcalityColumn.setCellValueFactory(new PropertyValueFactory<>("Criticality"));
 		charNameColumn.setCellValueFactory(new PropertyValueFactory<>("Char_name"));
-		charNameColumn.setCellFactory(mouseHoverTableCell.forCharNameTranslation(this.tableGrid));
+		//charNameColumn.setCellFactory(mouseHoverTableCell.forCharNameTranslation(this.tableGrid));
+		charNameColumn.setCellFactory(mouseHoverTableCell.forCharEdition(this.tableGrid,char_description));
 		
 		seqColumn.setCellValueFactory(new PropertyValueFactory<>("Char_sequence"));
 		uomColumn.setCellValueFactory(new PropertyValueFactory<>("Uom_display"));
@@ -112,6 +113,7 @@ public class CharPane_CharClassif {
 	
 	@FXML public void add_carac() throws SQLException, ClassNotFoundException {
 		CaracDeclarationDialog.CaracDeclarationPopUp(parent.account, Tools.get_project_segments(parent.account).get(selected_row.getClass_segment_string().split("&&&")[0]));
+		parent.refresh_ui_display();
 	}
 
 }
