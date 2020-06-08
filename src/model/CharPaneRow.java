@@ -123,6 +123,8 @@ public class CharPaneRow {
 		}
 		return this.getValue().getFormatedDisplayAndUomPair(parent, carac).getValue();
 	}
+
+
 	/*public TextFlow getValue_display(){
 		if(!(this.getValue()!=null)) {
 			return null;

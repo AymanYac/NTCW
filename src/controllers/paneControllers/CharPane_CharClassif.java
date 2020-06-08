@@ -11,7 +11,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import model.CharDescriptionRow;
 import model.CharPaneRow;
 import model.ClassCaracteristic;
-import model.mouseHoverTableCell;
+import model.inputEventTableCell;
 import service.CharValuesLoader;
 import transversal.dialog_toolbox.CaracDeclarationDialog;
 import transversal.generic.Tools;
@@ -23,7 +23,7 @@ public class CharPane_CharClassif {
 	@FXML public TableView<CharPaneRow> tableGrid;
 	@FXML private TableColumn<?, ?> critcalityColumn;
 	@FXML private TableColumn<?, ?> seqColumn;
-	@FXML private TableColumn<?, ?> charNameColumn;
+	@FXML private TableColumn<String, CharPaneRow> charNameColumn;
 	@FXML private TableColumn<?, ?> uomColumn;
 	@FXML private TableColumn<?, ?> valueColumn;
 	
@@ -49,7 +49,7 @@ public class CharPane_CharClassif {
 		}
 		this.tableGrid.getItems().clear();
 		this.tableGrid.getItems().addAll( this.paneRows);
-		
+
 		try {
 			triggerItemTableRefresh = false;
 			this.tableGrid.getSelectionModel().select(Math.floorMod(this.parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).size()));
@@ -66,10 +66,11 @@ public class CharPane_CharClassif {
 		this.parent = char_description;
 		this.tableGrid.getItems().addAll( this.paneRows);
 		critcalityColumn.setCellValueFactory(new PropertyValueFactory<>("Criticality"));
-		charNameColumn.setCellValueFactory(new PropertyValueFactory<>("Char_name"));
-		//charNameColumn.setCellFactory(mouseHoverTableCell.forCharNameTranslation(this.tableGrid));
-		charNameColumn.setCellFactory(mouseHoverTableCell.forCharEdition(this.tableGrid,char_description));
-		
+		charNameColumn.setCellValueFactory(new PropertyValueFactory<String, CharPaneRow>("Char_name"));
+		//charNameColumn.setCellFactory(model.mouseHoverTableCell.forCharNameTranslation(this.tableGrid));
+		charNameColumn.setCellFactory(inputEventTableCell.forCharEdition(this.tableGrid,char_description));
+
+
 		seqColumn.setCellValueFactory(new PropertyValueFactory<>("Char_sequence"));
 		uomColumn.setCellValueFactory(new PropertyValueFactory<>("Uom_display"));
 		
@@ -112,7 +113,7 @@ public class CharPane_CharClassif {
 	}
 	
 	@FXML public void add_carac() throws SQLException, ClassNotFoundException {
-		CaracDeclarationDialog.CaracDeclarationPopUp(parent.account, Tools.get_project_segments(parent.account).get(selected_row.getClass_segment_string().split("&&&")[0]));
+		CaracDeclarationDialog.CaracDeclarationPopUp(parent.account, Tools.get_project_segments(parent.account).get(selected_row.getClass_segment_string().split("&&&")[0]), null);
 		parent.refresh_ui_display();
 	}
 

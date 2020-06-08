@@ -5,8 +5,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import controllers.Char_description;
-import controllers.paneControllers.TablePane_CharClassif;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -14,7 +12,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.input.MouseEvent;
@@ -29,7 +26,6 @@ import javafx.util.Pair;
 import model.*;
 import service.CharItemFetcher;
 import service.CharValuesLoader;
-import transversal.generic.CustomKeyboardListener;
 import transversal.generic.Tools;
 
 public class CaracDeclarationDialog {
@@ -77,7 +73,7 @@ public class CaracDeclarationDialog {
 		dialog.showAndWait();
 	}
 
-	public static void CaracDeclarationPopUp(UserAccount account, ClassSegment itemSegment) throws SQLException, ClassNotFoundException {
+	public static void CaracDeclarationPopUp(UserAccount account, ClassSegment itemSegment, Pair<ClassSegment, ClassCaracteristic> editingCarac) throws SQLException, ClassNotFoundException {
 		// Create the custom dialog.
 		create_dialog();
 		
@@ -90,11 +86,15 @@ public class CaracDeclarationDialog {
 		//Set fields behavior
 		set_fields_behavior(dialog,validateButtonType,account,itemSegment);
 				
-				
 		dialog.getDialogPane().setContent(grid);
 
 		// Request focus on the char name by default.
-		Platform.runLater(() -> charName.requestFocus());
+		Platform.runLater(() -> {
+			charName.requestFocus();
+			if(editingCarac!=null){
+				charName.processSelectedCarac(editingCarac);
+			}
+		});
 		
 		
 		// Convert the result to a uom when the store button is clicked.
@@ -106,6 +106,8 @@ public class CaracDeclarationDialog {
 		});
 
 		dialog.showAndWait();
+
+
 
 	}
 
@@ -514,11 +516,9 @@ public class CaracDeclarationDialog {
 
 	public static void CaracEditionPopUp(ClassCaracteristic carac, UserAccount account, TableView<CharDescriptionRow> tableGrid) throws SQLException, ClassNotFoundException {
 		ClassSegment itemSegement = Tools.get_project_segments(account).get(tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]);
-		CaracDeclarationDialog.CaracDeclarationPopUp(account, itemSegement);
 		Pair<ClassSegment, ClassCaracteristic> entry = new Pair<ClassSegment, ClassCaracteristic>(itemSegement, carac);
-		charName.setText(entry.getValue().getCharacteristic_name()+"["+entry.getKey().getClassName()+"]");
-		charName.selectedEntry = entry;
-		charName.incompleteProperty.setValue(false);
+		CaracDeclarationDialog.CaracDeclarationPopUp(account, itemSegement,entry);
+
 
 	}
 

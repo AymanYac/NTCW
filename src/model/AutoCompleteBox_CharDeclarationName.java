@@ -147,7 +147,7 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 
 		  }
 
-	protected void processSelectedCarac(Pair<ClassSegment, ClassCaracteristic> result) {
+	public void processSelectedCarac(Pair<ClassSegment, ClassCaracteristic> result) {
 		setText(result.getValue().getCharacteristic_name()+"["+result.getKey().getClassName()+"]");
 		this.selectedEntry = result;
 		incompleteProperty.setValue(false);
