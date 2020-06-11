@@ -1,14 +1,10 @@
 package model;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -30,7 +26,8 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 	  public final ArrayList<Pair<ClassSegment,ClassCaracteristic>> entries;
 	  /** The popup used to select an entry. */
 	  private final ContextMenu entriesPopup;
-	  private Map<Integer, Pair<ClassSegment, ClassCaracteristic>> RESULTMAP;
+	public HashMap<String, HashSet<ClassSegment>> templateMaps;
+	private Map<Integer, Pair<ClassSegment, ClassCaracteristic>> RESULTMAP;
 	  protected boolean PopupIsVisible=false;
 	  public Pair<ClassSegment,ClassCaracteristic> selectedEntry;
 	  public javafx.beans.property.BooleanProperty incompleteProperty = new javafx.beans.property.SimpleBooleanProperty();
@@ -130,7 +127,8 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 		    for (int i = 0; i < count; i++)
 		    {
 		      final Pair<ClassSegment,ClassCaracteristic> result = searchResult.get(i);
-		      Label entryLabel = new Label(result.getValue().getCharacteristic_name()+"["+result.getKey().getClassName()+"]");
+		      boolean caracHasOnlyOneTemplate = entries.stream().filter(p -> p.getValue().getCharacteristic_id().equals(result.getValue().getCharacteristic_id())).count()==1;
+		      Label entryLabel = new Label(result.getValue().getCharacteristic_name()+(caracHasOnlyOneTemplate?"":" (e.g. "+result.getKey().getClassName()+")"));
 		      CustomMenuItem item = new CustomMenuItem(entryLabel, true);
 		      item.setOnAction(new EventHandler<ActionEvent>()
 		      {
@@ -148,9 +146,12 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 		  }
 
 	public void processSelectedCarac(Pair<ClassSegment, ClassCaracteristic> result) {
-		setText(result.getValue().getCharacteristic_name()+"["+result.getKey().getClassName()+"]");
+		boolean caracHasOnlyOneTemplate = entries.stream().filter(p -> p.getValue().getCharacteristic_id().equals(result.getValue().getCharacteristic_id())).count()==1;
+		setText(result.getValue().getCharacteristic_name()+(caracHasOnlyOneTemplate?"":" (e.g. "+result.getKey().getClassName()+")"));
 		this.selectedEntry = result;
 		incompleteProperty.setValue(false);
+		entriesPopup.hide();
+
 	}
 
 

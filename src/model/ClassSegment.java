@@ -78,5 +78,19 @@ public class ClassSegment {
 	public boolean hasSameClassNumbersAsSegment(ClassSegment tmpSegment) {
 		return tmpSegment.levelNumbers.equals(this.levelNumbers);
 	}
-	
+
+	@Override
+	public int hashCode() {
+		return getSegmentId().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj!=null){
+			if(obj instanceof ClassSegment){
+				return ((ClassSegment) obj).getSegmentId().equals(this.getSegmentId());
+			}
+		}
+		return false;
+	}
 }

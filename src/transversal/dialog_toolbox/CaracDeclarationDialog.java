@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -22,6 +24,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
+import javafx.util.Callback;
 import javafx.util.Pair;
 import model.*;
 import service.CharItemFetcher;
@@ -63,13 +66,54 @@ public class CaracDeclarationDialog {
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 
 		// Set the button types.
-		dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
+		dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(10, 10, 10, 10));
-		TableView<ClassSegmentClusterComboRow> tableview = new TableView<ClassSegmentClusterComboRow>();
+		TableView<Pair<ClassSegment,SimpleBooleanProperty>> tableview = new TableView<Pair<ClassSegment, SimpleBooleanProperty>>();
+
+		TableColumn col1 = new TableColumn("Cateogry ID");
+		col1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassSegment,SimpleBooleanProperty>, String>, ObservableValue<String>>() {
+			public ObservableValue<String> call(TableColumn.CellDataFeatures<Pair<ClassSegment,SimpleBooleanProperty>, String> r) {
+				return new ReadOnlyObjectWrapper(r.getValue().getKey().getClassNumber());
+			}
+		});
+		col1.setResizable(false);
+		col1.prefWidthProperty().bind(tableview.widthProperty().multiply(35 / 100.0));
+
+		TableColumn col2 = new TableColumn("Class name");
+		col2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassSegment,SimpleBooleanProperty>, String>, ObservableValue<String>>() {
+			public ObservableValue<String> call(TableColumn.CellDataFeatures<Pair<ClassSegment,SimpleBooleanProperty>, String> r) {
+				return new ReadOnlyObjectWrapper(r.getValue().getKey().getClassName());
+			}
+		});
+		col2.setResizable(false);
+		col2.prefWidthProperty().bind(tableview.widthProperty().multiply(35 / 100.0));
+
+		TableColumn col3 = new TableColumn("Active characteristic");
+		col3.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassSegment,SimpleBooleanProperty>, CheckBox>, ObservableValue<CheckBox>>() {
+			public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<Pair<ClassSegment,SimpleBooleanProperty>, CheckBox> r) {
+				CheckBox cb = new CheckBox();
+				cb.selectedProperty().bindBidirectional(r.getValue().getValue());
+				return new ReadOnlyObjectWrapper(cb);
+			}
+		});
+		col3.setResizable(false);
+		col3.prefWidthProperty().bind(tableview.widthProperty().multiply(27 / 100.0));
+
+		tableview.getColumns().add(col1);
+		tableview.getColumns().add(col2);
+		tableview.getColumns().add(col3);
+
+		//IntStream.range(0,20).forEach(idx->tableview.getItems().addAll(charClassLink.getValue().getRowSegments()));
+		tableview.getItems().addAll(charClassLink.getValue().getRowSegments());
+
 		grid.add(tableview,0,0);
+		tableview.setMinWidth(800);
+		tableview.getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/TableViewBlue.css").toExternalForm());
+		dialog.getDialogPane().setContent(grid);
+
 		dialog.showAndWait();
 	}
 
@@ -96,14 +140,7 @@ public class CaracDeclarationDialog {
 			}
 		});
 		
-		
-		// Convert the result to a uom when the store button is clicked.
-		dialog.setResultConverter(dialogButton -> {
-		    if (dialogButton == validateButtonType) {
-		    	return createCarac();
-		    }
-		    return null;
-		});
+
 
 		dialog.showAndWait();
 
@@ -111,20 +148,17 @@ public class CaracDeclarationDialog {
 
 	}
 
-	private static ClassCaracteristic createCarac() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType, UserAccount account, ClassSegment itemSegment) throws SQLException, ClassNotFoundException {
 		//Fill the carac name field and the template UoMs DS
 		ArrayList<ClassCaracteristic> uniqueCharTemplate = new ArrayList<ClassCaracteristic>();
+		HashMap<String,HashSet<ClassSegment>> templateMaps = new HashMap<String,HashSet<ClassSegment>>();
 		HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(account);
 		CharValuesLoader.active_characteristics.entrySet().stream()
 		.map(e-> new Pair<String,ArrayList<ClassCaracteristic>>
 				(e.getKey(),
 				new ArrayList<ClassCaracteristic>(e.getValue().stream().filter(
-						c->!c.matchesTemplates(uniqueCharTemplate)).collect(Collectors.toList()))
+						c->!c.matchesTemplates(uniqueCharTemplate,sid2Segment.get(e.getKey()),templateMaps)).collect(Collectors.toList()))
 				)
 			).flatMap(p->p.getValue().stream().map(c->new Pair<ClassSegment,ClassCaracteristic>(sid2Segment.get(p.getKey()),c)))
 				.forEach(p2->{
@@ -139,6 +173,7 @@ public class CaracDeclarationDialog {
 						templateUoMs.put(p2.getValue().getCharacteristic_id(),tmp);
 					}
 				});
+		charName.templateMaps = templateMaps;
 
 		charName.incompleteProperty.addListener(new ChangeListener<Boolean>() {
 			@Override
@@ -155,7 +190,14 @@ public class CaracDeclarationDialog {
 						charType.getSelectionModel().select("Text");
 						charTranslability.getSelectionModel().select(selectedCar.getIsTranslatable()?"Translatable":"Not translatable");
 					}
-					charClassLink.getSelectionModel().select(0);
+					ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(templateMaps,charName.selectedEntry);
+					if(cc.toString().endsWith("category(ies)")){
+						charClassLink.getItems().add(cc);
+						charClassLink.getSelectionModel().select(cc);
+					}else{
+						charClassLink.getSelectionModel().select(0);
+					}
+
 					int previousmaxSeq = 0;
 					try{
 						previousmaxSeq = Collections.max(sequence.getItems());
@@ -180,9 +222,17 @@ public class CaracDeclarationDialog {
 					charType.getSelectionModel().clearSelection();
 					charTranslability.getSelectionModel().clearSelection();
 					charClassLink.getSelectionModel().clearSelection();
+					charClassLink.getItems().clear();
+					IntStream.range(0,itemSegment.getSegmentGranularity()).forEach(lvl->{
+						ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(lvl, itemSegment,sid2Segment);
+						charClassLink.getItems().add(cc);
+					});
+					Collections.reverse(charClassLink.getItems());
+					ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(sid2Segment);
+					charClassLink.getItems().add(cc);
 					sequence.getSelectionModel().clearSelection();
 					criticality.getSelectionModel().clearSelection();
-					uom0.getSelectionModel().select("Other...");
+					//uom0.getSelectionModel().select("Other...");
 				}
 			}
 		});
@@ -202,13 +252,13 @@ public class CaracDeclarationDialog {
 		uom2.disableProperty().bind(charClassLink.valueProperty().isNull().or(criticality.valueProperty().isNull()));
 		uom2CB.disableProperty().bind(uom2.incompleteProperty);
 
-		uom0.visibleProperty().bind(charName.incompleteProperty.not().and(charType.valueProperty().isEqualTo("Numeric")).and(uom0.valueProperty().isEqualTo("Other...").not()));
+		uom0.visibleProperty().bind((charName.incompleteProperty.not().or(charType.valueProperty().isEqualTo("Numeric"))).and(uom0.valueProperty().isEqualTo("Other...").not()));
 		uom0CB.visibleProperty().bind(uom0.visibleProperty());
 		uom0Label.visibleProperty().bind(uom0.visibleProperty());
-		uom1.visibleProperty().bind(uom0.valueProperty().isEqualTo("Other...").and(charType.valueProperty().isEqualTo("Numeric")));
+		uom1.visibleProperty().bind(uom0.visibleProperty().not().and(charType.valueProperty().isEqualTo("Numeric")));
 		uom1CB.visibleProperty().bind(uom1.visibleProperty());
 		uom1Label.visibleProperty().bind(uom1.visibleProperty());
-		uom2.visibleProperty().bind(uom0.valueProperty().isEqualTo("Other...").and(charType.valueProperty().isEqualTo("Numeric")));
+		uom2.visibleProperty().bind(uom0.visibleProperty().not().and(charType.valueProperty().isEqualTo("Numeric")));
 		uom2CB.visibleProperty().bind(uom2.visibleProperty());
 		uom2Label.visibleProperty().bind(uom2.visibleProperty());
 
@@ -231,6 +281,7 @@ public class CaracDeclarationDialog {
 				}
 			}
 		});
+		charClassLink.getItems().clear();
 		IntStream.range(0,itemSegment.getSegmentGranularity()).forEach(lvl->{
 			ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(lvl, itemSegment,sid2Segment);
 			charClassLink.getItems().add(cc);
@@ -239,7 +290,7 @@ public class CaracDeclarationDialog {
 		ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(sid2Segment);
 		charClassLink.getItems().add(cc);
 
-		sequence.getItems().addAll(IntStream.range(1,CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).size()+1).boxed().collect(Collectors.toList()));
+		sequence.getItems().addAll(IntStream.range(1,CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).size()+2).boxed().collect(Collectors.toList()));
 
 		criticality.getItems().add("Critical");
 		criticality.getItems().add("Not critical");
@@ -289,14 +340,14 @@ public class CaracDeclarationDialog {
 
 
 	private static void dispatchCaracOnClasses(ClassCaracteristic newCarac) {
-		charClassLink.getValue().getRowSegments().parallelStream().forEach(s->{
+		charClassLink.getValue().getRowSegments().parallelStream().filter(p->p.getValue().getValue()).map(Pair::getKey).forEach(s->{
 			Optional<ClassCaracteristic> charClassMatch = CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> c.getCharacteristic_id().equals(newCarac.getCharacteristic_id())).findAny();
+			ClassCaracteristic copy = newCarac;
 			if(charClassMatch.isPresent()){
-				ClassCaracteristic copy = newCarac;
 				if(!sequenceCB.isSelected()){
 					copy.setSequence(charClassMatch.get().getSequence());
 				}else{
-					CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> !c.getCharacteristic_id().equals(newCarac.getCharacteristic_id()))
+					CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> !c.getCharacteristic_id().equals(copy.getCharacteristic_id()))
 							.forEach(c->{
 								if(charClassMatch.get().getSequence()<=copy.getSequence()){
 									//Advancing
@@ -317,12 +368,15 @@ public class CaracDeclarationDialog {
 				if(!uom0CB.isSelected() && uom1CB.isSelected()){
 					copy.setAllowedUoms(charClassMatch.get().getAllowedUoms());
 				}
-				int matchIndx = CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(charClassMatch);
+
+				int matchIndx = CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(charClassMatch.get());
 				CharValuesLoader.active_characteristics.get(s.getSegmentId()).set(matchIndx,copy);
 			}else{
 				//The carac is not present insert
-				CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> c.getSequence()>=newCarac.getSequence()).forEach(c->c.setSequence(c.getSequence()+1));
-				CharValuesLoader.active_characteristics.get(s.getSegmentId()).add(newCarac);
+				//Disabled, insert new carac at sequence max
+				// CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> c.getSequence()>=newCarac.getSequence()).forEach(c->c.setSequence(c.getSequence()+1));
+				copy.setSequence(CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().map(ClassCaracteristic::getSequence).max(Integer::compare).get()+1);
+				CharValuesLoader.active_characteristics.get(s.getSegmentId()).add(copy);
 				CharItemFetcher.allRowItems.stream().filter(r->r.getClass_segment_string().startsWith(s.getSegmentId())).forEach(r->{
 					r.expandDataField(s.getSegmentId());
 				});
@@ -341,7 +395,7 @@ public class CaracDeclarationDialog {
 		}else{
 			//Old carac
 			newCarac = charName.selectedEntry.getValue();
-			if(uom0.isVisible()){
+			if(uom0.isVisible() && templateUoMs.get(newCarac.getCharacteristic_id())!=null){
 				ArrayList<UnitOfMeasure> tmpUom = templateUoMs.get(newCarac.getCharacteristic_id()).get(uom0.getValue());
 				if(tmpUom!=null){
 					newUoms.addAll(tmpUom.stream().map(UnitOfMeasure::getUom_id).collect(Collectors.toCollection(ArrayList::new)));
@@ -394,9 +448,9 @@ public class CaracDeclarationDialog {
 		criticality.setMaxWidth(Integer.MAX_VALUE);
 		uom0 = new ComboBox<String>();
 		uom0.setMaxWidth(Integer.MAX_VALUE);
-		uom1 = new AutoCompleteBox_UnitOfMeasure();
+		uom1 = new AutoCompleteBox_UnitOfMeasure("NAME");
 		uom1.setMaxWidth(Integer.MAX_VALUE);
-		uom2 = new AutoCompleteBox_UnitOfMeasure();
+		uom2 = new AutoCompleteBox_UnitOfMeasure("NAME");
 		uom2.setMaxWidth(Integer.MAX_VALUE);
 		
 		
@@ -523,5 +577,19 @@ public class CaracDeclarationDialog {
 	}
 
 	public static void CaracDeletion(ClassCaracteristic carac) {
+		CharValuesLoader.active_characteristics.entrySet().stream().forEach(e->{
+			Optional<ClassCaracteristic> localCarac = e.getValue().stream().filter(c -> c.getCharacteristic_id().equals(carac.getCharacteristic_id())).findAny();
+			if(localCarac.isPresent()){
+				CharValuesLoader.active_characteristics.entrySet().stream().filter(
+						e2->e2.getValue().stream().map(c->c.getCharacteristic_id()).anyMatch(i->i.equals(localCarac.get().getCharacteristic_id()))).forEach(e3->{
+							e3.getValue().stream().filter(c->c.getSequence()>localCarac.get().getSequence()).forEach(c->c.setSequence(c.getSequence()-1));
+				});
+				CharValuesLoader.active_characteristics.put(e.getKey(),
+						e.getValue().stream().filter(c->!c.getCharacteristic_id().equals(carac.getCharacteristic_id())).collect(Collectors.toCollection(ArrayList::new))
+				);
+
+			}
+
+		});
 	}
 }

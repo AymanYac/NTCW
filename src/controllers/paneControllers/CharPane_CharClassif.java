@@ -1,6 +1,7 @@
 package controllers.paneControllers;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import controllers.Char_description;
 import javafx.application.Platform;
@@ -48,6 +49,12 @@ public class CharPane_CharClassif {
 			}
 		}
 		this.tableGrid.getItems().clear();
+		this.paneRows.sort(new Comparator<CharPaneRow>() {
+			@Override
+			public int compare(CharPaneRow o1, CharPaneRow o2) {
+				return Integer.compare(o1.getChar_sequence(),o2.getChar_sequence());
+			}
+		});
 		this.tableGrid.getItems().addAll( this.paneRows);
 
 		try {
@@ -57,7 +64,7 @@ public class CharPane_CharClassif {
 		}catch(Exception V) {
 			
 		}
-		
+
 		
 	}
 

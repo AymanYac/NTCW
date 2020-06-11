@@ -59,6 +59,8 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
                                 public void handle(MouseEvent event) {
                                     try {
                                         CaracDeclarationDialog.CaracEditionPopUp(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.account,parent.tableController.tableGrid);
+                                        popup.hide();
+                                        parent.refresh_ui_display();
                                     } catch (SQLException throwables) {
                                         throwables.printStackTrace();
                                     } catch (ClassNotFoundException e) {
@@ -70,6 +72,8 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
                                 @Override
                                 public void handle(MouseEvent event) {
                                     CaracDeclarationDialog.CaracDeletion(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac());
+                                    popup.hide();
+                                    parent.refresh_ui_display();
                                 }
                             });
 

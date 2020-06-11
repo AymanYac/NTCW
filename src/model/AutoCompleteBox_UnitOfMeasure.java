@@ -28,17 +28,19 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
   /** The popup used to select an entry. */
   private ContextMenu entriesPopup;
   private Map<Integer, UnitOfMeasure> RESULTMAP;
+  private String populateSearchMethod;
   protected boolean PopupIsVisible=false;
   public UnitOfMeasure selectedUom;
   public javafx.beans.property.BooleanProperty incompleteProperty = new javafx.beans.property.SimpleBooleanProperty();
 
     /** Construct a new AutoCompleteTextField.
  *  */
-  public AutoCompleteBox_UnitOfMeasure() {
+  public AutoCompleteBox_UnitOfMeasure(String SearchMethod) {
     super();
     entries = new ArrayList<UnitOfMeasure>();
     entriesPopup = new ContextMenu();
     incompleteProperty.setValue(true);
+    populateSearchMethod = SearchMethod;
     focusedProperty().addListener(new ChangeListener<Boolean>()
     {
         @Override
@@ -70,7 +72,7 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
             selectedUom=null;
             incompleteProperty.setValue(true);
           LinkedList<UnitOfMeasure> searchResult = new LinkedList<>();
-          final List<UnitOfMeasure> filteredEntries = entries.stream().filter(e -> e.HasPartialUomSymbol(getText()))
+          final List<UnitOfMeasure> filteredEntries = entries.stream().filter(e -> ( populateSearchMethod.equals("NAME") && e.getUom_name().contains(getText()) )||( populateSearchMethod.equals("SYMBOL") && e.HasPartialUomSymbol(getText()) ))
         		  .collect(Collectors.toList());
           searchResult.addAll(filteredEntries);
           //searchResult.addAll(entries.subSet(getText(), getText() + Character.MAX_VALUE));

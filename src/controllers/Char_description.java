@@ -1020,7 +1020,7 @@ public class Char_description {
 		for( String entry : CNAME_CID) {
 			classification.getEntries().add(entry);
 		}
-		uom_field = new AutoCompleteBox_UnitOfMeasure();
+		uom_field = new AutoCompleteBox_UnitOfMeasure("SYMBOL");
 		
 		classification_style.setVisible(false);
 		grid.add(classification, 1, 9);

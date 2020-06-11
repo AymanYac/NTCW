@@ -1,9 +1,6 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javafx.util.Pair;
@@ -135,17 +132,31 @@ public class ClassCaracteristic {
 		}
 		return null;
 	}
+
+
+	public String getTemplateSignature(){
+		return this.getCharacteristic_id()+"&&&"
+				//+this.getSequence().toString()+"&&&"
+				+this.getIsCritical().toString()+"&&&"
+				+(getAllowedUoms()!=null?String.join("&&&",getAllowedUoms()):"");
+	}
 	
-	public boolean matchesTemplates(ArrayList<ClassCaracteristic> templates) {
+	public boolean matchesTemplates(ArrayList<ClassCaracteristic> templates, ClassSegment currentMapInstance, HashMap<String,HashSet<ClassSegment>> templateMaps) {
 		boolean ret =  templates.stream()
 				.filter(t->t.getCharacteristic_id().equals(this.getCharacteristic_id()))
-				.filter(t->t.getSequence().equals(this.getSequence()))
+				//.filter(t->t.getSequence().equals(this.getSequence()))
 				.filter(t->t.getIsCritical().equals(this.getIsCritical()))
 				.anyMatch(t->  ( t.getAllowedUoms()!=null && this.getAllowedUoms()!=null && t.getAllowedUoms().equals(this.allowedUoms) )
 							|| ( !(t.getAllowedUoms()!=null) && !(this.getAllowedUoms()!=null) )
 				);
 		if(!ret){
 			templates.add(this);
+		}
+		try {
+			templateMaps.get(this.getTemplateSignature()).add(currentMapInstance);
+		}catch (Exception V){
+			templateMaps.put(this.getTemplateSignature(),new HashSet<ClassSegment>());
+			templateMaps.get(this.getTemplateSignature()).add(currentMapInstance);
 		}
 		return ret;
 	}
