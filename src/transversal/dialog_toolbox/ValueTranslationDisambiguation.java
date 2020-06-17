@@ -1,18 +1,18 @@
 package transversal.dialog_toolbox;
 
-import java.util.Optional;
-
 import controllers.Char_description;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar.ButtonData;
 import model.CharValueTextSuggestion;
+
+import java.util.Optional;
 
 public class ValueTranslationDisambiguation {
 	

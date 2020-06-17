@@ -1,33 +1,21 @@
 package service;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-
 import controllers.Char_description;
-import model.GenericCharRule;
-import model.CharDescriptionRow;
-import model.CharRuleResult;
-import model.CaracteristicValue;
-import model.ClassCaracteristic;
-import model.GlobalConstants;
-import model.UnitOfMeasure;
-import model.UserAccount;
+import model.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CharPatternServices {
 	
@@ -587,8 +575,8 @@ public class CharPatternServices {
 							System.out.println("The numerical value is followed by a known unit of measure");
 							UnitOfMeasure following_uom = uomsInSelection.get(0);
 							if(selected_text.toLowerCase().contains("max")) {
-//								The selection contains "MAX"? (e.g. "Temp. Max.=50°C")
-								System.out.println("The selection contains \"MAX\" (e.g. \"Temp. Max.=50°C\")");
+//								The selection contains "MAX"? (e.g. "Temp. Max.=50ï¿½C")
+								System.out.println("The selection contains \"MAX\" (e.g. \"Temp. Max.=50ï¿½C\")");
 								CaracteristicValue tmp = new CaracteristicValue();;;; tmp.setParentChar(active_char);
 
 								tmp.setMax_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));

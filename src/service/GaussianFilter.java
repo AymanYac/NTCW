@@ -1,11 +1,11 @@
 package service;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.Kernel;
-
 import transversal.generic.ConvolveFilter;
 import transversal.generic.ImageMath;
 import transversal.generic.PixelUtils;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.Kernel;
 
 public class GaussianFilter extends ConvolveFilter {
 

@@ -1,10 +1,5 @@
 package model;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import controllers.Char_description;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -13,6 +8,11 @@ import javafx.util.Pair;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class CaracteristicValue {
 	public boolean ManualValueReviewed=false;

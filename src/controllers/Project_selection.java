@@ -1,40 +1,28 @@
 package controllers;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import model.GlobalConstants;
-import model.Project;
-import model.ProjectTemplate;
-import model.SelectionButton;
-import model.UserAccount;
+import model.*;
 import service.ConcurentTask;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
+
+import java.sql.*;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Project_selection {
 

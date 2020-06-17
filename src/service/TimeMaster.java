@@ -1,16 +1,16 @@
 package service;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import controllers.Auto_classification_progress;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import model.TimeMasterRow;
 import model.TimeMasterTemplateRow;
 import transversal.generic.Tools;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class TimeMaster {
 	

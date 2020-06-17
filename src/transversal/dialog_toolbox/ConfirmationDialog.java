@@ -1,9 +1,6 @@
 package transversal.dialog_toolbox;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import controllers.Auto_classification_progress;
 import controllers.Project_parameters;
 import controllers.Project_selection;
@@ -11,12 +8,17 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseEvent;
 import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.UserAccount;
 import transversal.generic.Tools;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 public class ConfirmationDialog {
 	
 	public static void show(String title,String header,String yes,String no, Project_parameters parent, boolean confirmed) {
@@ -259,7 +261,58 @@ public class ConfirmationDialog {
 	      }
 	   }
 
-	
-		
+
+    public static Boolean showCaracDeleteScopeConfirmation() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Confirm characteristic deletion scope");
+		alert.setHeaderText("Delete this characteristic and all its occurences?");
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+
+		ButtonType yesButton = new ButtonType("Yes, all occurences");
+		ButtonType noButton = new ButtonType("No, delete for this category only");
+		ButtonType cancelButton = new ButtonType("Cancel");
+
+
+		alert.getButtonTypes().setAll(yesButton, noButton, cancelButton);
+
+		Optional<ButtonType> option = alert.showAndWait();
+		if(option.isPresent()){
+			if (option.get() == yesButton) {
+				return true;
+			} else if (option.get() == noButton) {
+				return false;
+			} else {
+				return null;
+			}
+		}else{
+			return null;
+		}
+    }
+
+	public static boolean showCaracDeleteImpactConfirmation(int impactCount) {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Confirm characteristic deletion impact");
+		alert.setHeaderText("Deleting this characteristic will erase "+String.valueOf(impactCount)+" value(s)");
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+
+		ButtonType yesButton = new ButtonType("Yes, delete all");
+		ButtonType noButton = new ButtonType("No, cancel");
+
+
+		alert.getButtonTypes().setAll(yesButton, noButton);
+
+		Optional<ButtonType> option = alert.showAndWait();
+		if(option.isPresent()){
+			if (option.get() == yesButton) {
+				return true;
+			} else {
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
 }
 

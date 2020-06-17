@@ -1,11 +1,5 @@
 package controllers.paneControllers;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
-import org.json.simple.parser.ParseException;
-
 import controllers.Manual_classif;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -16,6 +10,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 public class Browser_ManualClassif {
 	Manual_classif parent;

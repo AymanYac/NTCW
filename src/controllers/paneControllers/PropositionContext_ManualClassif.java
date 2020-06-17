@@ -1,10 +1,5 @@
 package controllers.paneControllers;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.controlsfx.control.textfield.TextFields;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -14,7 +9,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import org.controlsfx.control.textfield.TextFields;
 import service.ManualClassifContext;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class PropositionContext_ManualClassif {

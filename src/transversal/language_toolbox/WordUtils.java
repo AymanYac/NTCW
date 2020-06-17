@@ -1,5 +1,11 @@
 package transversal.language_toolbox;
 
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import model.*;
+import org.apache.commons.lang.StringUtils;
+import transversal.generic.Tools;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,17 +17,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang.StringUtils;
-
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
-import model.BinaryClassificationParameters;
-import model.ClassCaracteristic;
-import model.DescriptionType;
-import model.GlobalConstants;
-import model.UnitOfMeasure;
-import transversal.generic.Tools;
 
 public class WordUtils {
 	

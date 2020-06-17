@@ -1,24 +1,10 @@
 package transversal.data_exchange_toolbox;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-
+import com.monitorjbl.xlsx.StreamingReader;
+import javafx.scene.control.ProgressBar;
+import model.DataInputMethods;
+import model.GenericClassRule;
+import model.UserAccount;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -26,15 +12,13 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import com.monitorjbl.xlsx.StreamingReader;
-
-import javafx.scene.control.ProgressBar;
-import model.DataInputMethods;
-import model.GenericClassRule;
-import model.UserAccount;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
+
+import java.io.*;
+import java.sql.*;
+import java.time.LocalDate;
+import java.util.*;
 
 public class SpreadsheetUpload {
 	

@@ -1,26 +1,17 @@
 package service;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import controllers.Char_description;
+import javafx.util.Pair;
+import model.*;
+import transversal.data_exchange_toolbox.CharDescriptionExportServices;
+import transversal.generic.Tools;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import controllers.Char_description;
-import javafx.util.Pair;
-import model.CharDescriptionRow;
-import model.CaracteristicValue;
-import model.ClassCaracteristic;
-import model.DataInputMethods;
-import model.GlobalConstants;
-import model.UnitOfMeasure;
-import transversal.data_exchange_toolbox.CharDescriptionExportServices;
-import transversal.generic.Tools;
 
 public class CharValuesLoader {
 	

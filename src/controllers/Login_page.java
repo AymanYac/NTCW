@@ -1,7 +1,5 @@
 package controllers;
 
-import java.sql.SQLException;
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
@@ -18,6 +16,8 @@ import model.GlobalConstants;
 import model.UserAccount;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
+
+import java.sql.SQLException;
 
 
 public class Login_page {

@@ -1,9 +1,5 @@
 package service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import controllers.Manual_classif;
 import controllers.paneControllers.PropositionContext_ManualClassif;
 import javafx.beans.value.ChangeListener;
@@ -15,6 +11,10 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.ManualClassProposition;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ManualClassifContext {
 	public static Stage lastStage;

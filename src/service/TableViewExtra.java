@@ -1,5 +1,10 @@
 package service;
 
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.util.Callback;
+
 import java.util.LinkedHashSet;
 
 //com.sun.javafx: START
@@ -10,12 +15,7 @@ import java.util.LinkedHashSet;
 //import javafx.scene.Node;
 //import javafx.scene.control.IndexedCell;
 //import javafx.scene.control.Skin;
-//com.sun.javafx: END 
-
-import javafx.collections.ObservableList;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.util.Callback;
+//com.sun.javafx: END
 
 /**
 * Extra calls for TableView which would have been nice to see in JavaFx TableView

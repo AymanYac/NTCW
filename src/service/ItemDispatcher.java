@@ -1,16 +1,12 @@
 package service;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-
 import model.GlobalConstants;
 import model.ItemDispatcherRow;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
+
+import java.sql.*;
+import java.util.ArrayList;
 
 public class ItemDispatcher {
 

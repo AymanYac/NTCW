@@ -1,18 +1,16 @@
 package model;
 
+import com.fathzer.soft.javaluator.DoubleEvaluator;
+import controllers.Char_description;
+import org.apache.commons.lang.StringUtils;
+import service.TranslationServices;
+import transversal.language_toolbox.Unidecode;
+import transversal.language_toolbox.WordUtils;
+
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
-
-import com.fathzer.soft.javaluator.DoubleEvaluator;
-
-import controllers.Char_description;
-import service.TranslationServices;
-import transversal.language_toolbox.Unidecode;
-import transversal.language_toolbox.WordUtils;
 
 public class CharRuleResult {
 

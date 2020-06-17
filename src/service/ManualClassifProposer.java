@@ -1,17 +1,5 @@
 package service;
 
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.stream.Collectors;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import controllers.Manual_classif;
 import javafx.scene.control.Button;
 import model.GlobalConstants;
@@ -19,6 +7,13 @@ import model.ItemFetcherRow;
 import model.ManualClassProposition;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ManualClassifProposer {
 

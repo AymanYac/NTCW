@@ -1,5 +1,14 @@
 package transversal.data_exchange_toolbox;
 
+import com.monitorjbl.xlsx.StreamingReader;
+import model.*;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import service.CharValuesLoader;
+import service.TranslationServices;
+import transversal.generic.Tools;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,21 +20,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-
-import com.monitorjbl.xlsx.StreamingReader;
-
-import model.CharDescriptionRow;
-import model.ClassCaracteristic;
-import model.ClassSegment;
-import model.DataInputMethods;
-import model.UserAccount;
-import service.CharValuesLoader;
-import service.TranslationServices;
-import transversal.generic.Tools;
 
 public class CharDescriptionImportServices {
 

@@ -1,5 +1,7 @@
 package transversal.language_toolbox;
 
+import transversal.dialog_toolbox.ExceptionDialog;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,8 +10,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import transversal.dialog_toolbox.ExceptionDialog;
 
 import static java.lang.String.format;
 

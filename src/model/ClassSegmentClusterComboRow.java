@@ -2,7 +2,6 @@ package model;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.util.Pair;
-import transversal.generic.Tools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ public class ClassSegmentClusterComboRow {
             rowSegments = new ArrayList<Pair<ClassSegment,SimpleBooleanProperty>>();
             rowSegments.add(new Pair<ClassSegment,SimpleBooleanProperty>(itemSegment,new SimpleBooleanProperty(true)));
         }else{
-            rowLabel = itemSegment.getLevelName(lvl);
+            rowLabel = itemSegment.getLevelNumber(lvl)+" - "+itemSegment.getLevelName(lvl);
             rowSegments = projectSegments.values().stream().filter(s -> s.getLevelNumber(lvl).equals(itemSegment.getLevelNumber(lvl))).map(s ->new Pair<ClassSegment,SimpleBooleanProperty>(s,new SimpleBooleanProperty(true))).collect(Collectors.toCollection(ArrayList::new));
         }
 
@@ -35,6 +34,11 @@ public class ClassSegmentClusterComboRow {
         ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> templateMappedSegments = templateMaps.get(selectedEntry.getValue().getTemplateSignature()).stream().map(s -> new Pair<ClassSegment, SimpleBooleanProperty>(s, new SimpleBooleanProperty(true))).collect(Collectors.toCollection(ArrayList::new));
         rowSegments = templateMappedSegments;
         rowLabel = "This class"+(templateMappedSegments.size()>1?" and "+String.valueOf(templateMappedSegments.size()-1)+" other category(ies)":"");
+    }
+
+    public ClassSegmentClusterComboRow(String label, ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> rowSegments) {
+        this.rowLabel = label;
+        this.rowSegments = rowSegments;
     }
 
     @Override

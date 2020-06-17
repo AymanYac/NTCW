@@ -1,7 +1,5 @@
 package model;
 
-import java.util.ArrayList;
-
 import controllers.Char_description;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -13,6 +11,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 import javafx.scene.text.TextFlow;
+
+import java.util.ArrayList;
 
 public class CharPaneRow {
 
@@ -63,6 +63,7 @@ public class CharPaneRow {
 	public int getChar_sequence() {
 		return carac.getSequence();
 	}
+	public String getChar_name_complete(){ return carac.getCharacteristic_name()+" ("+carac.getCharacteristic_name_translated()+")"; }
 	public String getChar_name() {
 		return carac.getCharacteristic_name();
 	}

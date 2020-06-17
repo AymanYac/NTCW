@@ -1,11 +1,11 @@
 package model;
 
+import javafx.util.Pair;
+import transversal.language_toolbox.Unidecode;
+
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javafx.util.Pair;
-import transversal.language_toolbox.Unidecode;
 
 public class CharValueTextSuggestion {
 	

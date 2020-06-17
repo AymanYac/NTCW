@@ -1,11 +1,10 @@
 package transversal.generic;
 
-import java.util.*;
-
 import model.GlobalConstants;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 /**
  * Some more useful math functions for image processing.

@@ -1,9 +1,9 @@
 package service;
 
+import model.GlobalConstants;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import model.GlobalConstants;
 
 public class DownloadSegmenter {
 	

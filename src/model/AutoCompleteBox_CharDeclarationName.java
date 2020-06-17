@@ -1,11 +1,5 @@
 package model;
 
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -16,9 +10,12 @@ import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.text.Font;
 import javafx.util.Pair;
 import org.apache.commons.lang.StringUtils;
+import transversal.dialog_toolbox.CaracDeclarationDialog;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AutoCompleteBox_CharDeclarationName extends TextField{
 
@@ -56,6 +53,7 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 		          final List<Pair<ClassSegment,ClassCaracteristic>> filteredEntries = entries.stream().filter(e -> StringUtils.containsIgnoreCase(e.getValue().getCharacteristic_name(),getText()))
 		        		  .collect(Collectors.toList());
 		          searchResult.addAll(filteredEntries);
+		          searchResult.add(null);
 		          //searchResult.addAll(entries.subSet(getText(), getText() + Character.MAX_VALUE));
 		          if (entries.size() > 0)
 		          {
@@ -64,9 +62,19 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 
 						@Override
 						public int compare(Object o1, Object o2) {
+							if(o1!=null){
+								if(o2!=null){
+									int ret = ((Pair<ClassSegment, ClassCaracteristic>) o1).getValue().getCharacteristic_name().compareTo(
+											((Pair<ClassSegment, ClassCaracteristic>) o2).getValue().getCharacteristic_name());
 
-							return (((Pair<ClassSegment, ClassCaracteristic>) o1).getValue().getCharacteristic_name().compareTo(
-									((Pair<ClassSegment, ClassCaracteristic>) o2).getValue().getCharacteristic_name()));
+									int av_1 =  StringUtils.startsWithIgnoreCase(((Pair<ClassSegment, ClassCaracteristic>) o1).getValue().getCharacteristic_name(), getText())?1000000:0;
+									int av_2 =  StringUtils.startsWithIgnoreCase(((Pair<ClassSegment, ClassCaracteristic>) o2).getValue().getCharacteristic_name(), getText())?1000000:0;
+
+									return ret - av_1 + av_2;
+								}
+								return Integer.MAX_VALUE;
+							}
+							return Integer.MIN_VALUE;
 						}
 		                 
 		        		});
@@ -127,8 +135,11 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 		    for (int i = 0; i < count; i++)
 		    {
 		      final Pair<ClassSegment,ClassCaracteristic> result = searchResult.get(i);
-		      boolean caracHasOnlyOneTemplate = entries.stream().filter(p -> p.getValue().getCharacteristic_id().equals(result.getValue().getCharacteristic_id())).count()==1;
-		      Label entryLabel = new Label(result.getValue().getCharacteristic_name()+(caracHasOnlyOneTemplate?"":" (e.g. "+result.getKey().getClassName()+")"));
+		      Label entryLabel = new Label(getText()+" (new...)");
+		      if(result!=null){
+				  boolean caracHasOnlyOneTemplate = entries.stream().filter(p -> p.getValue().getCharacteristic_id().equals(result.getValue().getCharacteristic_id())).count()==1;
+				  entryLabel = new Label(result.getValue().getCharacteristic_name()+(caracHasOnlyOneTemplate && count > 2?"":" (e.g. "+result.getKey().getClassName()+")"));
+			  }
 		      CustomMenuItem item = new CustomMenuItem(entryLabel, true);
 		      item.setOnAction(new EventHandler<ActionEvent>()
 		      {
@@ -146,12 +157,18 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 		  }
 
 	public void processSelectedCarac(Pair<ClassSegment, ClassCaracteristic> result) {
-		boolean caracHasOnlyOneTemplate = entries.stream().filter(p -> p.getValue().getCharacteristic_id().equals(result.getValue().getCharacteristic_id())).count()==1;
-		setText(result.getValue().getCharacteristic_name()+(caracHasOnlyOneTemplate?"":" (e.g. "+result.getKey().getClassName()+")"));
-		this.selectedEntry = result;
-		incompleteProperty.setValue(false);
-		entriesPopup.hide();
+		if(result!=null){
+			boolean caracHasOnlyOneTemplate = entries.stream().filter(p -> p.getValue().getCharacteristic_id().equals(result.getValue().getCharacteristic_id())).count()==1;
+			setText(result.getValue().getCharacteristic_name()+(caracHasOnlyOneTemplate?"":" (e.g. "+result.getKey().getClassName()+")"));
+			this.selectedEntry = result;
+			incompleteProperty.setValue(false);
+			entriesPopup.hide();
 
+		}else{
+			incompleteProperty.setValue(true);
+			entriesPopup.hide();
+		}
+		CaracDeclarationDialog.skipToNextField(this);
 	}
 
 

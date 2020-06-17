@@ -1,16 +1,13 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.IntStream;
-
-import org.apache.commons.lang.StringUtils;
-
 import controllers.Char_description;
+import org.apache.commons.lang.StringUtils;
+import service.CharValuesLoader;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CharDescriptionRow {
 
@@ -292,5 +289,9 @@ public class CharDescriptionRow {
 		}
 
 
-
+    public boolean hasDataInCurrentClassForCarac(String characteristic_id) {
+			String itemClass = getClass_segment_string().split("&&&")[0];
+			int itemDataIdx = CharValuesLoader.active_characteristics.get(itemClass).stream().map(c -> c.getCharacteristic_id()).collect(Collectors.toCollection(ArrayList::new)).indexOf(characteristic_id);
+			return (itemDataIdx!=-1 && getData(itemClass)[itemDataIdx]!=null);
+    }
 }

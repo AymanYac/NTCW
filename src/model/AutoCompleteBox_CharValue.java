@@ -1,15 +1,5 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -25,6 +15,9 @@ import javafx.scene.input.KeyCode;
 import service.TranslationServices;
 import transversal.dialog_toolbox.ValueTranslationDisambiguation;
 import transversal.language_toolbox.Unidecode;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AutoCompleteBox_CharValue {
 	

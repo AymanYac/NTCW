@@ -1,7 +1,6 @@
 package transversal.generic;
 
 import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;

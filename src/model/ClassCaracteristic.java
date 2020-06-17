@@ -1,9 +1,9 @@
 package model;
 
+import javafx.util.Pair;
+
 import java.util.*;
 import java.util.stream.Collectors;
-
-import javafx.util.Pair;
 
 public class ClassCaracteristic {
 	//Char fields
@@ -160,5 +160,23 @@ public class ClassCaracteristic {
 		}
 		return ret;
 	}
-	
+
+    public ClassCaracteristic shallowCopy() {
+		ClassCaracteristic tmp = new ClassCaracteristic();
+		tmp.setCharacteristic_id(this.getCharacteristic_id());
+		tmp.setCharacteristic_name(this.getCharacteristic_name());
+		tmp.setCharacteristic_name_translated(this.getCharacteristic_name_translated());
+		tmp.setIsNumeric(this.getIsNumeric());
+		tmp.setIsTranslatable(this.getIsTranslatable());
+		tmp.setSequence(this.getSequence());
+		tmp.setIsCritical(this.getIsCritical());
+		if(this.getAllowedValues()!=null){
+			tmp.setAllowedValues((ArrayList<String>) this.getAllowedValues().clone());
+		}
+		if(this.getAllowedUoms()!=null){
+			tmp.setAllowedUoms((ArrayList<String>) this.getAllowedUoms().clone());
+		}
+		tmp.setIsActive(this.getIsActive());
+		return tmp;
+    }
 }

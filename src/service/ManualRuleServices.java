@@ -1,28 +1,18 @@
 package service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import controllers.Manual_classif;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.scene.control.MenuItem;
-import model.DataInputMethods;
-import model.GenericClassRule;
-import model.ItemFetcherRow;
-import model.RulePaneRow;
-import model.UserAccount;
+import model.*;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ManualRuleServices {
 

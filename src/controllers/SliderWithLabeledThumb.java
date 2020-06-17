@@ -2,10 +2,13 @@ package controllers;
 
 
 import javafx.application.Application;
-import javafx.geometry.*;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class SliderWithLabeledThumb extends Application {
@@ -35,7 +38,7 @@ public class SliderWithLabeledThumb extends Application {
         s.layout();
         Pane p = (Pane) s.lookup(".thumb");
         Label l = new Label();
-        l.textProperty().bind(s.valueProperty().asString("%.1f").concat(" °"));
+        l.textProperty().bind(s.valueProperty().asString("%.1f").concat(" ï¿½"));
         l.translateYProperty().set(-20);
         p.getChildren().add(l);
 
