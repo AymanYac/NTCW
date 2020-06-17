@@ -10,14 +10,10 @@ import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.util.Pair;
+import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -72,7 +68,12 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
             selectedUom=null;
             incompleteProperty.setValue(true);
           LinkedList<UnitOfMeasure> searchResult = new LinkedList<>();
-          final List<UnitOfMeasure> filteredEntries = entries.stream().filter(e -> ( populateSearchMethod.equals("NAME") && e.getUom_name().contains(getText()) )||( populateSearchMethod.equals("SYMBOL") && e.HasPartialUomSymbol(getText()) ))
+          final List<UnitOfMeasure> filteredEntries = entries.stream().filter(e ->
+                  (populateSearchMethod.equals("NAME") && e.getUom_name().contains(getText()) )
+                  ||( populateSearchMethod.equals("SYMBOL") && e.HasPartialUomSymbol(getText()) )
+                  ||( populateSearchMethod.equals("NAME_AND_SYMBOL") && (e.getUom_name().contains(getText()) || e.HasPartialUomSymbol(getText())) )
+
+          )
         		  .collect(Collectors.toList());
           searchResult.addAll(filteredEntries);
           //searchResult.addAll(entries.subSet(getText(), getText() + Character.MAX_VALUE));
@@ -87,8 +88,10 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
 							((UnitOfMeasure)o1).getUom_name().compareTo(
 							((UnitOfMeasure)o2).getUom_name())
 							));
-					
-        	  		return ret ;
+                  int av_1 =  ((UnitOfMeasure) o1).HasPartialUomSymbol(getText())?1000000:0;
+                  int av_2 =  ((UnitOfMeasure) o2).HasPartialUomSymbol(getText())?1000000:0;
+
+                  return ret - av_1 + av_2;
 				}
                  
         		});

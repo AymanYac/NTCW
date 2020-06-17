@@ -1,18 +1,5 @@
 package transversal.data_exchange_toolbox;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import controllers.Auto_classification_launch;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -26,6 +13,15 @@ import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
 import transversal.language_toolbox.SpellCorrector;
 import transversal.language_toolbox.WordUtils;
+
+import java.io.IOException;
+import java.sql.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class AutoClassificationBenchmark {
 	

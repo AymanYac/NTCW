@@ -1,8 +1,9 @@
 package model;
 
+import transversal.generic.Tools;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import transversal.generic.Tools;
 
 public class ProjectTemplate {
 	

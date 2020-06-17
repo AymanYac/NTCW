@@ -1,9 +1,9 @@
 package service;
 
+import model.TimeMasterTemplateRow;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import model.TimeMasterTemplateRow;
 
 public class TimeMasterTemplate {
 	//Array of <TimeMasterTemplateRow> stores for every row in the classification progress screen,

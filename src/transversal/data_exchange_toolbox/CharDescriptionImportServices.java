@@ -1,5 +1,14 @@
 package transversal.data_exchange_toolbox;
 
+import com.monitorjbl.xlsx.StreamingReader;
+import model.*;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import service.CharValuesLoader;
+import service.TranslationServices;
+import transversal.generic.Tools;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,21 +20,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-
-import com.monitorjbl.xlsx.StreamingReader;
-
-import model.CharDescriptionRow;
-import model.ClassCaracteristic;
-import model.ClassSegment;
-import model.DataInputMethods;
-import model.UserAccount;
-import service.CharValuesLoader;
-import service.TranslationServices;
-import transversal.generic.Tools;
 
 public class CharDescriptionImportServices {
 
@@ -167,7 +161,7 @@ public class CharDescriptionImportServices {
 
 
 	private static void storeDefaultValues(UserAccount account) {
-		CharDescriptionExportServices.flushDefaultCaracDataToDB(account,active_project);
+		CharDescriptionExportServices.flushCaracDefaultValuesToDB(account,active_project);
 	}
 
 	private static void printRejectedItemRows() {
@@ -247,11 +241,8 @@ public class CharDescriptionImportServices {
 	}
 
 	private static void storeTaxo() throws SQLException, ClassNotFoundException {
-		Connection conn = Tools.spawn_connection();
-		stmt = conn.prepareStatement("delete from "+active_project+".project_segments");
-		stmt.execute();
-		stmt.close();
-		
+
+
 		String tmp_insertColumns = "segment_id, ";
   	    String tmp_preparedStatementClause = "?, ";
   	    for(int i = 0; i < CharDescriptionImportServices.projectGranularity; i++){
@@ -262,8 +253,8 @@ public class CharDescriptionImportServices {
   	        tmp_preparedStatementClause += ", ";
   	      }
   	    }
-  	    
-  	    stmt = conn.prepareStatement("delete from "+active_project+".project_segments");
+		Connection conn = Tools.spawn_connection();
+		stmt = conn.prepareStatement("delete from "+active_project+".project_segments");
 		stmt.execute();
 		stmt.close();
 		stmt = conn.prepareStatement(String.format("Insert into "+active_project+".project_segments"+"(%s) values(%s)" , tmp_insertColumns, tmp_preparedStatementClause));

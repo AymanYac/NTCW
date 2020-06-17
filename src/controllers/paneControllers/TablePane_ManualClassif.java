@@ -1,18 +1,5 @@
 package controllers.paneControllers;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.json.simple.parser.ParseException;
-
 import controllers.Manual_classif;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -32,21 +19,22 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Screen;
-import model.GlobalConstants;
-import model.DataInputMethods;
-import model.ItemFetcherRow;
-import model.ManualClassProposition;
-import model.ObservableDeque;
-import model.UserAccount;
-import service.ItemFetcher;
-import service.ManualAdvancementUpdater;
-import service.ManualClassifContext;
-import service.ManualClassifProposer;
-import service.ManualRuleServices;
-import service.TableViewExtra;
-import service.TranslationServices;
+import model.*;
+import org.json.simple.parser.ParseException;
+import service.*;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class TablePane_ManualClassif {
 	

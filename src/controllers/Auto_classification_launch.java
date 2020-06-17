@@ -1,18 +1,5 @@
 package controllers;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
-
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
@@ -29,31 +16,28 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import model.GlobalConstants;
-import model.AbaqueRow;
-import model.BinaryClassificationParameters;
-import model.Project;
-import model.RuleSet;
-import model.UserAccount;
+import model.*;
 import service.ConcurentTask;
 import service.TimeMasterTemplate;
 import transversal.data_exchange_toolbox.AutoClassificationBenchmark;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Auto_classification_launch {
 

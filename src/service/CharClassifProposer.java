@@ -1,15 +1,16 @@
 package service;
 
-import java.util.HashMap;
 import controllers.Char_description;
 import javafx.scene.control.Button;
 import javafx.util.Pair;
-import model.CharDescriptionRow;
 import model.CaracteristicValue;
+import model.CharDescriptionRow;
 import model.ClassCaracteristic;
 import model.UnitOfMeasure;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.UoMDeclarationDialog;
+
+import java.util.HashMap;
 
 public class CharClassifProposer {
 

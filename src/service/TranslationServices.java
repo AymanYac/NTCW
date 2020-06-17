@@ -1,5 +1,13 @@
 package service;
 
+import controllers.Char_description;
+import model.CaracteristicValue;
+import model.CharValueTextSuggestion;
+import model.ClassCaracteristic;
+import model.GlobalConstants;
+import org.apache.commons.lang.StringEscapeUtils;
+import transversal.language_toolbox.Unidecode;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,15 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang.StringEscapeUtils;
-
-import controllers.Char_description;
-import model.CharValueTextSuggestion;
-import model.CaracteristicValue;
-import model.ClassCaracteristic;
-import model.GlobalConstants;
-import transversal.language_toolbox.Unidecode;
 
 public class TranslationServices {
 	

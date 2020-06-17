@@ -1,17 +1,16 @@
 package model;
 
+import javafx.application.Platform;
+import javafx.scene.control.Label;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+import service.ConcurentTask;
+import service.DownloadSegmenter;
+import transversal.generic.Tools;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Queue;
-
-import org.apache.commons.collections4.queue.CircularFifoQueue;
-
-import javafx.application.Platform;
-import javafx.scene.control.Label;
-import service.ConcurentTask;
-import service.DownloadSegmenter;
-import transversal.generic.Tools;
 
 public class TimeMasterRow {
 	

@@ -1,28 +1,5 @@
 package controllers;
 
-import java.awt.Desktop;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -43,9 +20,30 @@ import model.GlobalConstants;
 import model.ImageResult;
 import model.ItemDispatcherRow;
 import model.UserAccount;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import service.ItemDispatcher;
 import service.TranslationServices;
 import transversal.generic.Tools;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Rule_definition {
 
@@ -235,13 +233,13 @@ public class Rule_definition {
 		 * Large images: tbs=isz:l
 			Medium images: tbs=isz:m
 			Icon sized images: tba=isz:i
-			Image size larger than 400×300: tbs=isz:lt,islt:qsvga
-			Image size larger than 640×480: tbs=isz:lt,islt:vga
-			Image size larger than 800×600: tbs=isz:lt,islt:svga
-			Image size larger than 1024×768: tbs=isz:lt,islt:xga
-			Image size larger than 1600×1200: tbs=isz:lt,islt:2mp
-			Image size larger than 2272×1704: tbs=isz:lt,islt:4mp
-			Image sized exactly 1000×1000: tbs=isz:ex,iszw:1000,iszh:1000
+			Image size larger than 400ï¿½300: tbs=isz:lt,islt:qsvga
+			Image size larger than 640ï¿½480: tbs=isz:lt,islt:vga
+			Image size larger than 800ï¿½600: tbs=isz:lt,islt:svga
+			Image size larger than 1024ï¿½768: tbs=isz:lt,islt:xga
+			Image size larger than 1600ï¿½1200: tbs=isz:lt,islt:2mp
+			Image size larger than 2272ï¿½1704: tbs=isz:lt,islt:4mp
+			Image sized exactly 1000ï¿½1000: tbs=isz:ex,iszw:1000,iszh:1000
 			 Images in full color: tbs=ic:color
 			Images in black and white: tbs=ic:gray
 			Images that are red: tbs=ic:specific,isc:red [orange, yellow, green, teal, blue, purple, pink, white, gray, black, brown]

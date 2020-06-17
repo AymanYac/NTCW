@@ -2,11 +2,12 @@ package model;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.util.Pair;
-import transversal.generic.Tools;
+import service.CharValuesLoader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ClassSegmentClusterComboRow {
@@ -20,7 +21,7 @@ public class ClassSegmentClusterComboRow {
             rowSegments = new ArrayList<Pair<ClassSegment,SimpleBooleanProperty>>();
             rowSegments.add(new Pair<ClassSegment,SimpleBooleanProperty>(itemSegment,new SimpleBooleanProperty(true)));
         }else{
-            rowLabel = itemSegment.getLevelName(lvl);
+            rowLabel = itemSegment.getLevelNumber(lvl)+" - "+itemSegment.getLevelName(lvl);
             rowSegments = projectSegments.values().stream().filter(s -> s.getLevelNumber(lvl).equals(itemSegment.getLevelNumber(lvl))).map(s ->new Pair<ClassSegment,SimpleBooleanProperty>(s,new SimpleBooleanProperty(true))).collect(Collectors.toCollection(ArrayList::new));
         }
 
@@ -31,10 +32,19 @@ public class ClassSegmentClusterComboRow {
         rowSegments = new ArrayList<>(projectSegments.values().stream().map(s->new Pair<ClassSegment,SimpleBooleanProperty>(s,new SimpleBooleanProperty(true))).collect(Collectors.toCollection(ArrayList::new)));
     }
 
-    public ClassSegmentClusterComboRow(HashMap<String, HashSet<ClassSegment>> templateMaps, Pair<ClassSegment, ClassCaracteristic> selectedEntry) {
-        ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> templateMappedSegments = templateMaps.get(selectedEntry.getValue().getTemplateSignature()).stream().map(s -> new Pair<ClassSegment, SimpleBooleanProperty>(s, new SimpleBooleanProperty(true))).collect(Collectors.toCollection(ArrayList::new));
+    public ClassSegmentClusterComboRow(HashMap<String, ClassSegment> sid2Segment, Pair<ClassSegment, ClassCaracteristic> selectedEntry,String templateCriterion) {
+        ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> templateMappedSegments = CharValuesLoader.active_characteristics.entrySet().stream()
+                .filter(e->e.getValue().stream().map(ClassCaracteristic::getCharacteristic_id).collect(Collectors.toCollection(ArrayList::new))
+                        .contains(selectedEntry.getValue().getCharacteristic_id())).map(Map.Entry::getKey)
+                        .collect(Collectors.toCollection(HashSet::new)).stream().map(sid2Segment::get)
+                .map(s -> new Pair<ClassSegment, SimpleBooleanProperty>(s, new SimpleBooleanProperty(true))).collect(Collectors.toCollection(ArrayList::new));
         rowSegments = templateMappedSegments;
         rowLabel = "This class"+(templateMappedSegments.size()>1?" and "+String.valueOf(templateMappedSegments.size()-1)+" other category(ies)":"");
+    }
+
+    public ClassSegmentClusterComboRow(String label, ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> rowSegments) {
+        this.rowLabel = label;
+        this.rowSegments = rowSegments;
     }
 
     @Override

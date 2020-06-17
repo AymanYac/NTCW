@@ -1,42 +1,30 @@
 package transversal.data_exchange_toolbox;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-
 import controllers.Char_description;
 import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
-import model.CharDescriptionRow;
-import model.CaracteristicValue;
-import model.ClassCaracteristic;
-import model.UnitOfMeasure;
-import model.UserAccount;
+import model.*;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import service.CharItemFetcher;
 import service.CharValuesLoader;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 
 public class CharDescriptionExportServices {
@@ -45,6 +33,11 @@ public class CharDescriptionExportServices {
 	private static int baseRowIdx;
 	public static ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>> itemDataBuffer = new ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>>();
 	public static ConcurrentLinkedQueue<Pair<CaracteristicValue,ClassCaracteristic>> caracDataBuffer = new ConcurrentLinkedQueue<Pair<CaracteristicValue,ClassCaracteristic>>();
+	public static ConcurrentLinkedQueue<Pair<ClassCaracteristic,ClassSegment>> caracDefBuffer = new ConcurrentLinkedQueue<Pair<ClassCaracteristic,ClassSegment>>();
+	public static ConcurrentLinkedQueue<Pair<ClassCaracteristic,String>> caracDeleteBuffer = new ConcurrentLinkedQueue<Pair<ClassCaracteristic,String>>();
+
+	private static PreparedStatement stmt;
+
 	public static void ExportItemDataForClass(String targetClass, Char_description parent) throws ClassNotFoundException, SQLException, IOException {
 		
 		File file = openExportFile(parent);
@@ -441,6 +434,104 @@ public class CharDescriptionExportServices {
 		Pair<String, Pair<CaracteristicValue,ClassCaracteristic>> queueItem = new Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>(row.getItem_id(),valCaracPair);
 		itemDataBuffer.add(queueItem);
 	}
+
+	public static void addCaracDefinitionToPush(ClassCaracteristic template,ClassSegment segment){
+		Pair<ClassCaracteristic,ClassSegment> carSegPair = new Pair<ClassCaracteristic,ClassSegment>(template,segment);
+		caracDefBuffer.add(carSegPair);
+	}
+	public static void addCaracDefinitionToDisable(ClassCaracteristic template,String segmentId){
+		Pair<ClassCaracteristic,String> carSegPair = new Pair<ClassCaracteristic,String>(template,segmentId);
+		caracDeleteBuffer.add(carSegPair);
+	}
+
+	public static void flushCaracDefinitionToDB(UserAccount account) throws SQLException, ClassNotFoundException {
+		Connection conn = Tools.spawn_connection();
+		stmt = conn.prepareStatement("insert into " + account.getActive_project() + ".project_characteristics values(?,?,?,?,?) on conflict(characteristic_id) do update set characteristic_name=excluded.characteristic_name, characteristic_name_translated=excluded.characteristic_name_translated, isNumeric=excluded.isNumeric, isTranslatable=excluded.isTranslatable");
+		//characteristic_id , characteristic_name , characteristic_name_translated , isNumeric , isTranslatable 
+		caracDefBuffer.stream().map(Pair::getKey).collect(Collectors.toCollection(HashSet::new)).forEach(car->{
+			try {
+				stmt.setString(1, car.getCharacteristic_id());
+				stmt.setString(2, car.getCharacteristic_name());
+				stmt.setString(3, car.getCharacteristic_name_translated());
+				stmt.setBoolean(4, car.getIsNumeric());
+				stmt.setBoolean(5, car.getIsTranslatable());
+				System.out.println(stmt.toString());
+				stmt.addBatch();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		});
+		stmt.executeBatch();
+		stmt.clearBatch();
+		stmt.close();
+
+		stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_characteristics_x_segments values(?,?,?,?,?,?,?) on conflict(characteristic_id,segment_id) do update set sequence=excluded.sequence, isCritical=excluded.isCritical, allowedValues=excluded.allowedValues, allowedUoMs=excluded.allowedUoMs, isActive=excluded.isActive");
+		//characteristic_id,segment_id,sequence,isCritical,allowedValues[],allowedUoMs[],isActive
+
+		caracDefBuffer.forEach(p->{
+				ClassCaracteristic template = p.getKey();
+				ClassSegment segment = p.getValue();
+				try {
+					stmt.setString(1, template.getCharacteristic_id());
+					stmt.setString(2, segment.getSegmentId());
+					stmt.setInt(3, template.getSequence());
+					stmt.setBoolean(4, template.getIsCritical());
+					stmt.setArray(5, null);
+					try{
+						stmt.setArray(6, conn.createArrayOf("VARCHAR", template.getAllowedUoms().toArray(new String[0])));
+					}catch(Exception V) {
+						stmt.setArray(6, null);
+					}
+					stmt.setBoolean(7, true);
+					System.out.println(stmt.toString());
+					stmt.addBatch();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			});
+		stmt.executeBatch();
+		stmt.clearBatch();
+		stmt.close();
+		conn.close();
+		caracDefBuffer.clear();
+	}
+
+	public static void flushCaracDeleteToDB(UserAccount account) throws SQLException, ClassNotFoundException {
+		Connection conn = Tools.spawn_connection();
+		stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_characteristics_x_segments values(?,?,?,?,?,?,?) on conflict(characteristic_id,segment_id) do update set isActive=excluded.isActive");
+		//characteristic_id,segment_id,sequence,isCritical,allowedValues[],allowedUoMs[],isActive
+
+		caracDeleteBuffer.forEach(p->{
+			ClassCaracteristic template = p.getKey();
+			String segmentID = p.getValue();
+			try {
+				stmt.setString(1, template.getCharacteristic_id());
+				stmt.setString(2, segmentID);
+				stmt.setInt(3, template.getSequence());
+				stmt.setBoolean(4, template.getIsCritical());
+				stmt.setArray(5, null);
+				try{
+					stmt.setArray(6, conn.createArrayOf("VARCHAR", template.getAllowedUoms().toArray(new String[0])));
+				}catch(Exception V) {
+					stmt.setArray(6, null);
+				}
+				stmt.setBoolean(7, false);
+				System.out.println(stmt.toString());
+				stmt.addBatch();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+		stmt.executeBatch();
+		stmt.clearBatch();
+		stmt.close();
+		conn.close();
+		caracDefBuffer.clear();
+	}
 	
 	public static void addCaracDefaultDataToPush(String segment, ClassCaracteristic carac, CaracteristicValue val) {
 		Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
@@ -509,7 +600,7 @@ public class CharDescriptionExportServices {
 			
 	}
 	
-	public static void flushDefaultCaracDataToDB(UserAccount account, String active_project) {
+	public static void flushCaracDefaultValuesToDB(UserAccount account, String active_project) {
 		if(caracDataBuffer.peek()!=null) {
 			Task<Void> dbFlushTask = new Task<Void>() {
 			    

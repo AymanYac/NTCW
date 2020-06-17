@@ -1,9 +1,9 @@
 package model;
 
+import javafx.util.Pair;
+
 import java.util.*;
 import java.util.stream.Collectors;
-
-import javafx.util.Pair;
 
 public class ClassCaracteristic {
 	//Char fields
@@ -134,16 +134,24 @@ public class ClassCaracteristic {
 	}
 
 
-	public String getTemplateSignature(){
-		return this.getCharacteristic_id()+"&&&"
+	public String
+	getTemplateSignature(String templateCriterion){
+		String ret="";
+		if(templateCriterion!=null && templateCriterion.equals("NAME")){
+			ret+=this.getCharacteristic_name()+"&&&";
+		}else{
+			ret+=this.getCharacteristic_id()+"&&&";
+		}
+		return 	ret
 				//+this.getSequence().toString()+"&&&"
 				+this.getIsCritical().toString()+"&&&"
 				+(getAllowedUoms()!=null?String.join("&&&",getAllowedUoms()):"");
 	}
 	
-	public boolean matchesTemplates(ArrayList<ClassCaracteristic> templates, ClassSegment currentMapInstance, HashMap<String,HashSet<ClassSegment>> templateMaps) {
+	public boolean matchesTemplates(ArrayList<ClassCaracteristic> templates, ClassSegment currentMapInstance, HashMap<String,HashSet<ClassSegment>> templateMaps , String templateCriterion) {
 		boolean ret =  templates.stream()
-				.filter(t->t.getCharacteristic_id().equals(this.getCharacteristic_id()))
+				.filter(t->templateCriterion.equals("NAME") || t.getCharacteristic_id().equals(this.getCharacteristic_id()))
+				.filter(t->t.getCharacteristic_name().equals(this.getCharacteristic_name()))
 				//.filter(t->t.getSequence().equals(this.getSequence()))
 				.filter(t->t.getIsCritical().equals(this.getIsCritical()))
 				.anyMatch(t->  ( t.getAllowedUoms()!=null && this.getAllowedUoms()!=null && t.getAllowedUoms().equals(this.allowedUoms) )
@@ -153,12 +161,30 @@ public class ClassCaracteristic {
 			templates.add(this);
 		}
 		try {
-			templateMaps.get(this.getTemplateSignature()).add(currentMapInstance);
+			templateMaps.get(this.getTemplateSignature(templateCriterion)).add(currentMapInstance);
 		}catch (Exception V){
-			templateMaps.put(this.getTemplateSignature(),new HashSet<ClassSegment>());
-			templateMaps.get(this.getTemplateSignature()).add(currentMapInstance);
+			templateMaps.put(this.getTemplateSignature(templateCriterion),new HashSet<ClassSegment>());
+			templateMaps.get(this.getTemplateSignature(templateCriterion)).add(currentMapInstance);
 		}
 		return ret;
 	}
-	
+
+    public ClassCaracteristic shallowCopy() {
+		ClassCaracteristic tmp = new ClassCaracteristic();
+		tmp.setCharacteristic_id(this.getCharacteristic_id());
+		tmp.setCharacteristic_name(this.getCharacteristic_name());
+		tmp.setCharacteristic_name_translated(this.getCharacteristic_name_translated());
+		tmp.setIsNumeric(this.getIsNumeric());
+		tmp.setIsTranslatable(this.getIsTranslatable());
+		tmp.setSequence(this.getSequence());
+		tmp.setIsCritical(this.getIsCritical());
+		if(this.getAllowedValues()!=null){
+			tmp.setAllowedValues((ArrayList<String>) this.getAllowedValues().clone());
+		}
+		if(this.getAllowedUoms()!=null){
+			tmp.setAllowedUoms((ArrayList<String>) this.getAllowedUoms().clone());
+		}
+		tmp.setIsActive(this.getIsActive());
+		return tmp;
+    }
 }

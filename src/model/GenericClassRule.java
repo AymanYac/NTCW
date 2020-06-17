@@ -1,17 +1,16 @@
 package model;
 
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import org.apache.commons.lang.StringUtils;
+import transversal.language_toolbox.Unidecode;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
-
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
-import transversal.language_toolbox.Unidecode;
 
 public class GenericClassRule {
 	

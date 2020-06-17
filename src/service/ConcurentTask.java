@@ -1,14 +1,5 @@
 package service;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.concurrent.TimeUnit;
-
 import controllers.Auto_classification_launch;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -17,6 +8,15 @@ import javafx.scene.control.TableView;
 import model.TimeMasterRow;
 import transversal.data_exchange_toolbox.SpeedMonitor;
 import transversal.generic.Tools;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
 
 public class ConcurentTask {
 

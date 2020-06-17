@@ -1,10 +1,10 @@
 package model;
 
+import transversal.language_toolbox.WordUtils;
+
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import transversal.language_toolbox.WordUtils;
 
 public class GenericCharRule {
 

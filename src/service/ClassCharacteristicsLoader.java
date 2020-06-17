@@ -1,13 +1,14 @@
 package service;
 
+import controllers.paneControllers.TablePane_CharClassif;
+import model.ClassCaracteristic;
+import transversal.generic.Tools;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import controllers.paneControllers.TablePane_CharClassif;
-import model.ClassCaracteristic;
-import transversal.generic.Tools;
 
 public class ClassCharacteristicsLoader {
 

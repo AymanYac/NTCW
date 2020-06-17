@@ -1,14 +1,14 @@
 package model;
 
+import javafx.scene.input.KeyCode;
+import transversal.generic.CustomKeyboardListener;
+import transversal.generic.Tools;
+
 import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import javafx.scene.input.KeyCode;
-import transversal.generic.CustomKeyboardListener;
-import transversal.generic.Tools;
 
 public class UserAccount {
 	String user_id;

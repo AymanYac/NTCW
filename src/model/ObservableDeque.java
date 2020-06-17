@@ -1,10 +1,10 @@
 package model;
 
+import javafx.collections.ObservableListBase;
+
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import javafx.collections.ObservableListBase;
 
 
 public class ObservableDeque<E> extends ObservableListBase<E> implements Deque<E> {

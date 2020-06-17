@@ -1,15 +1,15 @@
 package service;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import controllers.Manual_classif;
 import javafx.application.Platform;
 import model.UserAccount;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.generic.Tools;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ManualAdvancementUpdater {
 

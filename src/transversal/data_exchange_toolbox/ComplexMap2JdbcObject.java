@@ -1,16 +1,14 @@
 package transversal.data_exchange_toolbox;
 
+import com.google.gson.Gson;
+import model.UserAccount;
+import org.postgresql.util.PGobject;
+import transversal.generic.Tools;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
-
-import org.postgresql.util.PGobject;
-
-import com.google.gson.Gson;
-
-import model.UserAccount;
-import transversal.generic.Tools;
 
 public class ComplexMap2JdbcObject {
 

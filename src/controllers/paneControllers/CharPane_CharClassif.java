@@ -1,7 +1,4 @@
 package controllers.paneControllers;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
 
 import controllers.Char_description;
 import javafx.application.Platform;
@@ -16,6 +13,10 @@ import model.inputEventTableCell;
 import service.CharValuesLoader;
 import transversal.dialog_toolbox.CaracDeclarationDialog;
 import transversal.generic.Tools;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class CharPane_CharClassif {
 
@@ -73,7 +74,7 @@ public class CharPane_CharClassif {
 		this.parent = char_description;
 		this.tableGrid.getItems().addAll( this.paneRows);
 		critcalityColumn.setCellValueFactory(new PropertyValueFactory<>("Criticality"));
-		charNameColumn.setCellValueFactory(new PropertyValueFactory<String, CharPaneRow>("Char_name"));
+		charNameColumn.setCellValueFactory(new PropertyValueFactory<String, CharPaneRow>("Char_name_complete"));
 		//charNameColumn.setCellFactory(model.mouseHoverTableCell.forCharNameTranslation(this.tableGrid));
 		charNameColumn.setCellFactory(inputEventTableCell.forCharEdition(this.tableGrid,char_description));
 

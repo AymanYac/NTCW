@@ -33,7 +33,7 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
         table = tableGrid;
         return forCharEdition(new DefaultStringConverter(),parent);
     }
-    private static <S, T> Callback<TableColumn<S, T>, TableCell<S, T>> forCharEdition(final StringConverter<T> converter,Char_description parent) {
+    private static <S, T> Callback<TableColumn<S, T>, TableCell<S, T>> forCharEdition(final StringConverter<T> converter, Char_description parent) {
         return new Callback<TableColumn<S, T>, TableCell<S, T>>() {
             private static final String HOVERED_BUTTON_STYLE = "-fx-background-color:#212934; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#ACB9CA;";
             private static final String STANDARD_BUTTON_STYLE="-fx-background-color:#ACB9CA; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#212934;";
@@ -71,7 +71,7 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
                             ligne2.setOnMouseClicked(new EventHandler<MouseEvent>() {
                                 @Override
                                 public void handle(MouseEvent event) {
-                                    CaracDeclarationDialog.CaracDeletion(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac());
+                                    CaracDeclarationDialog.CaracDeletion(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0],parent.account);
                                     popup.hide();
                                     parent.refresh_ui_display();
                                 }

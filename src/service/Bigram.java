@@ -1,25 +1,15 @@
 package service;
 
-import java.util.regex.Pattern;
-
-import model.GlobalConstants;
 import model.BinaryClassificationParameters;
 import model.DescriptionFetchRow;
+import model.GlobalConstants;
 import transversal.language_toolbox.NgramParser;
 
-import java.util.regex.Matcher;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Bigram
 {

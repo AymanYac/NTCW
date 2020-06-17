@@ -1,20 +1,16 @@
 package model;
 
-import java.math.BigDecimal;
-import java.sql.Array;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.stream.Collectors;
-
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
+
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class UnitOfMeasure {
 	private String uom_id;
@@ -223,15 +219,18 @@ public class UnitOfMeasure {
 	
 	
 	public static boolean ConversionPathExists(UnitOfMeasure following_uom, ArrayList<String> allowedUoms) {
-		for(String allowed:allowedUoms) {
-			if(UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_base_id().equals(following_uom.getUom_base_id())
-					||
-					UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_id().equals(following_uom.getUom_base_id())
-					||
-					UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_base_id().equals(following_uom.getUom_id())
-					) {
-				return true;
+		if(allowedUoms!=null){
+			for(String allowed:allowedUoms) {
+				if(UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_base_id().equals(following_uom.getUom_base_id())
+						||
+						UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_id().equals(following_uom.getUom_base_id())
+						||
+						UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_base_id().equals(following_uom.getUom_id())
+				) {
+					return true;
+				}
 			}
+			return false;
 		}
 		return false;
 	}

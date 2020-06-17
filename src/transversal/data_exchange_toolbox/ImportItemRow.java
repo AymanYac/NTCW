@@ -1,24 +1,18 @@
 package transversal.data_exchange_toolbox;
 
+import javafx.util.Pair;
+import model.*;
+import org.apache.poi.ss.usermodel.Row;
+import service.TranslationServices;
+import transversal.generic.Tools;
+import transversal.language_toolbox.Unidecode;
+import transversal.language_toolbox.WordUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.apache.poi.ss.usermodel.Row;
-
-import javafx.util.Pair;
-import model.CaracteristicValue;
-import model.CharDescriptionRow;
-import model.ClassCaracteristic;
-import model.ClassSegment;
-import model.UnitOfMeasure;
-import model.UserAccount;
-import service.TranslationServices;
-import transversal.generic.Tools;
-import transversal.language_toolbox.Unidecode;
-import transversal.language_toolbox.WordUtils;
 
 public class ImportItemRow {
 

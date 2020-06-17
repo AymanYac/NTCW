@@ -1,21 +1,10 @@
 package controllers.paneControllers;
 
-import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import controllers.Manual_classif;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -28,6 +17,11 @@ import model.RulePaneRow;
 import service.ManualRuleServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
+
+import java.sql.SQLException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class RulePane_ManualClassif {
 

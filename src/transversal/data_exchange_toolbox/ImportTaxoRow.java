@@ -1,27 +1,17 @@
 package transversal.data_exchange_toolbox;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.apache.poi.ss.usermodel.Row;
-
 import javafx.util.Pair;
-import model.CaracteristicValue;
-import model.ClassCaracteristic;
-import model.ClassSegment;
-import model.DataInputMethods;
-import model.UnitOfMeasure;
-import model.UserAccount;
+import model.*;
+import org.apache.poi.ss.usermodel.Row;
 import service.TranslationServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
+
+import java.sql.SQLException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ImportTaxoRow {
 

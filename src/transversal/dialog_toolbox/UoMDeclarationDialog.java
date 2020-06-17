@@ -1,32 +1,20 @@
 package transversal.dialog_toolbox;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import model.AutoCompleteBox_UnitOfMeasure;
-import model.CaracteristicValue;
-import model.ClassCaracteristic;
-import model.UnitOfMeasure;
-import model.UomClassComboRow;
+import model.*;
 import service.CharClassifProposer;
 import transversal.generic.Tools;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 public class UoMDeclarationDialog {
 	
 	
@@ -86,20 +74,29 @@ public class UoMDeclarationDialog {
 		});
 
 		Optional<UnitOfMeasure> result = dialog.showAndWait();
-
-		result.ifPresent(newUom -> {
+		if(result.isPresent()){
+			UnitOfMeasure newUom = result.get();
 			UnitOfMeasure.storeNewUom(newUom);
 			uom_field.setText(newUom.toString());
 			uom_field.selectedUom = newUom;
 			uom_field.incompleteProperty.setValue(false);
-		});
+		}else{
+			uom_field.clear();
+			uom_field.selectedUom = null;
+			uom_field.incompleteProperty.setValue(true);
+		}
 
 
 
 	}
 
+	public static void UomDeclarationPopUpAfterFailedFieldValidation(String proposedUomSymbol,
+																	 AutoCompleteBox_UnitOfMeasure uom_field, ClassCaracteristic active_char) {
+		GenericUomDeclarationPopUpRestrictedConvertibility(proposedUomSymbol,uom_field,active_char);
 
-	public static void UomDeclarationPopUpAfterFailedFieldValidation(Char_description parent, String proposedUomSymbol,
+	}
+
+	public static void GenericUomDeclarationPopUpRestrictedConvertibility(String proposedUomSymbol,
 																	 AutoCompleteBox_UnitOfMeasure uom_field, ClassCaracteristic active_char) {
 		
 		proposedUomSymbol  = proposedUomSymbol.trim();
@@ -146,11 +143,17 @@ public class UoMDeclarationDialog {
 
 		Optional<UnitOfMeasure> result = dialog.showAndWait();
 
-		result.ifPresent(newUom -> {
+		if(result.isPresent()){
+			UnitOfMeasure newUom = result.get();
 			UnitOfMeasure.storeNewUom(newUom);
 			uom_field.setText(newUom.toString());
-		});
-		
+			uom_field.selectedUom = newUom;
+			uom_field.incompleteProperty.setValue(false);
+		}else{
+			uom_field.clear();
+			uom_field.selectedUom = null;
+			uom_field.incompleteProperty.setValue(true);
+		}
 		
 		
 	}
@@ -379,7 +382,7 @@ public class UoMDeclarationDialog {
 		grid.add(uomAlt, 1, 3);
 		GridPane.setColumnSpan(uomAlt, 3);
 		
-		sortUomChoiceList();
+		sortUomChoiceList(active_char!=null);
 		try{
 			selectUomInComboBoxByUomId(active_char.getAllowedUoms().get(0));
 		}catch (Exception V){
@@ -388,12 +391,14 @@ public class UoMDeclarationDialog {
 		check_name_and_symbol_in_alts(null);
 	}
 
-	private static void sortUomChoiceList() {
-		uomChoice.getItems().sorted(new Comparator<UomClassComboRow>(){
+	private static void sortUomChoiceList(boolean caracRestriction) {
+		uomChoice.getItems().sort(new Comparator<UomClassComboRow>(){
 
 			@Override
 			public int compare(UomClassComboRow arg0, UomClassComboRow arg1) {
-
+				if(!caracRestriction){
+					return arg0.getUnitOfMeasure().getUom_name().compareToIgnoreCase(arg1.getUnitOfMeasure().getUom_name());
+				}
 				int nonFamilyVal = arg0.getUnitOfMeasure().getUom_base_id().equals(CharUomFamily)?500:-500;
 				int ret = arg0.getUnitOfMeasure().getUom_name().compareToIgnoreCase(
 						arg1.getUnitOfMeasure().getUom_name())

@@ -1,15 +1,15 @@
 package transversal.data_exchange_toolbox;
 
+import model.DataInputMethods;
+import model.ItemFetcherRow;
+import transversal.generic.Tools;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import model.DataInputMethods;
-import model.ItemFetcherRow;
-import transversal.generic.Tools;
 
 public class QueryFormater {
 

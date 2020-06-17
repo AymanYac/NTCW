@@ -1,18 +1,5 @@
 package controllers.paneControllers;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import org.json.simple.parser.ParseException;
-
 import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -29,23 +16,20 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
-import model.AutoCompleteBox_CharValue;
-import model.CharDescriptionRow;
-import model.CaracteristicValue;
-import model.ClassCaracteristic;
-import model.DataInputMethods;
-import model.GlobalConstants;
-import model.UserAccount;
-import service.CharAdvancementUpdater;
-import service.CharItemFetcher;
-import service.CharValuesLoader;
-import service.ClassCharacteristicsLoader;
-import service.TableViewExtra;
-import service.TranslationServices;
+import model.*;
+import org.json.simple.parser.ParseException;
+import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class TablePane_CharClassif {
 	

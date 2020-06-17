@@ -1,10 +1,11 @@
 package transversal.language_toolbox;
 
+import service.ConfusionMatrixReader;
+import service.CorpusReader;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import service.ConfusionMatrixReader;
-import service.CorpusReader;
 
 public class SpellCorrector {
     final private CorpusReader cr;

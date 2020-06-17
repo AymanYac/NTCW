@@ -1,5 +1,6 @@
 package model;
 
+import controllers.Manual_classif;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -14,19 +15,10 @@ import javafx.scene.input.KeyEvent;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.awt.*;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import controllers.Manual_classif;
 
 
 public class AutoCompleteBox_ManualClassification extends TextField

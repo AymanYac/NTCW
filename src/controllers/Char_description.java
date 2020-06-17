@@ -1,23 +1,5 @@
 package controllers;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.json.simple.parser.ParseException;
-
 import controllers.paneControllers.Browser_CharClassif;
 import controllers.paneControllers.CharPane_CharClassif;
 import controllers.paneControllers.ImagePane_CharClassif;
@@ -32,42 +14,38 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextFlow;
 import javafx.util.Pair;
-import model.GlobalConstants;
-import model.UnitOfMeasure;
-import model.AutoCompleteBox_CharClassification;
-import model.AutoCompleteBox_CharValue;
-import model.AutoCompleteBox_UnitOfMeasure;
-import model.CharDescClassComboRow;
-import model.CharDescriptionRow;
-import model.CaracteristicValue;
-import model.ClassCaracteristic;
-import model.DataInputMethods;
-import model.UserAccount;
-import service.CharClassifProposer;
-import service.CharItemFetcher;
-import service.CharPatternServices;
-import service.CharValuesLoader;
-import service.TranslationServices;
+import model.*;
+import org.json.simple.parser.ParseException;
+import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.UoMDeclarationDialog;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
+
+import java.awt.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Char_description {
 
@@ -871,7 +849,7 @@ public class Char_description {
 						return false;
 					}
 					if(hasFinishingText) {
-						UoMDeclarationDialog.UomDeclarationPopUpAfterFailedFieldValidation(this, finishingText, uom_field, active_char);
+						UoMDeclarationDialog.UomDeclarationPopUpAfterFailedFieldValidation(finishingText, uom_field, active_char);
 					}
 					return false;
 				}
@@ -885,7 +863,7 @@ public class Char_description {
 						return false;
 					}
 					if(hasFinishingText) {
-						UoMDeclarationDialog.UomDeclarationPopUpAfterFailedFieldValidation(this, finishingText, uom_field, active_char);
+						UoMDeclarationDialog.UomDeclarationPopUpAfterFailedFieldValidation(finishingText, uom_field, active_char);
 					}
 					return false;
 				}

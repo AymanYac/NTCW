@@ -1,9 +1,5 @@
 package controllers;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
@@ -17,6 +13,10 @@ import model.GlobalConstants;
 import model.UserAccount;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class Front_page {
 

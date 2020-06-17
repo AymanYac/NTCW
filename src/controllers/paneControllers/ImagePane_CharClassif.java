@@ -1,23 +1,5 @@
 package controllers.paneControllers;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import controllers.Char_description;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
@@ -26,16 +8,26 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import model.ImageResult;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import service.BoxBlurFilter;
 import transversal.generic.PixelUtils;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 	public class ImagePane_CharClassif {
 		@FXML GridPane imageList;
@@ -418,13 +410,13 @@ import transversal.generic.PixelUtils;
 		 * Large images: tbs=isz:l
 			Medium images: tbs=isz:m
 			Icon sized images: tba=isz:i
-			Image size larger than 400×300: tbs=isz:lt,islt:qsvga
-			Image size larger than 640×480: tbs=isz:lt,islt:vga
-			Image size larger than 800×600: tbs=isz:lt,islt:svga
-			Image size larger than 1024×768: tbs=isz:lt,islt:xga
-			Image size larger than 1600×1200: tbs=isz:lt,islt:2mp
-			Image size larger than 2272×1704: tbs=isz:lt,islt:4mp
-			Image sized exactly 1000×1000: tbs=isz:ex,iszw:1000,iszh:1000
+			Image size larger than 400ï¿½300: tbs=isz:lt,islt:qsvga
+			Image size larger than 640ï¿½480: tbs=isz:lt,islt:vga
+			Image size larger than 800ï¿½600: tbs=isz:lt,islt:svga
+			Image size larger than 1024ï¿½768: tbs=isz:lt,islt:xga
+			Image size larger than 1600ï¿½1200: tbs=isz:lt,islt:2mp
+			Image size larger than 2272ï¿½1704: tbs=isz:lt,islt:4mp
+			Image sized exactly 1000ï¿½1000: tbs=isz:ex,iszw:1000,iszh:1000
 			 Images in full color: tbs=ic:color
 			Images in black and white: tbs=ic:gray
 			Images that are red: tbs=ic:specific,isc:red [orange, yellow, green, teal, blue, purple, pink, white, gray, black, brown]

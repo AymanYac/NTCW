@@ -1,5 +1,13 @@
 package service;
 
+import controllers.paneControllers.TablePane_CharClassif;
+import javafx.util.Pair;
+import model.CaracteristicValue;
+import model.CharDescriptionRow;
+import model.ClassCaracteristic;
+import model.GlobalConstants;
+import transversal.generic.Tools;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,14 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import controllers.paneControllers.TablePane_CharClassif;
-import javafx.util.Pair;
-import model.CaracteristicValue;
-import model.CharDescriptionRow;
-import model.ClassCaracteristic;
-import model.GlobalConstants;
-import transversal.generic.Tools;
 
 public class CharItemFetcher {
 	

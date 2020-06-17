@@ -1,15 +1,14 @@
 package service;
 
+import com.impossibl.postgres.api.jdbc.PGConnection;
+import com.impossibl.postgres.api.jdbc.PGNotificationListener;
+import com.impossibl.postgres.jdbc.PGDataSource;
+import transversal.generic.Tools;
+
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
- 
-import com.impossibl.postgres.api.jdbc.PGConnection;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
-import com.impossibl.postgres.jdbc.PGDataSource;
-
-import transversal.generic.Tools;
  
 /**
 * This program uses the pgjdbc_ng driver which has an asynchronous

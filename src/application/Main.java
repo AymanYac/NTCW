@@ -1,13 +1,13 @@
 package application;
-	
+
 import javafx.application.Application;
-import javafx.stage.Stage;
-import model.GlobalConstants;
-import transversal.dialog_toolbox.ExceptionDialog;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
-import javafx.fxml.FXMLLoader;
+import javafx.stage.Stage;
+import model.GlobalConstants;
+import transversal.dialog_toolbox.ExceptionDialog;
 
 public class Main extends Application {
 	@Override
