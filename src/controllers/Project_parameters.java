@@ -25,6 +25,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.*;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import service.ItemFetcher;
 import service.ManualRuleServices;
 import transversal.data_exchange_toolbox.CharDescriptionImportServices;
@@ -2744,7 +2745,7 @@ public class Project_parameters {
 		if(GlobalConstants.USE_TAXOIMPORT_NEW_SCHEMA) {
 			try {
 				CharDescriptionImportServices.upsertTaxoAndChar(taxoFile.getText(),"TAXO","ITEMS",this.prj.getPid(),Integer.parseInt(classificationLevels.getValue()),account);
-			} catch (FileNotFoundException | ClassNotFoundException e) {
+			} catch (ClassNotFoundException | IOException | InvalidFormatException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

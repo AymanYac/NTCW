@@ -284,5 +284,21 @@ public class UnitOfMeasure {
 	}
 	public static void storeNewUom(UnitOfMeasure newUom) {
 		RunTimeUOMS.put(newUom.getUom_id(), newUom);
+		try{
+			Connection conn = Tools.spawn_connection();
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO public_ressources.units_of_measure(\n" +
+					"\tuom_id, uom_multiplier, uom_base_id, uom_name_en, uom_symbols)\n" +
+					"\tVALUES (?, ?, ?, ?, ?);");
+			stmt.setString(1,newUom.getUom_id());
+			stmt.setDouble(2,newUom.getUom_multiplier().doubleValue());
+			stmt.setString(3,newUom.getUom_base_id());
+			stmt.setString(4,newUom.getUom_name());
+			stmt.setArray(5,conn.createArrayOf("VARCHAR", newUom.getUom_symbols().toArray(new String [0])));
+			stmt.execute();
+			stmt.close();
+			conn.close();
+		}catch (Exception V){
+
+		}
 	}
 }

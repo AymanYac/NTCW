@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="NTCW_R4">
-    <output-path>$USER_HOME$/Documents/Deliveries/NTDW/Dev</output-path>
-    <root id="archive" name="NTCW_R4.0.3_ALPHA.jar">
-      <element id="module-output" name="Brouillon_classif_refactored" />
-    </root>
-  </artifact>
-</component>

@@ -19,7 +19,7 @@ public class ImportTaxoRow {
 	ClassCaracteristic carac;
 	private boolean segmentParseFail;
 	private boolean caracParseFail;
-	private static HashMap<String, Integer> columnMap;
+	public static HashMap<String, Integer> columnMap;
     
 	public static ArrayList<Pair<Row,String>> rejectedRows = new ArrayList<Pair<Row,String>>();
     

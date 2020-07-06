@@ -1,6 +1,7 @@
 package service;
 
 import controllers.Char_description;
+import javafx.util.Pair;
 import model.CaracteristicValue;
 import model.CharValueTextSuggestion;
 import model.ClassCaracteristic;
@@ -8,6 +9,7 @@ import model.GlobalConstants;
 import org.apache.commons.lang.StringEscapeUtils;
 import transversal.language_toolbox.Unidecode;
 
+import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -90,7 +92,7 @@ public class TranslationServices {
 			String userVal = pattern_value.getUserLanguageValue();
 			Unidecode unidecode = Unidecode.toAscii();
 			
-			Boolean conflictingLinks = createDicoTranslationLink(dataVal,userVal,false);
+			Boolean conflictingLinks = createVerifiedDicoTranslationLink(dataVal,userVal,false);
 			
 			if(conflictingLinks!=null) {
 				if(conflictingLinks) {
@@ -211,7 +213,77 @@ public class TranslationServices {
 		
 	}
 
-	public static Boolean createDicoTranslationLink(String dataVal, String userVal, boolean forceUpdate) {
+	public static Pair<String,String> createUnverifiedDicoTranslationLink(String dataVal, String userVal) {
+    	System.out.println("XXXXXXX Unverified link "+dataVal+"/"+userVal);
+		Data2UserTermsDico = (Data2UserTermsDico!=null)?Data2UserTermsDico:new HashMap<String,String>();
+		User2DataTermsDico = (User2DataTermsDico!=null)?User2DataTermsDico:new HashMap<String,String>();
+
+
+		Unidecode unidecode = Unidecode.toAscii();
+		if(dataVal!=null && dataVal.replaceAll(" ", "").length()>0 &&
+				userVal!=null && userVal.replaceAll(" ", "").length()>0) {
+
+			String dataValTrimmed = unidecode.decodeAndTrim(dataVal.toLowerCase());
+			String userValTrimmed = unidecode.decodeAndTrim(userVal.toLowerCase());
+			boolean matched;
+			if(Data2UserTermsDico.containsKey(dataValTrimmed)){
+				//dataval known
+				if(Data2UserTermsDico.get(dataValTrimmed)!=null){
+					//dataval translation known
+					matched = userValTrimmed.equals(unidecode.decodeAndTrim(Data2UserTermsDico.get(dataValTrimmed).toLowerCase()));
+					if(!matched){
+						System.out.println("conflict with known userval for input dataval");
+						return  new Pair<String,String>(dataVal,Data2UserTermsDico.get(dataValTrimmed));
+					}
+					System.out.println("no conflict with known userval for input dataval");
+					return  null;
+				}else{
+					//dataVal translation unknown
+					System.out.println("conflict with unknown userval for unput dataval");
+					return  new Pair<String,String>(dataVal,null);
+				}
+
+			}else {
+				//dataVal not known
+				if(User2DataTermsDico.containsKey(userValTrimmed)){
+					//The userval translation is known or the userval has an explicit no translation : conflict
+					System.out.println("conflict with known dataval for input userval");
+					return  new Pair<String,String>(User2DataTermsDico.get(userValTrimmed),userVal);
+				}else{
+					System.out.println("new entry");
+					//New entry
+					Data2UserTermsDico.put(dataValTrimmed, userVal);
+					User2DataTermsDico.put(userValTrimmed, dataVal);
+					return null;
+				}
+
+			}
+
+
+		}else {
+			//One of the values is null
+			if(dataVal!=null && dataVal.replaceAll(" ", "").length()>0) {
+				//the userval is null
+				String dataValTrimmed = unidecode.decodeAndTrim(dataVal.toLowerCase());
+				if(Data2UserTermsDico.get(dataValTrimmed)!=null){
+					return new Pair<String, String>(dataVal,Data2UserTermsDico.get(dataValTrimmed));
+				}
+				Data2UserTermsDico.put(dataValTrimmed, null);
+				return  null;
+			}
+			if(userVal!=null && userVal.replaceAll(" ", "").length()>0) {
+				String userValTrimmed = unidecode.decodeAndTrim(userVal.toLowerCase());
+				if(User2DataTermsDico.get(userValTrimmed)!=null){
+					return new Pair<String, String>(User2DataTermsDico.get(userValTrimmed),userVal);
+				}
+				User2DataTermsDico.put(userValTrimmed, null);
+				return null;
+			}
+			return null;
+		}
+
+	}
+	public static Boolean createVerifiedDicoTranslationLink(String dataVal, String userVal, boolean forceUpdate) {
 		Data2UserTermsDico = (Data2UserTermsDico!=null)?Data2UserTermsDico:new HashMap<String,String>();
 		User2DataTermsDico = (User2DataTermsDico!=null)?User2DataTermsDico:new HashMap<String,String>();
 		
@@ -283,9 +355,9 @@ public class TranslationServices {
 		updateTranslatedValues(result.getSource_value(),result.isDataFieldSuggestion(),null);
 		
 		if(!result.isDataFieldSuggestion()) {
-			createDicoTranslationLink(result.getTarget_value(),null,true);
+			createVerifiedDicoTranslationLink(result.getTarget_value(),null,true);
 		}else {
-			createDicoTranslationLink(null,result.getTarget_value(),true);
+			createVerifiedDicoTranslationLink(null,result.getTarget_value(),true);
 		}
 		
 		textEntries.replaceAll((k,v)->new HashSet(v));
@@ -333,7 +405,7 @@ public class TranslationServices {
 
 	private static void updateTextEntriesTranslationSuggestions(String key, boolean keyIsData, String newValue) {
 		
-		createDicoTranslationLink(key,newValue,true);
+		createVerifiedDicoTranslationLink(key,newValue,true);
 		
 		textEntries.values().parallelStream().forEach(a->a.stream().forEach(s->{
 			

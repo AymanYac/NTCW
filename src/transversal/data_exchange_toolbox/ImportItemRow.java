@@ -20,7 +20,7 @@ public class ImportItemRow {
 	private CaracteristicValue value;
 	private boolean itemParseHasFailed=false;
 	private boolean valueParseHasFailed=false;
-	private static HashMap<String, Integer> columnMap;
+	public static HashMap<String, Integer> columnMap;
 	
 	public static ArrayList<Pair<Row,String>> rejectedRows = new ArrayList<Pair<Row,String>>();
 	
@@ -171,12 +171,12 @@ public class ImportItemRow {
 					if(knownCarac.getIsTranslatable()) {
 						
 						
-						Boolean conflictingLinks = TranslationServices.createDicoTranslationLink(dataVal,userVal,false);
+						Pair<String, String> conflictingLinks = TranslationServices.createUnverifiedDicoTranslationLink(dataVal,userVal);
 						
-						if(conflictingLinks!=null && conflictingLinks) {
+						if(conflictingLinks!=null) {
 							
 							//Inconsistent translation
-							rejectedRows.add(new Pair<Row,String>(current_row,"Value "+dataVal+"/"+userVal+" was not created (inconsistent translation)"));
+							rejectedRows.add(new Pair<Row,String>(current_row,"Value "+dataVal+"/"+userVal+" was not created (inconsistent translation). Expected: "+conflictingLinks.getKey()+"/"+conflictingLinks.getValue()));
 							valueParseHasFailed=true;
 							return null;
 							
@@ -184,11 +184,7 @@ public class ImportItemRow {
 							current_value.setDataLanguageValue(dataVal);
 							current_value.setUserLanguageValue(userVal);
 						}
-						
-						
-						
-						conflictingLinks = TranslationServices.createDicoTranslationLink(dataVal,userVal,false);
-						
+
 						
 					}else {
 						current_value.setDataLanguageValue(dataVal);

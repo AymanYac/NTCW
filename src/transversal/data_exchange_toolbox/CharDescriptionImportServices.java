@@ -2,17 +2,19 @@ package transversal.data_exchange_toolbox;
 
 import com.monitorjbl.xlsx.StreamingReader;
 import model.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import service.CharValuesLoader;
 import service.TranslationServices;
+import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -30,17 +32,23 @@ public class CharDescriptionImportServices {
 	public static HashMap<String, ClassCaracteristic> chid2Carac;
 	public static HashMap<String, HashMap<String,ClassCaracteristic>> classSpecificFields;
 	public static HashMap<String, CharDescriptionRow> client2Item;
-	
-	public static void upsertTaxoAndChar(String filePath,String taxoSheetName,String itemDataSheetName, String active_pid, int projectGranularity, UserAccount account) throws FileNotFoundException, ClassNotFoundException, SQLException {
+	private static int rejected_row_num;
+
+	public static void upsertTaxoAndChar(String filePath,String taxoSheetName,String itemDataSheetName, String active_pid, int projectGranularity, UserAccount account) throws IOException, ClassNotFoundException, SQLException, InvalidFormatException {
 		active_project = active_pid;
 		account.setActive_project(active_pid);
 		
 		InputStream is = new FileInputStream(new File(filePath));
-		Workbook workbook = StreamingReader.builder()
+		/*Workbook workbook = StreamingReader.builder()
 		        .rowCacheSize(100)    // number of rows to keep in memory (defaults to 10)
 		        .bufferSize(4096)     // buffer size to use when reading InputStream to file (defaults to 1024)
-		        .open(is);            // InputStream or File for XLSX file (required)
-		
+		        .open(is);            // InputStream or File for XLSX file (required)*/
+
+		File excel = new File(filePath);
+		FileInputStream fis = new FileInputStream(excel);
+		XSSFWorkbook workbook = new XSSFWorkbook(fis);
+
+
 		CharDescriptionImportServices.projectGranularity=projectGranularity;
 		CharValuesLoader.fetchAllKnownValuesAssociated2Items(active_project);
 		
@@ -103,13 +111,25 @@ public class CharDescriptionImportServices {
 		
 		storeItemsWithClass(account);
 		storeItemsData(account);
-		
-		
-		printRejectedTaxoRows();
-		
-		
-		printRejectedItemRows();
-		
+
+
+		try{
+			printRejectedTaxoRows(workbook,taxoSheetName,taxoSheet.getRow(0));
+			printRejectedItemRows(workbook,itemDataSheetName,itemDataSheet.getRow(0));
+			//save file
+			FileOutputStream out = new FileOutputStream(new File(filePath).getAbsolutePath());
+			workbook.write(out);
+			out.close();
+			workbook.close();
+			is.close();
+		}catch (Exception V){
+			V.printStackTrace(System.err);
+			ConfirmationDialog.show("File saving failed", "Data uploaded but rejected rows could not be saved in\n"+filePath+"\nMake sure you have the the file is not open by another application", "OK", null);
+		}
+
+
+
+
 	}
 
 
@@ -164,14 +184,50 @@ public class CharDescriptionImportServices {
 		CharDescriptionExportServices.flushCaracDefaultValuesToDB(account,active_project);
 	}
 
-	private static void printRejectedItemRows() {
+	private static void printRejectedItemRows(Workbook workbook, String sourceSheetName, Row headerRow) {
+		Sheet sheet = workbook.createSheet(sourceSheetName + "_Rejected");
+		rejected_row_num = 0;
+		Row hr = sheet.createRow(rejected_row_num);
+		hr.createCell(0).setCellValue("Row number");
+		IntStream.range(1,ImportItemRow.columnMap.size()).forEach(idx->{
+			hr.createCell(idx).setCellValue(headerRow.getCell(idx-1).getStringCellValue());
+		});
+		hr.createCell(ImportItemRow.columnMap.size()).setCellValue("Comment");
 		ImportItemRow.rejectedRows.forEach(p->{
+			rejected_row_num+=1;
+			Row reject_row = sheet.createRow(rejected_row_num);
+			reject_row.createCell(0).setCellValue(p.getKey().getRowNum());
+			IntStream.range(1,ImportItemRow.columnMap.size()).forEach(idx->{
+				try{
+					reject_row.createCell(idx).setCellValue(p.getKey().getCell(idx).getStringCellValue());
+				}catch (Exception V){
+				}
+			});
+			reject_row.createCell(ImportItemRow.columnMap.size()).setCellValue(p.getValue());
 			System.out.println("Error on row "+String.valueOf(p.getKey().getRowNum()+1)+">"+p.getValue());
 		});;
 	}
 
-	private static void printRejectedTaxoRows() {
+	private static void printRejectedTaxoRows(Workbook workbook, String sourceSheetName, Row headerRow) {
+		Sheet sheet = workbook.createSheet(sourceSheetName + "_Rejected");
+		rejected_row_num = 0;
+		Row hr = sheet.createRow(rejected_row_num);
+		hr.createCell(0).setCellValue("Row number");
+		IntStream.range(1,ImportTaxoRow.columnMap.size()).forEach(idx->{
+			hr.createCell(idx).setCellValue(headerRow.getCell(idx-1).getStringCellValue());
+		});
+		hr.createCell(ImportTaxoRow.columnMap.size()).setCellValue("Comment");
 		ImportTaxoRow.rejectedRows.forEach(p->{
+			rejected_row_num+=1;
+			Row reject_row = sheet.createRow(rejected_row_num);
+			reject_row.createCell(0).setCellValue(p.getKey().getRowNum());
+			IntStream.range(1,ImportTaxoRow.columnMap.size()).forEach(idx->{
+				try{
+					reject_row.createCell(idx).setCellValue(p.getKey().getCell(idx).getStringCellValue());
+				}catch (Exception V){
+				}
+			});
+			reject_row.createCell(ImportTaxoRow.columnMap.size()).setCellValue(p.getValue());
 			System.out.println("Error on row "+String.valueOf(p.getKey().getRowNum()+1)+">"+p.getValue());
 		});;
 	}

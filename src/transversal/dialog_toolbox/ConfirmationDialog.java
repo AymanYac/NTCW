@@ -142,8 +142,11 @@ public class ConfirmationDialog {
 		 if (option.get() == null) {
 			 
 	      } else {
-	    	  ;
-	    	  parent.proceed_cancel();
+	    	  try{
+	    	  	parent.proceed_cancel();
+			  }catch (Exception V){
+
+			  }
 	      }
 	}
 
