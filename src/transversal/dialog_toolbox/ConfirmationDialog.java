@@ -1,6 +1,5 @@
 package transversal.dialog_toolbox;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import controllers.Auto_classification_progress;
 import controllers.Project_parameters;
 import controllers.Project_selection;

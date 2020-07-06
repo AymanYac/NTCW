@@ -122,7 +122,7 @@ public class CharPane_CharClassif {
 	
 	@FXML public void add_carac() throws SQLException, ClassNotFoundException {
 		CaracDeclarationDialog.CaracDeclarationPopUp(parent.account, Tools.get_project_segments(parent.account).get(selected_row.getClass_segment_string().split("&&&")[0]), null);
-		parent.refresh_ui_display();
+		parent.tableController.refresh_table_with_segment(parent.classCombo.getValue().getClassSegment());
 	}
 
 }

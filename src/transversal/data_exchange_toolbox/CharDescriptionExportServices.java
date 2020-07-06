@@ -436,6 +436,7 @@ public class CharDescriptionExportServices {
 	}
 
 	public static void addCaracDefinitionToPush(ClassCaracteristic template,ClassSegment segment){
+		System.out.println("carac def push "+template.getCharacteristic_name()+" for segment "+segment.getClassName());
 		Pair<ClassCaracteristic,ClassSegment> carSegPair = new Pair<ClassCaracteristic,ClassSegment>(template,segment);
 		caracDefBuffer.add(carSegPair);
 	}
@@ -530,7 +531,7 @@ public class CharDescriptionExportServices {
 		stmt.clearBatch();
 		stmt.close();
 		conn.close();
-		caracDefBuffer.clear();
+		caracDeleteBuffer.clear();
 	}
 	
 	public static void addCaracDefaultDataToPush(String segment, ClassCaracteristic carac, CaracteristicValue val) {

@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -27,6 +28,7 @@ import javafx.util.Callback;
 import javafx.util.Pair;
 import model.*;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import service.CharItemFetcher;
 import service.CharValuesLoader;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
@@ -37,6 +39,8 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static transversal.data_exchange_toolbox.CharDescriptionExportServices.*;
 
 public class CaracDeclarationDialog {
 
@@ -63,6 +67,7 @@ public class CaracDeclarationDialog {
 	private static CheckBox uom2CB;
 	private static ButtonType validateButtonType;
 	private static HashMap<String,HashMap<String,ArrayList<UnitOfMeasure>>> templateUoMs = new HashMap<String,HashMap<String,ArrayList<UnitOfMeasure>>>();
+
 
 	private static void showDetailedClassClusters(ClassSegment itemSegment) {
 		System.out.println("XXXXX SHOWING DETAILS XXXXXXX");
@@ -244,9 +249,13 @@ public class CaracDeclarationDialog {
 						uom0.getSelectionModel().select(0);
 						uom1.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->UnitOfMeasure.ConversionPathExists(u,charName.selectedEntry.getValue().getAllowedUoms())).collect(Collectors.toCollection(ArrayList::new)));
 						uom2.getEntries().addAll(uom1.getEntries());
+						uom1.clear();
+						uom2.clear();
 					}catch (Exception V){
 						uom0.getItems().add("No unit of measure");
 						uom0.getSelectionModel().select(0);
+						uom1.clear();
+						uom2.clear();
 					}
 
 				}else{
@@ -298,6 +307,33 @@ public class CaracDeclarationDialog {
 		uom2.visibleProperty().bind(uom0.visibleProperty().not().and(charType.valueProperty().isEqualTo("Numeric")));
 		uom2CB.visibleProperty().bind(uom2.visibleProperty());
 		uom2Label.visibleProperty().bind(uom2.visibleProperty());
+
+		uom1.incompleteProperty.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if(!newValue && charName.incompleteProperty.getValue()){
+					if(uom2.incompleteProperty.getValue() || (uom2.selectedUom!=null && !UnitOfMeasure.ConversionPathExists(uom2.selectedUom, Collections.singletonList(uom1.selectedUom.getUom_id()))) ){
+						uom2.clear();
+					}
+					uom2.getEntries().clear();
+					uom2.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->UnitOfMeasure.ConversionPathExists(u, Collections.singletonList(uom1.selectedUom.getUom_id()))).collect(Collectors.toCollection(ArrayList::new)));
+
+				}
+			}
+		});
+		uom2.incompleteProperty.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if(!newValue && charName.incompleteProperty.getValue()){
+					if(uom1.incompleteProperty.getValue() || (uom1.selectedUom!=null && !UnitOfMeasure.ConversionPathExists(uom1.selectedUom, Collections.singletonList(uom2.selectedUom.getUom_id()))) ){
+						uom1.clear();
+					}
+					uom1.getEntries().clear();
+					uom1.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->UnitOfMeasure.ConversionPathExists(u, Collections.singletonList(uom2.selectedUom.getUom_id()))).collect(Collectors.toCollection(ArrayList::new)));
+
+				}
+			}
+		});
 
 		charType.getItems().add("Numeric");
 		charType.getItems().add("Text");
@@ -465,11 +501,13 @@ public class CaracDeclarationDialog {
 									//Advancing
 									if(c.getSequence()>= charClassMatch.get().getSequence() && c.getSequence() <= copy.getSequence()){
 										c.setSequence(c.getSequence()-1);
+										addCaracDefinitionToPush(c,s);
 									}
 								}else{
 									//Regressing
 									if(c.getSequence() <= charClassMatch.get().getSequence() && c.getSequence()>=copy.getSequence()){
 										c.setSequence(c.getSequence()+1);
+										addCaracDefinitionToPush(c,s);
 									}
 								}
 							});
@@ -483,6 +521,13 @@ public class CaracDeclarationDialog {
 
 				int matchIndx = CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(charClassMatch.get());
 				CharValuesLoader.active_characteristics.get(s.getSegmentId()).set(matchIndx,copy);
+				CharValuesLoader.active_characteristics.get(s.getSegmentId()).sort(new Comparator<ClassCaracteristic>() {
+					@Override
+					public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
+						return o1.getSequence().compareTo(o2.getSequence());
+					}
+				});
+				addCaracDefinitionToPush(copy,s);
 			}else{
 				//The carac is not present insert if the charac name is not already used within the segment
 				if(CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().anyMatch(c->StringUtils.equalsIgnoreCase(c.getCharacteristic_name(),copy.getCharacteristic_name()))){
@@ -497,7 +542,12 @@ public class CaracDeclarationDialog {
 					System.out.println("Setting new car to min(config,max sequence) on segment "+s.getClassName());
 					try{
 						if(sequenceCB.isSelected()){
+							//Force use the config sequence if the sequence CB is selected
 							copy.setSequence(Math.min(copy.getSequence(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().map(ClassCaracteristic::getSequence).max(Integer::compare).get()+1));
+							CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c-> c.getSequence()>=copy.getSequence()).forEach(c->{
+								c.setSequence(c.getSequence()+1);
+								addCaracDefinitionToPush(c,s);
+							});
 						}else{
 							copy.setSequence(CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().map(ClassCaracteristic::getSequence).max(Integer::compare).get()+1);
 						}
@@ -508,24 +558,34 @@ public class CaracDeclarationDialog {
 				}else{
 					//Current class advance other caracs
 					System.out.println("Setting new car to sequence on current segment "+s.getClassName()+" "+copy.getSequence());
-					CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).stream().filter(c-> c.getSequence()>=copy.getSequence()).forEach(c->c.setSequence(c.getSequence()+1));
+					CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).stream().filter(c-> c.getSequence()>=copy.getSequence()).forEach(c->{
+						c.setSequence(c.getSequence()+1);
+						addCaracDefinitionToPush(c,s);
+					});
 				}
 				CharValuesLoader.active_characteristics.get(s.getSegmentId()).add(copy);
+				CharValuesLoader.active_characteristics.get(s.getSegmentId()).sort(new Comparator<ClassCaracteristic>() {
+					@Override
+					public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
+						return o1.getSequence().compareTo(o2.getSequence());
+					}
+				});
 				CharItemFetcher.allRowItems.stream().filter(r->r.getClass_segment_string().startsWith(s.getSegmentId())).forEach(r->{
 					r.expandDataField(s.getSegmentId());
 				});
-				CharDescriptionExportServices.addCaracDefinitionToPush(copy,s);
+				addCaracDefinitionToPush(copy,s);
 			}
 		});
 		try {
-			CharDescriptionExportServices.flushCaracDefinitionToDB(account);
+			flushCaracDefinitionToDB(account);
 		} catch (SQLException | ClassNotFoundException throwables) {
 			throwables.printStackTrace();
 		}
 		return droppedClassInsertions;
 	}
 
-	private static ClassCaracteristic loadCaracFromDialog() {
+	private static @NotNull
+	ClassCaracteristic loadCaracFromDialog() {
 		ClassCaracteristic newCarac = new ClassCaracteristic();
 		ArrayList<String> newUoms = new ArrayList<String>();
 		if(charName.incompleteProperty.getValue()){
@@ -787,7 +847,8 @@ public class CaracDeclarationDialog {
 
 	}
 
-	public static void CaracDeletion(ClassCaracteristic carac, String itemSegment,UserAccount account) {
+	public static void CaracDeletion(ClassCaracteristic carac, String itemSegment,UserAccount account) throws SQLException, ClassNotFoundException {
+		HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(account);
 		Boolean scopeChoice = ConfirmationDialog.showCaracDeleteScopeConfirmation();
 		if(scopeChoice!=null){
 
@@ -801,17 +862,28 @@ public class CaracDeclarationDialog {
 				Optional<ClassCaracteristic> localCarac = e.getValue().stream().filter(c -> c.getCharacteristic_id().equals(carac.getCharacteristic_id())).findAny();
 				if(localCarac.isPresent()){
 					CharValuesLoader.active_characteristics.get(e.getKey()).stream().filter(c->c.getSequence() > localCarac.get().getSequence())
-							.forEach(c->c.setSequence(c.getSequence()-1));
+							.forEach(c->{
+								System.out.println("Moving back "+c.getCharacteristic_name());
+								c.setSequence(c.getSequence()-1);
+								addCaracDefinitionToPush(c,sid2Segment.get(e.getKey()));
+							});
 					CharValuesLoader.active_characteristics.put(e.getKey(),
 							e.getValue().stream().filter(c->!c.getCharacteristic_id().equals(carac.getCharacteristic_id())).collect(Collectors.toCollection(ArrayList::new))
 					);
-					CharDescriptionExportServices.addCaracDefinitionToDisable(carac,e.getKey());
+					CharValuesLoader.active_characteristics.get(e.getKey()).sort(new Comparator<ClassCaracteristic>() {
+						@Override
+						public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
+							return o1.getSequence().compareTo(o2.getSequence());
+						}
+					});
+					addCaracDefinitionToDisable(carac,e.getKey());
 				}
 
 			});
 		}
 		try {
-			CharDescriptionExportServices.flushCaracDeleteToDB(account);
+			flushCaracDeleteToDB(account);
+			flushCaracDefinitionToDB(account);
 		} catch (SQLException | ClassNotFoundException throwables) {
 			throwables.printStackTrace();
 		}
@@ -819,13 +891,25 @@ public class CaracDeclarationDialog {
 	}
 
 	public static void skipToNextField(Node node) {
+		/*KeyEvent newEvent
+				= new KeyEvent(
+				null,
+				null,
+				KeyEvent.KEY_PRESSED,
+				"",
+				"\t",
+				KeyCode.TAB,
+				false,
+				false,
+				false,
+				false
+		);
+		Event.fireEvent( node, newEvent );*/
 		if(node instanceof TextField){
 			((BehaviorSkinBase) ((TextField)node).getSkin()).getBehavior().traverseNext();
 		}
 		if(node instanceof ComboBox){
 			((BehaviorSkinBase) ((ComboBox)node).getSkin()).getBehavior().traverseNext();
 		}
-
-
 	}
 }

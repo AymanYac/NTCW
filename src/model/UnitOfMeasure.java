@@ -10,6 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class UnitOfMeasure {
@@ -218,7 +219,7 @@ public class UnitOfMeasure {
 	
 	
 	
-	public static boolean ConversionPathExists(UnitOfMeasure following_uom, ArrayList<String> allowedUoms) {
+	public static boolean ConversionPathExists(UnitOfMeasure following_uom, List<String> allowedUoms) {
 		if(allowedUoms!=null){
 			for(String allowed:allowedUoms) {
 				if(UnitOfMeasure.RunTimeUOMS.get(allowed).getUom_base_id().equals(following_uom.getUom_base_id())

@@ -110,7 +110,7 @@ public class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
             if (AutoCompleteComboBoxListener.this.comboBox.getEditor().getText().toLowerCase().equals(items.get(i).toString().toLowerCase())) {
                 try {
                     ListView lv = ((ComboBoxListViewSkin) AutoCompleteComboBoxListener.this.comboBox.getSkin()).getListView();
-                    lv.getSelectionModel().clearAndSelect(i);
+                    this.comboBox.getSelectionModel().clearAndSelect(i);
                     lv.scrollTo(lv.getSelectionModel().getSelectedIndex());
                     found = true;
                     break;

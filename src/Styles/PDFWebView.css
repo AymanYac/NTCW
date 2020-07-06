@@ -1,0 +1,17 @@
+/*Styles of the scroll-bar*/
+.scroll-bar:horizontal,
+.scroll-bar:vertical {
+
+   -fx-background-color: #ACB9CA;
+}
+
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #ACB9CA;
+    -fx-background-radius: 0em;
+}
+
+.scroll-bar .corner {
+ -fx-background-color: #445469;
+ -fx-disabled: true;
+}

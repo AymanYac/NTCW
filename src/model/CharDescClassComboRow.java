@@ -3,11 +3,12 @@ package model;
 public class CharDescClassComboRow {
 	private final String className;
 	private final String classSegment;
-	
-	public CharDescClassComboRow(String className, String classSegment) {
-		super();
+	private final String classCode;
+
+	public CharDescClassComboRow(String classSegment,String className,String classCode) {
 		this.className = className;
 		this.classSegment = classSegment;
+		this.classCode = classCode;
 	}
 	
 	public String getclassName() {
@@ -16,9 +17,15 @@ public class CharDescClassComboRow {
 	public String getClassSegment() {
 		return classSegment;
 	}
+	public String getClassCode() {
+		return classCode;
+	}
 
     @Override
     public String toString() {
-        return getclassName();
+        if(getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)){
+        	return GlobalConstants.DEFAULT_CHARS_CLASS;
+		}
+		return getClassCode()+" "+getclassName();
     }
 }

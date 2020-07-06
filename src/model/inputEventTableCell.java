@@ -57,23 +57,26 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
                             ligne1.setOnMouseClicked(new EventHandler<MouseEvent>() {
                                 @Override
                                 public void handle(MouseEvent event) {
+                                    popup.hide();
                                     try {
                                         CaracDeclarationDialog.CaracEditionPopUp(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.account,parent.tableController.tableGrid);
-                                        popup.hide();
-                                        parent.refresh_ui_display();
-                                    } catch (SQLException throwables) {
+                                        parent.tableController.refresh_table_with_segment(parent.classCombo.getValue().getClassSegment());
+                                    } catch (SQLException | ClassNotFoundException throwables) {
                                         throwables.printStackTrace();
-                                    } catch (ClassNotFoundException e) {
-                                        e.printStackTrace();
                                     }
                                 }
                             });
                             ligne2.setOnMouseClicked(new EventHandler<MouseEvent>() {
                                 @Override
                                 public void handle(MouseEvent event) {
-                                    CaracDeclarationDialog.CaracDeletion(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0],parent.account);
                                     popup.hide();
-                                    parent.refresh_ui_display();
+                                    try {
+                                        CaracDeclarationDialog.CaracDeletion(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0],parent.account);
+                                        parent.tableController.refresh_table_with_segment(parent.classCombo.getValue().getClassSegment());
+                                    } catch (SQLException | ClassNotFoundException throwables) {
+                                        throwables.printStackTrace();
+                                    }
+
                                 }
                             });
 

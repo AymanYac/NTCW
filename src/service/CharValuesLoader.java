@@ -48,6 +48,10 @@ public class CharValuesLoader {
 				String user_id = rs.getString("user_id");
 				String description_method = rs.getString("description_method");
 				String description_rule_id = rs.getString("description_rule_id");
+				if(charIdArrays.get(loop_class_id).indexOf(characteristic_id)==-1){
+					System.out.println("Carac "+characteristic_id+" is not defined for segment "+loop_class_id);
+					continue;
+				}
 				CaracteristicValue val = new CaracteristicValue();
 				val.setValue_id(rs.getString("value_id"));
 				val.setDataLanguageValue(rs.getString("text_value_data_language"));

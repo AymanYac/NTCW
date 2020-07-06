@@ -5,6 +5,8 @@ import controllers.paneControllers.CharPane_CharClassif;
 import controllers.paneControllers.ImagePane_CharClassif;
 import controllers.paneControllers.TablePane_CharClassif;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -32,6 +34,7 @@ import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.UoMDeclarationDialog;
+import transversal.dialog_toolbox.UrlBookMarkDialog;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -127,7 +130,7 @@ public class Char_description {
 	
 	
 	private Browser_CharClassif browserController;
-	
+	public StringProperty browserUrlProperty = new SimpleStringProperty();;
 	
 	private GridPane imageGrid;
 	private GridPane ruleGrid;
@@ -205,8 +208,7 @@ public class Char_description {
 		
 		toolBarButtonListener();
 		initializePropButtons();
-		
-		
+
 		
 	}
 	
@@ -263,6 +265,7 @@ public class Char_description {
 			}
 			
 		});
+
 	}
 
 	private void listen_for_keyboard_events() {
@@ -329,8 +332,15 @@ public class Char_description {
 				
 			});
 		});
-		
-		
+
+		sd.getScene().getWindow().focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if(newValue && browserUrlProperty.get()!=null){
+					UrlBookMarkDialog.promptBookMarkForItemClass(browserUrlProperty.get(),tableController.tableGrid.getSelectionModel().getSelectedItem(),browserUrlProperty);
+				}
+			}
+		});
 	}
 
 	protected void handleDataKeyBoardEvent(KeyEvent keyEvent, boolean pressed) {
@@ -561,9 +571,13 @@ public class Char_description {
 		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
 			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
-			CharPatternServices.scanSelectionForPatternDetection(this,
-					CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
-					.get(active_char_index));
+			try{
+				CharPatternServices.scanSelectionForPatternDetection(this,
+						CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
+								.get(active_char_index));
+			}catch (Exception V){
+
+			}
 		}
 		
 		
@@ -906,7 +920,7 @@ public class Char_description {
 						
 					}
 				}catch(Exception V) {
-					V.printStackTrace(System.err);
+
 				}
 				
 				if(numValuesInSelection.size()==0) {
@@ -1025,7 +1039,7 @@ public class Char_description {
 			for(String entry:account.getUser_desc_classes()) {
 				for(String elem:CNAME_CID) {
 					if (elem.startsWith(entry)) {
-						CharDescClassComboRow tmp = new CharDescClassComboRow(elem.split("&&&")[1],elem.split("&&&")[0]);
+						CharDescClassComboRow tmp = new CharDescClassComboRow(elem.split("&&&")[0],elem.split("&&&")[1],elem.split("&&&")[2]);
 						classCombo.getItems().add(tmp);
 						if(elem.split("&&&")[0].equals(account.getUser_desc_class())) {
 							classCombo.getSelectionModel().select(tmp);
@@ -1039,7 +1053,7 @@ public class Char_description {
 			
 		}
 		
-		CharDescClassComboRow tmp = new CharDescClassComboRow(GlobalConstants.DEFAULT_CHARS_CLASS,GlobalConstants.DEFAULT_CHARS_CLASS);
+		CharDescClassComboRow tmp = new CharDescClassComboRow(GlobalConstants.DEFAULT_CHARS_CLASS,GlobalConstants.DEFAULT_CHARS_CLASS,GlobalConstants.DEFAULT_CHARS_CLASS);
 		classCombo.getItems().add(tmp);
 		
 		classCombo.getItems().sort(new Comparator<CharDescClassComboRow>(){
@@ -1047,7 +1061,7 @@ public class Char_description {
 			@Override
 			public int compare(CharDescClassComboRow o1, CharDescClassComboRow o2) {
 				// TODO Auto-generated method stub
-				return o1.getclassName().compareTo( o2.getclassName());
+				return o1.getClassCode().compareTo( o2.getClassCode());
 			}
 			
 		});

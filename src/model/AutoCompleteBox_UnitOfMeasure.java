@@ -69,11 +69,9 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
             incompleteProperty.setValue(true);
           LinkedList<UnitOfMeasure> searchResult = new LinkedList<>();
           final List<UnitOfMeasure> filteredEntries = entries.stream().filter(e ->
-                  (populateSearchMethod.equals("NAME") && e.getUom_name().contains(getText()) )
+                  (populateSearchMethod.equals("NAME") && StringUtils.containsIgnoreCase(e.getUom_name(),getText()) )
                   ||( populateSearchMethod.equals("SYMBOL") && e.HasPartialUomSymbol(getText()) )
-                  ||( populateSearchMethod.equals("NAME_AND_SYMBOL") && (e.getUom_name().contains(getText()) || e.HasPartialUomSymbol(getText())) )
-
-          )
+                  ||( populateSearchMethod.equals("NAME_AND_SYMBOL") && StringUtils.containsIgnoreCase(e.getUom_name(),getText()) || e.HasPartialUomSymbol(getText())) )
         		  .collect(Collectors.toList());
           searchResult.addAll(filteredEntries);
           //searchResult.addAll(entries.subSet(getText(), getText() + Character.MAX_VALUE));
@@ -85,11 +83,11 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
 				@Override
 				public int compare(Object o1, Object o2) {
 					int ret = (new Integer(
-							((UnitOfMeasure)o1).getUom_name().compareTo(
-							((UnitOfMeasure)o2).getUom_name())
+							((UnitOfMeasure)o1).getUom_symbol().toLowerCase().compareTo(
+							((UnitOfMeasure)o2).getUom_symbol().toLowerCase())
 							));
-                  int av_1 =  ((UnitOfMeasure) o1).HasPartialUomSymbol(getText())?1000000:0;
-                  int av_2 =  ((UnitOfMeasure) o2).HasPartialUomSymbol(getText())?1000000:0;
+                  int av_1 =  (StringUtils.startsWithIgnoreCase(((UnitOfMeasure) o1).getUom_name(),getText()) || StringUtils.startsWithIgnoreCase(((UnitOfMeasure) o1).getUom_symbol(),getText()))?1000000:0;
+                  int av_2 =  (StringUtils.startsWithIgnoreCase(((UnitOfMeasure) o2).getUom_name(),getText()) || StringUtils.startsWithIgnoreCase(((UnitOfMeasure) o2).getUom_symbol(),getText()))?1000000:0;
 
                   return ret - av_1 + av_2;
 				}
