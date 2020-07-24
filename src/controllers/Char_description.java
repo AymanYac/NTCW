@@ -129,8 +129,8 @@ public class Char_description {
 
 	
 	
-	private Browser_CharClassif browserController;
-	public StringProperty browserUrlProperty = new SimpleStringProperty();;
+	public Browser_CharClassif browserController;
+	public StringProperty externalBrowserUrlProperty = new SimpleStringProperty();;
 	
 	private GridPane imageGrid;
 	private GridPane ruleGrid;
@@ -336,8 +336,8 @@ public class Char_description {
 		sd.getScene().getWindow().focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				if(newValue && browserUrlProperty.get()!=null){
-					UrlBookMarkDialog.promptBookMarkForItemClass(browserUrlProperty.get(),tableController.tableGrid.getSelectionModel().getSelectedItem(),browserUrlProperty);
+				if(newValue && externalBrowserUrlProperty.get()!=null){
+					UrlBookMarkDialog.promptBookMarkForItemClass(externalBrowserUrlProperty.get(),tableController.tableGrid.getSelectionModel().getSelectedItem(), externalBrowserUrlProperty);
 				}
 			}
 		});
@@ -576,7 +576,7 @@ public class Char_description {
 						CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
 								.get(active_char_index));
 			}catch (Exception V){
-
+				V.printStackTrace(System.err);
 			}
 		}
 		
@@ -599,12 +599,17 @@ public class Char_description {
 			}
 			
 			try {
-				if(browserController.closeButton.isVisible()) {
 					//We clicked escape to close search
 					try {
 						show_table();
 					}catch(Exception V) {
 						
+					}
+					try{
+						System.out.println("Closing Secondary Stage");
+						browserController.secondaryStage.close();
+					}catch (Exception V){
+
 					}
 					if(this.lastRightPane.equals("CHARS")) {
 						charButton.setSelected(true);
@@ -615,9 +620,6 @@ public class Char_description {
 						load_image_pane(true);
 					}
 					this.lastRightPane="";
-				}else {
-					this.lastRightPane="";
-				}
 			}catch(Exception V) {
 				this.lastRightPane="";
 			}
@@ -1102,7 +1104,7 @@ public class Char_description {
 			tableController.fillTable_DYNAMIC((List<ItemFetcherRow>) ftc.currentList_DYNAMIC);
 		}*/
 		tableController.setCollapsedViewColumns(new String[] {"Completion status","Question status"});
-		tableController.refresh_table_with_segment(account.getUser_desc_class(classCombo.getItems().get(0).getClassSegment()));
+		tableController.refresh_table_with_segment(account.getUser_desc_class(classCombo.getItems().get(1).getClassSegment()));
 		System.gc();
 		 
 		
@@ -1189,8 +1191,19 @@ public class Char_description {
 		browserController.setParent(this);
 	}
 
+	public void setBrowserFullScreen(){
+		leftAnchor.toFront();
+		grid.setRowIndex(leftAnchor,2);
+		grid.setColumnIndex(leftAnchor,0);
+		grid.setRowSpan(leftAnchor,GridPane.REMAINING);
+		grid.setColumnSpan(leftAnchor,GridPane.REMAINING);
+	}
+
 	@SuppressWarnings("static-access")
 	public void setBottomRegionColumnSpans(boolean visibleRight) {
+		grid.setRowIndex(leftAnchor,grid.getRowIndex(rightAnchor));
+		grid.setColumnIndex(leftAnchor,1);
+		grid.setRowSpan(leftAnchor,grid.getRowSpan(rightAnchor));
 		if(visibleRight) {
 			rightAnchor.getChildren().removeAll(rightAnchor.getChildren());
 			rightAnchor.setVisible(true);

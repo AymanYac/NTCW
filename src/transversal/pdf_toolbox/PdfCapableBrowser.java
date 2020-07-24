@@ -1,6 +1,6 @@
 package transversal.pdf_toolbox;
 
-import javafx.application.Platform;
+import controllers.paneControllers.Browser_CharClassif;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
@@ -8,7 +8,6 @@ import javafx.scene.Parent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
-import transversal.dialog_toolbox.ItemUploadDialog;
 
 import java.awt.*;
 import java.io.*;
@@ -17,8 +16,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Base64;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PdfCapableBrowser {
 
@@ -29,7 +26,7 @@ public class PdfCapableBrowser {
     public WebView nodeValue;
     private String loadScript;
     private String toExecuteWhenPDFJSLoaded = "";
-
+    private Browser_CharClassif parent;
 
 
     public PdfCapableBrowser() {
@@ -205,6 +202,7 @@ public class PdfCapableBrowser {
 
     private WebView createWebView() {
         WebView webView = new WebView();
+        webView.setPrefSize(500,500);
         webView.setContextMenuEnabled(false);
         webView.getStylesheets().add(getClass().getResource("/Styles/PDFWebView.css").toExternalForm());
 
@@ -219,7 +217,6 @@ public class PdfCapableBrowser {
         engine.getLoadWorker().workDoneProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                System.out.println("%"+String.valueOf(newValue.intValue()));
                 if(newValue.intValue()==100){
                     try {
                         if (processListener != null) processListener.listen(pdfJsLoaded = true);
@@ -248,7 +245,6 @@ public class PdfCapableBrowser {
                                 engine.executeScript("console.log = function(message){ try {java.log(message);} catch(e) {} };");
 
                                 if (newValue == Worker.State.SUCCEEDED) {
-                                    System.out.println("Worker Success");
                                     try {
                                         if (processListener != null) processListener.listen(pdfJsLoaded = true);
 
@@ -278,13 +274,16 @@ public class PdfCapableBrowser {
                 try {
                     if ((address.toURL() + "").indexOf(".pdf") > -1)
                     {
-                        System.out.println("XXXXX PDF LINK DETECTED XXXXX");
-                        displayPdf(address.toURL());
+
+                        parent.icePdfBench(address.toURL());
+                        //displayPdf(address.toURL());
                         // wv.getEngine().load(oldValue); // 1
                         // wv.getEngine().getLoadWorker().cancel(); // 2
                         // wv.getEngine().executeScript("history.back()"); // 3
                         //d.browse(address);
                         //parent.browserUrlProperty.setValue(address.toURL().toString());
+                    }else{
+                        parent.showingPdf.setValue(false);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -298,7 +297,7 @@ public class PdfCapableBrowser {
 
 
 
-    public Parent toNode() {
+    public WebView toNode() {
         if (nodeValue == null)
             return nodeValue = createWebView();
         else
@@ -307,5 +306,9 @@ public class PdfCapableBrowser {
 
     public void loadPage(String url) {
         nodeValue.getEngine().load(url);
+    }
+
+    public void setParent(Browser_CharClassif browser_charClassif) {
+        this.parent = browser_charClassif;
     }
 }

@@ -2,6 +2,7 @@ package service;
 
 import controllers.Char_description;
 import model.*;
+import org.icepdf.ri.util.SearchTextTask;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
@@ -36,6 +37,17 @@ public class CharPatternServices {
 				}
 			}
 		}
+		if(parent.browserController.showingPdf.getValue()){
+			try{
+				String pdfSelection = parent.browserController.iceController.getDocumentViewController().getSelectedText();
+				if(pdfSelection!=null && pdfSelection.length()>0){
+					selected_text=pdfSelection;
+				}
+
+			}catch (Exception V){
+
+			}
+		}
 		System.out.println("Processing selected text ::: "+selected_text);
 		/*TRIM THE SELECTED TEXT IF TOO SHORT , PRECEDE AND FOLLOW WITH SPACE*/
 		selected_text = selected_text.trim();
@@ -60,7 +72,7 @@ public class CharPatternServices {
 		//Let's clean the selection from all separators and do the same thing for the known values
 		String[] SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 		System.out.println("Trying to match the selection with known values");
-		for(CaracteristicValue known_value:active_char.getKnownValues()) {
+		for(CaracteristicValue known_value:active_char.getKnownValues().stream().filter(k->(k!=null) && (k.getStdValue()!=null)).collect(Collectors.toList())) {
 			System.out.println("We know value "+known_value.getStdValue());
 			String separator_free_known = known_value.getDataLanguageValue();
 			String separator_free_selected = corrected_text;

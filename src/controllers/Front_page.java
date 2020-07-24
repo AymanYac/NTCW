@@ -220,6 +220,7 @@ public class Front_page {
 					//primaryStage.setMinHeight(768);
 					//primaryStage.setMinWidth(1024);
 					primaryStage.setMinHeight(768);primaryStage.setMinWidth(1024);primaryStage.setMaximized(true);primaryStage.setResizable(false);primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/pictures/NEONEC_Logo_Blue.png")));
+					//primaryStage.setFullScreen(true);
 					primaryStage.show();
 
 					controllers.Char_description controller = fxmlLoader.getController();
