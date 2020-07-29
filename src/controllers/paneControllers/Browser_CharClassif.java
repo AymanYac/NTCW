@@ -1,27 +1,35 @@
 package controllers.paneControllers;
 
+import com.sun.javafx.geom.Rectangle;
 import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.StackPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Pair;
 import model.CircularArrayList;
+import model.GlobalConstants;
+import net.miginfocom.layout.Grid;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.icepdf.core.pobjects.Destination;
 import org.icepdf.core.pobjects.graphics.text.LineText;
 import org.icepdf.core.util.PropertyConstants;
@@ -199,7 +207,27 @@ public class Browser_CharClassif {
 			// Change the value of a couple default viewer Properties.
 			// Note: this should be done before the factory is initialized.
 			properties.setBoolean(PropertiesManager.PROPERTY_VIEWPREF_HIDETOOLBAR,Boolean.TRUE);
+			properties.setBoolean(PropertiesManager.PROPERTY_VIEWPREF_HIDEMENUBAR,Boolean.TRUE);
+			//properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_KEYBOARD_SHORTCUTS,Boolean.FALSE);
 			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR_STATUSLABEL,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR_VIEWMODE,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_ANNOTATION,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_FIT,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_PAGENAV,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_ROTATE,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_TOOL,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_UTILITY,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_ZOOM,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_OPEN,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_PRINT,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_SAVE,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_SEARCH,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_UPANE,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITYPANE_ANNOTATION,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITYPANE_BOOKMARKS,Boolean.FALSE);
+			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITYPANE_SEARCH,Boolean.FALSE);
 
 			// add interactive mouse link annotation support via callback
 			iceController.getDocumentViewController().setAnnotationCallback(
@@ -450,11 +478,79 @@ public class Browser_CharClassif {
 	}
 	@FXML void paneNew(){
 		paneSmall();
-		StackPane secondaryLayout = new StackPane();
-		secondaryLayout.getChildren().add(toolBar);
+
+		GridPane secondaryLayout = new GridPane();
+		secondaryLayout.setMinWidth(GridPane.USE_COMPUTED_SIZE);
+		secondaryLayout.setMaxWidth(GridPane.USE_COMPUTED_SIZE);
+		secondaryLayout.setPrefWidth(GridPane.USE_COMPUTED_SIZE);
+		secondaryLayout.setMinHeight(GridPane.USE_COMPUTED_SIZE);
+		secondaryLayout.setMaxHeight(GridPane.USE_COMPUTED_SIZE);
+		secondaryLayout.setPrefWidth(GridPane.USE_COMPUTED_SIZE);
+		secondaryLayout.add(toolBar,0,1);
+		ToolBar headerBar = new ToolBar();
+		headerBar.setMinWidth(GridPane.USE_COMPUTED_SIZE);
+		headerBar.setMaxWidth(GridPane.USE_COMPUTED_SIZE);
+		headerBar.setPrefWidth(GridPane.USE_COMPUTED_SIZE);
+		headerBar.setMinHeight(GridPane.USE_COMPUTED_SIZE);
+		headerBar.setMaxHeight(GridPane.USE_COMPUTED_SIZE);
+		headerBar.setPrefWidth(GridPane.USE_COMPUTED_SIZE);
+		Button close = new Button("X");
+		close.getStylesheets().add(Browser_CharClassif.class.getResource("/Styles/CloseButtonRed.css").toExternalForm());
+		close.setAlignment(Pos.CENTER_RIGHT);
+		close.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				paneSmall();
+				secondaryStage.close();
+				switch_pane_hide_browser(true);
+			}
+		});
+		//Button icon = new Button();
+		//ImageView iconImage = new ImageView(new Image(getClass().getResourceAsStream("/pictures/NEONEC_FAV.ico")));
+		//iconImage.setFitHeight(close.getHeight());
+		//iconImage.setFitWidth(close.getWidth());
+		//icon.setGraphic(iconImage);
+		//icon.setAlignment(Pos.CENTER_LEFT);
+
+		Label title = new Label("Neonec classification wizard - V"+ GlobalConstants.TOOL_VERSION+" - Web Browser");
+		title.setAlignment(Pos.CENTER_LEFT);
+		Pane verticalSpace = new Pane();
+		HBox.setHgrow(verticalSpace, Priority.ALWAYS);
+
+
+		headerBar.getItems().setAll(title,verticalSpace,close);
+		headerBar.getStylesheets().add(Browser_CharClassif.class.getResource("/Styles/Main.css").toExternalForm());
+		GridPane.setValignment(headerBar, VPos.TOP);
+		secondaryLayout.add(headerBar,0,0);
+
+		Rectangle dragDelta = new Rectangle();
+		headerBar.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override public void handle(MouseEvent mouseEvent) {
+				// record a delta distance for the drag and drop operation.
+				dragDelta.x = (int) Math.floor(secondaryLayout.getScene().getWindow().getX() - mouseEvent.getScreenX());
+				dragDelta.y = (int) Math.floor(secondaryLayout.getScene().getWindow().getY() - mouseEvent.getScreenY());
+			}
+		});
+		headerBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
+			@Override public void handle(MouseEvent mouseEvent) {
+				secondaryLayout.getScene().getWindow().setX(mouseEvent.getScreenX() + dragDelta.x);
+				secondaryLayout.getScene().getWindow().setY(mouseEvent.getScreenY() + dragDelta.y);
+			}
+		});
+		RowConstraints R1 = new RowConstraints();
+		R1.setPercentHeight(5);
+		RowConstraints R2 = new RowConstraints();
+		R2.setPercentHeight(95);
+		secondaryLayout.getRowConstraints().setAll(R1,R2);
+		ColumnConstraints C0 = new ColumnConstraints();
+		C0.setPercentWidth(100);
+		secondaryLayout.getColumnConstraints().setAll(C0);
+
+		//secondaryLayout.getChildren().add(toolBar);
 		Scene secondScene = new Scene(secondaryLayout);
 		secondaryStage = new Stage();
 		secondaryStage.setScene(secondScene);
+		secondaryStage.initStyle(StageStyle.UNDECORATED);
 		secondaryStage.setMaximized(true);
 
 		secondScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
