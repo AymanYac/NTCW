@@ -569,9 +569,9 @@ public class Browser_CharClassif {
 	}
 
 	@FXML void externalBrowser() throws IOException, URISyntaxException, ParseException {
-		Desktop.getDesktop().browse(new URL(browser.toNode().getEngine().getLocation()).toURI());
-		parent.externalBrowserUrlProperty.setValue(browser.toNode().getEngine().getLocation());
-		hide_browser();
+		Desktop.getDesktop().browse(new URL(browser.toNode().getEngine().getLocation()+(showingPdf.get()?"#page="+pageField.getText():"")).toURI());
+		parent.externalBrowserUrlProperty.setValue(browser.toNode().getEngine().getLocation()+(showingPdf.get()?"#page="+pageField.getText():""));
+		//hide_browser();
 
 	}
 
