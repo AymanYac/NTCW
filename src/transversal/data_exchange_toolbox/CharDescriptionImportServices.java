@@ -117,9 +117,9 @@ public class CharDescriptionImportServices {
 			printRejectedTaxoRows(workbook,taxoSheetName,taxoSheet.getRow(0));
 			printRejectedItemRows(workbook,itemDataSheetName,itemDataSheet.getRow(0));
 			//save file
-			FileOutputStream out = new FileOutputStream(new File(filePath).getAbsolutePath());
-			workbook.write(out);
-			out.close();
+			//FileOutputStream out = new FileOutputStream(new File(filePath).getAbsolutePath());
+			//workbook.write(out);
+			//out.close();
 			workbook.close();
 			is.close();
 		}catch (Exception V){

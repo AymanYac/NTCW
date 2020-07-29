@@ -95,14 +95,14 @@ public class AutoCompleteBox_CharClassification extends TextField
     {
         public void handle(final KeyEvent keyEvent) 
         {
-            handleKeyBoardEvent(keyEvent,true);
+            handleReclassifFieldKeyBoardEvent(keyEvent,true);
         }
     });
     this.setOnKeyReleased(new EventHandler<KeyEvent>() 
     {
         public void handle(final KeyEvent keyEvent) 
         {
-            handleKeyBoardEvent(keyEvent,false);
+            handleReclassifFieldKeyBoardEvent(keyEvent,false);
         }
     });
     
@@ -180,121 +180,10 @@ public class AutoCompleteBox_CharClassification extends TextField
     this.setStyle(style);
   }
 
-  protected void handleKeyBoardEvent(KeyEvent keyEvent, boolean pressed) {
-	
-	
-	if(keyEvent.getCode().equals(KeyCode.CONTROL)) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.UP, false);
-		this.account.PRESSED_KEYBOARD.put(KeyCode.DOWN, false);
-		
-		this.account.PRESSED_KEYBOARD.put(KeyCode.CONTROL, pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.SHIFT)) {
-		if(!pressed) {
-			this.account.PRESSED_KEYBOARD.put(KeyCode.UP, false);
-			this.account.PRESSED_KEYBOARD.put(KeyCode.DOWN, false);
-		}
-		this.account.PRESSED_KEYBOARD.put(KeyCode.SHIFT, pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.D)) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.D, pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.U)) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.U, pressed);
-	}
-	
-	if(keyEvent.getCode().equals(KeyCode.PAGE_UP)) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.PAGE_UP, pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.PAGE_DOWN)) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.PAGE_DOWN, pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.DOWN)) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.DOWN, pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.UP)) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.UP, pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.ENTER)) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.ENTER, pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.RIGHT)) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.RIGHT, pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.LEFT)) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.LEFT, pressed);
-	}
-	
-	
-	/*
-	if(keyEvent.getCode().equals(KeyCode.CONTROL)) {
-		keyEvent.consume();
-		this.account.PRESSED_KEYBOARD.put(KeyCode.CONTROL, pressed);
-	}*/
-	if(keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_1))) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_1), pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_2))) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_2), pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_3))) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_3), pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_4))) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_4), pressed);
-	}
-	if(keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_5))) {
-		this.account.PRESSED_KEYBOARD.put(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_5), pressed);
-	}
-	
-	
-	if(this.account.PRESSED_KEYBOARD.get(KeyCode.RIGHT) ) {
-		parent_controller.tableController.nextChar();
-	}
-	
-	if(this.account.PRESSED_KEYBOARD.get(KeyCode.LEFT) ) {
-		parent_controller.tableController.previousChar();
-	}
-	
-	if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_1))) {
-		parent_controller.firePropositionButton(1);
-	}
-	if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_2))) {
-		parent_controller.firePropositionButton(2);
-	}
-	if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_3))) {
-		parent_controller.firePropositionButton(3);
-	}
-	if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_4))) {
-		parent_controller.firePropositionButton(4);
-	}
-	if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_5))) {
-		parent_controller.firePropositionButton(5);
-	}
-	
-	
-	
-	
-	
-	if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.D)) {
-		//parent_controller.tableController.fireClassDown();
-	}
-	
-	else if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.U)) {
-		//parent_controller.tableController.fireClassUp();
-	}
-	
-	else if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
-		//parent_controller.tableController.fireScrollNBDown();
-		entriesPopup.hide();
-	}
-	
-	else if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
-		//parent_controller.tableController.fireScrollNBUp();
-		entriesPopup.hide();
-	}
+  protected void handleReclassifFieldKeyBoardEvent(KeyEvent keyEvent, boolean pressed) {
 
-	else if (this.account.PRESSED_KEYBOARD.get(KeyCode.ENTER) && !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
+
+	if (this.account.PRESSED_KEYBOARD.get(KeyCode.ENTER) && !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
 		
 			if(entriesPopup.isShowing()) {
 				send_classification_to_parent(RESULTMAP.get(0));
@@ -309,30 +198,6 @@ public class AutoCompleteBox_CharClassification extends TextField
 			parent_controller.value_field.end();
 			parent_controller.value_field.selectAll();
 		}
-	
-	else if (this.account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
-		parent_controller.tableController.tableGrid.requestFocus();
-		duplicateKeyEvent(KeyCode.DOWN);
-		//parent_controller.fireClassScroll(rowIndex+1,KeyCode.DOWN);
-	}
-	else if (this.account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
-		parent_controller.tableController.tableGrid.requestFocus();
-		duplicateKeyEvent(KeyCode.UP);
-		//parent_controller.fireClassScroll(rowIndex-1,KeyCode.UP);
-	}
-	
-	else if (this.account.PRESSED_KEYBOARD.get(KeyCode.PAGE_DOWN)) {
-		parent_controller.tableController.tableGrid.requestFocus();
-		duplicateKeyEvent(KeyCode.PAGE_DOWN);
-		//parent_controller.fireClassScroll(rowIndex+1,KeyCode.DOWN);
-	}
-	else if (this.account.PRESSED_KEYBOARD.get(KeyCode.PAGE_UP)) {
-		parent_controller.tableController.tableGrid.requestFocus();
-		duplicateKeyEvent(KeyCode.PAGE_UP);
-		//parent_controller.fireClassScroll(rowIndex-1,KeyCode.UP);
-	}
-	
-	
 	
 }
 

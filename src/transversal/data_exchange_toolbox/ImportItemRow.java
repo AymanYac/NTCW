@@ -42,7 +42,11 @@ public class ImportItemRow {
 	
 	private String rowGetCharNumber(Row current_row) {
 		try{
-			return current_row.getCell(columnMap.get("charId")).getStringCellValue();
+			String ret = current_row.getCell(columnMap.get("charId")).getStringCellValue();
+			if(ret.length()>0){
+				return ret;
+			}
+			return null;
 		}catch(Exception V) {
 			return null;
 		}
@@ -211,73 +215,75 @@ public class ImportItemRow {
 
 
 	private CharDescriptionRow setItem(Row current_row) {
-		String row_item_number = current_row.getCell(columnMap.get("client_number"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
-		row_item_number = unidecode.decodeAndTrim(row_item_number);
-		String row_sd_data = current_row.getCell(columnMap.get("sd_data"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
-		row_sd_data = unidecode.decodeAndTrim(row_sd_data);
-		String row_sd_user = current_row.getCell(columnMap.get("sd_user"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
-		row_sd_user = unidecode.decodeAndTrim(row_sd_user);
-		String row_ld_data = current_row.getCell(columnMap.get("ld_data"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
-		row_ld_data = unidecode.decodeAndTrim(row_ld_data);
-		String row_ld_user = current_row.getCell(columnMap.get("ld_user"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
-		row_ld_user = unidecode.decodeAndTrim(row_ld_user);
-		String row_mg = current_row.getCell(columnMap.get("mg"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
-		row_mg = unidecode.decodeAndTrim(row_mg);
-		String row_pc = current_row.getCell(columnMap.get("preclass"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
-		row_pc = unidecode.decodeAndTrim(row_pc);
-		
-		String row_class_number = current_row.getCell(columnMap.get("class_number"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
-		Optional<ClassSegment> row_segment = CharDescriptionImportServices.sid2Segment.values().stream().filter(s->s.getClassNumber().equals(row_class_number)).findAny();
-		
-		CharDescriptionRow row_item = new CharDescriptionRow();
-		if(row_item_number.replace(" ", "").length()==0) {
-			rejectedRows.add(new Pair<Row,String>(current_row,"Row has no item ID"));
-			itemParseHasFailed = true;
-			return null;
-		}
-		if(row_sd_data.replace(" ", "").length()==0 && row_ld_data.replace(" ", "").length()==0) {
-			rejectedRows.add(new Pair<Row,String>(current_row,"Row has no data language ID"));
-			itemParseHasFailed = true;
-			return null;
-		}
-		
-		if(row_segment.isPresent()) {
-			row_item.setClass_segment(row_segment.get());
-		}else {
-			if(row_class_number.length()>0) {
-				rejectedRows.add(new Pair<Row,String>(current_row,"Class number unknown: "+row_class_number+". Item created but not classified"));
+		try {
+			String row_item_number = current_row.getCell(columnMap.get("client_number"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+			row_item_number = unidecode.decodeAndTrim(row_item_number);
+			String row_sd_data = current_row.getCell(columnMap.get("sd_data"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+			row_sd_data = unidecode.decodeAndTrim(row_sd_data);
+			String row_sd_user = current_row.getCell(columnMap.get("sd_user"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+			row_sd_user = unidecode.decodeAndTrim(row_sd_user);
+			String row_ld_data = current_row.getCell(columnMap.get("ld_data"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+			row_ld_data = unidecode.decodeAndTrim(row_ld_data);
+			String row_ld_user = current_row.getCell(columnMap.get("ld_user"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+			row_ld_user = unidecode.decodeAndTrim(row_ld_user);
+			String row_mg = current_row.getCell(columnMap.get("mg"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+			row_mg = unidecode.decodeAndTrim(row_mg);
+			String row_pc = current_row.getCell(columnMap.get("preclass"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+			row_pc = unidecode.decodeAndTrim(row_pc);
+
+			String row_class_number = current_row.getCell(columnMap.get("class_number"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+			Optional<ClassSegment> row_segment = CharDescriptionImportServices.sid2Segment.values().stream().filter(s->s.getClassNumber().equals(row_class_number)).findAny();
+
+			CharDescriptionRow row_item = new CharDescriptionRow();
+			if(row_item_number.replace(" ", "").length()==0) {
+				rejectedRows.add(new Pair<Row,String>(current_row,"Row has no item ID"));
+				itemParseHasFailed = true;
+				return null;
 			}
-			row_item.setClass_segment(null);
+
+			if(row_segment.isPresent()) {
+				row_item.setClass_segment(row_segment.get());
+			}else {
+				if(row_class_number.length()>0) {
+					rejectedRows.add(new Pair<Row,String>(current_row,"Class number unknown: "+row_class_number+". Item created but not classified"));
+				}
+				row_item.setClass_segment(null);
+			}
+
+			row_item.setClient_item_number(row_item_number);
+			row_item.setShort_desc(row_sd_data.length()>0?row_sd_data:null);
+			row_item.setLong_desc(row_ld_data.length()>0?row_ld_data:null);
+			row_item.setShort_desc_translated(row_sd_user.length()>0?row_sd_user:null);
+			row_item.setLong_desc_translated(row_ld_user.length()>0?row_ld_user:null);
+			row_item.setMaterial_group(row_mg.length()>0?row_mg:null);
+			row_item.setPreclassif(row_pc.length()>0?row_pc:null);
+
+			CharDescriptionRow known_item = CharDescriptionImportServices.client2Item.get(row_item.getClient_item_number().toLowerCase());
+			if(known_item!=null) {
+				//The item is known
+				known_item.setShort_desc(forceUpdate?row_item.getShort_desc():known_item.getShort_desc());
+				known_item.setLong_desc(forceUpdate?row_item.getLong_desc():known_item.getLong_desc());
+				known_item.setShort_desc_translated(forceUpdate?row_item.getShort_desc_translated():known_item.getShort_desc_translated());
+				known_item.setLong_desc_translated(forceUpdate?row_item.getLong_desc_translated():known_item.getLong_desc_translated());
+				known_item.setMaterial_group(forceUpdate?row_item.getMaterial_group():known_item.getMaterial_group());
+				known_item.setPreclassif(forceUpdate?row_item.getPreclassif():known_item.getPreclassif());
+				known_item.setClass_segment((forceUpdate && row_item.getClass_segment()!=null)?row_item.getClass_segment():known_item.getClass_segment());
+
+				CharDescriptionImportServices.client2Item.put(known_item.getClient_item_number().toLowerCase(), known_item);
+				return known_item;
+			}else {
+				//The item is not known
+				row_item.setItem_id(Tools.generate_uuid());
+				CharDescriptionImportServices.client2Item.put(row_item.getClient_item_number().toLowerCase(), row_item);
+				return row_item;
+			}
+		}catch(Exception V) {
+			rejectedRows.add(new Pair<Row,String>(current_row,"Line could not be read"));
+			itemParseHasFailed = true;
+			return null;
 		}
-				
-		row_item.setClient_item_number(row_item_number);
-		row_item.setShort_desc(row_sd_data.length()>0?row_sd_data:null);
-		row_item.setLong_desc(row_ld_data.length()>0?row_ld_data:null);
-		row_item.setShort_desc_translated(row_sd_user.length()>0?row_sd_user:null);
-		row_item.setLong_desc_translated(row_ld_user.length()>0?row_ld_user:null);
-		row_item.setMaterial_group(row_mg.length()>0?row_mg:null);
-		row_item.setPreclassif(row_pc.length()>0?row_pc:null);
-		
-		CharDescriptionRow known_item = CharDescriptionImportServices.client2Item.get(row_item.getClient_item_number().toLowerCase());
-		if(known_item!=null) {
-			//The item is known
-			known_item.setShort_desc(forceUpdate?row_item.getShort_desc():known_item.getShort_desc());
-			known_item.setLong_desc(forceUpdate?row_item.getLong_desc():known_item.getLong_desc());
-			known_item.setShort_desc_translated(forceUpdate?row_item.getShort_desc_translated():known_item.getShort_desc_translated());
-			known_item.setLong_desc_translated(forceUpdate?row_item.getLong_desc_translated():known_item.getLong_desc_translated());
-			known_item.setMaterial_group(forceUpdate?row_item.getMaterial_group():known_item.getMaterial_group());
-			known_item.setPreclassif(forceUpdate?row_item.getPreclassif():known_item.getPreclassif());
-			known_item.setClass_segment((forceUpdate && row_item.getClass_segment()!=null)?row_item.getClass_segment():known_item.getClass_segment());
-			
-			CharDescriptionImportServices.client2Item.put(known_item.getClient_item_number().toLowerCase(), known_item);
-			return known_item;
-		}else {
-			//The item is not known
-			row_item.setItem_id(Tools.generate_uuid());
-			CharDescriptionImportServices.client2Item.put(row_item.getClient_item_number().toLowerCase(), row_item);
-			return row_item;
-		}
-		
+
+
 	}
 
 	public static void setColumnMap() {

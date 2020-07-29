@@ -418,7 +418,7 @@ public class Char_description {
 				
 			}
 			
-			if(account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
+			if((!this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) && account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
 				tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()+1);
 				Platform.runLater(new Runnable() {
 					@Override
@@ -428,7 +428,7 @@ public class Char_description {
 					}
 				});
 			}
-			if(account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
+			if((!this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) && account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
 				tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()-1);
 				Platform.runLater(new Runnable() {
 					@Override
@@ -668,8 +668,14 @@ public class Char_description {
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_5))) {
 			firePropositionButton(5);
 		}
-		
-		
+
+		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
+			tableController.fireScrollNBDown();
+		}
+
+		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
+			tableController.fireScrollNBUp();
+		}
 		
 		
 		

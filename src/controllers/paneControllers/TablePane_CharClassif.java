@@ -336,12 +336,9 @@ public class TablePane_CharClassif {
 		
 		int currentIdx = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
 		tableGrid.getSelectionModel().clearAndSelect(1+ currentIdx);
-		if(1+currentIdx>tvX.getLastVisibleIndex()) {
-			tableGrid.scrollTo(currentIdx+1);
-			//tableGrid.scrollTo(tvX.getFirstVisibleIndex()+2);
-		}
+		scrollSelectedItemVisible();
 	}
-	
+
 	public void setUserAccount(UserAccount account) {
 		this.account=account;
 		this.advancement = new CharAdvancementUpdater();
@@ -863,6 +860,122 @@ public class TablePane_CharClassif {
 	private void selectFirstItem() {
 		//Temporary : select first item
 		this.tableGrid.getSelectionModel().select(0);
+	}
+
+	public void fireScrollNBUp() {
+		try {
+
+			int min = (int) Collections.min(tableGrid.getSelectionModel().getSelectedIndices());
+			CharDescriptionRow thisItem = ((CharDescriptionRow) tableGrid.getItems().get(min));
+			CharDescriptionRow previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
+			String data_this = "";
+			String data_previous="";
+			try{
+				data_this = thisItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+			}catch (Exception V){
+
+			}
+			try{
+				data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+			}catch (Exception V){
+
+			}
+
+			if(data_this.length()>0  && data_previous.length()>0) {
+				while(data_previous.length()>0) {
+					min-=1;
+					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
+					data_previous="";
+					try{
+						data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+					}catch (Exception V){
+
+					}
+				}
+				tableGrid.getSelectionModel().clearAndSelect(Math.max(0,min));
+				scrollSelectedItemVisible();
+			}else {
+				while(! ( data_previous.length()>0 ) ) {
+					min-=1;
+					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
+					data_previous="";
+					try{
+						data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+					}catch (Exception V){
+
+					}
+				}
+				tableGrid.getSelectionModel().clearAndSelect(Integer.max(min-1,0));
+				scrollSelectedItemVisible();
+
+			}
+		}catch(Exception V) {
+
+		}
+	}
+
+
+	public void fireScrollNBDown() {
+
+		try {
+
+			int max = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
+			CharDescriptionRow thisItem = ((CharDescriptionRow) tableGrid.getItems().get(max));
+			CharDescriptionRow nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
+			String data_this = "";
+			String data_next="";
+			try{
+				data_this = thisItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+			}catch (Exception V){
+
+			}
+			try{
+				data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+			}catch (Exception V){
+
+			}
+
+			if(data_this.length()>0  && data_next.length()>0) {
+				while(data_next.length()>0) {
+					max+=1;
+					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
+					data_next="";
+					try{
+						data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+					}catch (Exception V){
+
+					}
+				}
+				tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max));
+				scrollSelectedItemVisible();
+			}else {
+				while(! ( data_next.length()>0 ) ) {
+					max+=1;
+					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
+					data_next="";
+					try{
+						data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+					}catch (Exception V){
+
+					}
+				}
+				tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max+1));
+				scrollSelectedItemVisible();
+
+			}
+		}catch(Exception V) {
+
+		}
+	}
+
+	private void scrollSelectedItemVisible() {
+		int selectedIdx = tableGrid.getSelectionModel().getFocusedIndex();
+		int fvIdx = tvX.getFirstVisibleIndex();
+		int lvIdx = tvX.getLastVisibleIndex();
+		if( fvIdx<=selectedIdx && selectedIdx<=lvIdx){
+			return;
+		}
+		tableGrid.scrollTo(selectedIdx);
 	}
 
 }
