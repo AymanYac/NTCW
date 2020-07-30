@@ -37,17 +37,18 @@ public class CharDescriptionImportServices {
 	public static void upsertTaxoAndChar(String filePath,String taxoSheetName,String itemDataSheetName, String active_pid, int projectGranularity, UserAccount account) throws IOException, ClassNotFoundException, SQLException, InvalidFormatException {
 		active_project = active_pid;
 		account.setActive_project(active_pid);
-		
-		InputStream is = new FileInputStream(new File(filePath));
-		/*Workbook workbook = StreamingReader.builder()
-		        .rowCacheSize(100)    // number of rows to keep in memory (defaults to 10)
-		        .bufferSize(4096)     // buffer size to use when reading InputStream to file (defaults to 1024)
-		        .open(is);            // InputStream or File for XLSX file (required)*/
 
+
+		InputStream is = new FileInputStream(new File(filePath));
+		Workbook workbook = StreamingReader.builder()
+		        .rowCacheSize(1000)    // number of rows to keep in memory (defaults to 10)
+		        .bufferSize(2048)     // buffer size to use when reading InputStream to file (defaults to 1024)
+		        .open(is);            // InputStream or File for XLSX file (required)*/
+		/*
 		File excel = new File(filePath);
 		FileInputStream fis = new FileInputStream(excel);
 		XSSFWorkbook workbook = new XSSFWorkbook(fis);
-
+*/
 
 		CharDescriptionImportServices.projectGranularity=projectGranularity;
 		CharValuesLoader.fetchAllKnownValuesAssociated2Items(active_project);
@@ -114,8 +115,8 @@ public class CharDescriptionImportServices {
 
 
 		try{
-			printRejectedTaxoRows(workbook,taxoSheetName,taxoSheet.getRow(0));
-			printRejectedItemRows(workbook,itemDataSheetName,itemDataSheet.getRow(0));
+			//printRejectedTaxoRows(workbook,taxoSheetName,taxoSheet.getRow(0));
+			//printRejectedItemRows(workbook,itemDataSheetName,itemDataSheet.getRow(0));
 			//save file
 			//FileOutputStream out = new FileOutputStream(new File(filePath).getAbsolutePath());
 			//workbook.write(out);
@@ -125,6 +126,8 @@ public class CharDescriptionImportServices {
 		}catch (Exception V){
 			V.printStackTrace(System.err);
 			ConfirmationDialog.show("File saving failed", "Data uploaded but rejected rows could not be saved in\n"+filePath+"\nMake sure you have the the file is not open by another application", "OK", null);
+			workbook.close();
+			is.close();
 		}
 
 
