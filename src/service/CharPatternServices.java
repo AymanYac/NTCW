@@ -37,16 +37,17 @@ public class CharPatternServices {
 				}
 			}
 		}
-		if(parent.browserController.showingPdf.getValue()){
-			try{
+
+		try{
+			if(parent.browserController.showingPdf.getValue()) {
 				String pdfSelection = parent.browserController.iceController.getDocumentViewController().getSelectedText();
-				if(pdfSelection!=null && pdfSelection.length()>0){
-					selected_text=pdfSelection;
+				if (pdfSelection != null && pdfSelection.length() > 0) {
+					selected_text = pdfSelection;
 				}
-
-			}catch (Exception V){
-
 			}
+
+		}catch (Exception V){
+
 		}
 		System.out.println("Processing selected text ::: "+selected_text);
 		/*TRIM THE SELECTED TEXT IF TOO SHORT , PRECEDE AND FOLLOW WITH SPACE*/
@@ -73,7 +74,6 @@ public class CharPatternServices {
 		String[] SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 		System.out.println("Trying to match the selection with known values");
 		for(CaracteristicValue known_value:active_char.getKnownValues().stream().filter(k->(k!=null) && (k.getStdValue()!=null)).collect(Collectors.toList())) {
-			System.out.println("We know value "+known_value.getStdValue());
 			String separator_free_known = known_value.getDataLanguageValue();
 			String separator_free_selected = corrected_text;
 			for(String sep:SEPARATORS) {
@@ -120,7 +120,6 @@ public class CharPatternServices {
 					SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 					System.out.println("Trying to match the after :/= segment with known values");
 					for(CaracteristicValue known_value:active_char.getKnownValues()) {
-						System.out.println("We know value "+known_value.getDataLanguageValue());
 						String separator_free_known = known_value.getDataLanguageValue();
 						String separator_free_selected = corrected_part_after_identifier;
 						for(String sep:SEPARATORS) {
@@ -146,7 +145,6 @@ public class CharPatternServices {
 							SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 							HashSet<CaracteristicValue> VALUES_CONTAINING_AFTER_IDENTIFIER = new HashSet<CaracteristicValue>();
 							for(CaracteristicValue known_value:active_char.getKnownValues()) {
-								System.out.println("We know value "+known_value.getDataLanguageValue());
 								/*
 								String separator_free_known = known_value.getDataLanguageValue();
 								String separator_free_selected = corrected_part_after_identifier;
@@ -185,7 +183,6 @@ public class CharPatternServices {
 								SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 								VALUES_CONTAINING_AFTER_IDENTIFIER = new HashSet<CaracteristicValue>();
 								for(CaracteristicValue known_value:active_char.getKnownValues()) {
-									System.out.println("We know value "+known_value.getUserLanguageValue());
 									/*String separator_free_known = known_value.getUserLanguageValue();
 									String separator_free_selected = corrected_part_after_identifier;
 									for(String sep:SEPARATORS) {
@@ -241,6 +238,7 @@ public class CharPatternServices {
 				HashSet<CaracteristicValue> VALUES_CONTAINING_SELECTION = new HashSet<CaracteristicValue>();
 				for(CaracteristicValue known_value:active_char.getKnownValues()) {
 					System.out.println("we known value "+known_value.getDataLanguageValue());
+					if(!(known_value.getDataLanguageValue()!=null)){continue;}
 					for(String known_value_sub_element:known_value.getDataLanguageValue().split(String.join("|", SEPARATORS))) {
 						if( unidecode.decode(known_value_sub_element).toUpperCase().equals(
 								unidecode.decode(corrected_text).toUpperCase()) ){
@@ -268,7 +266,7 @@ public class CharPatternServices {
 					SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 					VALUES_CONTAINING_SELECTION = new HashSet<CaracteristicValue>();
 					for(CaracteristicValue known_value:active_char.getKnownValues()) {
-						System.out.println("we know value "+known_value.getUserLanguageValue());
+						if(!(known_value.getUserLanguageValue()!=null)){continue;}
 						String[] subelements;
 						try{
 							subelements = known_value.getUserLanguageValue().split(String.join("|", SEPARATORS));
@@ -469,7 +467,6 @@ public class CharPatternServices {
 						SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 						HashSet<CaracteristicValue> VALUES_CONTAINED_IN_SELECTION = new HashSet<CaracteristicValue>();
 						for(CaracteristicValue known_value:active_char.getKnownValues()) {
-							System.out.println("We know value "+known_value.getDataLanguageValue());
 							/*
 							String separator_free_known = known_value.getDataLanguageValue();
 							String separator_free_selected = corrected_text;
@@ -1810,102 +1807,7 @@ public class CharPatternServices {
 						}else {
 							//The selection contains 4+ digits
 							System.out.println("4+ digits in selection");
-							/*
-							String inbetweenNumbersText1 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf("%1")
-									+"%1".length(),
-									selected_text.replace(",", ".").indexOf("%2")
-									);
-							String inbetweenNumbersText2 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf("%2")
-									+"%2".length(),
-									selected_text.replace(",", ".").indexOf("%3")
-									);
-							String inbetweenNumbersText3 = selected_text.substring(
-									selected_text.replace(",", ".").indexOf("%3")
-									+"%3".length(),
-									selected_text.replace(",", ".").indexOf("%4")
-									);
-							
-							
-							UnitOfMeasure infered_uom = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0));
-							
-							CharacteristicValue preparedValue1 = new CharacteristicValue();;;; preparedValue1.setParentChar(active_char);
-							preparedValue1.setUom_id(infered_uom.getUom_id());
-							preparedValue1.setNominal_value(WordUtils.DoubleToString(
-									numValuesInSelection.get(0)
-									));
 
-							String preparedRule1 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-									"%1"))+"\"(|+0)%1(|+0)\""
-									+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
-									+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)\""
-									+inbetweenNumbersText3+"\""+"(|+0)%4"
-									+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf("%4")+
-													"%4".length())
-									+"\""+"<NOM %1><UOM \""+infered_uom+"\">";
-							
-							parent.preparePatternProposition(0, preparedValue1.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue1, preparedRule1, active_char);
-							
-							
-							CharacteristicValue preparedValue2 = new CharacteristicValue();;;; preparedValue2.setParentChar(active_char);
-							preparedValue2.setUom_id(infered_uom.getUom_id());
-							preparedValue2.setNominal_value(WordUtils.DoubleToString(
-									numValuesInSelection.get(1)
-									));
-							
-							String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-									"%1"))+"\"(|+0)%1(|+0)\""
-									+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
-									+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)\""
-									+inbetweenNumbersText3+"\""+"(|+0)%4"
-									+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf("%4")+
-													"%4".length())
-									+"\""+"<NOM %2><UOM \""+infered_uom+"\">";
-							
-							parent.preparePatternProposition(1, preparedValue2.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue2, preparedRule2, active_char);
-							
-							
-							CharacteristicValue preparedValue3 = new CharacteristicValue();;;; preparedValue3.setParentChar(active_char);
-							preparedValue3.setUom_id(infered_uom.getUom_id());
-							preparedValue3.setNominal_value(WordUtils.DoubleToString(
-									numValuesInSelection.get(2)
-									));
-							
-							String preparedRule3 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-									"%1"))+"\"(|+0)%1(|+0)\""
-									+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
-									+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)\""
-									+inbetweenNumbersText3+"\""+"(|+0)%4"
-									+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf("%4")+
-													"%4".length())
-									+"\""+"<NOM %3><UOM \""+infered_uom+"\">";
-							
-							parent.preparePatternProposition(2, preparedValue3.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue3, preparedRule3, active_char);
-							
-							
-							CharacteristicValue preparedValue4 = new CharacteristicValue();;;; preparedValue4.setParentChar(active_char);
-							preparedValue4.setUom_id(infered_uom.getUom_id());
-							preparedValue4.setNominal_value(WordUtils.DoubleToString(
-									numValuesInSelection.get(3)
-									));
-							
-							String preparedRule4 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
-									"%1"))+"\"(|+0)%1(|+0)\""
-									+inbetweenNumbersText1+"\""+"(|+0)%2(|+0)\""
-									+inbetweenNumbersText2+"\""+"(|+0)%3(|+0)\""
-									+inbetweenNumbersText3+"\""+"(|+0)%4"
-									+"\""+selected_text.substring(
-											selected_text.replace(",", ".").indexOf("%4")+
-													"%4".length())
-									+"\""+"<NOM %4><UOM \""+infered_uom+"\">";
-							
-							parent.preparePatternProposition(3, preparedValue4.getNominal_value_truncated()+" "+infered_uom.getUom_symbol()+" ("+infered_uom.getUom_name()+")", preparedValue4, preparedRule4, active_char);
-							*/
-							
 							ArrayList<String> textBetweenNumbers = new ArrayList<String>();
 							String[] textBetweenNumberstmp = (selected_text+" ").split("%\\d");
 							for(int i=0;i<textBetweenNumberstmp.length;i++) {
@@ -2623,6 +2525,10 @@ public class CharPatternServices {
 		for(String key:specialwords.keySet()) {
 			LinkedHashSet<String> tmp = specialwords.get(key);
 			for(String sw:tmp) {
+				if(sw!=null){
+				}else{
+					continue;
+				}
 				if(WordUtils.CORRECT(selected_text).toUpperCase().startsWith(sw.toUpperCase())){
 					return selected_text.substring(0,sw.length());
 				}
@@ -2675,19 +2581,22 @@ public class CharPatternServices {
 		}
 		boolean exitOnShortDesc = false;
 		Matcher m;
+		HashSet<String> matchingSegments = new HashSet<String>();
 		if(r.getShort_desc()!=null) {
 			m = regexPattern.matcher(" "+r.getShort_desc()+" ");
 			exitOnShortDesc = false;
 			while(m.find()) {
-				addCharResult2Row(r,activeCharRule,r.getShort_desc(),m.group(),parent);
-				exitOnShortDesc = true;
+				matchingSegments.addAll(
+				addCharResult2Row(r,activeCharRule,r.getShort_desc(),m.group(),parent)
+				);
+				exitOnShortDesc = false;
 			}
 		}
 		if(exitOnShortDesc || !(r.getLong_desc()!=null)) {
+			matchingSegments.forEach(segment->r.reEvaluateCharRules(segment,charIdArrays.get(segment).size()));
 			return;
 		}
 		m = regexPattern.matcher(" "+r.getLong_desc()+" ");
-		HashSet<String> matchingSegments = new HashSet<String>();
 		while(m.find()) {
 			matchingSegments.addAll(
 					addCharResult2Row(r,activeCharRule,r.getLong_desc(),m.group(),parent)
@@ -2699,11 +2608,11 @@ public class CharPatternServices {
 
 	private static ArrayList<String> addCharResult2Row(CharDescriptionRow matchedRow, GenericCharRule matchedRule, String matchedText,
 			String matchedGroup, Char_description parent) {
-		
+		/*
 		System.out.println("Rule "+matchedRule.getRuleMarker()+":"+
 				"\n\t matches item "+matchedRow.getClient_item_number()+
 				"\n\t with desc "+matchedText+
-				"\n\t at group "+matchedGroup);
+				"\n\t at group "+matchedGroup);*/
 			
 		ArrayList<String> matchingSegments = new ArrayList<String>();
 		//For every segment that contains char in item

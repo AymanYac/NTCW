@@ -28,7 +28,6 @@ import javafx.util.Callback;
 import javafx.util.Pair;
 import model.*;
 import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import service.CharItemFetcher;
 import service.CharValuesLoader;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
@@ -273,7 +272,9 @@ public class CaracDeclarationDialog {
 					charClassLink.getItems().add(cc);
 					charClassLink.getSelectionModel().select(0); //Select this category only on carac creation
 					sequence.getSelectionModel().clearSelection();
+					sequence.getSelectionModel().select(Integer.valueOf(CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).size()+1));
 					criticality.getSelectionModel().clearSelection();
+					criticality.getSelectionModel().select("Not critical");
 					uom0.getItems().add("No unit of measure");
 					uom0.getItems().add("Other...");
 					uom1.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values());
@@ -284,13 +285,13 @@ public class CaracDeclarationDialog {
 		});
 
 		charNameTranslated.disableProperty().bind(charName.textProperty().length().isEqualTo(0));
-		charType.disableProperty().bind(charNameTranslated.textProperty().length().isEqualTo(0).or(charName.incompleteProperty.not()));
+		charType.disableProperty().bind(charName.incompleteProperty.not());
 		charTranslability.disableProperty().bind(charType.valueProperty().isNull().or(charName.incompleteProperty.not()));
 		charClassLink.disableProperty().bind(charTranslability.valueProperty().isNull());
-		sequence.disableProperty().bind(charClassLink.valueProperty().isNull());
-		sequenceCB.disableProperty().bind(sequence.valueProperty().isNull());
-		criticality.disableProperty().bind(charClassLink.valueProperty().isNull().or(sequence.valueProperty().isNull()));
-		criticalityCB.disableProperty().bind(criticality.valueProperty().isNull());
+		sequence.disableProperty().bind(charClassLink.valueProperty().isNull().or(charTranslability.valueProperty().isNull()));
+		sequenceCB.disableProperty().bind(sequence.valueProperty().isNull().or(sequence.disableProperty()));
+		criticality.disableProperty().bind(charClassLink.valueProperty().isNull().or(sequence.valueProperty().isNull()).or(sequence.disableProperty()));
+		criticalityCB.disableProperty().bind(criticality.valueProperty().isNull().or(criticality.disableProperty()));
 		uom0.disableProperty().bind(charClassLink.valueProperty().isNull().or(criticality.valueProperty().isNull()));
 		uom0CB.disableProperty().bind(uom0.valueProperty().isNull());
 		uom1.disableProperty().bind(charClassLink.valueProperty().isNull().or(criticality.valueProperty().isNull()));
@@ -584,8 +585,7 @@ public class CaracDeclarationDialog {
 		return droppedClassInsertions;
 	}
 
-	private static @NotNull
-	ClassCaracteristic loadCaracFromDialog() {
+	private static ClassCaracteristic loadCaracFromDialog() {
 		ClassCaracteristic newCarac = new ClassCaracteristic();
 		ArrayList<String> newUoms = new ArrayList<String>();
 		if(charName.incompleteProperty.getValue()){

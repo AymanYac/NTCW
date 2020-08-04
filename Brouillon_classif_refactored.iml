@@ -340,17 +340,17 @@
     </orderEntry>
     <orderEntry type="module-library">
       <library>
-        <CLASSES />
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Documents/Deliveries/NTDW/Libs/org.eclipse.swt-3.1.jar!/" />
+        </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/src" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Documents/Deliveries/NTDW/Libs/org.eclipse.swt-3.1.jar!/" />
+          <root url="jar://$USER_HOME$/Documents/Deliveries/NTDW/Libs/log4j-1.2.16.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
