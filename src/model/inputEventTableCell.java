@@ -60,7 +60,7 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
                                     popup.hide();
                                     try {
                                         CaracDeclarationDialog.CaracEditionPopUp(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.account,parent.tableController.tableGrid);
-                                        parent.tableController.refresh_table_with_segment(parent.classCombo.getValue().getClassSegment());
+                                        parent.tableController.refresh_table_preserve_sort_order();
                                     } catch (SQLException | ClassNotFoundException throwables) {
                                         throwables.printStackTrace();
                                     }
@@ -72,7 +72,7 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
                                     popup.hide();
                                     try {
                                         CaracDeclarationDialog.CaracDeletion(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0],parent.account);
-                                        parent.tableController.refresh_table_with_segment(parent.classCombo.getValue().getClassSegment());
+                                        parent.tableController.refresh_table_preserve_sort_order();
                                     } catch (SQLException | ClassNotFoundException throwables) {
                                         throwables.printStackTrace();
                                     }

@@ -162,7 +162,7 @@ public class ImportTaxoRow {
 							List<Pair<String, String>> reInterpredUoms = undeclaredUomIds.stream().map(uid-> knownTemplate.attemptUomSymbolInterpretationCorrection(uid))
 							.filter(pair->pair!=null).collect(Collectors.toList());
 							tmpCarac.setAllowedUoms(new ArrayList<String> (tmpCarac.getAllowedUoms().stream()
-									.map(u->reInterpredUoms.stream().filter(i->i.getKey().equals(u)).findAny().get().getValue()).collect(Collectors.toList())));
+									.map(u->reInterpredUoms.stream().filter(i->i.getKey().equals(u)).findAny().map(e->e.getValue()).orElse(null)).filter(t->t!=null).collect(Collectors.toList())));
 							
 							if(undeclaredUomIds.size() == reInterpredUoms.size()) {
 								//All uoms were misrepresented
@@ -515,7 +515,7 @@ public class ImportTaxoRow {
 		
 	}
 	
-    public static void loadTaxoDS() {
+    public static void loadTaxoDS(String active_pid) {
     	forceUpdate = false;
     	accumulateUoMs = true;
     	
@@ -524,7 +524,7 @@ public class ImportTaxoRow {
     	CharDescriptionImportServices.classSpecificFields = new HashMap<String, HashMap<String,ClassCaracteristic>>();
     	
     	try {
-			UnitOfMeasure.RunTimeUOMS = UnitOfMeasure.fetch_units_of_measures("en");
+			UnitOfMeasure.RunTimeUOMS = UnitOfMeasure.fetch_units_of_measures(Tools.get_project_user_language_code(active_pid));
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

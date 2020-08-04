@@ -4,6 +4,7 @@ import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -32,8 +33,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class TablePane_CharClassif {
-	
-	
+
+
 	@FXML public TableView<CharDescriptionRow> tableGrid;
 	
 	
@@ -362,8 +363,7 @@ public class TablePane_CharClassif {
 			Parent.charButton.setDisable(false);
 			System.out.println("Refreshing table with segment "+active_class);
 			
-			tvX = new TableViewExtra(tableGrid);
-			
+
 			this.classItems = getActiveItemsID(active_class);
 			
 			CharItemFetcher.fetchAllItems(account.getActive_project(),this);
@@ -382,6 +382,7 @@ public class TablePane_CharClassif {
 			selectFirstItem();
 			this.selected_col = -1;
 			nextChar();
+
 		}else {
 			try {
 				Parent.charPaneController.PaneClose();
@@ -777,9 +778,9 @@ public class TablePane_CharClassif {
         articleColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
         articleColumn.setResizable(false);
         this.tableGrid.getColumns().add(articleColumn);
-        
-        
-        this.tableGrid.getItems().setAll(this.itemArray);
+
+		tvX = new TableViewExtra(tableGrid);
+        this.tableGrid.getItems().addAll(this.itemArray);
         //this.tableGrid.refresh();
         
         
@@ -864,19 +865,19 @@ public class TablePane_CharClassif {
 
 	public void fireScrollNBUp() {
 		try {
-
+			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size());
 			int min = (int) Collections.min(tableGrid.getSelectionModel().getSelectedIndices());
 			CharDescriptionRow thisItem = ((CharDescriptionRow) tableGrid.getItems().get(min));
 			CharDescriptionRow previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
 			String data_this = "";
 			String data_previous="";
 			try{
-				data_this = thisItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+				data_this = thisItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
 			try{
-				data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+				data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
@@ -887,7 +888,7 @@ public class TablePane_CharClassif {
 					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
 					data_previous="";
 					try{
-						data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+						data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}
@@ -900,7 +901,7 @@ public class TablePane_CharClassif {
 					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
 					data_previous="";
 					try{
-						data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+						data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}
@@ -918,19 +919,19 @@ public class TablePane_CharClassif {
 	public void fireScrollNBDown() {
 
 		try {
-
+			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size());
 			int max = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
 			CharDescriptionRow thisItem = ((CharDescriptionRow) tableGrid.getItems().get(max));
 			CharDescriptionRow nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
 			String data_this = "";
 			String data_next="";
 			try{
-				data_this = thisItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+				data_this = thisItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
 			try{
-				data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+				data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
@@ -941,7 +942,7 @@ public class TablePane_CharClassif {
 					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
 					data_next="";
 					try{
-						data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+						data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}
@@ -954,7 +955,7 @@ public class TablePane_CharClassif {
 					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
 					data_next="";
 					try{
-						data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[selected_col].getDisplayValue(Parent);
+						data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}
@@ -969,7 +970,7 @@ public class TablePane_CharClassif {
 	}
 
 	private void scrollSelectedItemVisible() {
-		int selectedIdx = tableGrid.getSelectionModel().getFocusedIndex();
+		int selectedIdx = tableGrid.getSelectionModel().getSelectedIndex();
 		int fvIdx = tvX.getFirstVisibleIndex();
 		int lvIdx = tvX.getLastVisibleIndex();
 		if( fvIdx<=selectedIdx && selectedIdx<=lvIdx){
@@ -978,4 +979,41 @@ public class TablePane_CharClassif {
 		tableGrid.scrollTo(selectedIdx);
 	}
 
+	public void refresh_table_preserve_sort_order() throws SQLException, ClassNotFoundException {
+		ObservableList<TableColumn<CharDescriptionRow, ?>> SO = tableGrid.getSortOrder();
+		ArrayList<String> sortCols = new ArrayList<>();
+		ArrayList<String> sortDirs = new ArrayList<>();
+
+		for (TableColumn<CharDescriptionRow, ?> c : SO) {
+			sortCols.add(c.getText());
+			sortDirs.add(c.getSortType().toString());
+		}
+
+
+
+		int SC = selected_col;
+		int SI = tableGrid.getSelectionModel().getSelectedIndex();
+		refresh_table_with_segment(Parent.classCombo.getValue().getClassSegment());
+
+		List<TableColumn<CharDescriptionRow, ?>> sortOrder = tableGrid.getSortOrder();
+		sortOrder.clear();
+		if(SO.stream().filter(tc->!tableGrid.getColumns().stream().map(c->c.getText()).collect(Collectors.toList()).contains(tc.getText())).findAny().isPresent()){
+			//At least a sorting column is no longer available, do not restore order
+		}else{
+			//Restore order
+			for (int ix = 0; ix < sortCols.size(); ix++) {
+				for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getColumns()) {
+					if (c.getText().equals(sortCols.get(ix))) {
+						sortOrder.add(c);
+						c.setSortType(TableColumn.SortType.valueOf(sortDirs.get(ix)));
+					}
+				}
+			}
+
+			tableGrid.getSelectionModel().clearAndSelect(SI);
+		}
+
+		selected_col = SC-1;
+		nextChar();
+	}
 }

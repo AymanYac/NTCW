@@ -1,5 +1,6 @@
 package model;
 
+import org.apache.commons.lang.StringUtils;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
@@ -91,21 +92,37 @@ public class UnitOfMeasure {
 		return this.getUom_symbol()+" ("+this.getUom_name()+")";
 		
 	}
-	public static  HashMap<String, UnitOfMeasure> fetch_units_of_measures(String language_code) throws ClassNotFoundException, SQLException {
+	public static  HashMap<String, UnitOfMeasure> fetch_units_of_measures(String language_code) throws SQLException, ClassNotFoundException {
 		HashMap<String,UnitOfMeasure> ret = new HashMap<String,UnitOfMeasure>();
 		Connection conn = Tools.spawn_connection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("select uom_id, uom_symbols, "+QueryFormater.UOM_MULTIPLIER_DOUBLE2CHAR_QUERY("uom_multiplier")+", uom_base_id, uom_name_"+language_code.toLowerCase()+" from public_ressources.units_of_measure");
-		while(rs.next()) {
-			UnitOfMeasure tmp = new UnitOfMeasure();
-			tmp.setUom_id(rs.getString("uom_id"));
-			tmp.setUom_name(rs.getString("uom_name_"+language_code.toLowerCase()));
-			tmp.setUom_symbols(rs.getArray("uom_symbols"));
-			tmp.setUom_multiplier(rs.getString("uom_multiplier"));
-			tmp.setUom_base_id(rs.getString("uom_base_id"));
-			ret.put(tmp.getUom_id(), tmp);
-			
+		ResultSet rs;
+		try{
+			rs = stmt.executeQuery("select uom_id, uom_symbols, "+QueryFormater.UOM_MULTIPLIER_DOUBLE2CHAR_QUERY("uom_multiplier")+", uom_base_id, uom_name_"+language_code.toLowerCase()+" from public_ressources.units_of_measure");
+			while(rs.next()) {
+				UnitOfMeasure tmp = new UnitOfMeasure();
+				tmp.setUom_id(rs.getString("uom_id"));
+				tmp.setUom_name(rs.getString("uom_name_"+language_code.toLowerCase()));
+				tmp.setUom_symbols(rs.getArray("uom_symbols"));
+				tmp.setUom_multiplier(rs.getString("uom_multiplier"));
+				tmp.setUom_base_id(rs.getString("uom_base_id"));
+				ret.put(tmp.getUom_id(), tmp);
+
+			}
+		} catch (SQLException throwables) {
+			rs = stmt.executeQuery("select uom_id, uom_symbols, "+QueryFormater.UOM_MULTIPLIER_DOUBLE2CHAR_QUERY("uom_multiplier")+", uom_base_id, uom_name_"+"en".toLowerCase()+" from public_ressources.units_of_measure");
+			while(rs.next()) {
+				UnitOfMeasure tmp = new UnitOfMeasure();
+				tmp.setUom_id(rs.getString("uom_id"));
+				tmp.setUom_name(rs.getString("uom_name_"+"en".toLowerCase()));
+				tmp.setUom_symbols(rs.getArray("uom_symbols"));
+				tmp.setUom_multiplier(rs.getString("uom_multiplier"));
+				tmp.setUom_base_id(rs.getString("uom_base_id"));
+				ret.put(tmp.getUom_id(), tmp);
+
+			}
 		}
+
 		rs.close();
 		stmt.close();
 		conn.close();
@@ -165,6 +182,10 @@ public class UnitOfMeasure {
 							}
 						}
 						for(String symbol:e.getValue().getUom_symbols()) {
+							if(StringUtils.equalsIgnoreCase(symbol,text) && !(allowedUoms!=null)){
+								uom_lookup_best_candidate=e.getValue();
+								uom_lookup_max_found_length = Integer.MAX_VALUE;
+							}
 							String searchedSymbol = unidecode.decodeAndTrim(symbol).toLowerCase();
 							if(searchedSymbol.length()>uom_lookup_max_found_length) {
 								if(unidecode.decodeAndTrim(text).toLowerCase().startsWith(searchedSymbol)) {

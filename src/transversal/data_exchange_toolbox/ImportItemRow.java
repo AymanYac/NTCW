@@ -209,7 +209,7 @@ public class ImportItemRow {
 			valueParseHasFailed = true;
 			return null;
 		}
-		
+		current_value.setSource(DataInputMethods.PROJECT_SETUP_UPLOAD);
 		return current_value;
 	}
 

@@ -63,7 +63,9 @@ public class CharPaneRow {
 	public int getChar_sequence() {
 		return carac.getSequence();
 	}
-	public String getChar_name_complete(){ return carac.getCharacteristic_name()+" ("+carac.getCharacteristic_name_translated()+")"; }
+	public String getChar_name_complete(){
+		return carac.getCharacteristic_name()+((carac.getCharacteristic_name_translated()!=null && carac.getCharacteristic_name_translated().length()>0)?" ("+carac.getCharacteristic_name_translated()+")":"");
+	}
 	public String getChar_name() {
 		return carac.getCharacteristic_name();
 	}

@@ -66,11 +66,14 @@ public class ClassCaracteristic {
 		return allowedValues;
 	}
 	public HashSet<CaracteristicValue> getKnownValues(){
-		HashSet<CaracteristicValue> ret = CaracteristicValue.loadedValues.get(this.getCharacteristic_id());
-		if(ret!=null) {
-			return ret;
+		if(CaracteristicValue.loadedValues.get(this.getCharacteristic_id())!=null){
+			HashSet<CaracteristicValue> ret = CaracteristicValue.loadedValues.get(this.getCharacteristic_id()).stream().filter(v->v!=null).collect(Collectors.toCollection(HashSet::new));
+			if(ret!=null) {
+				return ret;
+			}
 		}
 		return new HashSet<CaracteristicValue>();
+
 	}
 	public void setAllowedValues(ArrayList<String> allowedValues) {
 		this.allowedValues = allowedValues;

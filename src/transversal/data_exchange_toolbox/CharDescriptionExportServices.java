@@ -430,9 +430,7 @@ public class CharDescriptionExportServices {
 	public static void addItemCharDataToPush(CharDescriptionRow row, String segment, int charIdx, int charIdxSize) {
 		CaracteristicValue val = row.getData(segment)[charIdx];
 		ClassCaracteristic carac = CharValuesLoader.active_characteristics.get(segment).get(charIdx);
-		Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
-		Pair<String, Pair<CaracteristicValue,ClassCaracteristic>> queueItem = new Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>(row.getItem_id(),valCaracPair);
-		itemDataBuffer.add(queueItem);
+		addItemCharDataToPush(row,val,carac);
 	}
 
 	public static void addCaracDefinitionToPush(ClassCaracteristic template,ClassSegment segment){
@@ -695,7 +693,7 @@ public class CharDescriptionExportServices {
 					Connection conn = Tools.spawn_connection();
 					Connection conn2 = Tools.spawn_connection();
 					Connection conn3 = Tools.spawn_connection();
-					PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_values values(?,?,?,?,?,?,?,?)");
+					PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_values values(?,?,?,?,?,?,?,?) on conflict(value_id) do nothing");
 					PreparedStatement stmt2 = conn2.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values values (?,?,?,?,clock_timestamp(),?,?,?) on conflict (item_id,characteristic_id) do update set user_id = excluded.user_id, description_method = excluded.description_method, description_time=excluded.description_time, value_id = excluded.value_id, description_rule_id=excluded.description_rule_id,url_link = excluded.url_link");
 					PreparedStatement stmt3 = conn3.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values_history values (?,?,?,?,clock_timestamp(),?,?,?)");
 					while(itemDataBuffer.peek()!=null) {

@@ -1013,7 +1013,7 @@ public class Char_description {
 		
 		
 		//this.UOMS = Tools.get_units_of_measures(user_language_gcode);
-		UnitOfMeasure.RunTimeUOMS = UnitOfMeasure.fetch_units_of_measures("en");
+		UnitOfMeasure.RunTimeUOMS = UnitOfMeasure.fetch_units_of_measures(user_language_gcode);
 		
 		//classification tmp.setNew_segment_name( CID2NAME,j,parent_controller);
 		classification = new AutoCompleteBox_CharClassification(this,classification_style.getStyle(),account);

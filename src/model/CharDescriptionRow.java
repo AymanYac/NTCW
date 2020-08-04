@@ -174,6 +174,7 @@ public class CharDescriptionRow {
 		
 		
 		public void addCharRuleResult(CharRuleResult newMatch, String segment, int charIdx, int charIdSize) {
+			//System.out.println("New rule match for item "+getClient_item_number()+" : "+newMatch.getActionValue().getDisplayValue(parent));
 			try {
 				this.ruleResults.get(segment)[charIdx].add(newMatch);
 			}catch(Exception V) {
@@ -194,7 +195,7 @@ public class CharDescriptionRow {
 					Optional<CharRuleResult> SuperRule = ruleResults.get(segment)[charIdx].stream()
 					.filter(rloop->rloop.isSuperBlockOf(r)).findAny();
 					if(SuperRule.isPresent()) {
-						System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
+						//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
 						r.addSuperRule(SuperRule);
 					}
 					
@@ -230,7 +231,7 @@ public class CharDescriptionRow {
 					String ruleVal = r.getActionValue().getDisplayValue(parent);
 					boolean ret = StringUtils.equalsIgnoreCase(loopVal, ruleVal);
 					if(ret) {
-						System.out.println("known value "+ruleVal+" for rule "+r.getGenericCharRule().getRuleMarker()+" at index "+String.valueOf(idx+1));
+						//System.out.println("known value "+ruleVal+" for rule "+r.getGenericCharRule().getRuleMarker()+" at index "+String.valueOf(idx+1));
 						filledResultsMatched.add(idx);
 					}
 					return ret;
@@ -255,6 +256,7 @@ public class CharDescriptionRow {
 			}
 		}
 		public void reEvaluateRulesForChar(String segment, int charIdx, int charIdxSize) {
+			//System.out.println("\tReevaluation rules for char "+charIdx+ " in segment "+segment);
 			//If the value is MANUAL or UPLOAD, continue
 			if(DataInputMethods.MANUAL.equals(getData(segment)[charIdx].getSource())
 				||DataInputMethods.PROJECT_SETUP_UPLOAD.equals(getData(segment)[charIdx].getSource())) {
@@ -263,7 +265,7 @@ public class CharDescriptionRow {
 			
 			disableSubTextRules(segment,charIdx);
 			HashMap<String, CharRuleResult> distinctResultsLeft = returnUnfilledResults(segment,charIdx,charIdxSize);
-			System.out.println("**\tDistinct results :"+distinctResultsLeft.size());
+			//System.out.println("**\tDistinct results :"+distinctResultsLeft.size());
 			if(distinctResultsLeft.size()>0) {
 				if(distinctResultsLeft.size()==1) {
 					try{
@@ -279,6 +281,7 @@ public class CharDescriptionRow {
 			}
 		}
 		public void reEvaluateCharRules(String segment, int charIdxSize) {
+			//System.out.println("reEvaluating rules for item "+getClient_item_number()+" in segment "+segment);
 			IntStream.range(0, charIdxSize).forEach(loopIdx->{
 				try{
 					reEvaluateRulesForChar(segment,loopIdx,charIdxSize);
