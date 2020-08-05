@@ -7,9 +7,7 @@ import model.CharValueTextSuggestion;
 import model.ClassCaracteristic;
 import model.GlobalConstants;
 import org.apache.commons.lang.StringEscapeUtils;
-import transversal.language_toolbox.Unidecode;
 
-import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -90,7 +88,7 @@ public class TranslationServices {
 		if(charac.getIsTranslatable()) {
 			String dataVal = pattern_value.getDataLanguageValue();
 			String userVal = pattern_value.getUserLanguageValue();
-			Unidecode unidecode = Unidecode.toAscii();
+
 			
 			Boolean conflictingLinks = createVerifiedDicoTranslationLink(dataVal,userVal,false);
 			
@@ -108,12 +106,12 @@ public class TranslationServices {
 			
 			//Add this charval to known values carrying this dataVal
 			if(dataVal!=null && dataVal.replaceAll(" ", "").length()>0) {
-				addToDataValues(dataVal, unidecode, pattern_value);
+				addToDataValues(dataVal, pattern_value);
 			}
 			
 			//Add this charval to known values carrying this dataVal
 			if(userVal!=null && userVal.replaceAll(" ", "").length()>0) {
-				addToUserValues(userVal,unidecode,pattern_value);
+				addToUserValues(userVal,pattern_value);
 			}
 		}else {
 			//Charac is not translatable only add this value for autocompletion abilities
@@ -127,60 +125,60 @@ public class TranslationServices {
 		
 	}
 
-	private static void addToUserValues(String userVal, Unidecode unidecode, CaracteristicValue pattern_value) {
+	private static void addToUserValues(String userVal, CaracteristicValue pattern_value) {
 		
 		User2ValuesDico = (User2ValuesDico!=null)?User2ValuesDico:new HashMap<String,ArrayList<CaracteristicValue>>();
 		try {
-			User2ValuesDico.get(unidecode.decode(userVal.toLowerCase())).add(pattern_value);
+			User2ValuesDico.get(userVal.trim().toLowerCase()).add(pattern_value);
 		}catch(Exception V) {
 			ArrayList<CaracteristicValue> tmp = new ArrayList<CaracteristicValue>();
 			tmp.add(pattern_value);
-			User2ValuesDico.put(unidecode.decode(userVal.toLowerCase()), tmp);
+			User2ValuesDico.put(userVal.trim().toLowerCase(), tmp);
 		}
 	}
 
-	private static void addToDataValues(String dataVal,Unidecode unidecode, CaracteristicValue pattern_value) {
+	private static void addToDataValues(String dataVal, CaracteristicValue pattern_value) {
 		Data2ValuesDico = (Data2ValuesDico!=null)?Data2ValuesDico:new HashMap<String,ArrayList<CaracteristicValue>>();
 		try {
-			Data2ValuesDico.get(unidecode.decode(dataVal.toLowerCase())).add(pattern_value);
+			Data2ValuesDico.get(dataVal.toLowerCase().trim()).add(pattern_value);
 		}catch(Exception V) {
 			ArrayList<CaracteristicValue> tmp = new ArrayList<CaracteristicValue>();
 			tmp.add(pattern_value);
-			Data2ValuesDico.put(unidecode.decode(dataVal.toLowerCase()), tmp);
+			Data2ValuesDico.put(dataVal.toLowerCase().trim(), tmp);
 		}
 	}
 	
 	private static void cleanValueDicts() {
 		
-		Unidecode unidec = Unidecode.toAscii();
+
 		
 		User2ValuesDico = (User2ValuesDico!=null)?User2ValuesDico:new HashMap<String,ArrayList<CaracteristicValue>>();
-		User2ValuesDico.replaceAll((k,v)->cleanUserValueArray(v,k,unidec));
+		User2ValuesDico.replaceAll((k,v)->cleanUserValueArray(v,k));
 		
 		Data2ValuesDico = (Data2ValuesDico!=null)?Data2ValuesDico:new HashMap<String,ArrayList<CaracteristicValue>>();
-		Data2ValuesDico.replaceAll((k,v)->cleanDataValueArray(v,k,unidec));
+		Data2ValuesDico.replaceAll((k,v)->cleanDataValueArray(v,k));
 	}
 
-	private static ArrayList<CaracteristicValue> cleanDataValueArray(ArrayList<CaracteristicValue> v, String k, Unidecode unidec) {
+	private static ArrayList<CaracteristicValue> cleanDataValueArray(ArrayList<CaracteristicValue> v, String k) {
 		
-		final String key = unidec.decodeAndTrim(k).toLowerCase();
+		final String key = k.toLowerCase().trim();
 		return new ArrayList<CaracteristicValue>(
-				v.parallelStream().filter(cv->ValueisCleanWithRespectToKey(cv.getDataLanguageValue(),unidec,key)).collect(Collectors.toList())
+				v.parallelStream().filter(cv->ValueisCleanWithRespectToKey(cv.getDataLanguageValue(),key)).collect(Collectors.toList())
 				);
 	}
 
-	private static Boolean ValueisCleanWithRespectToKey(String valueInLanguage, Unidecode unidec, String key) {
+	private static Boolean ValueisCleanWithRespectToKey(String valueInLanguage, String key) {
 		try{
-			return unidec.decodeAndTrim(valueInLanguage).toLowerCase().equals(key);
+			return valueInLanguage.toLowerCase().trim().equals(key);
 		}catch(Exception V) {
 			return true;
 		}
 	}
 
-	private static ArrayList<CaracteristicValue> cleanUserValueArray(ArrayList<CaracteristicValue> v, String k, Unidecode unidec) {
-		final String key = unidec.decodeAndTrim(k).toLowerCase();
+	private static ArrayList<CaracteristicValue> cleanUserValueArray(ArrayList<CaracteristicValue> v, String k) {
+		final String key = k.toLowerCase().trim();
 		return new ArrayList<CaracteristicValue>(
-				v.parallelStream().filter(cv->ValueisCleanWithRespectToKey(cv.getUserLanguageValue(),unidec,key)).collect(Collectors.toList())
+				v.parallelStream().filter(cv->ValueisCleanWithRespectToKey(cv.getUserLanguageValue(),key)).collect(Collectors.toList())
 				);
 	}
 
@@ -214,32 +212,28 @@ public class TranslationServices {
 	}
 
 	public static Pair<String,String> createUnverifiedDicoTranslationLink(String dataVal, String userVal) {
-    	System.out.println("XXXXXXX Unverified link "+dataVal+"/"+userVal);
-		Data2UserTermsDico = (Data2UserTermsDico!=null)?Data2UserTermsDico:new HashMap<String,String>();
+    	Data2UserTermsDico = (Data2UserTermsDico!=null)?Data2UserTermsDico:new HashMap<String,String>();
 		User2DataTermsDico = (User2DataTermsDico!=null)?User2DataTermsDico:new HashMap<String,String>();
 
 
-		Unidecode unidecode = Unidecode.toAscii();
+
 		if(dataVal!=null && dataVal.replaceAll(" ", "").length()>0 &&
 				userVal!=null && userVal.replaceAll(" ", "").length()>0) {
 
-			String dataValTrimmed = unidecode.decodeAndTrim(dataVal.toLowerCase());
-			String userValTrimmed = unidecode.decodeAndTrim(userVal.toLowerCase());
+			String dataValTrimmed = dataVal.toLowerCase().trim();
+			String userValTrimmed = userVal.toLowerCase().trim();
 			boolean matched;
 			if(Data2UserTermsDico.containsKey(dataValTrimmed)){
 				//dataval known
 				if(Data2UserTermsDico.get(dataValTrimmed)!=null){
 					//dataval translation known
-					matched = userValTrimmed.equals(unidecode.decodeAndTrim(Data2UserTermsDico.get(dataValTrimmed).toLowerCase()));
+					matched = userValTrimmed.equals(Data2UserTermsDico.get(dataValTrimmed).toLowerCase().trim());
 					if(!matched){
-						System.out.println("conflict with known userval for input dataval");
 						return  new Pair<String,String>(dataVal,Data2UserTermsDico.get(dataValTrimmed));
 					}
-					System.out.println("no conflict with known userval for input dataval");
 					return  null;
 				}else{
 					//dataVal translation unknown
-					System.out.println("conflict with unknown userval for unput dataval");
 					return  new Pair<String,String>(dataVal,null);
 				}
 
@@ -247,10 +241,8 @@ public class TranslationServices {
 				//dataVal not known
 				if(User2DataTermsDico.containsKey(userValTrimmed)){
 					//The userval translation is known or the userval has an explicit no translation : conflict
-					System.out.println("conflict with known dataval for input userval");
 					return  new Pair<String,String>(User2DataTermsDico.get(userValTrimmed),userVal);
 				}else{
-					System.out.println("new entry");
 					//New entry
 					Data2UserTermsDico.put(dataValTrimmed, userVal);
 					User2DataTermsDico.put(userValTrimmed, dataVal);
@@ -264,7 +256,7 @@ public class TranslationServices {
 			//One of the values is null
 			if(dataVal!=null && dataVal.replaceAll(" ", "").length()>0) {
 				//the userval is null
-				String dataValTrimmed = unidecode.decodeAndTrim(dataVal.toLowerCase());
+				String dataValTrimmed = dataVal.toLowerCase().trim();
 				if(Data2UserTermsDico.get(dataValTrimmed)!=null){
 					return new Pair<String, String>(dataVal,Data2UserTermsDico.get(dataValTrimmed));
 				}
@@ -272,7 +264,7 @@ public class TranslationServices {
 				return  null;
 			}
 			if(userVal!=null && userVal.replaceAll(" ", "").length()>0) {
-				String userValTrimmed = unidecode.decodeAndTrim(userVal.toLowerCase());
+				String userValTrimmed = userVal.toLowerCase().trim();
 				if(User2DataTermsDico.get(userValTrimmed)!=null){
 					return new Pair<String, String>(User2DataTermsDico.get(userValTrimmed),userVal);
 				}
@@ -288,15 +280,15 @@ public class TranslationServices {
 		User2DataTermsDico = (User2DataTermsDico!=null)?User2DataTermsDico:new HashMap<String,String>();
 		
 		
-		Unidecode unidecode = Unidecode.toAscii();
+
 		if(dataVal!=null && dataVal.replaceAll(" ", "").length()>0 &&
 				userVal!=null && userVal.replaceAll(" ", "").length()>0) {
 			
-			String dataValTrimmed = unidecode.decodeAndTrim(dataVal.toLowerCase());
-			String userValTrimmed = unidecode.decodeAndTrim(userVal.toLowerCase());
+			String dataValTrimmed = dataVal.toLowerCase().trim();
+			String userValTrimmed = userVal.toLowerCase().trim();
 			
 			try{
-				boolean matched = unidecode.decodeAndTrim(Data2UserTermsDico.get(dataValTrimmed).toLowerCase()).equals(userValTrimmed);
+				boolean matched = Data2UserTermsDico.get(dataValTrimmed).toLowerCase().toLowerCase().trim().equals(userValTrimmed);
 				//matched = matched && unidecode.decodeAndTrim(User2DataTermsDico.get(userValTrimmed).toLowerCase()).equals(dataValTrimmed);
 				if(forceUpdate) {
 					Data2UserTermsDico.put(dataValTrimmed, userVal);
@@ -314,11 +306,11 @@ public class TranslationServices {
 		}else {
 			//One of the values is null
 			if(dataVal!=null && dataVal.replaceAll(" ", "").length()>0) {
-				String dataValTrimmed = unidecode.decodeAndTrim(dataVal.toLowerCase());
+				String dataValTrimmed = dataVal.toLowerCase().trim();
 				Data2UserTermsDico.put(dataValTrimmed, null);
 			}
 			if(userVal!=null && userVal.replaceAll(" ", "").length()>0) {
-				String userValTrimmed = unidecode.decodeAndTrim(userVal.toLowerCase());
+				String userValTrimmed = userVal.toLowerCase().trim();
 				User2DataTermsDico.put(userValTrimmed, null);
 			}
 			return null;
@@ -369,25 +361,25 @@ public class TranslationServices {
 	private static void updateTranslatedValues(String key, boolean keyIsData, String newValue) {
 		
 		
-		Unidecode unidecode = Unidecode.toAscii();
+
 		if(keyIsData) {
 			try {
-				Data2ValuesDico.get(unidecode.decode(key.toLowerCase())).parallelStream().forEach(
+				Data2ValuesDico.get(key.toLowerCase().trim()).parallelStream().forEach(
 						v->{
 							
 							v.setUserLanguageValue(newValue);
-							addToUserValues(newValue, unidecode, v);
+							addToUserValues(newValue, v);
 						});
 			}catch(Exception V) {
 
 			}
 		}else {
 			try {
-				User2ValuesDico.get(unidecode.decode(key.toLowerCase())).parallelStream().forEach(
+				User2ValuesDico.get(key.toLowerCase().trim()).parallelStream().forEach(
 						v->{
 							
 							v.setDataLanguageValue(newValue);
-							addToDataValues(newValue, unidecode, v);
+							addToDataValues(newValue, v);
 							
 						});
 			}catch(Exception V) {
@@ -440,11 +432,11 @@ public class TranslationServices {
 
 	public static String getEntryTranslation(String source_value, boolean sourceInDataLanguage) {
 		try {
-			Unidecode unidecode = Unidecode.toAscii();
+
 			if(sourceInDataLanguage) {
-				return Data2UserTermsDico.get(unidecode.decodeAndTrim(source_value).toLowerCase());
+				return Data2UserTermsDico.get(source_value.toLowerCase().trim());
 			}else {
-				return User2DataTermsDico.get(unidecode.decodeAndTrim(source_value).toLowerCase());
+				return User2DataTermsDico.get(source_value.toLowerCase().trim());
 			}
 		}catch(Exception V) {
 			return null;

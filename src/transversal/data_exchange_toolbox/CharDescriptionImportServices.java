@@ -57,15 +57,8 @@ public class CharDescriptionImportServices {
 		CharDescriptionImportServices.projectGranularity=projectGranularity;
 		CharValuesLoader.fetchAllKnownValuesAssociated2Items(active_project);
 		
-		System.out.println(">>>> Known translation link data language perspective");
-		try {
-			TranslationServices.Data2UserTermsDico.entrySet().forEach(e->{
-				System.out.println(e.getKey()+"<=>"+e.getValue());
-			});
-		}catch(Exception V) {
-			
-		}
-		
+
+
 		ImportTaxoRow.setColumnMap();
 		ImportTaxoRow.loadTaxoDS(active_pid);
         Sheet taxoSheet = workbook.getSheet(taxoSheetName);
@@ -77,16 +70,7 @@ public class CharDescriptionImportServices {
 		while(rows.hasNext()) {
 			processTaxoRow(rows.next(),account);
 		}
-		
-		System.out.println(">>>> Known translation link data language perspective");
-		
-		try {
-			TranslationServices.Data2UserTermsDico.entrySet().forEach(e->{
-				System.out.println(e.getKey()+"<=>"+e.getValue());
-			});
-		}catch(Exception V) {
-			
-		}
+
 		
 		ImportItemRow.setColumnMap();
 		ImportItemRow.loadItemDS();
@@ -99,17 +83,7 @@ public class CharDescriptionImportServices {
 		while(rows.hasNext()) {
 			processItemRow(rows.next(),account);
 		}
-		
-		System.out.println(">>>> Known translation link data language perspective");
-		
-		try {
-			TranslationServices.Data2UserTermsDico.entrySet().forEach(e->{
-				System.out.println(e.getKey()+"<=>"+e.getValue());
-			});
-		}catch(Exception V) {
-			
-		}
-		
+
 		storeTaxo();
 		storeChars();
 		storeDefaultValues(account);
@@ -225,7 +199,7 @@ public class CharDescriptionImportServices {
 			reject_row.createCell(0).setCellValue(p.getKey().getRowNum());
 			IntStream.range(1,ImportItemRow.columnMap.size()).forEach(idx->{
 				try{
-					reject_row.createCell(idx).setCellValue(p.getKey().getCell(idx).getStringCellValue());
+					reject_row.createCell(idx).setCellValue(p.getKey().getCell(idx-1).getStringCellValue());
 				}catch (Exception V){
 				}
 			});
@@ -249,7 +223,7 @@ public class CharDescriptionImportServices {
 			reject_row.createCell(0).setCellValue(p.getKey().getRowNum());
 			IntStream.range(1,ImportTaxoRow.columnMap.size()).forEach(idx->{
 				try{
-					reject_row.createCell(idx).setCellValue(p.getKey().getCell(idx).getStringCellValue());
+					reject_row.createCell(idx).setCellValue(p.getKey().getCell(idx-1).getStringCellValue());
 				}catch (Exception V){
 				}
 			});

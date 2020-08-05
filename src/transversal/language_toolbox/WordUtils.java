@@ -431,20 +431,6 @@ public class WordUtils {
 		}
 
 		
-		public static ArrayList<UnitOfMeasure> parseKnownUoMsFollowingDecimal(String selected_text) {
-			String pattern = "(-?\\d+(\\.\\d+)?)";
-		    String patternPlusOverLaps = pattern+"(?=(" + "(.*)" + ")).";
-		    Pattern p = Pattern.compile(patternPlusOverLaps);
-		    
-		    Matcher m = p.matcher(selected_text.replace(",", "."));
-			
-			ArrayList<UnitOfMeasure> ret = new ArrayList<UnitOfMeasure>();
-			while (m.find()) {
-				UnitOfMeasure tmp = UnitOfMeasure.lookUpUomInText_V2(m.group(3),null);
-				ret.add(tmp);
-				}
-			return ret;
-		}
 
 		
 		

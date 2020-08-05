@@ -121,30 +121,25 @@ public class ImportItemRow {
 						if(tmpUomSymbol!=null && tmpUomSymbol.length()>0) {
 							
 							//The uom symbol exists in row
-							ArrayList<UnitOfMeasure> tmpUom = WordUtils.parseKnownUoMsFollowingDecimal("1"+tmpUomSymbol);
-							if(tmpUom.size()>0) {
+							UnitOfMeasure tmpUom = UnitOfMeasure.lookUpUomInText_SymbolPriority(tmpUomSymbol);
+							if(tmpUom!=null) {
 								
 								//The uom symbol is known
-								List<String> undeclaredUomIds = tmpUom.stream().map(u->u.getUom_id()).filter(uid->!knownTemplate.getAllowedUoms().contains(uid)).collect(Collectors.toList());
-								if(undeclaredUomIds.size()==0) {
-									
-									//The row uom is known in the template
-									current_value.setUom_id(tmpUom.get(0).getUom_id());
+								if(knownTemplate.getAllowedUoms().contains(tmpUom.getUom_id())){
+									current_value.setUom_id(tmpUom.getUom_id());
 								}else {
 									
 									//The row uom is not known in the template
 									
 									//Check if the symbol has been misinterpreted and should be a convertible uom to it
-									List<Pair<String, String>> reInterpredUoms = undeclaredUomIds.stream().map(uid-> knownTemplate.attemptUomSymbolInterpretationCorrection(uid))
-									.filter(pair->pair!=null).collect(Collectors.toList());
-									if(undeclaredUomIds.size() == reInterpredUoms.size()) {
-										
+									Pair<String, String> reInterpredUom = knownTemplate.attemptUomSymbolInterpretationCorrection(tmpUom.getUom_id());
+									if(reInterpredUom!=null) {
 										//The uom has been corrected
-										current_value.setUom_id(reInterpredUoms.get(0).getValue());
+										current_value.setUom_id(reInterpredUom.getValue());
 									}else {
 										
 										//The uom can not be corrected
-										rejectedRows.add(new Pair<Row,String>(current_row,UnitOfMeasure.RunTimeUOMS.get(undeclaredUomIds.get(0)).toString()+" can not be converted to "+String.join(",", knownTemplate.getAllowedUoms().stream().map(uid->UnitOfMeasure.RunTimeUOMS.get(uid).getUom_name()).collect(Collectors.toList()))));
+										rejectedRows.add(new Pair<Row,String>(current_row,UnitOfMeasure.RunTimeUOMS.get(tmpUom).toString()+" can not be converted to "+String.join(",", knownTemplate.getAllowedUoms().stream().map(uid->UnitOfMeasure.RunTimeUOMS.get(uid).getUom_name()).collect(Collectors.toList()))));
 										valueParseHasFailed=true;
 										return null;
 									}

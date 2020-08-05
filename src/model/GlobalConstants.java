@@ -46,7 +46,7 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
 	public static final boolean MANUAL_CLASSIF_PERSIST = false;
-	public static final String TOOL_VERSION = "4";
+	public static final String TOOL_VERSION = "4.0 Alpha";
 	
 	
 	public static final Integer RULE_DISPLAY_FONT_SIZE = 12;

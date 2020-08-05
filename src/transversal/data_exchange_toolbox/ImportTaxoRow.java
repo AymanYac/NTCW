@@ -73,7 +73,7 @@ public class ImportTaxoRow {
 					if(forceUpdate) {
 						CharDescriptionImportServices.chid2Carac.get(row_char_id).setCharacteristic_name(tmpCarac.getCharacteristic_name());
 					}else {
-						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong name: "+tmpCarac.getCharacteristic_name()+", expected: "+knownCarac.getCharacteristic_name());
+						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+" with wrong name: "+tmpCarac.getCharacteristic_name()+", expected: "+knownCarac.getCharacteristic_name());
 						rejectedRows.add(rejectedRow);
 						caracParseFail();
 						return null;
@@ -85,7 +85,7 @@ public class ImportTaxoRow {
 					if(forceUpdate) {
 						CharDescriptionImportServices.chid2Carac.get(row_char_id).setCharacteristic_name_translated(tmpCarac.getCharacteristic_name_translated());
 					}else {
-						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong translated name: "+tmpCarac.getCharacteristic_name_translated()+", expected: "+knownCarac.getCharacteristic_name_translated());
+						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+" with wrong translated name: "+tmpCarac.getCharacteristic_name_translated()+", expected: "+knownCarac.getCharacteristic_name_translated());
 						rejectedRows.add(rejectedRow);
 						caracParseFail();
 						return null;
@@ -105,7 +105,7 @@ public class ImportTaxoRow {
 					if(forceUpdate) {
 						CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setIsCritical(tmpCarac.getIsCritical());
 					}else {
-						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong criticality: "+tmpCarac.getIsCritical()+", expected: "+knownTemplate.getIsCritical());
+						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+" with wrong criticality: "+tmpCarac.getIsCritical()+", expected: "+knownTemplate.getIsCritical());
 						rejectedRows.add(rejectedRow);
 						caracParseFail();
 						return null;
@@ -121,7 +121,7 @@ public class ImportTaxoRow {
 					if(forceUpdate) {
 						CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setSequence(tmpCarac.getSequence());
 					}else {
-						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong sequnece: "+tmpCarac.getSequence()+", expected: "+knownTemplate.getSequence());
+						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+" with wrong sequence: "+tmpCarac.getSequence()+", expected: "+knownTemplate.getSequence());
 						rejectedRows.add(rejectedRow);
 						caracParseFail();
 						return null;
@@ -131,7 +131,7 @@ public class ImportTaxoRow {
 				if(tmpCarac.getIsNumeric().equals(knownCarac.getIsNumeric())) {
 					
 				}else {
-					Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong type: "+(tmpCarac.getIsNumeric()?"NUM":"TXT")+", expected: "+(knownCarac.getIsNumeric()?"NUM":"TXT"));
+					Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+" with wrong type: "+(tmpCarac.getIsNumeric()?"NUM":"TXT")+", expected: "+(knownCarac.getIsNumeric()?"NUM":"TXT"));
 					rejectedRows.add(rejectedRow);
 					caracParseFail();
 					return null;
@@ -140,7 +140,7 @@ public class ImportTaxoRow {
 				if(tmpCarac.getIsTranslatable().equals(knownCarac.getIsTranslatable())) {
 					
 				}else {
-					Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong translability: "+(tmpCarac.getIsTranslatable()?"Y":"N")+", expected: "+(knownCarac.getIsTranslatable()?"Y":"N"));
+					Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+" with wrong translability: "+(tmpCarac.getIsTranslatable()?"Y":"N")+", expected: "+(knownCarac.getIsTranslatable()?"Y":"N"));
 					rejectedRows.add(rejectedRow);
 					caracParseFail();
 					return null;
@@ -174,7 +174,7 @@ public class ImportTaxoRow {
 										tmpUoms.addAll(tmpCarac.getAllowedUoms());
 										CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setAllowedUoms(new ArrayList<String>(new HashSet<String>(tmpUoms)));
 									}else {
-										Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong uom(s) :"+
+										Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+" with wrong uom(s) :"+
 										String.join(",",reInterpredUoms.stream().map(
 												u->UnitOfMeasure.RunTimeUOMS.get(u.getValue()).toString()).collect(Collectors.toList()))
 										+". uom(s) convertible");
@@ -186,7 +186,7 @@ public class ImportTaxoRow {
 								}
 							}else {
 								//Some uoms are not convertible
-								Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with wrong uom(s) :"+
+								Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+" with wrong uom(s) :"+
 								String.join(",",undeclaredUomIds.stream().filter(id->!reInterpredUoms.stream().map(r->r.getKey()).collect(Collectors.toList()).contains(id)).map(
 										u->UnitOfMeasure.RunTimeUOMS.get(u).toString()).collect(Collectors.toList()))
 								+". uom(s) not convertible");
@@ -200,7 +200,7 @@ public class ImportTaxoRow {
 							
 					}else {
 						//The row lacks declared uoms
-						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+" with undeclared uom(s), excpected: "+
+						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+" with undeclared uom(s), excpected: "+
 						String.join(",",knownTemplate.getAllowedUoms().stream().map(id->UnitOfMeasure.RunTimeUOMS.get(id).toString()).collect(Collectors.toList())));
 						rejectedRows.add(rejectedRow);
 						caracParseFail();
@@ -214,7 +214,7 @@ public class ImportTaxoRow {
 							ArrayList<String> tmpUoms = tmpCarac.getAllowedUoms();
 							CharDescriptionImportServices.classSpecificFields.get(row_char_id).get(current_segment_id).setAllowedUoms(new ArrayList<String>(new HashSet<String>(tmpUoms)));
 						}else {
-							Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Dupplicate char "+row_char_id+". Expected no uom");
+							Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+". Expected no uom");
 							rejectedRows.add(rejectedRow);
 							caracParseFail();
 							return null;
@@ -352,9 +352,11 @@ public class ImportTaxoRow {
 		try{
 			String tmpUomSymbol = current_row.getCell(columnMap.get("charUoM"),Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
 			if(tmpUomSymbol!=null && tmpUomSymbol.length()>0) {
-				ArrayList<UnitOfMeasure> tmpUom = WordUtils.parseKnownUoMsFollowingDecimal("1"+tmpUomSymbol);
-				if(tmpUom.size()>0) {
-					tmpCarac.setAllowedUoms(new ArrayList<String>(tmpUom.stream().map(u->u.getUom_id()).collect(Collectors.toList())));
+				UnitOfMeasure tmpUom = UnitOfMeasure.lookUpUomInText_SymbolPriority(tmpUomSymbol);
+				if(tmpUom!=null) {
+					ArrayList<String> tmp = new ArrayList<String>();
+					tmp.add(tmpUom.getUom_id());
+					tmpCarac.setAllowedUoms(tmp);
 				}else {
 					if(tmpCarac.getIsNumeric()) {
 						throw new NullPointerException();
