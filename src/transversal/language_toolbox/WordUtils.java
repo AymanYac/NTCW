@@ -431,7 +431,7 @@ public class WordUtils {
 		}
 
 		
-		public static ArrayList<UnitOfMeasure> parseKnownUoMsFollowingDecimal(String selected_text) {
+		public static ArrayList<UnitOfMeasure> parseUomNoPriorSymbolPriority(String selected_text) {
 			String pattern = "(-?\\d+(\\.\\d+)?)";
 		    String patternPlusOverLaps = pattern+"(?=(" + "(.*)" + ")).";
 		    Pattern p = Pattern.compile(patternPlusOverLaps);
@@ -440,7 +440,7 @@ public class WordUtils {
 			
 			ArrayList<UnitOfMeasure> ret = new ArrayList<UnitOfMeasure>();
 			while (m.find()) {
-				UnitOfMeasure tmp = UnitOfMeasure.lookUpUomInText_V2(m.group(3),null);
+				UnitOfMeasure tmp = UnitOfMeasure.lookUpUomInText_SymbolPriority(m.group(3));
 				ret.add(tmp);
 				}
 			return ret;

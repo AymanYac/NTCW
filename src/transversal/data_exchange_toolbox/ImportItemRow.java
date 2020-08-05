@@ -121,7 +121,7 @@ public class ImportItemRow {
 						if(tmpUomSymbol!=null && tmpUomSymbol.length()>0) {
 							
 							//The uom symbol exists in row
-							ArrayList<UnitOfMeasure> tmpUom = WordUtils.parseKnownUoMsFollowingDecimal("1"+tmpUomSymbol);
+							ArrayList<UnitOfMeasure> tmpUom = WordUtils.parseUomNoPriorSymbolPriority("1"+tmpUomSymbol);
 							if(tmpUom.size()>0) {
 								
 								//The uom symbol is known

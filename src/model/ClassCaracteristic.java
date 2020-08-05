@@ -122,6 +122,7 @@ public class ClassCaracteristic {
 	
 	
 	public Pair<String,String> attemptUomSymbolInterpretationCorrection(String uomFalse){
+		System.out.println("Trying to reinterpret "+UnitOfMeasure.RunTimeUOMS.get(uomFalse).getUom_name()+" to match "+String.join(",",allowedUoms.stream().map(uid->UnitOfMeasure.RunTimeUOMS.get(uid).getUom_name()).collect(Collectors.toList())));
 		HashSet<String> fs = new HashSet<String>(UnitOfMeasure.RunTimeUOMS.get(uomFalse).getUom_symbols());
 		
 		Optional<String> match = 
@@ -131,9 +132,12 @@ public class ClassCaracteristic {
 		.findAny();
 		
 		if(match.isPresent()) {
+			System.out.println("=>reinterpreted to "+UnitOfMeasure.RunTimeUOMS.get(match.get()).getUom_name());
 			return new Pair<String,String>(uomFalse,match.get());
 		}
+		System.out.println("=>Unable to reinterpret");
 		return null;
+
 	}
 
 

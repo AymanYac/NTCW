@@ -163,6 +163,35 @@ public class UnitOfMeasure {
 		}
 		return null;
 	}
+
+	public static UnitOfMeasure lookUpUomInText_SymbolPriority(String text) {
+		if(text!=null) {
+
+			Unidecode unidecode = Unidecode.toAscii();
+			uom_lookup_max_found_length = 0;
+			uom_lookup_best_candidate=null;
+
+			UnitOfMeasure.RunTimeUOMS.entrySet().stream().forEach(e -> {
+						if(e.getValue().getUom_symbol().equals(text)){
+							uom_lookup_max_found_length = Integer.MAX_VALUE;
+							uom_lookup_best_candidate = e.getValue();
+						}
+						for(String symbol:e.getValue().getUom_symbols()) {
+							if(symbol.length()>uom_lookup_max_found_length){
+								if(StringUtils.equalsIgnoreCase(unidecode.decodeAndTrim(symbol),unidecode.decodeAndTrim(text))){
+									uom_lookup_max_found_length = symbol.length();
+									uom_lookup_best_candidate = e.getValue();
+								}
+							}
+						}
+
+					});
+
+			return uom_lookup_best_candidate;
+
+		}
+		return null;
+	}
 	
 	public static UnitOfMeasure lookUpUomInText_V2(String text, ArrayList<String> allowedUoms) {
 		if(text!=null) {
@@ -182,10 +211,6 @@ public class UnitOfMeasure {
 							}
 						}
 						for(String symbol:e.getValue().getUom_symbols()) {
-							if(StringUtils.equalsIgnoreCase(symbol,text) && !(allowedUoms!=null)){
-								uom_lookup_best_candidate=e.getValue();
-								uom_lookup_max_found_length = Integer.MAX_VALUE;
-							}
 							String searchedSymbol = unidecode.decodeAndTrim(symbol).toLowerCase();
 							if(searchedSymbol.length()>uom_lookup_max_found_length) {
 								if(unidecode.decodeAndTrim(text).toLowerCase().startsWith(searchedSymbol)) {

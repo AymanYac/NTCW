@@ -214,8 +214,7 @@ public class TranslationServices {
 	}
 
 	public static Pair<String,String> createUnverifiedDicoTranslationLink(String dataVal, String userVal) {
-    	System.out.println("XXXXXXX Unverified link "+dataVal+"/"+userVal);
-		Data2UserTermsDico = (Data2UserTermsDico!=null)?Data2UserTermsDico:new HashMap<String,String>();
+    	Data2UserTermsDico = (Data2UserTermsDico!=null)?Data2UserTermsDico:new HashMap<String,String>();
 		User2DataTermsDico = (User2DataTermsDico!=null)?User2DataTermsDico:new HashMap<String,String>();
 
 
@@ -232,14 +231,11 @@ public class TranslationServices {
 					//dataval translation known
 					matched = userValTrimmed.equals(unidecode.decodeAndTrim(Data2UserTermsDico.get(dataValTrimmed).toLowerCase()));
 					if(!matched){
-						System.out.println("conflict with known userval for input dataval");
 						return  new Pair<String,String>(dataVal,Data2UserTermsDico.get(dataValTrimmed));
 					}
-					System.out.println("no conflict with known userval for input dataval");
 					return  null;
 				}else{
 					//dataVal translation unknown
-					System.out.println("conflict with unknown userval for unput dataval");
 					return  new Pair<String,String>(dataVal,null);
 				}
 
@@ -247,10 +243,8 @@ public class TranslationServices {
 				//dataVal not known
 				if(User2DataTermsDico.containsKey(userValTrimmed)){
 					//The userval translation is known or the userval has an explicit no translation : conflict
-					System.out.println("conflict with known dataval for input userval");
 					return  new Pair<String,String>(User2DataTermsDico.get(userValTrimmed),userVal);
 				}else{
-					System.out.println("new entry");
 					//New entry
 					Data2UserTermsDico.put(dataValTrimmed, userVal);
 					User2DataTermsDico.put(userValTrimmed, dataVal);
