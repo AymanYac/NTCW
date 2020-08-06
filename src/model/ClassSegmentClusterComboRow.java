@@ -32,9 +32,9 @@ public class ClassSegmentClusterComboRow {
         rowSegments = new ArrayList<>(projectSegments.values().stream().map(s->new Pair<ClassSegment,SimpleBooleanProperty>(s,new SimpleBooleanProperty(true))).collect(Collectors.toCollection(ArrayList::new)));
     }
 
-    public ClassSegmentClusterComboRow(HashMap<String, ClassSegment> sid2Segment, Pair<ClassSegment, ClassCaracteristic> selectedEntry,String templateCriterion) {
+    public ClassSegmentClusterComboRow(HashMap<String, ClassSegment> sid2Segment, Pair<ClassSegment, ClassCaracteristic> selectedEntry,String templateCriterion,ClassSegment currentSegment) {
         ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> templateMappedSegments = CharValuesLoader.active_characteristics.entrySet().stream()
-                .filter(e->e.getValue().stream().map(ClassCaracteristic::getCharacteristic_id).collect(Collectors.toCollection(ArrayList::new))
+                .filter(e->e.getKey().equals(currentSegment.getSegmentId()) || e.getValue().stream().map(ClassCaracteristic::getCharacteristic_id).collect(Collectors.toCollection(ArrayList::new))
                         .contains(selectedEntry.getValue().getCharacteristic_id())).map(Map.Entry::getKey)
                         .collect(Collectors.toCollection(HashSet::new)).stream().map(sid2Segment::get)
                 .map(s -> new Pair<ClassSegment, SimpleBooleanProperty>(s, new SimpleBooleanProperty(true))).collect(Collectors.toCollection(ArrayList::new));

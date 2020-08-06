@@ -317,9 +317,7 @@ public class TablePane_CharClassif {
 							ClassCaracteristic old_char = CharValuesLoader.active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).get(idx2);
 							if(
 									old_char.getCharacteristic_name().toLowerCase().equals(new_char.getCharacteristic_name().toLowerCase())
-									||
-									old_char.getCharacteristic_name_translated().toLowerCase().equals(new_char.getCharacteristic_name_translated().toLowerCase()
-							)) {
+							) {
 								row.getData(row.getClass_segment_string().split("&&&")[0])[idx]=row.getData(itemPreviousClasses.get(row).split("&&&")[0])[idx2];
 								CharDescriptionExportServices.addItemCharDataToPush(row,row.getClass_segment_string().split("&&&")[0],idx,CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
 								break;

@@ -230,7 +230,7 @@ public class CaracDeclarationDialog {
 						charType.getSelectionModel().select("Text");
 						charTranslability.getSelectionModel().select(selectedCar.getIsTranslatable()?"Translatable":"Not translatable");
 					}
-					ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(sid2Segment,charName.selectedEntry,templateCriterion);
+					ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(sid2Segment,charName.selectedEntry,templateCriterion,itemSegment);
 					if(cc.toString().endsWith("category(ies)")){
 						charClassLink.getItems().add(cc);
 						charClassLink.getSelectionModel().select(cc);
