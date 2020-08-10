@@ -269,8 +269,23 @@ public class WordUtils {
 			return ret;
 		}
 
+	public static String ALPHANUM_PATTERN_RULE_EVAL(String action, String matchedBlock) {
+		String value = null;
+		//action = action.replace("\"","");
+		action = action.replace("#","[0-9]");
+		action = action.replace("@","[A-Z]");
+		action = action.replace("(|+0)","[\\W]*");
+		action = action.replace("(|+1)","[\\W]+");
+		Pattern p = Pattern.compile(action);
+		Matcher matcher = p.matcher(matchedBlock);
+		if(matcher.find()){
+			return matcher.group(0);
+		}
+		return null;
+		}
 
-		public static String ALPHANUM_PATTERN_RULE_INREPLACE(String selected_text, boolean keepAlphaBeforeFirstSep) {
+
+		public static String ALPHANUM_PATTERN_RULE_INREPLACE(String selected_text, boolean keepAlphaBeforeFirstSep,boolean quoteOuterText) {
 			//e.g. "abcd ef12-gh34-ij56"
 			//Rule = ["ab"#"cd"#(|+0)@@##(|+0)@@##]
 			String rule="";
@@ -279,13 +294,13 @@ public class WordUtils {
 			for(int i=0;i<selected_text.length();i++) {
 				char c = selected_text.charAt(i);
 				if(Character.isAlphabetic(c)) {
-					rule=rule+(firstSepPassed?"@":(last_is_alpha?c:(i==0?"\""+c:c)));
+					rule=rule+(firstSepPassed?"@":(last_is_alpha?c:(i==0&&quoteOuterText?"\""+c:c)));
 					last_is_alpha = true;
 				}else if (Character.isDigit(c)) {
-					rule=rule+(firstSepPassed?"#":(last_is_alpha?"\"#":"#"));
+					rule=rule+(firstSepPassed?"#":(last_is_alpha&&quoteOuterText?"\"#":"#"));
 					last_is_alpha = false;
 				}else {
-					rule=rule+(last_is_alpha&&!firstSepPassed?"\"(|+0)":"(|+0)");
+					rule=rule+(last_is_alpha&&!firstSepPassed&&quoteOuterText?"\"(|+0)":"(|+0)");
 					if(i!=0) {
 						firstSepPassed=true;
 					}
@@ -641,4 +656,6 @@ public class WordUtils {
 			}
 			return className.split("&&&")[1].contains(typedText);
 		}
+
+
 }

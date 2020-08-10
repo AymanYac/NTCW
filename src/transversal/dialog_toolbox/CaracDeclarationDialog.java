@@ -585,7 +585,8 @@ public class CaracDeclarationDialog {
 		return droppedClassInsertions;
 	}
 
-	private static ClassCaracteristic loadCaracFromDialog() {
+	private static ClassCaracteristic
+	loadCaracFromDialog() {
 		ClassCaracteristic newCarac = new ClassCaracteristic();
 		ArrayList<String> newUoms = new ArrayList<String>();
 		if(charName.incompleteProperty.getValue()){

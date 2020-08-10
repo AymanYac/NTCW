@@ -80,7 +80,7 @@ public class CharRuleResult {
 			}
 			if(action.startsWith("TXT ")) {
 				action=action.substring(4).trim();
-				actionValue.setTXTValue(action);
+				actionValue.setTXTValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL(action,matchedBlock));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><",genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(parent.account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);

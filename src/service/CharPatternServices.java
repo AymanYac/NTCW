@@ -335,13 +335,13 @@ public class CharPatternServices {
 					*/
 					parent.sendPatternRule("\""+selected_text.split(":")[0]+
 							"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+">");
+									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false,true)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false,false)+">");
 							
 					parent.sendSemiAutoPattern(tmp, "\""+selected_text.split(":")[0]+
 							"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false)+">");
+									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false,true)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(":")[1]),false,false)+">");
 							
 					System.out.println("Match!");
 					return;
@@ -361,13 +361,13 @@ public class CharPatternServices {
 					*/
 					parent.sendPatternRule("\""+selected_text.split("=")[0]+
 							"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+">");
+									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false,true)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false,false)+">");
 							
 					parent.sendSemiAutoPattern(tmp, "\""+selected_text.split("=")[0]+
 							"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false)+">");
+									WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false,true)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+											WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split("=")[1]),false,false)+">");
 							
 					System.out.println("Match!");
 					return;
@@ -392,12 +392,12 @@ public class CharPatternServices {
 						*/
 						parent.sendPatternRule("\""+sw_splitter+
 								"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-										WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-												WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+">");
+										WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false,true)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+												WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false,false)+">");
 						parent.sendSemiAutoPattern(tmp, "\""+sw_splitter+
 								"\"(|+1)"+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-										WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
-												WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false)+">");
+										WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false,true)+"<TXT "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+												WordUtils.TRIM_LEADING_SEPARATORS(selected_text.split(sw_splitter)[1]),false,false)+">");
 						
 						System.out.println("Match!");
 						return;
@@ -412,11 +412,11 @@ public class CharPatternServices {
 //						
 //							Rule = ["ab"#"cd"#(|+0)@@##(|+0)@@##]
 						
-						parent.sendPatternRule(WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true)+"<TXT "+
-						WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true)
+						parent.sendPatternRule(WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true,true)+"<TXT "+
+						WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true,false)
 						+">");
-						parent.sendSemiAutoPattern(tmp, WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true)+"<TXT "+
-						WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true)
+						parent.sendSemiAutoPattern(tmp, WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true,true)+"<TXT "+
+						WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(selected_text, true,false)
 						+">");
 						System.out.println("Match!");
 //						
@@ -2516,9 +2516,7 @@ public class CharPatternServices {
 		if(WordUtils.CORRECT(selected_text).toUpperCase().startsWith(active_char.getCharacteristic_name().toUpperCase())){
 			return selected_text.substring(0,active_char.getCharacteristic_name().length());
 		}
-		if(WordUtils.CORRECT(selected_text).toUpperCase().startsWith(active_char.getCharacteristic_name_translated().toUpperCase())){
-			return selected_text.substring(0,active_char.getCharacteristic_name().length());
-		}
+
 		
 		
 		
