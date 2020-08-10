@@ -663,7 +663,25 @@ public class TablePane_CharClassif {
             descriptionColumn.setResizable(false);
             descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
             
-        	
+        	CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream().forEach(characteristic->{
+				TableColumn col = new TableColumn<>(characteristic.getCharacteristic_name());
+				col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+					public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+						try{
+							return new ReadOnlyObjectWrapper(r.getValue().getData(Parent.classCombo.getSelectionModel().getSelectedItem().getClassSegment())[CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).indexOf(characteristic)].getDisplayValue(Parent));
+						}catch(Exception V) {
+							//Object has null data at daataIndex
+							return new ReadOnlyObjectWrapper("");
+						}
+					}
+				});
+				col.setVisible(false);
+				col.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
+				col.setResizable(false);
+
+				this.tableGrid.getColumns().add(col);
+			});
+        	/*
         	for(int i=0;i<CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size();i++) {
                 ClassCaracteristic characteristic = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).get(i);
                 final int dataIndex = i;
@@ -684,7 +702,7 @@ public class TablePane_CharClassif {
                 
                 this.tableGrid.getColumns().add(col);
             }
-        	
+        	*/
         	TableColumn linkColumn = new TableColumn<>("Link");
             //linkColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
             linkColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {

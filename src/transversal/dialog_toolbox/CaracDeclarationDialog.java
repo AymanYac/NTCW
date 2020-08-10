@@ -522,12 +522,12 @@ public class CaracDeclarationDialog {
 
 				int matchIndx = CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(charClassMatch.get());
 				CharValuesLoader.active_characteristics.get(s.getSegmentId()).set(matchIndx,copy);
-				CharValuesLoader.active_characteristics.get(s.getSegmentId()).sort(new Comparator<ClassCaracteristic>() {
+				/*CharValuesLoader.active_characteristics.get(s.getSegmentId()).sort(new Comparator<ClassCaracteristic>() {
 					@Override
 					public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
 						return o1.getSequence().compareTo(o2.getSequence());
 					}
-				});
+				});*/
 				addCaracDefinitionToPush(copy,s);
 			}else{
 				//The carac is not present insert if the charac name is not already used within the segment
@@ -565,12 +565,12 @@ public class CaracDeclarationDialog {
 					});
 				}
 				CharValuesLoader.active_characteristics.get(s.getSegmentId()).add(copy);
-				CharValuesLoader.active_characteristics.get(s.getSegmentId()).sort(new Comparator<ClassCaracteristic>() {
+				/*CharValuesLoader.active_characteristics.get(s.getSegmentId()).sort(new Comparator<ClassCaracteristic>() {
 					@Override
 					public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
 						return o1.getSequence().compareTo(o2.getSequence());
 					}
-				});
+				});*/
 				CharItemFetcher.allRowItems.stream().filter(r->r.getClass_segment_string().startsWith(s.getSegmentId())).forEach(r->{
 					r.expandDataField(s.getSegmentId());
 				});
@@ -871,12 +871,12 @@ public class CaracDeclarationDialog {
 					CharValuesLoader.active_characteristics.put(e.getKey(),
 							e.getValue().stream().filter(c->!c.getCharacteristic_id().equals(carac.getCharacteristic_id())).collect(Collectors.toCollection(ArrayList::new))
 					);
-					CharValuesLoader.active_characteristics.get(e.getKey()).sort(new Comparator<ClassCaracteristic>() {
+					/*	CharValuesLoader.active_characteristics.get(e.getKey()).sort(new Comparator<ClassCaracteristic>() {
 						@Override
 						public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
 							return o1.getSequence().compareTo(o2.getSequence());
 						}
-					});
+					});*/
 					addCaracDefinitionToDisable(carac,e.getKey());
 				}
 
