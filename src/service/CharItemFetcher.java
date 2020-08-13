@@ -111,7 +111,7 @@ public class CharItemFetcher {
 		
 	}
 	public static void generateItemArray(List<String> classItemIDs, TablePane_CharClassif tablePane_CharClassif) {
-		System.out.println("Retrieving "+classItemIDs.size());
+
 		try {
 			tablePane_CharClassif.itemArray.clear();
 			indexedRowItems.entrySet().parallelStream().filter(e->classItemIDs.contains(e.getKey()))
@@ -139,7 +139,6 @@ public class CharItemFetcher {
 	}
 
 	public static void initClassDataFields(TablePane_CharClassif tablePane_CharClassif) {
-		System.out.println("Initializing all data fields");
 		allRowItems.forEach(r->{
 			String item_class_id = classifiedItems.get(r.getItem_id()).split("&&&")[4];
 			r.allocateDataField(item_class_id,CharValuesLoader.active_characteristics.get(item_class_id).size());

@@ -64,19 +64,24 @@ public class TranslationServices {
 
 	public static ArrayList<CharValueTextSuggestion> getTextEntriesForActiveCharOnLanguages(Char_description parent, boolean isDataField) {
 		
-		try{
-			String active_class = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
-			int active_idx = parent.tableController.selected_col;
-			active_idx%=CharValuesLoader.active_characteristics.get(active_class).size();
-			ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(active_class).get(active_idx);
-			return new ArrayList<CharValueTextSuggestion>(
-					textEntries.get(active_char.getCharacteristic_id()).parallelStream().filter(
-							s->s.hasSourceValue(isDataField)).collect(Collectors.toList()));
-		}catch(Exception V) {
-			return new ArrayList<CharValueTextSuggestion>();
-		}
+		String active_class = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
+		int active_idx = parent.tableController.selected_col;
+		active_idx%=CharValuesLoader.active_characteristics.get(active_class).size();
+		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(active_class).get(active_idx);
+		return getTextEntriesForCharOnLanguages(active_char,isDataField);
+
 		
 		
+	}
+
+	public static ArrayList<CharValueTextSuggestion> getTextEntriesForCharOnLanguages(ClassCaracteristic active_char,boolean isDataField) {
+			try{
+				return new ArrayList<CharValueTextSuggestion>(
+						textEntries.get(active_char.getCharacteristic_id()).parallelStream().filter(
+								s->s.hasSourceValue(isDataField)).collect(Collectors.toList()));
+			}catch(Exception V) {
+				return new ArrayList<CharValueTextSuggestion>();
+			}
 	}
 
 

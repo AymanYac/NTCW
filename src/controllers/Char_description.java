@@ -33,6 +33,7 @@ import org.json.simple.parser.ParseException;
 import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
+import transversal.dialog_toolbox.DescriptionExportExcelSheets;
 import transversal.dialog_toolbox.UoMDeclarationDialog;
 import transversal.dialog_toolbox.UrlBookMarkDialog;
 import transversal.generic.Tools;
@@ -191,7 +192,11 @@ public class Char_description {
 	@FXML void export() throws SQLException, ClassNotFoundException {
 		
 		try {
-			CharDescriptionExportServices.ExportItemDataForClass(null,this);
+			Optional<ArrayList<Boolean>> choice = DescriptionExportExcelSheets.choicePopUp();
+			if(choice.isPresent()){
+				CharDescriptionExportServices.ExportItemDataForClass(null,this,choice.get().get(0),choice.get().get(1),choice.get().get(2),choice.get().get(3));
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
     		ConfirmationDialog.show("File saving failed", "Results could not be saved.\nMake sure you have the rights to create files in this folder and that the file is not open by another application", "OK");

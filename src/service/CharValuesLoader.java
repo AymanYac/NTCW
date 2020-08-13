@@ -7,24 +7,22 @@ import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.generic.Tools;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CharValuesLoader {
 	
 	static ArrayList<CaracteristicValue> knownValues;
 	static HashMap<String,Integer> indexedKnownValues = new HashMap<String,Integer>();
 	public static HashMap<String,ArrayList<ClassCaracteristic>> active_characteristics = new HashMap<String,ArrayList<ClassCaracteristic>>();
+	public static HashMap<String,HashMap<Integer,HashSet<Integer>>> itemDataMovementQueue = new HashMap<String,HashMap<Integer,HashSet<Integer>>>();
 	public static void fetchAllKnownValuesAssociated2Items(String active_project) throws SQLException, ClassNotFoundException {
 		if(knownValues!=null) {
 			return;
 		}else {
 			fetchDefaultCharValues(active_project);
 			knownValues = new ArrayList<CaracteristicValue>();
-			System.out.println("Loading all values known to items");
 			
 			Connection conn = Tools.spawn_connection();
 			PreparedStatement stmt;
@@ -34,7 +32,7 @@ public class CharValuesLoader {
 					+ "(select * from "+active_project+".project_items_x_values"
 									+ ") data left join "+active_project+".project_values "
 											+ "on data.value_id = project_values.value_id");
-			System.out.println(stmt.toString());
+
 			rs = stmt.executeQuery();
 			HashMap<String, List<String>> charIdArrays = new HashMap<String,List<String>>();
 			CharValuesLoader.active_characteristics.forEach((k,v)->{
@@ -214,7 +212,6 @@ public class CharValuesLoader {
 
 
 	public static void fetchDefaultCharValues(String activeProject) throws ClassNotFoundException, SQLException {
-		System.out.println("Fetching default values");
 		CharItemFetcher.defaultCharValues = new ArrayList<Pair<ClassCaracteristic,CaracteristicValue>>();
 		Connection conn = Tools.spawn_connection();
 		Statement stmt = conn.createStatement();
@@ -224,12 +221,7 @@ public class CharValuesLoader {
 			+ "(select * from "+activeProject+".project_characteristics_x_values) relations left join "
 				+ ""+activeProject+".project_values on project_values.value_id = relations.value_id) values "
 		+ "left join "+activeProject+".project_characteristics on values.characteristic_id = project_characteristics.characteristic_id");
-		System.out.println(
-				"select * from (select characteristic_id,user_id,description_method,description_rule_id,"
-				+ "project_values.value_id,text_value_data_language, text_value_user_language,note from "
-					+ "(select * from "+activeProject+".project_characteristics_x_values) relations left join "
-						+ ""+activeProject+".project_values on project_values.value_id = relations.value_id) values "
-				+ "left join "+activeProject+".project_characteristics on values.characteristic_id = project_characteristics.characteristic_id");
+
 						
 		while(rs.next()) {
 			
@@ -267,5 +259,75 @@ public class CharValuesLoader {
 		rs.close();
 		stmt.close();
 		conn.close();
+	}
+
+	public static ArrayList<ClassCaracteristic> returnSortedCopyOfClassCharacteristic(String classSegment) {
+
+		ArrayList<ClassCaracteristic> tmp = new ArrayList<ClassCaracteristic>(active_characteristics.get(classSegment));
+		tmp.sort(new Comparator<ClassCaracteristic>() {
+			@Override
+			public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
+				return o1.getSequence().compareTo(o2.getSequence());
+			}
+		});
+		return  tmp;
+
+	}
+
+	public static void prepareItemMoveItemDataInArray(int offset, String segmentId, int targetIndex) {
+
+		try{
+			itemDataMovementQueue.get(segmentId).get(offset).add(targetIndex);
+		}catch (Exception V){
+			try{
+				itemDataMovementQueue.get(segmentId).put(offset,new HashSet<>(targetIndex));
+			}catch (Exception E){
+				HashMap<Integer, HashSet<Integer>> tmp = new HashMap<Integer, HashSet<Integer>>();
+				tmp.put(offset,new HashSet<>(targetIndex));
+				itemDataMovementQueue.put(segmentId,tmp);
+			}
+		}
+
+	}
+
+	public static void executeMoveItemDataInArray() {
+		itemDataMovementQueue.entrySet().stream().forEach(e->{
+			System.out.println(e.getValue());
+			String segmentID = e.getKey();
+			CharItemFetcher.allRowItems.parallelStream().filter(r->r.getData().containsKey(segmentID)).forEach(r->{
+				try {
+					ArrayList<Integer> negatives = new ArrayList<Integer>(e.getValue().get(-1));
+					negatives.sort(new Comparator<Integer>() {
+						@Override
+						public int compare(Integer o1, Integer o2) {
+							return o1.compareTo(o2);
+						}
+					});
+					negatives.stream().forEach(idx->{
+
+						r.getData(segmentID)[idx-1] = r.getData(segmentID)[idx];
+					});
+				}catch (Exception V){
+
+				}
+				try {
+					ArrayList<Integer> negatives = new ArrayList<Integer>(e.getValue().get(1));
+					negatives.sort(new Comparator<Integer>() {
+						@Override
+						public int compare(Integer o1, Integer o2) {
+							return o2.compareTo(o1);
+						}
+					});
+					negatives.stream().forEach(idx->{
+
+						r.getData(segmentID)[idx+1] = r.getData(segmentID)[idx];
+					});
+				}catch (Exception V){
+
+				}
+
+			});
+		});
+		itemDataMovementQueue.clear();
 	}
 }

@@ -28,8 +28,12 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 	  public Pair<ClassSegment,ClassCaracteristic> selectedEntry;
 	  public javafx.beans.property.BooleanProperty incompleteProperty = new javafx.beans.property.SimpleBooleanProperty();
 
-	public AutoCompleteBox_CharDeclarationName() {
+	public AutoCompleteBox_CharDeclarationName(Pair<ClassSegment, ClassCaracteristic> editingCarac) {
 		super();
+		if(editingCarac!=null){
+			selectedEntry = editingCarac;
+		}
+
 		entries = new ArrayList<Pair<ClassSegment,ClassCaracteristic>>();
 		entriesPopup = new ContextMenu();
 
@@ -45,9 +49,17 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 		          entriesPopup.hide();
 		        } else
 		        {
+					if(editingCarac!=null){
+						if(getText().length() == 0){
+							setText("NO_NAME");
+						}
+						selectedEntry=editingCarac;
+						incompleteProperty.setValue(false);
+					}else{
+						selectedEntry=null;
+						incompleteProperty.setValue(true);
+					}
 
-					selectedEntry=null;
-					incompleteProperty.setValue(true);
 		          LinkedList<Pair<ClassSegment,ClassCaracteristic>> searchResult = new LinkedList<>();
 		          final List<Pair<ClassSegment,ClassCaracteristic>> filteredEntries = entries.stream().filter(e -> StringUtils.containsIgnoreCase(e.getValue().getCharacteristic_name(),getText()))
 		        		  .collect(Collectors.toList());
@@ -79,7 +91,7 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 		        		});
 		        	
 		        	
-		            populatePopup(searchResult);
+		            populatePopup(searchResult,editingCarac);
 		            if (!entriesPopup.isShowing())
 		            {
 		              entriesPopup.show(AutoCompleteBox_CharDeclarationName.this, Side.BOTTOM, 0, 0);
@@ -90,7 +102,7 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 		            	entriesPopup.getSkin().getNode().lookup(".menu-item").requestFocus();
 		            	entriesPopup.getSkin().getNode().lookup(".menu-item").setOnKeyPressed(ke ->{
 		            		if(ke.getCode().equals(KeyCode.ENTER) ) {
-		            			processSelectedCarac(RESULTMAP.get(0));
+		            			processSelectedCarac(RESULTMAP.get(0),editingCarac);
 		            		}
 		            	});
 		            	PopupIsVisible = true;
@@ -125,7 +137,7 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 
 
 
-	private void populatePopup(LinkedList<Pair<ClassSegment, ClassCaracteristic>> searchResult) {
+	private void populatePopup(LinkedList<Pair<ClassSegment, ClassCaracteristic>> searchResult, Pair<ClassSegment, ClassCaracteristic> editingCarac) {
 		    List<CustomMenuItem> menuItems = new LinkedList<>();
 		    int maxEntries = 20;
 		    int count = Math.min(searchResult.size(), maxEntries);
@@ -146,7 +158,7 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 		      {
 		        @Override
 		        public void handle(ActionEvent actionEvent) {
-		        	processSelectedCarac(result);
+		        	processSelectedCarac(result,editingCarac);
 		        }
 		      });
 		      RESULTMAP.put(i,result);
@@ -157,7 +169,15 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 
 		  }
 
-	public void processSelectedCarac(Pair<ClassSegment, ClassCaracteristic> result) {
+	public void processSelectedCarac(Pair<ClassSegment, ClassCaracteristic> result,Pair<ClassSegment, ClassCaracteristic> editingCarac) {
+		if(editingCarac!=null){
+			incompleteProperty.setValue(true);
+			incompleteProperty.setValue(false);
+			this.selectedEntry = editingCarac;
+			entriesPopup.hide();
+			CaracDeclarationDialog.skipToNextField(this);
+			return;
+		}
 		if(result!=null){
 			/*boolean caracHasOnlyOneTemplate = entries.stream().filter(p -> p.getValue().getCharacteristic_id().equals(result.getValue().getCharacteristic_id())).count()==1;
 			setText(result.getValue().getCharacteristic_name()+(caracHasOnlyOneTemplate?"":" (e.g. "+result.getKey().getClassName()+")"));*/

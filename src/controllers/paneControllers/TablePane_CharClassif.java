@@ -205,7 +205,7 @@ public class TablePane_CharClassif {
 		
 		translationThread = new Thread(translationTask);; translationThread.setDaemon(true);
 		translationThread.setName("Trnsl");
-		translationThread.start();
+		//translationThread.start();
 		
 		
 		
@@ -359,8 +359,6 @@ public class TablePane_CharClassif {
 		
 		if(!active_class.equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			Parent.charButton.setDisable(false);
-			System.out.println("Refreshing table with segment "+active_class);
-			
 
 			this.classItems = getActiveItemsID(active_class);
 			
@@ -553,7 +551,7 @@ public class TablePane_CharClassif {
 	@SuppressWarnings("rawtypes")
 	private void selectChartAtIndex(int i,boolean collapsedView) {
 		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size());
-		List<String> char_headers = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
+		List<String> char_headers = CharValuesLoader.returnSortedCopyOfClassCharacteristic(Parent.classCombo.getValue().getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
 		for( Object col:this.tableGrid.getColumns()) {
 			int idx = char_headers.indexOf(((TableColumn)col).getText());
 			if(idx!=selected_col ) {
@@ -662,8 +660,8 @@ public class TablePane_CharClassif {
             descriptionColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.4));;
             descriptionColumn.setResizable(false);
             descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
-            
-        	CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream().forEach(characteristic->{
+
+            CharValuesLoader.returnSortedCopyOfClassCharacteristic(Parent.classCombo.getValue().getClassSegment()).stream().forEach(characteristic->{
 				TableColumn col = new TableColumn<>(characteristic.getCharacteristic_name());
 				col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 					public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {

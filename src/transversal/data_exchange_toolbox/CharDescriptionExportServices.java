@@ -12,6 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import service.CharItemFetcher;
 import service.CharValuesLoader;
+import service.TranslationServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
 
@@ -20,9 +21,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
@@ -31,6 +31,9 @@ public class CharDescriptionExportServices {
 
 	private static int reviewRowIdx;
 	private static int baseRowIdx;
+	private static int taxoRowIdx;
+	private static int knownValueRowIdx;
+
 	public static ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>> itemDataBuffer = new ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>>();
 	public static ConcurrentLinkedQueue<Pair<CaracteristicValue,ClassCaracteristic>> caracDataBuffer = new ConcurrentLinkedQueue<Pair<CaracteristicValue,ClassCaracteristic>>();
 	public static ConcurrentLinkedQueue<Pair<ClassCaracteristic,ClassSegment>> caracDefBuffer = new ConcurrentLinkedQueue<Pair<ClassCaracteristic,ClassSegment>>();
@@ -38,7 +41,7 @@ public class CharDescriptionExportServices {
 
 	private static PreparedStatement stmt;
 
-	public static void ExportItemDataForClass(String targetClass, Char_description parent) throws ClassNotFoundException, SQLException, IOException {
+	public static void ExportItemDataForClass(String targetClass, Char_description parent,boolean exportReview, boolean exportBase, boolean exportTaxo, boolean exportKV) throws ClassNotFoundException, SQLException, IOException {
 		
 		File file = openExportFile(parent);
 		
@@ -51,12 +54,22 @@ public class CharDescriptionExportServices {
         
         
 		SXSSFWorkbook wb = new SXSSFWorkbook(5000); // keep 5000 rows in memory, exceeding rows will be flushed to disk
-        Sheet reviewSheet = wb.createSheet("Review format");
-        Sheet baseSheet = wb.createSheet("Database format");
-        createHeaderRows(wb,new Sheet[] {reviewSheet,baseSheet},parent);
+        Sheet reviewSheet = null;
+        if(exportReview){
+        	reviewSheet = wb.createSheet("Review format");
+			createReviewHeader(parent,wb,reviewSheet);
+		}
+        Sheet baseSheet = null;
+        if(exportBase) {
+        	baseSheet = wb.createSheet("Database format");
+        	createBaseHeader(parent,wb,baseSheet);
+
+		}
+
         reviewRowIdx = 0;
         baseRowIdx = 0;
         int reviewCharCardinality=0;
+
         for(CharDescriptionRow item:CharItemFetcher.allRowItems) {
         	String itemClass = item.getClass_segment_string().split("&&&")[0];
         	if(targetClass!=null && !targetClass.equals(itemClass)) {
@@ -66,13 +79,57 @@ public class CharDescriptionExportServices {
         	if(itemChars.size()>reviewCharCardinality) {
         		reviewCharCardinality = itemChars.size();
         	}
-        	appendReviewItem(item,reviewSheet,itemChars,parent);
-        	appendBaseItem(item,baseSheet,itemChars,parent);
+        	if(exportReview) appendReviewItem(item,reviewSheet,itemChars,parent);
+        	if(exportBase) appendBaseItem(item,baseSheet,itemChars,parent);
         }
+
+		HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(parent.account);
+		ArrayList<Pair<String, ClassSegment>> ks = CharValuesLoader.active_characteristics.keySet().stream().map(s -> new Pair<String, ClassSegment>(s, sid2Segment.get(s))).collect(Collectors.toCollection(ArrayList::new));
+		ks.sort(new Comparator<Pair<String, ClassSegment>>() {
+			@Override
+			public int compare(Pair<String, ClassSegment> o1, Pair<String, ClassSegment> o2) {
+				return o1.getValue().getClassNumber().compareTo(o2.getValue().getClassNumber());
+			}
+		});
+
+		if(exportTaxo) {
+			Sheet taxoSheet = wb.createSheet("Taxonomy");
+			createTaxoHeader(taxoSheet,wb,parent);
+			taxoRowIdx=0;
+			ks.stream().forEach(kse->{
+				CharValuesLoader.returnSortedCopyOfClassCharacteristic(kse.getKey()).forEach(carac->{
+					appendTaxoRow(kse.getValue(),carac,taxoSheet);
+				});
+			});
+		}
+
+		if(exportKV){
+			Sheet knownValueSheet = wb.createSheet("Known values");
+			createKnownValuesHeader(knownValueSheet,wb,parent);
+			knownValueRowIdx=0;
+			HashSet<ClassCaracteristic> caracSet = new HashSet<ClassCaracteristic>();
+			CharValuesLoader.active_characteristics.values().stream().flatMap(a->a.stream()).forEach(c->caracSet.add(c));
+			ArrayList<ClassCaracteristic> caracArray = new ArrayList<ClassCaracteristic>(caracSet);
+			caracArray.sort(new Comparator<ClassCaracteristic>() {
+				@Override
+				public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
+					return (o1.getCharacteristic_name()+o1.getCharacteristic_id()).compareTo(o2.getCharacteristic_name()+o2.getCharacteristic_id());
+				}
+			});
+			caracArray.forEach(c->{
+				TranslationServices.getTextEntriesForCharOnLanguages(c,true).forEach(t->{
+					appendKnownValueRow(c, t,knownValueSheet);
+				});
+
+			});
+
+		}
+
+
+
+
         
-        
-        
-        setColumnWidths(reviewSheet,baseSheet,parent);
+        setColumnWidths(reviewSheet,baseSheet,parent,exportBase,exportReview,exportTaxo,exportKV);
         
         closeExportFile(file,wb);
 		
@@ -80,7 +137,63 @@ public class CharDescriptionExportServices {
 		
 		
 	}
-	
+
+	private static void createReviewHeader(Char_description parent, SXSSFWorkbook wb, Sheet reviewSheet) {
+		Row reviewHeader = createHeaderRow(parent,wb,reviewSheet,new String[] {
+				"Client Item Number",
+				"Short description",
+				"Long description",
+				"Material Group",
+				"Classification number",
+				"Classification name"}, new IndexedColors[] {
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN
+		});
+		completeReviewHeaderRow(wb,reviewHeader,
+				CharValuesLoader.active_characteristics.values().parallelStream()
+						.map(a->a.size()).max(Integer::compare).get());
+	}
+
+
+	private static void createBaseHeader(Char_description parent, SXSSFWorkbook wb, Sheet baseSheet) {
+		createHeaderRow(parent,wb,baseSheet,new String[] {
+				"Client Item Number",
+				"Characteristic Sequence",
+				"Characteristic ID",
+				"Characteristic Name",
+				"Characteristic Type",
+				"Value",
+				"Unit of Measure",
+				"Value (translation)",
+				"Value (Min)",
+				"Value (Max)",
+				"Note",
+				"Source",
+				"Rule",
+				"Author",
+				"URL"}, new IndexedColors[] {
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+		});
+	}
+
 
 	private static void closeExportFile(File file, SXSSFWorkbook wb) throws IOException {
 		FileOutputStream out = new FileOutputStream(file.getAbsolutePath());
@@ -92,46 +205,105 @@ public class CharDescriptionExportServices {
         wb.close();
 	}
 
-	private static void setColumnWidths(Sheet reviewSheet, Sheet baseSheet, Char_description parent) {
-		
-		reviewSheet.setColumnWidth(0,256*17);
-		reviewSheet.setColumnWidth(1,256*50);
-		reviewSheet.setColumnWidth(2,256*50);
-		reviewSheet.setColumnWidth(3,256*15);
-		reviewSheet.setColumnWidth(4,256*25);
-		reviewSheet.setColumnWidth(5,256*35);
-		for(int i=0;i<CharValuesLoader.active_characteristics.values().parallelStream()
-				.map(a->a.size()).max(Integer::compare).get();i++) {
-			reviewSheet.setColumnWidth(6+2*i,256*20);
-			reviewSheet.setColumnWidth(7+2*i,256*20);
+	private static void setColumnWidths(Sheet reviewSheet, Sheet baseSheet, Char_description parent, boolean exportBase, boolean exportReview, boolean exportTaxo, boolean exportKV) {
+
+		if(exportReview){
+			reviewSheet.setColumnWidth(0,256*17);
+			reviewSheet.setColumnWidth(1,256*50);
+			reviewSheet.setColumnWidth(2,256*50);
+			reviewSheet.setColumnWidth(3,256*15);
+			reviewSheet.setColumnWidth(4,256*25);
+			reviewSheet.setColumnWidth(5,256*35);
+			for(int i=0;i<CharValuesLoader.active_characteristics.values().parallelStream()
+					.map(a->a.size()).max(Integer::compare).get();i++) {
+				reviewSheet.setColumnWidth(6+2*i,256*20);
+				reviewSheet.setColumnWidth(7+2*i,256*20);
+			}
+			reviewSheet.setZoom(60);
+			reviewSheet.createFreezePane(0, 1);
 		}
-		reviewSheet.setZoom(60);
-		reviewSheet.createFreezePane(0, 1);
-		
-		
-		baseSheet.setColumnWidth(0, 256*16);
-		baseSheet.setColumnWidth(1, 256*8);
-		baseSheet.setColumnWidth(2, 256*22);
-		baseSheet.setColumnWidth(3, 256*22);
-		baseSheet.setColumnWidth(4, 256*22);
-		baseSheet.setColumnWidth(5, 256*14);
-		baseSheet.setColumnWidth(6, 256*14);
-		baseSheet.setColumnWidth(7, 256*14);
-		baseSheet.setColumnWidth(8, 256*14);
-		baseSheet.setColumnWidth(9, 256*14);
-		baseSheet.setColumnWidth(10, 256*14);
-		baseSheet.setColumnWidth(11, 256*14);
-		baseSheet.setColumnWidth(12, 256*14);
-		baseSheet.setColumnWidth(13, 256*14);
-		baseSheet.setColumnWidth(14, 256*14);
-		baseSheet.setZoom(90);
-		baseSheet.createFreezePane(0, 1);
+
+		if(exportBase){
+			baseSheet.setColumnWidth(0, 256*16);
+			baseSheet.setColumnWidth(1, 256*8);
+			baseSheet.setColumnWidth(2, 256*22);
+			baseSheet.setColumnWidth(3, 256*22);
+			baseSheet.setColumnWidth(4, 256*22);
+			baseSheet.setColumnWidth(5, 256*14);
+			baseSheet.setColumnWidth(6, 256*14);
+			baseSheet.setColumnWidth(7, 256*14);
+			baseSheet.setColumnWidth(8, 256*14);
+			baseSheet.setColumnWidth(9, 256*14);
+			baseSheet.setColumnWidth(10, 256*14);
+			baseSheet.setColumnWidth(11, 256*14);
+			baseSheet.setColumnWidth(12, 256*14);
+			baseSheet.setColumnWidth(13, 256*14);
+			baseSheet.setColumnWidth(14, 256*14);
+			baseSheet.setZoom(90);
+			baseSheet.createFreezePane(0, 1);
+		}
+
+	}
+
+	private static void appendKnownValueRow(ClassCaracteristic carac, CharValueTextSuggestion sugg, Sheet knownValueSheet) {
+		knownValueRowIdx+=1;
+		Row row = knownValueSheet.createRow(knownValueRowIdx);
+		Cell loopCell = row.createCell(0);
+		loopCell.setCellValue(carac.getCharacteristic_id());
+
+		loopCell = row.createCell(1);
+		loopCell.setCellValue(carac.getCharacteristic_name());
+
+		try{
+			loopCell = row.createCell(2);
+			loopCell.setCellValue(sugg.getSource_value());
+		}catch (Exception V){
+			loopCell = row.createCell(3);
+			loopCell.setCellValue(sugg.getTarget_value());
+		}
+
+	}
+
+	private static void appendTaxoRow(ClassSegment segment, ClassCaracteristic carac, Sheet taxoSheet) {
+		taxoRowIdx+=1;
+		Row row = taxoSheet.createRow(taxoRowIdx);
+		Cell loopCell = row.createCell(0);
+		loopCell.setCellValue(segment.getClassNumber());
+
+		loopCell = row.createCell(1);
+		loopCell.setCellValue(carac.getSequence());
+
+		loopCell = row.createCell(2);
+		loopCell.setCellValue(carac.getCharacteristic_id());
+
+		loopCell = row.createCell(3);
+		loopCell.setCellValue(carac.getCharacteristic_name());
+
+		loopCell = row.createCell(4);
+		loopCell.setCellValue(
+				carac.getIsNumeric()?
+						((carac.getAllowedUoms()!=null && carac.getAllowedUoms().size()>0)?"NUM with UoM":"NUM w/o Uom")
+						:
+						(carac.getIsTranslatable()?"TXT translatable":"TXT non translatable")
+		);
+
+		loopCell = row.createCell(5);
+		loopCell.setCellValue(carac.getIsCritical()?"Critical":"Not critical");
+
+		loopCell = row.createCell(6);
+		try {
+			loopCell.setCellValue(String.join("--",carac.getAllowedUoms().stream().map(uid->UnitOfMeasure.RunTimeUOMS.get(uid).toString()).collect(Collectors.toCollection(ArrayList::new))));
+		}catch(Exception V) {
+
+		}
+
+
 	}
 
 	private static void appendBaseItem(CharDescriptionRow item, Sheet baseSheet, ArrayList<ClassCaracteristic> itemChars, Char_description parent) {
 		
 		for(int i=0;i<itemChars.size();i++) {
-			if(item.getData(item.getClass_segment_string().split("&&&")[0])!=null) {
+			if(item.getData(item.getClass_segment_string().split("&&&")[0])!=null && item.getData(item.getClass_segment_string().split("&&&")[0])[i]!=null) {
 				baseRowIdx+=1;
 				Row row = baseSheet.createRow(baseRowIdx);
 				Cell loopCell = row.createCell(0);
@@ -271,64 +443,35 @@ public class CharDescriptionExportServices {
 		
 	}
 
-	private static void createHeaderRows(SXSSFWorkbook wb, Sheet[] sheets, Char_description parent) {
-		
-		Sheet reviewSheet = sheets[0];
-		Row reviewHeader = createHeaderRow(parent,wb,reviewSheet,new String[] {
-				"Client Item Number",
-				"Short description",
-				"Long description",
-				"Material Group",
-				"Classification number",
-				"Classification name"}, new IndexedColors[] {
-						IndexedColors.GREY_80_PERCENT,
-						IndexedColors.GREY_80_PERCENT,
-						IndexedColors.GREY_80_PERCENT,
-						IndexedColors.GREY_80_PERCENT,
-						IndexedColors.SEA_GREEN,
-						IndexedColors.SEA_GREEN
-				});
-		completeReviewHeaderRow(wb,reviewHeader,
-				CharValuesLoader.active_characteristics.values().parallelStream()
-				.map(a->a.size()).max(Integer::compare).get());
-		
-		
-		Sheet baseSheet = sheets[1];
-		createHeaderRow(parent,wb,baseSheet,new String[] {
-				"Client Item Number",
+	private static void createKnownValuesHeader(Sheet knownValueSheet, SXSSFWorkbook wb, Char_description parent) {
+		createHeaderRow(parent,wb,knownValueSheet,new String[] {
+				"Characteristic ID",
+				"Characteristic Name",
+				"Known value in DL",
+				"Known value in UL"}, new IndexedColors[] {
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT});
+	}
+	private static void createTaxoHeader(Sheet taxoSheet, SXSSFWorkbook wb, Char_description parent){
+		createHeaderRow(parent,wb,taxoSheet,new String[] {
+				"Class Number",
 				"Characteristic Sequence",
 				"Characteristic ID",
 				"Characteristic Name",
 				"Characteristic Type",
-				"Value",
-				"Unit of Measure",
-				"Value (translation)",
-				"Value (Min)",
-				"Value (Max)",
-				"Note",
-				"Source",
-				"Rule",
-				"Author",
-				"URL"}, new IndexedColors[] {
-						IndexedColors.GREY_80_PERCENT,
-						IndexedColors.GREY_80_PERCENT,
-						IndexedColors.GREY_80_PERCENT,
-						IndexedColors.GREY_80_PERCENT,
-						IndexedColors.GREY_80_PERCENT,
-						null,
-						null,
-						null,
-						null,
-						null,
-						null,
-						null,
-						null,
-						null,
-						null,
-						});
-		
-		
+				"Characteristic Criticality",
+				"Unit of Measure"}, new IndexedColors[] {
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT});
 	}
+
 	
 	private static void completeReviewHeaderRow(SXSSFWorkbook wb, Row headerRow, int reviewCharCardinality) {
 		
@@ -434,7 +577,6 @@ public class CharDescriptionExportServices {
 	}
 
 	public static void addCaracDefinitionToPush(ClassCaracteristic template,ClassSegment segment){
-		System.out.println("carac def push "+template.getCharacteristic_name()+" for segment "+segment.getClassName());
 		Pair<ClassCaracteristic,ClassSegment> carSegPair = new Pair<ClassCaracteristic,ClassSegment>(template,segment);
 		caracDefBuffer.add(carSegPair);
 	}
@@ -454,7 +596,7 @@ public class CharDescriptionExportServices {
 				stmt.setString(3, car.getCharacteristic_name_translated());
 				stmt.setBoolean(4, car.getIsNumeric());
 				stmt.setBoolean(5, car.getIsTranslatable());
-				System.out.println(stmt.toString());
+
 				stmt.addBatch();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -484,7 +626,7 @@ public class CharDescriptionExportServices {
 						stmt.setArray(6, null);
 					}
 					stmt.setBoolean(7, true);
-					System.out.println(stmt.toString());
+
 					stmt.addBatch();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
@@ -518,7 +660,7 @@ public class CharDescriptionExportServices {
 					stmt.setArray(6, null);
 				}
 				stmt.setBoolean(7, false);
-				System.out.println(stmt.toString());
+
 				stmt.addBatch();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block

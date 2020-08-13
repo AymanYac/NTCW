@@ -7,7 +7,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -30,8 +29,6 @@ import model.*;
 import org.apache.commons.lang.StringUtils;
 import service.CharItemFetcher;
 import service.CharValuesLoader;
-import transversal.data_exchange_toolbox.CharDescriptionExportServices;
-import transversal.data_exchange_toolbox.CharDescriptionImportServices;
 import transversal.generic.Tools;
 
 import java.sql.SQLException;
@@ -50,7 +47,7 @@ public class CaracDeclarationDialog {
 	private static ComboBox<String> charType;
 	private static ComboBox<String> charTranslability;
 	private static ComboBox<ClassSegmentClusterComboRow> charClassLink;
-	private static ComboBox<Integer> sequence;
+	private static ComboBox<ComboPair<Integer,String>> sequence;
 	private static ComboBox<String> criticality;
 	private static Label uom0Label;
 	private static ComboBox<String> uom0;
@@ -69,7 +66,6 @@ public class CaracDeclarationDialog {
 
 
 	private static void showDetailedClassClusters(ClassSegment itemSegment) {
-		System.out.println("XXXXX SHOWING DETAILS XXXXXXX");
 		Dialog dialog = new Dialog<>();
 		dialog.setTitle("Listing all impacted classes");
 		dialog.setHeaderText(null);
@@ -152,23 +148,50 @@ public class CaracDeclarationDialog {
 		grid.add(tableview,0,0);
 		tableview.setMinWidth(800);
 		tableview.getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/TableViewBlue.css").toExternalForm());
+		GridPane.setColumnSpan(tableview,GridPane.REMAINING);
+
+		Button sab = new Button("Select All");
+		sab.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				tableview.getItems().stream().forEach(r->r.getValue().set(true));
+			}
+		});
+		Button uab = new Button("Deselect All");
+		uab.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				tableview.getItems().stream().filter(r->!r.getKey().getSegmentId().equals(itemSegment.getSegmentId())).forEach(r->r.getValue().set(false));
+			}
+		});
+		grid.add(sab,1,1);
+		grid.add(uab,2,1);
+		ColumnConstraints c1 = new ColumnConstraints();
+		c1.setPercentWidth(80);
+		ColumnConstraints c2 = new ColumnConstraints();
+		c2.setPercentWidth(10);
+		ColumnConstraints c3 = new ColumnConstraints();
+		c3.setPercentWidth(10);
+		grid.getColumnConstraints().addAll(c1,c2,c3);
 		dialog.getDialogPane().setContent(grid);
 
 		dialog.showAndWait();
 	}
 
 	public static void CaracDeclarationPopUp(UserAccount account, ClassSegment itemSegment, Pair<ClassSegment, ClassCaracteristic> editingCarac) throws SQLException, ClassNotFoundException {
+
+
 		// Create the custom dialog.
 		create_dialog();
 		
 		// Create the carac labels and fields.
-		create_dialog_fields();
+		create_dialog_fields(editingCarac);
 
 		// Set fields layout
 		set_fields_layout();
 				
 		//Set fields behavior
-		set_fields_behavior(dialog,validateButtonType,account,itemSegment,"NAME");
+		set_fields_behavior(dialog,validateButtonType,account,itemSegment,"NAME",editingCarac);
 				
 		dialog.getDialogPane().setContent(grid);
 
@@ -176,7 +199,7 @@ public class CaracDeclarationDialog {
 		Platform.runLater(() -> {
 			charName.requestFocus();
 			if(editingCarac!=null){
-				charName.processSelectedCarac(editingCarac);
+				charName.processSelectedCarac(editingCarac,editingCarac);
 			}
 		});
 		
@@ -189,30 +212,35 @@ public class CaracDeclarationDialog {
 	}
 
 
-	private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType, UserAccount account, ClassSegment itemSegment,String templateCriterion) throws SQLException, ClassNotFoundException {
+	private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType, UserAccount account, ClassSegment itemSegment, String templateCriterion, Pair<ClassSegment, ClassCaracteristic> editingCarac) throws SQLException, ClassNotFoundException {
 		//Fill the carac name field and the template UoMs DS
 		ArrayList<ClassCaracteristic> uniqueCharTemplate = new ArrayList<ClassCaracteristic>();
 		HashSet<String> uniqueCharIDs = new HashSet<String>();
 		HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(account);
-		CharValuesLoader.active_characteristics.entrySet().stream()
-		.map(e-> new Pair<String,ArrayList<ClassCaracteristic>>
-				(e.getKey(),
-				new ArrayList<ClassCaracteristic>(e.getValue().stream().filter(
-						c->uniqueCharIDs.add(c.getCharacteristic_id())).collect(Collectors.toList()))
-				)
-			).flatMap(p->p.getValue().stream().map(c->new Pair<ClassSegment,ClassCaracteristic>(sid2Segment.get(p.getKey()),c)))
-				.forEach(p2->{
-					//Add entry to charName combo
-					charName.entries.add(p2);
-					//Fill the template UoMs DS
-					if(p2.getValue().getAllowedUoms()!=null && p2.getValue().getAllowedUoms().size()>0){
-						ArrayList<UnitOfMeasure> UoMs = p2.getValue().getAllowedUoms().stream().map(uid -> UnitOfMeasure.RunTimeUOMS.get(uid)).collect(Collectors.toCollection(ArrayList::new));
-						HashMap<String, ArrayList<UnitOfMeasure>> tmp = templateUoMs.get(p2.getValue().getCharacteristic_id());
-						tmp = tmp!=null?tmp:new HashMap<String,ArrayList<UnitOfMeasure>>();
-						tmp.put(String.join(",",UoMs.stream().map(u->u.getUom_symbol()).collect(Collectors.toList())),UoMs);
-						templateUoMs.put(p2.getValue().getCharacteristic_id(),tmp);
-					}
-				});
+		if(editingCarac!=null){
+
+		}else{
+			CharValuesLoader.active_characteristics.entrySet().stream()
+					.map(e-> new Pair<String,ArrayList<ClassCaracteristic>>
+							(e.getKey(),
+									new ArrayList<ClassCaracteristic>(e.getValue().stream().filter(
+											c->uniqueCharIDs.add(c.getCharacteristic_id())).collect(Collectors.toList()))
+							)
+					).flatMap(p->p.getValue().stream().map(c->new Pair<ClassSegment,ClassCaracteristic>(sid2Segment.get(p.getKey()),c)))
+					.forEach(p2->{
+						//Add entry to charName combo
+						charName.entries.add(p2);
+						//Fill the template UoMs DS
+						if(p2.getValue().getAllowedUoms()!=null && p2.getValue().getAllowedUoms().size()>0){
+							ArrayList<UnitOfMeasure> UoMs = p2.getValue().getAllowedUoms().stream().map(uid -> UnitOfMeasure.RunTimeUOMS.get(uid)).collect(Collectors.toCollection(ArrayList::new));
+							HashMap<String, ArrayList<UnitOfMeasure>> tmp = templateUoMs.get(p2.getValue().getCharacteristic_id());
+							tmp = tmp!=null?tmp:new HashMap<String,ArrayList<UnitOfMeasure>>();
+							tmp.put(String.join(",",UoMs.stream().map(u->u.getUom_symbol()).collect(Collectors.toList())),UoMs);
+							templateUoMs.put(p2.getValue().getCharacteristic_id(),tmp);
+						}
+					});
+		}
+
 
 		charName.incompleteProperty.addListener(new ChangeListener<Boolean>() {
 			@Override
@@ -223,6 +251,9 @@ public class CaracDeclarationDialog {
 
 				if(!newValue){
 					ClassCaracteristic selectedCar = charName.selectedEntry.getValue();
+					if(editingCarac!=null){
+						charName.setText(selectedCar.getCharacteristic_name());
+					}
 					charNameTranslated.setText(selectedCar.getCharacteristic_name_translated());
 					if(selectedCar.getIsNumeric()){
 						charType.getSelectionModel().select("Numeric");
@@ -238,7 +269,8 @@ public class CaracDeclarationDialog {
 						charClassLink.getSelectionModel().select(0);
 					}
 
-					sequence.getSelectionModel().select(Integer.valueOf(Math.min(selectedCar.getSequence(),Collections.max(sequence.getItems()))));
+					//sequence.getSelectionModel().select(Integer.valueOf(Math.min(selectedCar.getSequence(),Collections.max((Collection<? extends Integer>) sequence.getItems().stream().map(i->i.getKey()).collect(Collectors.toCollection(ArrayList::new))))));
+					sequence.getSelectionModel().select(sequence.getItems().size()-1);
 					criticality.getSelectionModel().select(selectedCar.getIsCritical()?"Critical":"Not critical");
 					//Use the template UoM DS to set the uom0 combobox
 					try{
@@ -272,7 +304,8 @@ public class CaracDeclarationDialog {
 					charClassLink.getItems().add(cc);
 					charClassLink.getSelectionModel().select(0); //Select this category only on carac creation
 					sequence.getSelectionModel().clearSelection();
-					sequence.getSelectionModel().select(Integer.valueOf(CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).size()+1));
+					//sequence.getSelectionModel().select(Integer.valueOf(CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).size()+1));
+					sequence.getSelectionModel().select(sequence.getItems().size()-1);
 					criticality.getSelectionModel().clearSelection();
 					criticality.getSelectionModel().select("Not critical");
 					uom0.getItems().add("No unit of measure");
@@ -364,7 +397,8 @@ public class CaracDeclarationDialog {
 		ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(sid2Segment);
 		charClassLink.getItems().add(cc);
 
-		sequence.getItems().addAll(IntStream.range(1,CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).size()+2).boxed().collect(Collectors.toList()));
+		//sequence.getItems().addAll(IntStream.range(1,CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).size()+2).boxed().collect(Collectors.toList()));
+		sequence.getItems().addAll(CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).stream().map(c->new ComboPair<Integer,String>(c.getSequence(),c.getCharacteristic_name())).collect(Collectors.toCollection(ArrayList::new)));
 
 		criticality.getItems().add("Critical");
 		criticality.getItems().add("Not critical");
@@ -411,8 +445,9 @@ public class CaracDeclarationDialog {
 		validationButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				ClassCaracteristic newCarac = loadCaracFromDialog();
+				ClassCaracteristic newCarac = loadCaracFromDialog(editingCarac);
 				ArrayList<ClassSegment> droppedClassInsertions = dispatchCaracOnClassesReturnDropped(newCarac, itemSegment,account);
+				CharValuesLoader.executeMoveItemDataInArray();
 				dialog.close();
 				showDroppedClassInsertions(droppedClassInsertions);
 			}
@@ -426,7 +461,6 @@ public class CaracDeclarationDialog {
 			return;
 		}
 		ClassSegment firstRow = droppedClassInsertions.get(0);
-		System.out.println("XXXXX SHOWING DROPPED INSERTIONS XXXXXXX");
 		Dialog dialog = new Dialog<>();
 		dialog.setTitle("Listing dropped characteristic insertion");
 		dialog.setHeaderText("Duplicate characteristic name within segments is not allowed. The following classes have not been changed:");
@@ -487,7 +521,6 @@ public class CaracDeclarationDialog {
 
 			if(!(CharValuesLoader.active_characteristics.get(s.getSegmentId()) !=null)){
 				//The segment has no defined caracs
-				System.out.println("segment "+s.getClassName()+" has no defined caracs");
 				CharValuesLoader.active_characteristics.put(s.getSegmentId(),new ArrayList<ClassCaracteristic>());
 			}
 			Optional<ClassCaracteristic> charClassMatch = CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> c.getCharacteristic_id().equals(newCarac.getCharacteristic_id())).findAny();
@@ -501,12 +534,14 @@ public class CaracDeclarationDialog {
 								if(charClassMatch.get().getSequence()<=copy.getSequence()){
 									//Advancing
 									if(c.getSequence()>= charClassMatch.get().getSequence() && c.getSequence() <= copy.getSequence()){
+										CharValuesLoader.prepareItemMoveItemDataInArray(-1,s.getSegmentId(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(c));
 										c.setSequence(c.getSequence()-1);
 										addCaracDefinitionToPush(c,s);
 									}
 								}else{
 									//Regressing
 									if(c.getSequence() <= charClassMatch.get().getSequence() && c.getSequence()>=copy.getSequence()){
+										CharValuesLoader.prepareItemMoveItemDataInArray(+1,s.getSegmentId(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(c));
 										c.setSequence(c.getSequence()+1);
 										addCaracDefinitionToPush(c,s);
 									}
@@ -532,20 +567,18 @@ public class CaracDeclarationDialog {
 			}else{
 				//The carac is not present insert if the charac name is not already used within the segment
 				if(CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().anyMatch(c->StringUtils.equalsIgnoreCase(c.getCharacteristic_name(),copy.getCharacteristic_name()))){
-					System.out.println("Already known carac name "+copy.getCharacteristic_name()+" for segment "+s.getClassName());
 					droppedClassInsertions.add(s);
 					return;
 				}
 				//Disabled, insert new carac at sequence max
 				// CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> c.getSequence()>=newCarac.getSequence()).forEach(c->c.setSequence(c.getSequence()+1));
-				System.out.println("new car sequence on segment "+s.getClassName()+" "+copy.getSequence());
 				if(!s.equals(itemSegment)){
-					System.out.println("Setting new car to min(config,max sequence) on segment "+s.getClassName());
 					try{
 						if(sequenceCB.isSelected()){
 							//Force use the config sequence if the sequence CB is selected
 							copy.setSequence(Math.min(copy.getSequence(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().map(ClassCaracteristic::getSequence).max(Integer::compare).get()+1));
 							CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c-> c.getSequence()>=copy.getSequence()).forEach(c->{
+								CharValuesLoader.prepareItemMoveItemDataInArray(+1,s.getSegmentId(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(c));
 								c.setSequence(c.getSequence()+1);
 								addCaracDefinitionToPush(c,s);
 							});
@@ -558,8 +591,8 @@ public class CaracDeclarationDialog {
 					}
 				}else{
 					//Current class advance other caracs
-					System.out.println("Setting new car to sequence on current segment "+s.getClassName()+" "+copy.getSequence());
 					CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).stream().filter(c-> c.getSequence()>=copy.getSequence()).forEach(c->{
+						CharValuesLoader.prepareItemMoveItemDataInArray(+1,s.getSegmentId(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(c));
 						c.setSequence(c.getSequence()+1);
 						addCaracDefinitionToPush(c,s);
 					});
@@ -586,7 +619,7 @@ public class CaracDeclarationDialog {
 	}
 
 	private static ClassCaracteristic
-	loadCaracFromDialog() {
+	loadCaracFromDialog(Pair<ClassSegment, ClassCaracteristic> editingCarac) {
 		ClassCaracteristic newCarac = new ClassCaracteristic();
 		ArrayList<String> newUoms = new ArrayList<String>();
 		if(charName.incompleteProperty.getValue()){
@@ -604,10 +637,14 @@ public class CaracDeclarationDialog {
 				}
 			}
 		}
+		if(editingCarac!=null){
+			newCarac.setCharacteristic_name(charName.getText());
+		}
 		newCarac.setCharacteristic_name_translated(charNameTranslated.getText());
 		newCarac.setIsNumeric(charType.getValue().equals("Numeric"));
 		newCarac.setIsTranslatable(charTranslability.getValue().equals("Translatable"));
-		newCarac.setSequence(sequence.getValue());
+		//newCarac.setSequence(sequence.getValue().getKey());
+		newCarac.setSequence(FxUtilTest.getComboBoxValue(sequence).getKey());
 		newCarac.setIsCritical(criticality.getValue().equals("Critical"));
 		if(uom1.isVisible() && !uom1.incompleteProperty.getValue()){
 			newUoms.add(uom1.selectedUom.getUom_id());
@@ -633,9 +670,9 @@ public class CaracDeclarationDialog {
 
 	}
 	@SuppressWarnings("static-access")
-	private static void create_dialog_fields() {
+	private static void create_dialog_fields(Pair<ClassSegment, ClassCaracteristic> editingCarac) {
 		grid = new GridPane();
-		charName = new AutoCompleteBox_CharDeclarationName();
+		charName = new AutoCompleteBox_CharDeclarationName(editingCarac);
 
 		charNameTranslated = new TextField();
 		charNameTranslated.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -680,7 +717,8 @@ public class CaracDeclarationDialog {
 			}
 		});
 
-		sequence = new ComboBox<Integer>();
+		sequence = new ComboBox<ComboPair<Integer,String>>();
+		FxUtilTest.autoCompleteComboBoxPlus(sequence, (typedText, itemToCompare) -> itemToCompare.getValue().toLowerCase().contains(typedText.toLowerCase()) || itemToCompare.getKey().toString().equals(typedText));
 		sequence.setMaxWidth(Integer.MAX_VALUE);
 		sequence.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
@@ -864,7 +902,7 @@ public class CaracDeclarationDialog {
 				if(localCarac.isPresent()){
 					CharValuesLoader.active_characteristics.get(e.getKey()).stream().filter(c->c.getSequence() > localCarac.get().getSequence())
 							.forEach(c->{
-								System.out.println("Moving back "+c.getCharacteristic_name());
+								CharValuesLoader.prepareItemMoveItemDataInArray(-1,e.getKey(),CharValuesLoader.active_characteristics.get(e.getKey()).indexOf(c));
 								c.setSequence(c.getSequence()-1);
 								addCaracDefinitionToPush(c,sid2Segment.get(e.getKey()));
 							});
@@ -888,7 +926,7 @@ public class CaracDeclarationDialog {
 		} catch (SQLException | ClassNotFoundException throwables) {
 			throwables.printStackTrace();
 		}
-
+		CharValuesLoader.executeMoveItemDataInArray();
 	}
 
 	public static void skipToNextField(Node node) {

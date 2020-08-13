@@ -29,7 +29,6 @@ public class ClassCharacteristicsLoader {
 	}
 	
 	public static void loadAllClassCharacteristic(TablePane_CharClassif tablePane_CharClassif, String active_project) throws ClassNotFoundException, SQLException {
-		System.out.println("Loading all known characteristics");
 		if(CharValuesLoader.knownValues!=null) {
 			return;
 		}
