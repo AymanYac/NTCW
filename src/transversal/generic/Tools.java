@@ -189,9 +189,7 @@ public class Tools {
 	}
 
 	public static String load_ip() {
-		//return "localhost";
-		return "91.167.182.87";//"82.66.148.154";//"88.190.148.154";
-		//return "192.168.0.25";
+		return GlobalConstants.HOST_ADDRESS;
 	}
 	public static String load_port() {
 		return "5432";

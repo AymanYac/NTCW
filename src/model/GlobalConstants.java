@@ -4,7 +4,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import transversal.generic.Tools;
 
 public class GlobalConstants {
 
@@ -47,7 +46,10 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
 	public static final boolean MANUAL_CLASSIF_PERSIST = false;
-	public static final String TOOL_VERSION = "4.1.2 Prod";
+	public static final String TOOL_VERSION = "4.1.3 BB";
+	//public static final String HOST_ADDRESS = "localhost";
+	public static final String HOST_ADDRESS = "91.167.182.87";//"82.66.148.154";//"88.190.148.154";
+	//public static final String HOST_ADDRESS = "192.168.0.25";
 	
 	
 	public static final Integer RULE_DISPLAY_FONT_SIZE = 12;

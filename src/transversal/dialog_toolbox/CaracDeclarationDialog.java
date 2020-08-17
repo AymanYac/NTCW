@@ -399,6 +399,14 @@ public class CaracDeclarationDialog {
 
 		//sequence.getItems().addAll(IntStream.range(1,CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).size()+2).boxed().collect(Collectors.toList()));
 		sequence.getItems().addAll(CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).stream().map(c->new ComboPair<Integer,String>(c.getSequence(),c.getCharacteristic_name())).collect(Collectors.toCollection(ArrayList::new)));
+		if(!(editingCarac!=null)){
+			sequence.getItems().add(new ComboPair<>(CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).stream().map(c->c.getSequence()).max(new Comparator<Integer>() {
+				@Override
+				public int compare(Integer o1, Integer o2) {
+					return o1.compareTo(o2);
+				}
+			}).get()+1,ComboPair.NEW_ENTRY_LABEL));
+		}
 
 		criticality.getItems().add("Critical");
 		criticality.getItems().add("Not critical");
