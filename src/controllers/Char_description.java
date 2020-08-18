@@ -11,6 +11,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,15 +29,15 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextFlow;
 import javafx.util.Pair;
+import javafx.util.StringConverter;
 import model.*;
+import org.apache.commons.lang.StringUtils;
 import org.json.simple.parser.ParseException;
 import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
-import transversal.dialog_toolbox.ConfirmationDialog;
-import transversal.dialog_toolbox.DescriptionExportExcelSheets;
-import transversal.dialog_toolbox.UoMDeclarationDialog;
-import transversal.dialog_toolbox.UrlBookMarkDialog;
+import transversal.dialog_toolbox.*;
 import transversal.generic.Tools;
+import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
 import java.awt.*;
@@ -1048,6 +1049,33 @@ public class Char_description {
 	
 	private void decorate_class_combobox() {
 		classCombo.getItems().clear();
+		Unidecode unidecode = Unidecode.toAscii();
+		FxUtilTest.autoCompleteComboBoxPlus(classCombo, (typedText, itemToCompare) -> StringUtils.startsWithIgnoreCase(itemToCompare.getClassCode(),typedText) || unidecode.decodeAndTrim(itemToCompare.getclassName()).toLowerCase().contains(unidecode.decodeAndTrim(typedText).toLowerCase()));
+		classCombo.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if(newValue){
+					classCombo.getEditor().selectAll();
+				}
+			}
+		});
+		classCombo.setConverter(new StringConverter<CharDescClassComboRow>() {
+
+			@Override
+			public String toString(CharDescClassComboRow object) {
+				if (object == null) return null;
+				return object.toString();
+			}
+
+			@Override
+			public CharDescClassComboRow fromString(String string) {
+				Optional<CharDescClassComboRow> match = classCombo.getItems().stream().filter(e -> e.toString().equals(string)).findAny();
+				if(match.isPresent()){
+					return match.get();
+				}
+				return classCombo.getItems().get(0);
+			}
+		});
 		if(account.getUser_desc_classes()!=null) {
 			for(String entry:account.getUser_desc_classes()) {
 				for(String elem:CNAME_CID) {
@@ -1078,15 +1106,47 @@ public class Char_description {
 			}
 			
 		});
-		
-		classCombo.setOnAction(e -> {
-			try {
-				tableController.refresh_table_with_segment(classCombo.getValue().getClassSegment());
-			} catch (ClassNotFoundException | SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+		classCombo.setOnHidden(new EventHandler<Event>() {
+			@Override
+			public void handle(Event event) {
+				try {
+					tableController.refresh_table_with_segment(classCombo.getValue().getClassSegment());
+				} catch (ClassNotFoundException | SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
+		classCombo.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+				if(event.getCode().equals(KeyCode.ENTER)){
+					try {
+						tableController.refresh_table_with_segment(classCombo.getValue().getClassSegment());
+					} catch (ClassNotFoundException | SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		/*classCombo.valueProperty().addListener(new ChangeListener<CharDescClassComboRow>() {
+			@Override
+			public void changed(ObservableValue<? extends CharDescClassComboRow> observable, CharDescClassComboRow oldValue, CharDescClassComboRow newValue) {
+				if(classCombo.isShowing()){
+					return;
+				}
+				if(newValue!=null){
+					try {
+						tableController.refresh_table_with_segment(classCombo.getValue().getClassSegment());
+					} catch (ClassNotFoundException | SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});*/
+
 		
 	}
 	@SuppressWarnings("static-access")

@@ -19,12 +19,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import javafx.util.StringConverter;
 import model.*;
 import org.apache.commons.lang.StringUtils;
 import service.CharItemFetcher;
@@ -43,6 +45,7 @@ public class CaracDeclarationDialog {
 	private static Dialog<ClassCaracteristic>  dialog;
 	private static GridPane grid;
 	private static AutoCompleteBox_CharDeclarationName charName;
+	private static Label searchLabel;
 	private static TextField charNameTranslated;
 	private static ComboBox<String> charType;
 	private static ComboBox<String> charTranslability;
@@ -185,7 +188,7 @@ public class CaracDeclarationDialog {
 		create_dialog();
 		
 		// Create the carac labels and fields.
-		create_dialog_fields(editingCarac);
+		create_dialog_fields(editingCarac,account);
 
 		// Set fields layout
 		set_fields_layout();
@@ -678,9 +681,27 @@ public class CaracDeclarationDialog {
 
 	}
 	@SuppressWarnings("static-access")
-	private static void create_dialog_fields(Pair<ClassSegment, ClassCaracteristic> editingCarac) {
+	private static void create_dialog_fields(Pair<ClassSegment, ClassCaracteristic> editingCarac,UserAccount account) {
 		grid = new GridPane();
 		charName = new AutoCompleteBox_CharDeclarationName(editingCarac);
+		searchLabel = new Label("Advanced search...");
+		searchLabel.setUnderline(true);
+		searchLabel.setTextAlignment(TextAlignment.CENTER);
+		GridPane.setHalignment(searchLabel,HPos.CENTER);
+		searchLabel.setFont(Font.font(searchLabel.getFont().getName(), FontWeight.LIGHT, FontPosture.ITALIC, searchLabel.getFont().getSize()));
+		searchLabel.setVisible(!(editingCarac!=null));
+		searchLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				try {
+					showAdvancedSearchPane(account);
+				} catch (SQLException throwables) {
+					throwables.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		charNameTranslated = new TextField();
 		charNameTranslated.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -793,7 +814,196 @@ public class CaracDeclarationDialog {
 		grid.setHalignment(uom2CB, HPos.CENTER);
 	}
 
-	
+	private static void showAdvancedSearchPane(UserAccount account) throws SQLException, ClassNotFoundException {
+		Dialog dialog = new Dialog<>();
+		dialog.setTitle("Advance characteristic search");
+		dialog.setHeaderText(null);
+		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStyleClass().add("customDialog");
+
+		// Set the button types.
+		ButtonType importButtonType = new ButtonType("Import selected",ButtonData.APPLY);
+		dialog.getDialogPane().getButtonTypes().addAll(importButtonType,ButtonType.CLOSE);
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(10, 10, 10, 10));
+		grid.add(new Label("Search by characteristic name"),0,0);
+		Button conjButton = new Button("AND");
+		conjButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				if (conjButton.getText().equals("AND")){
+					conjButton.setText("OR");
+				}else{
+					conjButton.setText("AND");
+				}
+			}
+		});
+		grid.add(conjButton,1,0);
+		GridPane.setHalignment(conjButton,HPos.CENTER);
+		grid.add(new Label("Search by class name"),2,0);
+
+		ColumnConstraints c1 = new ColumnConstraints();
+		c1.setPercentWidth(40);
+		ColumnConstraints c2 = new ColumnConstraints();
+		c2.setPercentWidth(20);
+		ColumnConstraints c3 = new ColumnConstraints();
+		c3.setPercentWidth(40);
+		grid.getColumnConstraints().setAll(c1,c2,c3);
+		
+		ComboBox<ClassCaracteristic> caracCombo = new ComboBox<ClassCaracteristic>();
+		FxUtilTest.autoCompleteComboBoxPlus(caracCombo, (typedText, itemToCompare) -> StringUtils.containsIgnoreCase(itemToCompare.getCharacteristic_name(),typedText));
+		grid.add(caracCombo,0,1);
+		ComboBox<ClassSegment> segCombo = new ComboBox<ClassSegment>();
+		FxUtilTest.autoCompleteComboBoxPlus(segCombo, (typedText, itemToCompare) -> StringUtils.containsIgnoreCase(itemToCompare.getClassName(),typedText) || StringUtils.containsIgnoreCase(itemToCompare.getClassNumber(),typedText));
+		grid.add(segCombo,2,1);
+		TableView<AdvancedResultRow> resultTable = new TableView<AdvancedResultRow>();
+		TableColumn col1 = new TableColumn("Characteristic Name");
+		col1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<AdvancedResultRow, String>, ObservableValue<String>>() {
+			public ObservableValue<String> call(TableColumn.CellDataFeatures<AdvancedResultRow, String> r) {
+				return new ReadOnlyObjectWrapper(r.getValue().getCarac());
+			}
+		});
+		col1.setResizable(false);
+		col1.prefWidthProperty().bind(resultTable.widthProperty().multiply(50 / 100.0));
+
+		TableColumn col2 = new TableColumn("Category Name");
+		col2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<AdvancedResultRow, String>, ObservableValue<String>>() {
+			public ObservableValue<String> call(TableColumn.CellDataFeatures<AdvancedResultRow, String> r) {
+				return new ReadOnlyObjectWrapper(r.getValue().getSegment());
+			}
+		});
+		col2.setResizable(false);
+		col2.prefWidthProperty().bind(resultTable.widthProperty().multiply(50 / 100.0));
+		resultTable.getColumns().setAll(col1,col2);
+
+		grid.add(resultTable,0,2);
+		GridPane.setColumnSpan(resultTable,GridPane.REMAINING);
+
+		RowConstraints r1 = new RowConstraints();
+		r1.setPercentHeight(10);
+		RowConstraints r2 = new RowConstraints();
+		r2.setPercentHeight(10);
+		RowConstraints r3 = new RowConstraints();
+		r3.setPercentHeight(80);
+		grid.getRowConstraints().setAll(r1,r2,r3);
+
+		dialog.getDialogPane().setContent(grid);
+
+		HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(account);
+		HashSet<String> uniqueCaracNames = new HashSet<String>();
+		CharValuesLoader.active_characteristics.values().stream().flatMap(x->x.stream())
+				.filter(c->uniqueCaracNames.add(c.getCharacteristic_name()))
+				.collect(Collectors.toCollection(HashSet::new)).forEach(c->caracCombo.getItems().add(c));
+		sid2Segment.values().forEach(s->segCombo.getItems().add(s));
+
+		Button importButton = (Button) dialog.getDialogPane().lookupButton(importButtonType);
+		importButton.visibleProperty().bind(resultTable.getSelectionModel().selectedIndexProperty().greaterThanOrEqualTo(0));
+		importButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Pair<ClassSegment, ClassCaracteristic> selectedEntry = new Pair<>(resultTable.getSelectionModel().getSelectedItem().getSegment(), resultTable.getSelectionModel().getSelectedItem().getCarac());
+				charName.setText(selectedEntry.getValue().getCharacteristic_name()+(false?"":" (e.g. "+selectedEntry.getKey().getClassName()+")"));
+				charName.selectedEntry = selectedEntry;
+				charName.incompleteProperty.setValue(false);
+				charName.hideEntriesPopup();
+				dialog.close();
+			}
+		});
+
+		caracCombo.setConverter(new StringConverter<ClassCaracteristic>() {
+
+			@Override
+			public String toString(ClassCaracteristic object) {
+				if (object == null) return null;
+				return object.toString();
+			}
+
+			@Override
+			public ClassCaracteristic fromString(String string) {
+				Optional<ClassCaracteristic> match = caracCombo.getItems().stream().filter(e -> e.toString().equals(string)).findAny();
+				if(match.isPresent()){
+					return match.get();
+				}
+				return null;
+			}
+		});
+		caracCombo.valueProperty().addListener(new ChangeListener<ClassCaracteristic>() {
+			@Override
+			public void changed(ObservableValue<? extends ClassCaracteristic> observable, ClassCaracteristic oldValue, ClassCaracteristic newValue) {
+				resultTable.getItems().setAll(updateAdvancedSearchResults(caracCombo,segCombo,resultTable,conjButton,sid2Segment));
+			}
+		});
+		segCombo.setConverter(new StringConverter<ClassSegment>() {
+
+			@Override
+			public String toString(ClassSegment object) {
+				if (object == null) return null;
+				return object.toString();
+			}
+
+			@Override
+			public ClassSegment fromString(String string) {
+				Optional<ClassSegment> match = segCombo.getItems().stream().filter(e -> e.toString().equals(string)).findAny();
+				if(match.isPresent()){
+					return match.get();
+				}
+				return null;
+			}
+		});
+		segCombo.valueProperty().addListener(new ChangeListener<ClassSegment>() {
+			@Override
+			public void changed(ObservableValue<? extends ClassSegment> observable, ClassSegment oldValue, ClassSegment newValue) {
+				resultTable.getItems().setAll(updateAdvancedSearchResults(caracCombo,segCombo,resultTable,conjButton,sid2Segment));
+			}
+		});
+		GridPane.setHgrow(segCombo,Priority.ALWAYS);
+		GridPane.setHgrow(caracCombo,Priority.ALWAYS);
+		segCombo.valueProperty().addListener(new ChangeListener<ClassSegment>() {
+			@Override
+			public void changed(ObservableValue<? extends ClassSegment> observable, ClassSegment oldValue, ClassSegment newValue) {
+				System.out.println("New seg value "+newValue);
+			}
+		});
+		conjButton.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				resultTable.getItems().setAll(updateAdvancedSearchResults(caracCombo,segCombo,resultTable,conjButton,sid2Segment));
+			}
+		});
+
+
+		dialog.showAndWait();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				caracCombo.requestFocus();
+			}
+		});
+
+	}
+
+	private static ArrayList<AdvancedResultRow> updateAdvancedSearchResults(ComboBox<ClassCaracteristic> caracCombo, ComboBox<ClassSegment> segCombo, TableView<AdvancedResultRow> resultTable, Button conjButton, HashMap<String, ClassSegment> sid2Segment) {
+		ArrayList<AdvancedResultRow> retainedRows = new ArrayList<AdvancedResultRow>();
+		CharValuesLoader.active_characteristics.entrySet().forEach(e->{
+			ClassSegment loopSegment = sid2Segment.get(e.getKey());
+			if(conjButton.getText().equals("AND") && segCombo.getValue()!=null && !loopSegment.equals(segCombo.getValue())){
+				return;
+			}
+			e.getValue().forEach(loopCarac->{
+				if(conjButton.getText().equals("AND") && caracCombo.getValue()!=null && !loopCarac.getCharacteristic_name().equals(caracCombo.getValue().getCharacteristic_name())){
+					return;
+				}
+				if(caracCombo.getValue()!=null && loopCarac.getCharacteristic_name().equals(caracCombo.getValue().getCharacteristic_name())
+					||
+					segCombo.getValue()!=null && loopSegment.equals(segCombo.getValue())){
+					retainedRows.add(new AdvancedResultRow(loopSegment,loopCarac));
+				}
+			});
+		});
+		return retainedRows;
+	}
 
 
 	@SuppressWarnings("static-access")
@@ -833,6 +1043,7 @@ public class CaracDeclarationDialog {
 		grid.add(headerLabel1, 1, 0);
 		
 		grid.add(new Label("Characteristic name"), 1, 2);
+		grid.add(searchLabel,5,2);
 		grid.add(new Label("Characteristic name translated"), 1, 3);
 		grid.add(new Label("Characteristic type"), 1, 4);
 		grid.add(new Label("Translation type"), 1, 5);

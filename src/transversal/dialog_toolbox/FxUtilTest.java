@@ -22,7 +22,7 @@ public class FxUtilTest {
                 comboBox.getEditor().setText(null);
             }
         });
-        comboBox.addEventHandler(KeyEvent.KEY_PRESSED, t -> comboBox.hide());
+        //comboBox.addEventHandler(KeyEvent.KEY_PRESSED, t -> comboBox.hide());
         comboBox.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 
             private boolean moveCaretToPos = false;
@@ -56,6 +56,7 @@ public class FxUtilTest {
                         caretPos = comboBox.getEditor().getCaretPosition();
                     }
                 } else if (event.getCode() == KeyCode.ENTER) {
+                    comboBox.hide();
                     int selectedIndex = comboBox.getSelectionModel().getSelectedIndex();
                     if(selectedIndex > 0){
                         comboBox.getSelectionModel().select(selectedIndex);

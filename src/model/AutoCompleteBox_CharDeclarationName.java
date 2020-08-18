@@ -195,5 +195,11 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 	}
 
 
-	  
+	public void hideEntriesPopup() {
+		try{
+			entriesPopup.hide();
+		}catch (Exception V){
+
+		}
+	}
 }

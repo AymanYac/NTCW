@@ -119,6 +119,10 @@ public class ClassCaracteristic {
 	public int hashCode() {
 		return getCharacteristic_id().hashCode();
 	}
+	@Override
+	public String toString() {
+		return getCharacteristic_name();
+	}
 	
 	
 	public Pair<String,String> attemptUomSymbolInterpretationCorrection(String uomFalse){
