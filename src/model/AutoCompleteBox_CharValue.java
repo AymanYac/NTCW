@@ -30,6 +30,7 @@ public class AutoCompleteBox_CharValue {
 	  private ArrayList<CharValueTextSuggestion> entries;
 	  private AutoCompleteBox_CharValue sibling;
 	  private static boolean blockFocusLostProcessing=false;
+	  private static Unidecode unidecode = Unidecode.toAscii();
 	  
 	  public AutoCompleteBox_CharValue(Char_description parent,TextField textField,boolean isDataField, UserAccount account){
 		  this.textfield = textField;
@@ -68,8 +69,10 @@ public class AutoCompleteBox_CharValue {
 									((CharValueTextSuggestion)o1).getSource_value().compareTo(
 									((CharValueTextSuggestion)o2).getSource_value())
 									));
-							
-		        	  		return ret ;
+							int av_1 =  unidecode.decodeAndTrim(((String)o1).split("&&&")[1]).toUpperCase().startsWith(unidecode.decodeAndTrim(textField.getText()).toUpperCase())?1000000:0;
+							int av_2 =  unidecode.decodeAndTrim(((String)o2).split("&&&")[1]).toUpperCase().startsWith(unidecode.decodeAndTrim(textField.getText()).toUpperCase())?1000000:0;
+
+							return ret - av_1 + av_2;
 						}
 		                 
 		        		});
@@ -321,9 +324,8 @@ protected Boolean setValuesOnParent(CharValueTextSuggestion result, Char_descrip
 						//Launch this function with the otherResult as input
 						
 						String knownTranslation = otherResult.get().getTarget_value();
-						Unidecode unidec = Unidecode.toAscii();
-						if(unidec.decodeAndTrim(knownTranslation.toLowerCase()).equals(
-								unidec.decodeAndTrim(textfield.getText().toLowerCase()))){
+						if(unidecode.decodeAndTrim(knownTranslation.toLowerCase()).equals(
+								unidecode.decodeAndTrim(textfield.getText().toLowerCase()))){
 							
 							
 						}else {
@@ -463,9 +465,9 @@ protected Boolean setValuesOnParent(CharValueTextSuggestion result, Char_descrip
 						//The other field has a known translation
 						
 						String knownTranslation = otherResult.get().getTarget_value();
-						Unidecode unidec = Unidecode.toAscii();
-						if(unidec.decodeAndTrim(knownTranslation.toLowerCase()).equals(
-								unidec.decodeAndTrim(textfield.getText().toLowerCase()))){
+
+						if(unidecode.decodeAndTrim(knownTranslation.toLowerCase()).equals(
+								unidecode.decodeAndTrim(textfield.getText().toLowerCase()))){
 							
 							
 						}else {

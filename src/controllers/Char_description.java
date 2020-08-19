@@ -1055,7 +1055,12 @@ public class Char_description {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				if(newValue){
-					classCombo.getEditor().selectAll();
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							classCombo.getEditor().selectAll();
+						}
+					});
 				}
 			}
 		});

@@ -124,32 +124,32 @@ public class CharValuesLoader {
 		CaracteristicValue tmp = new CaracteristicValue();
 		tmp.setParentChar(active_char);
 		if(active_char.getIsNumeric()) {
-			tmp.setNominal_value(parent.value_field.getText());
+			tmp.setNominal_value(parent.value_field.getText().trim());
 			if(active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0) {
-				Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->u.toString().equals(parent.uom_field.getText())).findAny();
+				Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->u.toString().equals(parent.uom_field.getText().trim())).findAny();
 				if(uom.isPresent()) {
 					tmp.setUom_id(uom.get().getUom_id());
 				}
-				tmp.setMin_value(parent.min_field_uom.getText());
-				tmp.setMax_value(parent.max_field_uom.getText());
+				tmp.setMin_value(parent.min_field_uom.getText().trim());
+				tmp.setMax_value(parent.max_field_uom.getText().trim());
 			}else {
-				tmp.setMin_value(parent.min_field.getText());
-				tmp.setMax_value(parent.max_field.getText());
+				tmp.setMin_value(parent.min_field.getText().trim());
+				tmp.setMax_value(parent.max_field.getText().trim());
 			}
 		}else {
 			if(parent.value_field.getText()!=null && parent.value_field.getText().replace(" ", "").length()>0) {
-				tmp.setDataLanguageValue(parent.value_field.getText());
+				tmp.setDataLanguageValue(parent.value_field.getText().trim());
 			}else {
 				tmp.setDataLanguageValue(null);
 			}
 			
 			if(parent.translated_value_field.getText()!=null && parent.translated_value_field.getText().replace(" ", "").length()>0) {
-				tmp.setUserLanguageValue(parent.translated_value_field.getText());
+				tmp.setUserLanguageValue(parent.translated_value_field.getText().trim());
 			}else {
 				tmp.setUserLanguageValue(null);
 			}
 		}
-		tmp.setNote(parent.note_field_uom.getText());
+		tmp.setNote(parent.note_field_uom.getText().trim());
 		tmp.setSource(DataInputMethods.MANUAL);
 		tmp.setAuthor(parent.account.getUser_id());
 		tmp.ManualValueReviewed=true;
@@ -168,32 +168,32 @@ public class CharValuesLoader {
 		tmp.setValue_id(row.getItem_id());
 		tmp.setParentChar(active_char);
 		if(active_char.getIsNumeric()) {
-			tmp.setNominal_value(parent.value_field.getText());
+			tmp.setNominal_value(parent.value_field.getText().trim());
 			if(active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0) {
 				Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->u.toString().equals(parent.uom_field.getText())).findAny();
 				if(uom.isPresent()) {
 					tmp.setUom_id(uom.get().getUom_id());
 				}
-				tmp.setMin_value(parent.min_field_uom.getText());
-				tmp.setMax_value(parent.max_field_uom.getText());
+				tmp.setMin_value(parent.min_field_uom.getText().trim());
+				tmp.setMax_value(parent.max_field_uom.getText().trim());
 			}else {
-				tmp.setMin_value(parent.min_field.getText());
-				tmp.setMax_value(parent.max_field.getText());
+				tmp.setMin_value(parent.min_field.getText().trim());
+				tmp.setMax_value(parent.max_field.getText().trim());
 			}
 		}else {
 			if(parent.value_field.getText()!=null && parent.value_field.getText().replace(" ", "").length()>0) {
-				tmp.setDataLanguageValue(parent.value_field.getText());
+				tmp.setDataLanguageValue(parent.value_field.getText().trim());
 			}else {
 				tmp.setDataLanguageValue(null);
 			}
 			
 			if(parent.translated_value_field.getText()!=null && parent.translated_value_field.getText().replace(" ", "").length()>0) {
-				tmp.setUserLanguageValue(parent.translated_value_field.getText());
+				tmp.setUserLanguageValue(parent.translated_value_field.getText().trim());
 			}else {
 				tmp.setUserLanguageValue(null);
 			}
 		}
-		tmp.setNote(parent.note_field_uom.getText());
+		tmp.setNote(parent.note_field_uom.getText().trim());
 		tmp.setSource(DataInputMethods.MANUAL);
 		tmp.setAuthor(parent.account.getUser_id());
 		tmp.ManualValueReviewed=true;

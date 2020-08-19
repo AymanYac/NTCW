@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import service.CharItemFetcher;
 import service.CharValuesLoader;
 import transversal.generic.Tools;
+import transversal.language_toolbox.Unidecode;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -66,13 +67,14 @@ public class CaracDeclarationDialog {
 	private static CheckBox uom2CB;
 	private static ButtonType validateButtonType;
 	private static HashMap<String,HashMap<String,ArrayList<UnitOfMeasure>>> templateUoMs = new HashMap<String,HashMap<String,ArrayList<UnitOfMeasure>>>();
+	private static Unidecode unidecode;
 
 
 	private static void showDetailedClassClusters(ClassSegment itemSegment) {
 		Dialog dialog = new Dialog<>();
 		dialog.setTitle("Listing all impacted classes");
 		dialog.setHeaderText(null);
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 
 		// Set the button types.
@@ -150,7 +152,6 @@ public class CaracDeclarationDialog {
 
 		grid.add(tableview,0,0);
 		tableview.setMinWidth(800);
-		tableview.getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/TableViewBlue.css").toExternalForm());
 		GridPane.setColumnSpan(tableview,GridPane.REMAINING);
 
 		Button sab = new Button("Select All");
@@ -205,8 +206,8 @@ public class CaracDeclarationDialog {
 				charName.processSelectedCarac(editingCarac,editingCarac);
 			}
 		});
-		
 
+		//grid.getRowConstraints().forEach(rc->rc.setVgrow(Priority.ALWAYS));
 
 		dialog.showAndWait();
 
@@ -475,7 +476,7 @@ public class CaracDeclarationDialog {
 		Dialog dialog = new Dialog<>();
 		dialog.setTitle("Listing dropped characteristic insertion");
 		dialog.setHeaderText("Duplicate characteristic name within segments is not allowed. The following classes have not been changed:");
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 
 		// Set the button types.
@@ -519,7 +520,6 @@ public class CaracDeclarationDialog {
 
 		grid.add(tableview,0,0);
 		tableview.setMinWidth(800);
-		tableview.getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/TableViewBlue.css").toExternalForm());
 		dialog.getDialogPane().setContent(grid);
 
 		dialog.showAndWait();
@@ -672,12 +672,13 @@ public class CaracDeclarationDialog {
 		dialog = new Dialog<>();
 		dialog.setTitle("New class characteristic declaration");
 		dialog.setHeaderText(null);
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 		
 		// Set the button types.
 		validateButtonType = new ButtonType("Apply", ButtonData.OK_DONE);
-		dialog.getDialogPane().getButtonTypes().addAll(validateButtonType, ButtonType.CANCEL);
+		ButtonType cancelButtonType = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+		dialog.getDialogPane().getButtonTypes().addAll(validateButtonType, cancelButtonType);
 
 	}
 	@SuppressWarnings("static-access")
@@ -818,12 +819,14 @@ public class CaracDeclarationDialog {
 		Dialog dialog = new Dialog<>();
 		dialog.setTitle("Advance characteristic search");
 		dialog.setHeaderText(null);
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 
 		// Set the button types.
 		ButtonType importButtonType = new ButtonType("Import selected",ButtonData.APPLY);
-		dialog.getDialogPane().getButtonTypes().addAll(importButtonType,ButtonType.CLOSE);
+		ButtonType closeButtonType = new ButtonType("Close",ButtonData.CANCEL_CLOSE);
+
+		dialog.getDialogPane().getButtonTypes().addAll(importButtonType,closeButtonType);
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
@@ -853,10 +856,12 @@ public class CaracDeclarationDialog {
 		grid.getColumnConstraints().setAll(c1,c2,c3);
 		
 		ComboBox<ClassCaracteristic> caracCombo = new ComboBox<ClassCaracteristic>();
-		FxUtilTest.autoCompleteComboBoxPlus(caracCombo, (typedText, itemToCompare) -> StringUtils.containsIgnoreCase(itemToCompare.getCharacteristic_name(),typedText));
+		unidecode = Unidecode.toAscii();
+
+		FxUtilTest.autoCompleteComboBoxPlus(caracCombo, (typedText, itemToCompare) -> StringUtils.containsIgnoreCase(unidecode.decodeAndTrim(itemToCompare.getCharacteristic_name()),unidecode.decodeAndTrim(typedText)));
 		grid.add(caracCombo,0,1);
 		ComboBox<ClassSegment> segCombo = new ComboBox<ClassSegment>();
-		FxUtilTest.autoCompleteComboBoxPlus(segCombo, (typedText, itemToCompare) -> StringUtils.containsIgnoreCase(itemToCompare.getClassName(),typedText) || StringUtils.containsIgnoreCase(itemToCompare.getClassNumber(),typedText));
+		FxUtilTest.autoCompleteComboBoxPlus(segCombo, (typedText, itemToCompare) -> StringUtils.containsIgnoreCase(unidecode.decodeAndTrim(itemToCompare.getClassName()),unidecode.decodeAndTrim(typedText)) || StringUtils.containsIgnoreCase(itemToCompare.getClassNumber().trim(),typedText.trim()));
 		grid.add(segCombo,2,1);
 		TableView<AdvancedResultRow> resultTable = new TableView<AdvancedResultRow>();
 		TableColumn col1 = new TableColumn("Characteristic Name");
@@ -883,10 +888,13 @@ public class CaracDeclarationDialog {
 
 		RowConstraints r1 = new RowConstraints();
 		r1.setPercentHeight(10);
+		r1.setVgrow(Priority.ALWAYS);
 		RowConstraints r2 = new RowConstraints();
 		r2.setPercentHeight(10);
+		r2.setVgrow(Priority.ALWAYS);
 		RowConstraints r3 = new RowConstraints();
 		r3.setPercentHeight(80);
+		r3.setVgrow(Priority.ALWAYS);
 		grid.getRowConstraints().setAll(r1,r2,r3);
 
 		dialog.getDialogPane().setContent(grid);
@@ -896,7 +904,19 @@ public class CaracDeclarationDialog {
 		CharValuesLoader.active_characteristics.values().stream().flatMap(x->x.stream())
 				.filter(c->uniqueCaracNames.add(c.getCharacteristic_name()))
 				.collect(Collectors.toCollection(HashSet::new)).forEach(c->caracCombo.getItems().add(c));
+		caracCombo.getItems().sort(new Comparator<ClassCaracteristic>() {
+			@Override
+			public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
+				return o1.getCharacteristic_name().compareTo(o2.getCharacteristic_name());
+			}
+		});
 		sid2Segment.values().forEach(s->segCombo.getItems().add(s));
+		segCombo.getItems().sort(new Comparator<ClassSegment>() {
+			@Override
+			public int compare(ClassSegment o1, ClassSegment o2) {
+				return o1.getClassNumber().compareTo(o2.getClassNumber());
+			}
+		});
 
 		Button importButton = (Button) dialog.getDialogPane().lookupButton(importButtonType);
 		importButton.visibleProperty().bind(resultTable.getSelectionModel().selectedIndexProperty().greaterThanOrEqualTo(0));
@@ -958,8 +978,7 @@ public class CaracDeclarationDialog {
 				resultTable.getItems().setAll(updateAdvancedSearchResults(caracCombo,segCombo,resultTable,conjButton,sid2Segment));
 			}
 		});
-		GridPane.setHgrow(segCombo,Priority.ALWAYS);
-		GridPane.setHgrow(caracCombo,Priority.ALWAYS);
+
 		segCombo.valueProperty().addListener(new ChangeListener<ClassSegment>() {
 			@Override
 			public void changed(ObservableValue<? extends ClassSegment> observable, ClassSegment oldValue, ClassSegment newValue) {
@@ -973,6 +992,8 @@ public class CaracDeclarationDialog {
 			}
 		});
 
+		GridPane.setHgrow(segCombo,Priority.ALWAYS);
+		GridPane.setHgrow(caracCombo,Priority.ALWAYS);
 
 		dialog.showAndWait();
 		Platform.runLater(new Runnable() {

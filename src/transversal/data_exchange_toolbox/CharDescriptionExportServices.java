@@ -253,14 +253,19 @@ public class CharDescriptionExportServices {
 
 		loopCell = row.createCell(1);
 		loopCell.setCellValue(carac.getCharacteristic_name());
-
 		try{
 			loopCell = row.createCell(2);
 			loopCell.setCellValue(sugg.getSource_value());
 		}catch (Exception V){
+
+		}
+		try{
 			loopCell = row.createCell(3);
 			loopCell.setCellValue(sugg.getTarget_value());
+		}catch (Exception V){
+
 		}
+
 
 	}
 

@@ -93,7 +93,8 @@ public class CharValueTextSuggestion {
 	public boolean sourceTextContains(String subText) {
 		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
 		try{
-			return unidecode.decodeAndTrim(getSource_value().toLowerCase()).contains(unidecode.decodeAndTrim(subText.toLowerCase()));
+			if(subText.replace(" ","").length()==0) return true;
+			return unidecode.decode(getSource_value().toLowerCase()).contains(unidecode.decode(subText.toLowerCase()));
 		}catch(Exception V) {
 			return false;
 		}

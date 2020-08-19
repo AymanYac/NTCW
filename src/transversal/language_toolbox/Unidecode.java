@@ -90,27 +90,7 @@ public class Unidecode {
      *     Description of the used transliterization method</a>
      */
     public String decodeAndTrim(String str) {
-        if (str == null) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            int codePoint = str.codePointAt(i);
-
-            // basic ASCII, don't change
-            if (codePoint < 0x80) {
-                sb.append(c);
-                continue;
-            }
-            // characters in the Private Use Area and above are ignored
-            if (codePoint > 0xffff) {
-                continue;
-            }
-            sb.append(substituteChar(codePoint));
-        }
-        return sb.toString().trim();
+        return decode(str).trim();
     }
     
     
