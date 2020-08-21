@@ -172,10 +172,10 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 	public void processSelectedCarac(Pair<ClassSegment, ClassCaracteristic> result,Pair<ClassSegment, ClassCaracteristic> editingCarac) {
 		if(editingCarac!=null){
 			incompleteProperty.setValue(true);
-			incompleteProperty.setValue(false);
 			this.selectedEntry = editingCarac;
 			entriesPopup.hide();
 			CaracDeclarationDialog.skipToNextField(this);
+			incompleteProperty.setValue(false);
 			return;
 		}
 		if(result!=null){

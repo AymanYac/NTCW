@@ -274,18 +274,37 @@ public class CaracDeclarationDialog {
 					}
 
 					//sequence.getSelectionModel().select(Integer.valueOf(Math.min(selectedCar.getSequence(),Collections.max((Collection<? extends Integer>) sequence.getItems().stream().map(i->i.getKey()).collect(Collectors.toCollection(ArrayList::new))))));
-					sequence.getSelectionModel().select(sequence.getItems().size()-1);
+					if(editingCarac!=null){
+						sequence.getSelectionModel().select(selectedCar.getSequence()-1);
+					}else{
+						sequence.getSelectionModel().select(sequence.getItems().size()-1);
+					}
 					criticality.getSelectionModel().select(selectedCar.getIsCritical()?"Critical":"Not critical");
 					//Use the template UoM DS to set the uom0 combobox
 					try{
-						Set<String> UomKS = templateUoMs.get(charName.selectedEntry.getValue().getCharacteristic_id()).keySet();
-						uom0.getItems().addAll(UomKS);
-						uom0.getItems().add("Other...");
-						uom0.getSelectionModel().select(0);
-						uom1.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->UnitOfMeasure.ConversionPathExists(u,charName.selectedEntry.getValue().getAllowedUoms())).collect(Collectors.toCollection(ArrayList::new)));
-						uom2.getEntries().addAll(uom1.getEntries());
-						uom1.clear();
-						uom2.clear();
+						if(editingCarac!=null && charName.selectedEntry.getValue().getAllowedUoms()!=null && charName.selectedEntry.getValue().getAllowedUoms().size()>0){
+							uom0.getItems().add("Other...");
+							uom0.getSelectionModel().select(0);
+							uom1.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->UnitOfMeasure.ConversionPathExists(u,charName.selectedEntry.getValue().getAllowedUoms())).collect(Collectors.toCollection(ArrayList::new)));
+							uom2.getEntries().addAll(uom1.getEntries());
+							uom1.clear();
+							uom2.clear();
+							uom1.print_uom_in_parent(UnitOfMeasure.RunTimeUOMS.get(charName.selectedEntry.getValue().getAllowedUoms().get(0)));
+							try{
+								uom2.print_uom_in_parent(UnitOfMeasure.RunTimeUOMS.get(charName.selectedEntry.getValue().getAllowedUoms().get(1)));
+							}catch (Exception V){
+
+							}
+						}else{
+							Set<String> UomKS = templateUoMs.get(charName.selectedEntry.getValue().getCharacteristic_id()).keySet();
+							uom0.getItems().addAll(UomKS);
+							uom0.getItems().add("Other...");
+							uom0.getSelectionModel().select(0);
+							uom1.getEntries().addAll(UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->UnitOfMeasure.ConversionPathExists(u,charName.selectedEntry.getValue().getAllowedUoms())).collect(Collectors.toCollection(ArrayList::new)));
+							uom2.getEntries().addAll(uom1.getEntries());
+							uom1.clear();
+							uom2.clear();
+						}
 					}catch (Exception V){
 						uom0.getItems().add("No unit of measure");
 						uom0.getSelectionModel().select(0);

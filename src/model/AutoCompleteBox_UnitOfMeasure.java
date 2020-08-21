@@ -58,15 +58,15 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
       @SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
       public void changed(ObservableValue<? extends String> observableValue, String s, String s2) {
+        selectedUom=null;
+        incompleteProperty.setValue(true);
+
         if (getText().length() == 0 || !isFocused())
         {
-
           entriesPopup.hide();
         } else
         {
 
-            selectedUom=null;
-            incompleteProperty.setValue(true);
           LinkedList<UnitOfMeasure> searchResult = new LinkedList<>();
           final List<UnitOfMeasure> filteredEntries = entries.stream().filter(e ->
                   (populateSearchMethod.equals("NAME") && StringUtils.containsIgnoreCase(e.getUom_name(),getText()) )
@@ -184,7 +184,7 @@ protected void check_revert_value_in_allowed_uoms() {
   }
 
 
-protected void print_uom_in_parent(UnitOfMeasure result) {
+public void print_uom_in_parent(UnitOfMeasure result) {
       setText(result.toString());
       this.selectedUom = result;
       incompleteProperty.setValue(false);
