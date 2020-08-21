@@ -163,8 +163,9 @@ public class Char_description {
 
 
 	public AutoCompleteBox_CharValue valueAutoComplete;
-	
-	
+	private boolean allowRefreshActiveClass = true;
+
+
 	@FXML void nextBlank() {
 	}
 	@FXML void previousBlank() {
@@ -1087,7 +1088,7 @@ public class Char_description {
 					if (elem.startsWith(entry)) {
 						CharDescClassComboRow tmp = new CharDescClassComboRow(elem.split("&&&")[0],elem.split("&&&")[1],elem.split("&&&")[2]);
 						classCombo.getItems().add(tmp);
-						if(elem.split("&&&")[0].equals(account.getUser_desc_class())) {
+						if(allowRefreshActiveClass && elem.split("&&&")[0].equals(account.getUser_desc_class())) {
 							classCombo.getSelectionModel().select(tmp);
 						}
 					}
@@ -1114,12 +1115,16 @@ public class Char_description {
 		classCombo.setOnHidden(new EventHandler<Event>() {
 			@Override
 			public void handle(Event event) {
-				try {
-					tableController.refresh_table_with_segment(classCombo.getValue().getClassSegment());
-				} catch (ClassNotFoundException | SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				allowRefreshActiveClass = false;
+				CharDescClassComboRow newValue = classCombo.getValue();
+				decorate_class_combobox();
+				classCombo.getSelectionModel().select(newValue);
+				allowRefreshActiveClass = true;
+				//tableController.refresh_table_with_segment(newValue.getClassSegment());
+				KeyEvent press = new KeyEvent(classCombo, classCombo, KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false);
+				classCombo.getEditor().fireEvent(press);
+
+
 			}
 		});
 		classCombo.setOnKeyPressed(new EventHandler<KeyEvent>() {

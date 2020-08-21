@@ -356,7 +356,8 @@ public class TablePane_CharClassif {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void refresh_table_with_segment(String active_class) throws ClassNotFoundException, SQLException {
-		
+		account.setUser_desc_class(active_class);
+		Tools.set_desc_class(account);
 		if(!active_class.equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			Parent.charButton.setDisable(false);
 

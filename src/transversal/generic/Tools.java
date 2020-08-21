@@ -314,7 +314,9 @@ public class Tools {
     	return sid2Segment;
     }
 
-    public void create_project_schema(String pid) {
+
+
+	public void create_project_schema(String pid) {
 		try {
 			String schema_creation_query = readStringFile("/scripts/project_schema_creation.sql",Charset.defaultCharset());
 			Connection conn = spawn_connection();
@@ -1259,7 +1261,16 @@ public class Tools {
 		return ret;
 	}
 
+	public static void set_desc_class(UserAccount account) throws SQLException, ClassNotFoundException {
+    	if(account.getUser_desc_class()!=null){
+			Connection conn = Tools.spawn_connection();
+			Statement stmt = conn.createStatement();
+			stmt.execute("update administration.users_x_projects set user_description_class = '"+account.getUser_desc_class()+"' where project_id = '"+account.getActive_project()+"' and user_id = '"+account.getUser_id()+"'");
+			stmt.close();
+			conn.close();
+		}
 
+	}
 
 	public static String get_desc_class(UserAccount account) throws ClassNotFoundException, SQLException {
 		Connection conn = Tools.spawn_connection();

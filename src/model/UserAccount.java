@@ -169,6 +169,6 @@ public class UserAccount {
 		 this.ManualSortDirs = new ArrayList<> ( Arrays.asList( ( (String[])array.getArray() )) );
 		
 	}
-	
-	
+
+
 }

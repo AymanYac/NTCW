@@ -112,6 +112,16 @@
 	-fx-background-color:transparent;
 }
 
+.combo-box:focused{
+	-fx-text-fill:#445469;
+	-fx-font-weight:normal;
+	-fx-padding:0 0 0 0;
+	-fx-background-color:transparent;
+	-fx-faint-focus-color: transparent;
+	-fx-border-width: 5px;
+    -fx-border-color: #9BBB5C
+}
+
 .combo-box .arrow-button{
 	-fx-background-color:#445469,
 	linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%),
@@ -184,6 +194,26 @@
 
 	}
 
+.button:focused{
+	-fx-background-color:#445469,
+	linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%),
+    linear-gradient(#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
+
+	-fx-font-family:Calibri;
+	-fx-font-weight:Bold;
+	-fx-font-size:16px;
+	-fx-text-fill:white;
+
+	-fx-border-color:#9BBB5C;
+	-fx-border-width:2px;
+
+	-fx-background-radius:5px;
+	-fx-border-radius:5px;
+
+	-fx-background-insets:1px;
+
+	}
+
 .text-field{
 	-fx-font-family:calibri;
 	-fx-font-size:16px;
@@ -191,6 +221,22 @@
 	-fx-background-radius:0;
 
 	-fx-border-color:#445469;
+	-fx-border-radius:0;
+
+	-fx-effect:none;
+
+	-fx-text-fill:#445469;
+	-fx-font-weight:bold;
+}
+
+.text-field:focused{
+	-fx-font-family:calibri;
+	-fx-font-size:16px;
+	-fx-background-color:white;
+	-fx-background-radius:0;
+
+	-fx-border-color:#9BBB5C;
+	-fx-border-width: 5px;
 	-fx-border-radius:0;
 
 	-fx-effect:none;

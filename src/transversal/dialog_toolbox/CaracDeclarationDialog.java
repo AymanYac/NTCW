@@ -1134,9 +1134,12 @@ public class CaracDeclarationDialog {
 			int impactedValuesOnDelete = (int) CharItemFetcher.allRowItems.stream().filter(r->(scopeChoice||r.getClass_segment_string().split("&&&")[0].equals(itemSegment)))
 					.filter(r->r.hasDataInCurrentClassForCarac(carac.getCharacteristic_id())).count();
 
-			if(!ConfirmationDialog.showCaracDeleteImpactConfirmation(impactedValuesOnDelete)){
-				return;
+			if(impactedValuesOnDelete>0){
+				if(!ConfirmationDialog.showCaracDeleteImpactConfirmation(impactedValuesOnDelete)){
+					return;
+				}
 			}
+
 			CharValuesLoader.active_characteristics.entrySet().stream().filter(e->scopeChoice||e.getKey().equals(itemSegment)).forEach(e->{
 				Optional<ClassCaracteristic> localCarac = e.getValue().stream().filter(c -> c.getCharacteristic_id().equals(carac.getCharacteristic_id())).findAny();
 				if(localCarac.isPresent()){
