@@ -36,6 +36,7 @@ import transversal.language_toolbox.Unidecode;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -182,20 +183,20 @@ public class CaracDeclarationDialog {
 		dialog.showAndWait();
 	}
 
-	public static void CaracDeclarationPopUp(UserAccount account, ClassSegment itemSegment, Pair<ClassSegment, ClassCaracteristic> editingCarac) throws SQLException, ClassNotFoundException {
+	public static void CaracDeclarationPopUp(UserAccount account, ClassSegment currentItemSegment, Pair<ClassSegment, ClassCaracteristic> editingCarac) throws SQLException, ClassNotFoundException {
 
 
 		// Create the custom dialog.
 		create_dialog();
 		
 		// Create the carac labels and fields.
-		create_dialog_fields(editingCarac,account);
+		create_dialog_fields(editingCarac,account,currentItemSegment);
 
 		// Set fields layout
 		set_fields_layout();
 				
 		//Set fields behavior
-		set_fields_behavior(dialog,validateButtonType,account,itemSegment,"NAME",editingCarac);
+		set_fields_behavior(dialog,validateButtonType,account,currentItemSegment,"NAME",editingCarac);
 				
 		dialog.getDialogPane().setContent(grid);
 
@@ -216,7 +217,7 @@ public class CaracDeclarationDialog {
 	}
 
 
-	private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType, UserAccount account, ClassSegment itemSegment, String templateCriterion, Pair<ClassSegment, ClassCaracteristic> editingCarac) throws SQLException, ClassNotFoundException {
+	private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType, UserAccount account, ClassSegment currentItemSegment, String templateCriterion, Pair<ClassSegment, ClassCaracteristic> editingCarac) throws SQLException, ClassNotFoundException {
 		//Fill the carac name field and the template UoMs DS
 		ArrayList<ClassCaracteristic> uniqueCharTemplate = new ArrayList<ClassCaracteristic>();
 		HashSet<String> uniqueCharIDs = new HashSet<String>();
@@ -265,7 +266,7 @@ public class CaracDeclarationDialog {
 						charType.getSelectionModel().select("Text");
 						charTranslability.getSelectionModel().select(selectedCar.getIsTranslatable()?"Translatable":"Not translatable");
 					}
-					ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(sid2Segment,charName.selectedEntry,templateCriterion,itemSegment);
+					ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(sid2Segment,charName.selectedEntry,templateCriterion,currentItemSegment);
 					if(cc.toString().endsWith("category(ies)")){
 						charClassLink.getItems().add(cc);
 						charClassLink.getSelectionModel().select(cc);
@@ -318,8 +319,8 @@ public class CaracDeclarationDialog {
 					charTranslability.getSelectionModel().clearSelection();
 					charClassLink.getSelectionModel().clearSelection();
 					charClassLink.getItems().clear();
-					IntStream.range(0,itemSegment.getSegmentGranularity()).forEach(lvl->{
-						ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(lvl, itemSegment,sid2Segment);
+					IntStream.range(0,currentItemSegment.getSegmentGranularity()).forEach(lvl->{
+						ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(lvl, currentItemSegment,sid2Segment);
 						charClassLink.getItems().add(cc);
 					});
 					Collections.reverse(charClassLink.getItems());
@@ -327,7 +328,7 @@ public class CaracDeclarationDialog {
 					charClassLink.getItems().add(cc);
 					charClassLink.getSelectionModel().select(0); //Select this category only on carac creation
 					sequence.getSelectionModel().clearSelection();
-					//sequence.getSelectionModel().select(Integer.valueOf(CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).size()+1));
+					//sequence.getSelectionModel().select(Integer.valueOf(CharValuesLoader.active_characteristics.get(currentItemSegment.getSegmentId()).size()+1));
 					sequence.getSelectionModel().select(sequence.getItems().size()-1);
 					criticality.getSelectionModel().clearSelection();
 					criticality.getSelectionModel().select("Not critical");
@@ -412,18 +413,18 @@ public class CaracDeclarationDialog {
 			}
 		});
 		charClassLink.getItems().clear();
-		IntStream.range(0,itemSegment.getSegmentGranularity()).forEach(lvl->{
-			ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(lvl, itemSegment,sid2Segment);
+		IntStream.range(0,currentItemSegment.getSegmentGranularity()).forEach(lvl->{
+			ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(lvl, currentItemSegment,sid2Segment);
 			charClassLink.getItems().add(cc);
 		});
 		Collections.reverse(charClassLink.getItems());
 		ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(sid2Segment);
 		charClassLink.getItems().add(cc);
 
-		//sequence.getItems().addAll(IntStream.range(1,CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).size()+2).boxed().collect(Collectors.toList()));
-		sequence.getItems().addAll(CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).stream().map(c->new ComboPair<Integer,String>(c.getSequence(),c.getCharacteristic_name())).collect(Collectors.toCollection(ArrayList::new)));
+		//sequence.getItems().addAll(IntStream.range(1,CharValuesLoader.active_characteristics.get(currentItemSegment.getSegmentId()).size()+2).boxed().collect(Collectors.toList()));
+		sequence.getItems().addAll(CharValuesLoader.active_characteristics.get(currentItemSegment.getSegmentId()).stream().map(c->new ComboPair<Integer,String>(c.getSequence(),c.getCharacteristic_name())).collect(Collectors.toCollection(ArrayList::new)));
 		if(!(editingCarac!=null)){
-			sequence.getItems().add(new ComboPair<>(CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).stream().map(c->c.getSequence()).max(new Comparator<Integer>() {
+			sequence.getItems().add(new ComboPair<>(CharValuesLoader.active_characteristics.get(currentItemSegment.getSegmentId()).stream().map(c->c.getSequence()).max(new Comparator<Integer>() {
 				@Override
 				public int compare(Integer o1, Integer o2) {
 					return o1.compareTo(o2);
@@ -467,7 +468,7 @@ public class CaracDeclarationDialog {
 		detailsLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				showDetailedClassClusters(itemSegment);
+				showDetailedClassClusters(currentItemSegment);
 			}
 		});
 
@@ -477,7 +478,7 @@ public class CaracDeclarationDialog {
 			@Override
 			public void handle(ActionEvent event) {
 				ClassCaracteristic newCarac = loadCaracFromDialog(editingCarac);
-				ArrayList<ClassSegment> droppedClassInsertions = dispatchCaracOnClassesReturnDropped(newCarac, itemSegment,account);
+				ArrayList<ClassSegment> droppedClassInsertions = dispatchCaracOnClassesReturnDropped(newCarac, charClassLink.getValue().getRowSegments(),currentItemSegment,account);
 				CharValuesLoader.executeMoveItemDataInArray();
 				dialog.close();
 				showDroppedClassInsertions(droppedClassInsertions);
@@ -545,9 +546,9 @@ public class CaracDeclarationDialog {
 	}
 
 
-	private static ArrayList<ClassSegment> dispatchCaracOnClassesReturnDropped(ClassCaracteristic newCarac, ClassSegment itemSegment, UserAccount account)  {
+	private static ArrayList<ClassSegment> dispatchCaracOnClassesReturnDropped(ClassCaracteristic newCarac, ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> targetClasses, ClassSegment currentItemSegment, UserAccount account)  {
 		ArrayList<ClassSegment> droppedClassInsertions = new ArrayList<ClassSegment>();
-		charClassLink.getValue().getRowSegments().parallelStream().filter(p->p.getValue().getValue()).map(Pair::getKey).forEach(s->{
+		targetClasses.parallelStream().filter(p->p.getValue().getValue()).map(Pair::getKey).forEach(s->{
 
 			if(!(CharValuesLoader.active_characteristics.get(s.getSegmentId()) !=null)){
 				//The segment has no defined caracs
@@ -556,7 +557,7 @@ public class CaracDeclarationDialog {
 			Optional<ClassCaracteristic> charClassMatch = CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> c.getCharacteristic_id().equals(newCarac.getCharacteristic_id())).findAny();
 			ClassCaracteristic copy = newCarac.shallowCopy();
 			if(charClassMatch.isPresent()){
-				if(!sequenceCB.isSelected() && !s.equals(itemSegment)){
+				if(!sequenceCB.isSelected() && !s.equals(currentItemSegment)){
 					copy.setSequence(charClassMatch.get().getSequence());
 				}else{
 					CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> !c.getCharacteristic_id().equals(copy.getCharacteristic_id()))
@@ -578,10 +579,10 @@ public class CaracDeclarationDialog {
 								}
 							});
 				}
-				if(!criticalityCB.isSelected() && !s.equals(itemSegment)){
+				if(!criticalityCB.isSelected() && !s.equals(currentItemSegment)){
 					copy.setIsCritical(charClassMatch.get().getIsCritical());
 				}
-				if(!uom0CB.isSelected() && !uom1CB.isSelected() && !uom2CB.isSelected() && !s.equals(itemSegment)){
+				if(!uom0CB.isSelected() && !uom1CB.isSelected() && !uom2CB.isSelected() && !s.equals(currentItemSegment)){
 					copy.setAllowedUoms(charClassMatch.get().getAllowedUoms());
 				}
 
@@ -602,7 +603,7 @@ public class CaracDeclarationDialog {
 				}
 				//Disabled, insert new carac at sequence max
 				// CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c -> c.getSequence()>=newCarac.getSequence()).forEach(c->c.setSequence(c.getSequence()+1));
-				if(!s.equals(itemSegment)){
+				if(!s.equals(currentItemSegment)){
 					try{
 						if(sequenceCB.isSelected()){
 							//Force use the config sequence if the sequence CB is selected
@@ -621,7 +622,7 @@ public class CaracDeclarationDialog {
 					}
 				}else{
 					//Current class advance other caracs
-					CharValuesLoader.active_characteristics.get(itemSegment.getSegmentId()).stream().filter(c-> c.getSequence()>=copy.getSequence()).forEach(c->{
+					CharValuesLoader.active_characteristics.get(currentItemSegment.getSegmentId()).stream().filter(c-> c.getSequence()>=copy.getSequence()).forEach(c->{
 						CharValuesLoader.prepareItemMoveItemDataInArray(+1,s.getSegmentId(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(c));
 						c.setSequence(c.getSequence()+1);
 						addCaracDefinitionToPush(c,s);
@@ -701,7 +702,7 @@ public class CaracDeclarationDialog {
 
 	}
 	@SuppressWarnings("static-access")
-	private static void create_dialog_fields(Pair<ClassSegment, ClassCaracteristic> editingCarac,UserAccount account) {
+	private static void create_dialog_fields(Pair<ClassSegment, ClassCaracteristic> editingCarac, UserAccount account, ClassSegment currentItemSegment) {
 		grid = new GridPane();
 		charName = new AutoCompleteBox_CharDeclarationName(editingCarac);
 		searchLabel = new Label("Advanced search...");
@@ -714,7 +715,7 @@ public class CaracDeclarationDialog {
 			@Override
 			public void handle(MouseEvent event) {
 				try {
-					showAdvancedSearchPane(account);
+					showAdvancedSearchPane(account,currentItemSegment);
 				} catch (SQLException throwables) {
 					throwables.printStackTrace();
 				} catch (ClassNotFoundException e) {
@@ -834,7 +835,7 @@ public class CaracDeclarationDialog {
 		grid.setHalignment(uom2CB, HPos.CENTER);
 	}
 
-	private static void showAdvancedSearchPane(UserAccount account) throws SQLException, ClassNotFoundException {
+	private static void showAdvancedSearchPane(UserAccount account, ClassSegment currentItemSegment) throws SQLException, ClassNotFoundException {
 		Dialog dialog = new Dialog<>();
 		dialog.setTitle("Advance characteristic search");
 		dialog.setHeaderText(null);
@@ -882,7 +883,9 @@ public class CaracDeclarationDialog {
 		ComboBox<ClassSegment> segCombo = new ComboBox<ClassSegment>();
 		FxUtilTest.autoCompleteComboBoxPlus(segCombo, (typedText, itemToCompare) -> StringUtils.containsIgnoreCase(unidecode.decodeAndTrim(itemToCompare.getClassName()),unidecode.decodeAndTrim(typedText)) || StringUtils.containsIgnoreCase(itemToCompare.getClassNumber().trim(),typedText.trim()));
 		grid.add(segCombo,2,1);
+
 		TableView<AdvancedResultRow> resultTable = new TableView<AdvancedResultRow>();
+		resultTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		TableColumn col1 = new TableColumn("Characteristic Name");
 		col1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<AdvancedResultRow, String>, ObservableValue<String>>() {
 			public ObservableValue<String> call(TableColumn.CellDataFeatures<AdvancedResultRow, String> r) {
@@ -942,6 +945,18 @@ public class CaracDeclarationDialog {
 		importButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				if(resultTable.getSelectionModel().getSelectedIndices().size()>1){
+					resultTable.getSelectionModel().getSelectedItems().forEach(r->{
+						ClassCaracteristic tmp = r.getCarac().shallowCopy();
+						tmp.setSequence(CharValuesLoader.active_characteristics.get(currentItemSegment.getSegmentId()).size() + 1);
+						ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> charClassMatchLocal = new ArrayList<Pair<ClassSegment, SimpleBooleanProperty>>();
+						charClassMatchLocal.add(new Pair<ClassSegment,SimpleBooleanProperty>(currentItemSegment,new SimpleBooleanProperty(true)));
+						dispatchCaracOnClassesReturnDropped(tmp,charClassMatchLocal,currentItemSegment,account);
+						dialog.close();
+						CaracDeclarationDialog.dialog.close();
+						return;
+					});
+				}
 				Pair<ClassSegment, ClassCaracteristic> selectedEntry = new Pair<>(resultTable.getSelectionModel().getSelectedItem().getSegment(), resultTable.getSelectionModel().getSelectedItem().getCarac());
 				charName.setText(selectedEntry.getValue().getCharacteristic_name()+(false?"":" (e.g. "+selectedEntry.getKey().getClassName()+")"));
 				charName.selectedEntry = selectedEntry;
