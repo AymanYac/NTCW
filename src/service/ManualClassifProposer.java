@@ -674,7 +674,7 @@ public class ManualClassifProposer {
 		}
 		try {
 			System.out.println("Saving propositions");
-			transversal.data_exchange_toolbox.ComplexMap2JdbcObject.saveAccountProjectPreference(parent_controller.account);
+			transversal.data_exchange_toolbox.ComplexMap2JdbcObject.saveAccountProjectPreferenceForClassification(parent_controller.account);
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

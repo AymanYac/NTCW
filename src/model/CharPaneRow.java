@@ -1,6 +1,9 @@
 package model;
 
 import controllers.Char_description;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -11,8 +14,17 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 import javafx.scene.text.TextFlow;
+import javafx.util.Pair;
+import service.CharValuesLoader;
+import transversal.data_exchange_toolbox.CharDescriptionExportServices;
+import transversal.dialog_toolbox.CaracDeclarationDialog;
+import transversal.generic.Tools;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import static transversal.data_exchange_toolbox.CharDescriptionExportServices.addCaracDefinitionToPush;
 
 public class CharPaneRow {
 
@@ -20,7 +32,8 @@ public class CharPaneRow {
 	private CaracteristicValue value;
 	private ClassCaracteristic carac;
 	private static Char_description parent;
-	
+	private CharDescriptionRow item;
+
 	public StackPane getCriticality() {
 		Circle tmp = new Circle(8,8,8);
 		
@@ -41,7 +54,30 @@ public class CharPaneRow {
 		
 		StackPane stack = new StackPane();
 		stack.getChildren().addAll(tmp, text);
-		stack.setVisible(carac.getIsCritical());
+		stack.setOpacity(carac.getIsCritical()?1.0:0.0);
+		stack.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				if(event.isShiftDown()){
+					ClassCaracteristic newCarac = carac.shallowCopy();
+					newCarac.setIsCritical(!carac.getIsCritical());
+					try {
+						HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(parent.account);
+						ClassSegment s = sid2Segment.get(item.getClass_segment_string().split("&&&")[0]);
+						CharValuesLoader.active_characteristics.get(s.getSegmentId()).set(CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(carac),newCarac);
+						addCaracDefinitionToPush(newCarac,s);
+						CharDescriptionExportServices.flushCaracDefinitionToDB(parent.account);
+						parent.refresh_ui_display();
+
+					} catch (SQLException throwables) {
+						throwables.printStackTrace();
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+
+				}
+			}
+		});
 		
 		return stack;
 	}
@@ -125,6 +161,10 @@ public class CharPaneRow {
 			return null;
 		}
 		return this.getValue().getFormatedDisplayAndUomPair(parent, carac).getValue();
+	}
+
+	public void setItem(CharDescriptionRow selected_row) {
+		this.item = selected_row;
 	}
 
 

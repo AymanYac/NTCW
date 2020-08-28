@@ -10,6 +10,8 @@ import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,14 +34,13 @@ public class CaracteristicValue {
 	private String author;
 	private String rule_id;
 	private String url;
+	private LocalDateTime descriptionTime;
 	
 	
 	private ClassCaracteristic parentChar;
 
-	
-	
-	
-	
+
+
 	public CaracteristicValue() {
 		super();
 		this.value_id = Tools.generate_uuid();
@@ -372,6 +373,7 @@ public class CaracteristicValue {
 	}
 	public void setSource(String source) {
 		this.source = source;
+		this.descriptionTime = LocalDateTime.now();
 	}
 	public String getAuthor() {
 		return author;
@@ -494,5 +496,11 @@ public class CaracteristicValue {
 			return getAuthor();
 		}
 	}
-	
+
+    public void setDescriptionTime(Timestamp description_time) {
+		this.descriptionTime = description_time.toLocalDateTime();
+    }
+	public LocalDateTime getDescriptionTime() {
+		return this.descriptionTime;
+	}
 }

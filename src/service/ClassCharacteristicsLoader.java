@@ -39,7 +39,6 @@ public class ClassCharacteristicsLoader {
 						+active_project+".project_characteristics_x_segments where isActive ) chars inner join "
 				+active_project+".project_characteristics on chars.characteristic_id = project_characteristics.characteristic_id order by sequence asc");
 		System.out.println("Loading all chars");
-		System.out.println(stmt.toString());
 		ResultSet rs=stmt.executeQuery();
 		
 		while(rs.next()) {

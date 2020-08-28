@@ -1,6 +1,8 @@
 package transversal.dialog_toolbox;
 
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
+import controllers.Char_description;
+import controllers.paneControllers.TablePane_CharClassif;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -183,20 +185,20 @@ public class CaracDeclarationDialog {
 		dialog.showAndWait();
 	}
 
-	public static void CaracDeclarationPopUp(UserAccount account, ClassSegment currentItemSegment, Pair<ClassSegment, ClassCaracteristic> editingCarac) throws SQLException, ClassNotFoundException {
+	public static void CaracDeclarationPopUp(UserAccount account, ClassSegment currentItemSegment, Pair<ClassSegment, ClassCaracteristic> editingCarac, Char_description parent,Integer defaultSeq) throws SQLException, ClassNotFoundException {
 
 
 		// Create the custom dialog.
 		create_dialog();
 		
 		// Create the carac labels and fields.
-		create_dialog_fields(editingCarac,account,currentItemSegment);
+		create_dialog_fields(editingCarac,account,currentItemSegment,parent);
 
 		// Set fields layout
 		set_fields_layout();
 				
 		//Set fields behavior
-		set_fields_behavior(dialog,validateButtonType,account,currentItemSegment,"NAME",editingCarac);
+		set_fields_behavior(dialog,validateButtonType,account,currentItemSegment,"NAME",editingCarac,parent,defaultSeq);
 				
 		dialog.getDialogPane().setContent(grid);
 
@@ -217,7 +219,7 @@ public class CaracDeclarationDialog {
 	}
 
 
-	private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType, UserAccount account, ClassSegment currentItemSegment, String templateCriterion, Pair<ClassSegment, ClassCaracteristic> editingCarac) throws SQLException, ClassNotFoundException {
+	private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType, UserAccount account, ClassSegment currentItemSegment, String templateCriterion, Pair<ClassSegment, ClassCaracteristic> editingCarac, Char_description parent,Integer defaultSeq) throws SQLException, ClassNotFoundException {
 		//Fill the carac name field and the template UoMs DS
 		ArrayList<ClassCaracteristic> uniqueCharTemplate = new ArrayList<ClassCaracteristic>();
 		HashSet<String> uniqueCharIDs = new HashSet<String>();
@@ -276,8 +278,13 @@ public class CaracDeclarationDialog {
 
 					//sequence.getSelectionModel().select(Integer.valueOf(Math.min(selectedCar.getSequence(),Collections.max((Collection<? extends Integer>) sequence.getItems().stream().map(i->i.getKey()).collect(Collectors.toCollection(ArrayList::new))))));
 					if(editingCarac!=null){
+						System.out.println("Editing carac seq");
 						sequence.getSelectionModel().select(selectedCar.getSequence()-1);
+					}else if(defaultSeq!=null){
+						System.out.println("Default seq =>"+defaultSeq);
+						sequence.getSelectionModel().select(defaultSeq-1);
 					}else{
+						System.out.println("No default seq");
 						sequence.getSelectionModel().select(sequence.getItems().size()-1);
 					}
 					criticality.getSelectionModel().select(selectedCar.getIsCritical()?"Critical":"Not critical");
@@ -329,7 +336,11 @@ public class CaracDeclarationDialog {
 					charClassLink.getSelectionModel().select(0); //Select this category only on carac creation
 					sequence.getSelectionModel().clearSelection();
 					//sequence.getSelectionModel().select(Integer.valueOf(CharValuesLoader.active_characteristics.get(currentItemSegment.getSegmentId()).size()+1));
-					sequence.getSelectionModel().select(sequence.getItems().size()-1);
+					if(defaultSeq!=null){
+						sequence.getSelectionModel().select(defaultSeq-1);
+					}else{
+						sequence.getSelectionModel().select(sequence.getItems().size()-1);
+					}
 					criticality.getSelectionModel().clearSelection();
 					criticality.getSelectionModel().select("Not critical");
 					uom0.getItems().add("No unit of measure");
@@ -431,7 +442,6 @@ public class CaracDeclarationDialog {
 				}
 			}).get()+1,ComboPair.NEW_ENTRY_LABEL));
 		}
-
 		criticality.getItems().add("Critical");
 		criticality.getItems().add("Not critical");
 
@@ -478,7 +488,7 @@ public class CaracDeclarationDialog {
 			@Override
 			public void handle(ActionEvent event) {
 				ClassCaracteristic newCarac = loadCaracFromDialog(editingCarac);
-				ArrayList<ClassSegment> droppedClassInsertions = dispatchCaracOnClassesReturnDropped(newCarac, charClassLink.getValue().getRowSegments(),currentItemSegment,account);
+				ArrayList<ClassSegment> droppedClassInsertions = dispatchCaracOnClassesReturnDropped(newCarac, charClassLink.getValue().getRowSegments(),currentItemSegment,account,parent);
 				CharValuesLoader.executeMoveItemDataInArray();
 				dialog.close();
 				showDroppedClassInsertions(droppedClassInsertions);
@@ -546,7 +556,7 @@ public class CaracDeclarationDialog {
 	}
 
 
-	private static ArrayList<ClassSegment> dispatchCaracOnClassesReturnDropped(ClassCaracteristic newCarac, ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> targetClasses, ClassSegment currentItemSegment, UserAccount account)  {
+	public static ArrayList<ClassSegment> dispatchCaracOnClassesReturnDropped(ClassCaracteristic newCarac, ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> targetClasses, ClassSegment currentItemSegment, UserAccount account,Char_description parent)  {
 		ArrayList<ClassSegment> droppedClassInsertions = new ArrayList<ClassSegment>();
 		targetClasses.parallelStream().filter(p->p.getValue().getValue()).map(Pair::getKey).forEach(s->{
 
@@ -627,6 +637,7 @@ public class CaracDeclarationDialog {
 						c.setSequence(c.getSequence()+1);
 						addCaracDefinitionToPush(c,s);
 					});
+					parent.tableController.selected_col=copy.getSequence()-1;
 				}
 				CharValuesLoader.active_characteristics.get(s.getSegmentId()).add(copy);
 				/*CharValuesLoader.active_characteristics.get(s.getSegmentId()).sort(new Comparator<ClassCaracteristic>() {
@@ -702,7 +713,7 @@ public class CaracDeclarationDialog {
 
 	}
 	@SuppressWarnings("static-access")
-	private static void create_dialog_fields(Pair<ClassSegment, ClassCaracteristic> editingCarac, UserAccount account, ClassSegment currentItemSegment) {
+	private static void create_dialog_fields(Pair<ClassSegment, ClassCaracteristic> editingCarac, UserAccount account, ClassSegment currentItemSegment,Char_description parent) {
 		grid = new GridPane();
 		charName = new AutoCompleteBox_CharDeclarationName(editingCarac);
 		searchLabel = new Label("Advanced search...");
@@ -715,7 +726,7 @@ public class CaracDeclarationDialog {
 			@Override
 			public void handle(MouseEvent event) {
 				try {
-					showAdvancedSearchPane(account,currentItemSegment);
+					showAdvancedSearchPane(account,currentItemSegment,parent);
 				} catch (SQLException throwables) {
 					throwables.printStackTrace();
 				} catch (ClassNotFoundException e) {
@@ -835,7 +846,7 @@ public class CaracDeclarationDialog {
 		grid.setHalignment(uom2CB, HPos.CENTER);
 	}
 
-	private static void showAdvancedSearchPane(UserAccount account, ClassSegment currentItemSegment) throws SQLException, ClassNotFoundException {
+	private static void showAdvancedSearchPane(UserAccount account, ClassSegment currentItemSegment, Char_description parent) throws SQLException, ClassNotFoundException {
 		Dialog dialog = new Dialog<>();
 		dialog.setTitle("Advance characteristic search");
 		dialog.setHeaderText(null);
@@ -951,7 +962,7 @@ public class CaracDeclarationDialog {
 						tmp.setSequence(CharValuesLoader.active_characteristics.get(currentItemSegment.getSegmentId()).size() + 1);
 						ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> charClassMatchLocal = new ArrayList<Pair<ClassSegment, SimpleBooleanProperty>>();
 						charClassMatchLocal.add(new Pair<ClassSegment,SimpleBooleanProperty>(currentItemSegment,new SimpleBooleanProperty(true)));
-						dispatchCaracOnClassesReturnDropped(tmp,charClassMatchLocal,currentItemSegment,account);
+						dispatchCaracOnClassesReturnDropped(tmp,charClassMatchLocal,currentItemSegment,account,parent);
 						dialog.close();
 						CaracDeclarationDialog.dialog.close();
 						return;
@@ -1152,10 +1163,10 @@ public class CaracDeclarationDialog {
 		grid.add(uom2CB, 5, 14);
 	}
 
-	public static void CaracEditionPopUp(ClassCaracteristic carac, UserAccount account, TableView<CharDescriptionRow> tableGrid) throws SQLException, ClassNotFoundException {
+	public static void CaracEditionPopUp(ClassCaracteristic carac, UserAccount account, TableView<CharDescriptionRow> tableGrid,Char_description parent) throws SQLException, ClassNotFoundException {
 		ClassSegment itemSegement = Tools.get_project_segments(account).get(tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]);
 		Pair<ClassSegment, ClassCaracteristic> entry = new Pair<ClassSegment, ClassCaracteristic>(itemSegement, carac);
-		CaracDeclarationDialog.CaracDeclarationPopUp(account, itemSegement,entry);
+		CaracDeclarationDialog.CaracDeclarationPopUp(account, itemSegement,entry,parent,null);
 
 
 	}

@@ -4,7 +4,7 @@ import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
+import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -26,7 +26,12 @@ import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -39,10 +44,10 @@ public class TablePane_CharClassif {
 	
 	
 	
-	public Char_description Parent;
+	public static Char_description Parent;
 	protected String translated_sd;
 	protected String translated_ld;
-	private UserAccount account;
+	private static UserAccount account;
 	private CharAdvancementUpdater advancement;
 	//public HashMap<String,ArrayList<ClassCharacteristic>> active_characteristics = new HashMap<String,ArrayList<ClassCharacteristic>>();
 
@@ -76,7 +81,7 @@ public class TablePane_CharClassif {
 
 
 
-	private ArrayList<String> collapsedViewColumns;
+	private static ArrayList<String> collapsedViewColumns;
 
 
 
@@ -86,7 +91,55 @@ public class TablePane_CharClassif {
 
 
 	private List<String> classItems;
+	private boolean allowOverWriteAccountPreference = true;
 
+	public void restorePreviousLayout(){
+
+		try{
+			applySortOrder(account.getDescriptionSortColumns(),account.getDescriptionSortDirs());
+		}catch(Exception V) {
+			V.printStackTrace(System.err);
+		}
+	}
+
+	private void applySortOrder(ArrayList<String> SortColumns, ArrayList<String> SortDirs) {
+		allowOverWriteAccountPreference = false;
+		for (int ix = 0; ix < SortColumns.size(); ix++) {
+			for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getColumns()) {
+				if (c.getText().equals(SortColumns.get(ix))) {
+					tableGrid.getSortOrder().add(c);
+					c.setSortType(TableColumn.SortType.valueOf(SortDirs.get(ix)));
+				}
+			}
+		}
+		selected_col = account.getDescriptionActiveIdx()-1;
+		nextChar();
+		allowOverWriteAccountPreference=true;
+	}
+
+	public static void loadPreviousLayout() throws SQLException, ClassNotFoundException {
+
+		Connection conn = Tools.spawn_connection();
+		PreparedStatement stmt = conn.prepareStatement("select "
+				+ "user_description_sorting_columns, user_description_sorting_order, user_description_active_index"
+				+ " from administration.users_x_projects where project_id = ? and user_id = ?");
+		stmt.setString(1, account.getActive_project());
+		stmt.setString(2, account.getUser_id());
+		ResultSet rs = stmt.executeQuery();
+		rs.next();
+		try {
+			account.setDescriptionSortColumns(rs.getArray(1));
+			account.setDescriptionSortDirs(rs.getArray(2));
+			account.setDescriptionActiveIdx(rs.getInt(3));
+		}catch(Exception V) {
+			V.printStackTrace(System.err);
+		}
+		rs.close();
+		stmt.close();
+		conn.close();
+
+
+	}
 
 
 	protected void initKeyBoardEvent(KeyEvent keyEvent, boolean pressed) {
@@ -376,7 +429,7 @@ public class TablePane_CharClassif {
 			
 			
 			fillTable(false);
-			selectFirstItem();
+			selectLastDescribedItem();
 			this.selected_col = -1;
 			nextChar();
 
@@ -397,8 +450,30 @@ public class TablePane_CharClassif {
 		}
 		
 	}
-	
-	
+
+	private void selectLastDescribedItem() {
+		Optional<LocalDateTime> latestDescriptionTimeInClass = tableGrid.getItems().stream().map(
+				r -> r.getData().values().stream().flatMap(a -> Arrays.stream(a.clone())).filter(v->v!=null && v.getDisplayValue(Parent).length()>0).map(v -> v.getDescriptionTime()).max(new Comparator<LocalDateTime>() {
+					@Override
+					public int compare(LocalDateTime o1, LocalDateTime o2) {
+						return o1.compareTo(o2);
+					}
+				})
+		).filter(m -> m.isPresent()).map(m -> m.get()).findAny();
+		if(latestDescriptionTimeInClass.isPresent()){
+			Optional<CharDescriptionRow> latestEditedItem = tableGrid.getItems().stream().filter(
+					r -> r.getData().values().stream().flatMap(a-> Arrays.stream(a.clone()))
+							.filter(v -> v != null && v.getDescriptionTime().isEqual(latestDescriptionTimeInClass.get())).findAny().isPresent()).findAny();
+			if(latestEditedItem.isPresent()){
+				tableGrid.getSelectionModel().clearSelection();
+				tableGrid.getSelectionModel().select(latestEditedItem.get());
+				tableGrid.scrollTo(tableGrid.getSelectionModel().getSelectedIndex());
+			}
+		}
+
+	}
+
+
 	public  List<String> getActiveItemsID(String active_class) throws ClassNotFoundException, SQLException {
 		String joinStatement = "";
 		if(CharItemFetcher.classifiedItems!=null) {
@@ -538,25 +613,28 @@ public class TablePane_CharClassif {
 		if(Parent.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			return;
 		}
-		this.selected_col+=1;
-		selectChartAtIndex(selected_col,this.Parent.charButton.isSelected());
+		selected_col+=1;
+		selectChartAtIndex(selected_col,Parent.charButton.isSelected());
 	}
 	public void previousChar() {
 		if(Parent.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			return;
 		}
 		this.selected_col-=1;
-		selectChartAtIndex(selected_col,this.Parent.charButton.isSelected());
+		selectChartAtIndex(selected_col,Parent.charButton.isSelected());
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void selectChartAtIndex(int i,boolean collapsedView) {
+	private void selectChartAtIndex(int i, boolean collapsedView) {
+		if(selected_col<0){
+			selected_col = selected_col + CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size();
+		}
 		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size());
 		List<String> char_headers = CharValuesLoader.returnSortedCopyOfClassCharacteristic(Parent.classCombo.getValue().getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
 		for( Object col:this.tableGrid.getColumns()) {
 			int idx = char_headers.indexOf(((TableColumn)col).getText());
 			if(idx!=selected_col ) {
-				if(this.collapsedViewColumns.contains(((TableColumn)col).getText())) {
+				if(collapsedViewColumns.contains(((TableColumn)col).getText())) {
 					//Hide/Show collapse only columns
 					((TableColumn)col).setVisible(collapsedView);
 					continue;
@@ -566,7 +644,7 @@ public class TablePane_CharClassif {
 					//keep full view columns visible if not in collapsed views , hide otherwise
 					//Unless column is description column
 					if(((TableColumn)col).getText().equals("Description")) {
-						((TableColumn)col).prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(collapsedView?0.68:0.3));;
+						((TableColumn)col).prefWidthProperty().bind(tableGrid.widthProperty().multiply(collapsedView?0.68:0.3));;
 						((TableColumn)col).setVisible(true);
 						continue;
 					}
@@ -797,8 +875,13 @@ public class TablePane_CharClassif {
 		tvX = new TableViewExtra(tableGrid);
         this.tableGrid.getItems().addAll(this.itemArray);
         //this.tableGrid.refresh();
-        
-        
+
+		tableGrid.getSortOrder().addListener((ListChangeListener)(c -> {
+			if(allowOverWriteAccountPreference){
+				saveSortOrder();
+			}
+			tableGrid.scrollTo(tableGrid.getSelectionModel().getSelectedIndex());
+		}));
 
 		tableGrid.setOnKeyPressed(new EventHandler<KeyEvent>() 
         {
@@ -995,40 +1078,53 @@ public class TablePane_CharClassif {
 	}
 
 	public void refresh_table_preserve_sort_order() throws SQLException, ClassNotFoundException {
-		ObservableList<TableColumn<CharDescriptionRow, ?>> SO = tableGrid.getSortOrder();
-		ArrayList<String> sortCols = new ArrayList<>();
-		ArrayList<String> sortDirs = new ArrayList<>();
+		allowOverWriteAccountPreference = false;
+		account.getDescriptionSortColumns().clear();
+		account.getDescriptionSortDirs().clear();
+		for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getSortOrder()) {
 
-		for (TableColumn<CharDescriptionRow, ?> c : SO) {
-			sortCols.add(c.getText());
-			sortDirs.add(c.getSortType().toString());
+			account.getDescriptionSortColumns().add(c.getText());
+			account.getDescriptionSortDirs().add(c.getSortType().toString());
 		}
-
-
-
-		int SC = selected_col;
+		account.setDescriptionActiveIdx(selected_col);
 		int SI = tableGrid.getSelectionModel().getSelectedIndex();
+
 		refresh_table_with_segment(Parent.classCombo.getValue().getClassSegment());
 
-		List<TableColumn<CharDescriptionRow, ?>> sortOrder = tableGrid.getSortOrder();
-		sortOrder.clear();
-		if(SO.stream().filter(tc->!tableGrid.getColumns().stream().map(c->c.getText()).collect(Collectors.toList()).contains(tc.getText())).findAny().isPresent()){
+		tableGrid.getSortOrder().clear();
+		if(account.getDescriptionSortColumns().stream().filter(tc->!tableGrid.getColumns().stream().map(c->c.getText()).collect(Collectors.toList()).contains(tc)).findAny().isPresent()){
 			//At least a sorting column is no longer available, do not restore order
 		}else{
 			//Restore order
-			for (int ix = 0; ix < sortCols.size(); ix++) {
-				for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getColumns()) {
-					if (c.getText().equals(sortCols.get(ix))) {
-						sortOrder.add(c);
-						c.setSortType(TableColumn.SortType.valueOf(sortDirs.get(ix)));
-					}
-				}
-			}
+			restorePreviousLayout();
 
 			tableGrid.getSelectionModel().clearAndSelect(SI);
 		}
+		try{
+			Parent.charPaneController.tableGrid.scrollTo(Parent.charPaneController.tableGrid.getSelectionModel().getSelectedIndex());
+		}catch (Exception E){
 
-		selected_col = SC-1;
-		nextChar();
+		}
+		allowOverWriteAccountPreference=true;
+	}
+
+	private void saveSortOrder() {
+		account.getDescriptionSortColumns().clear();
+		account.getDescriptionSortDirs().clear();
+
+		for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getSortOrder()) {
+			account.getDescriptionSortColumns().add(c.getText());
+			account.getDescriptionSortDirs().add(c.getSortType().toString());
+		}
+
+		account.setDescriptionActiveIdx(selected_col);
+
+		try {
+			transversal.data_exchange_toolbox.ComplexMap2JdbcObject.saveAccountProjectPreferenceForDescription(account);
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }

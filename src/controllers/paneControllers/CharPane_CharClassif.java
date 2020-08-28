@@ -43,6 +43,7 @@ public class CharPane_CharClassif {
 			for(int i=0;i<CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).size();i++) {
 				ClassCaracteristic carac = CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).get(i);
 				CharPaneRow tmp = new CharPaneRow(this.parent);
+				tmp.setItem(selected_row);
 				tmp.setChar_index(i);
 				tmp.setCarac(carac);
 				tmp.setValue(selected_row.getData(selected_row.getClass_segment_string().split("&&&")[0])[i]);
@@ -121,7 +122,7 @@ public class CharPane_CharClassif {
 	}
 	
 	@FXML public void add_carac() throws SQLException, ClassNotFoundException {
-		CaracDeclarationDialog.CaracDeclarationPopUp(parent.account, Tools.get_project_segments(parent.account).get(selected_row.getClass_segment_string().split("&&&")[0]), null);
+		CaracDeclarationDialog.CaracDeclarationPopUp(parent.account, Tools.get_project_segments(parent.account).get(selected_row.getClass_segment_string().split("&&&")[0]), null,parent,null);
 		parent.tableController.refresh_table_preserve_sort_order();
 	}
 

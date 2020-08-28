@@ -28,7 +28,7 @@ public class CharValuesLoader {
 			PreparedStatement stmt;
 			ResultSet rs;
 			
-			stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,url_link,project_values.value_id,text_value_data_language, text_value_user_language,nominal_value,min_value,max_value,note,uom_id from "
+			stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,url_link,project_values.value_id,text_value_data_language, text_value_user_language,nominal_value,min_value,max_value,note,uom_id,description_time from "
 					+ "(select * from "+active_project+".project_items_x_values"
 									+ ") data left join "+active_project+".project_values "
 											+ "on data.value_id = project_values.value_id");
@@ -47,7 +47,6 @@ public class CharValuesLoader {
 				String description_method = rs.getString("description_method");
 				String description_rule_id = rs.getString("description_rule_id");
 				if(charIdArrays.get(loop_class_id).indexOf(characteristic_id)==-1){
-					System.out.println("Carac "+characteristic_id+" is not defined for segment "+loop_class_id);
 					continue;
 				}
 				CaracteristicValue val = new CaracteristicValue();
@@ -64,7 +63,7 @@ public class CharValuesLoader {
 				val.setSource(description_method);
 				val.setRule_id(description_rule_id);
 				val.setUrl(rs.getString("url_link"));
-				
+				val.setDescriptionTime(rs.getTimestamp("description_time"));
 				try{
 					val.setParentChar(CharValuesLoader.active_characteristics.get(loop_class_id).get(charIdArrays.get(loop_class_id).indexOf(characteristic_id)));
 				}catch(Exception V) {

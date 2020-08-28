@@ -56,12 +56,14 @@ public class FxUtilTest {
                         caretPos = comboBox.getEditor().getCaretPosition();
                     }
                 } else if (event.getCode() == KeyCode.ENTER) {
-                    comboBox.hide();
-                    int selectedIndex = comboBox.getSelectionModel().getSelectedIndex();
-                    if(selectedIndex > 0){
-                        comboBox.getSelectionModel().select(selectedIndex);
-                    }else{
-                        comboBox.getSelectionModel().selectFirst();
+                    if(comboBox.isShowing()){
+                        comboBox.hide();
+                        int selectedIndex = comboBox.getSelectionModel().getSelectedIndex();
+                        if(selectedIndex < 0){
+                            System.out.println("FXUtilTest: Resetting selection to first item");
+                            comboBox.getSelectionModel().selectFirst();
+                        }
+
                     }
                     return;
                 }

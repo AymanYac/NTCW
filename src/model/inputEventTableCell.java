@@ -22,8 +22,10 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
 import transversal.dialog_toolbox.CaracDeclarationDialog;
+import transversal.generic.Tools;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 
 public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
 
@@ -49,17 +51,31 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
                     public void handle(Event event) {
                         try{
                             //new Label(((CharPaneRow)table.getItems().get(result.getIndex())).getChar_name_translated());
-                            final Label ligne1 = new Label("Edit characteristic");
+                            final Label ligne0 = new Label("Insert characteristic...");
+                            final Label ligne1 = new Label("Edit characteristic...");
                             final Label ligne2 = new Label("Delete characteristic");
 
-
+                            ligne0.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                                @Override
+                                public void handle(MouseEvent event) {
+                                    popup.hide();
+                                    try {
+                                        HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(parent.account);
+                                        ClassSegment currentItemSegment = sid2Segment.get(parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]);
+                                        CaracDeclarationDialog.CaracDeclarationPopUp(parent.account,currentItemSegment,null ,parent,((CharPaneRow)table.getItems().get(result.getIndex())).getChar_sequence());
+                                        parent.tableController.refresh_table_preserve_sort_order();
+                                    } catch (SQLException | ClassNotFoundException throwables) {
+                                        throwables.printStackTrace();
+                                    }
+                                }
+                            });
 
                             ligne1.setOnMouseClicked(new EventHandler<MouseEvent>() {
                                 @Override
                                 public void handle(MouseEvent event) {
                                     popup.hide();
                                     try {
-                                        CaracDeclarationDialog.CaracEditionPopUp(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.account,parent.tableController.tableGrid);
+                                        CaracDeclarationDialog.CaracEditionPopUp(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.account,parent.tableController.tableGrid,parent);
                                         parent.tableController.refresh_table_preserve_sort_order();
                                     } catch (SQLException | ClassNotFoundException throwables) {
                                         throwables.printStackTrace();
@@ -80,13 +96,17 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
                                 }
                             });
 
+                            setStyle(ligne0);
                             setStyle(ligne1);
                             setStyle(ligne2);
 
 
                             GridPane contentGrid = new GridPane();
-                            contentGrid.add(ligne1,0,0);
-                            contentGrid.add(ligne2,0,1);
+                            contentGrid.add(ligne0,0,0);
+                            contentGrid.add(ligne1,0,1);
+                            contentGrid.add(ligne2,0,2);
+                            contentGrid.setHgrow(ligne0, Priority.ALWAYS);
+                            ligne0.setMaxWidth(Integer.MAX_VALUE);
                             contentGrid.setHgrow(ligne1, Priority.ALWAYS);
                             ligne1.setMaxWidth(Integer.MAX_VALUE);
                             contentGrid.setHgrow(ligne2, Priority.ALWAYS);

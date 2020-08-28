@@ -163,7 +163,6 @@ public class Char_description {
 
 
 	public AutoCompleteBox_CharValue valueAutoComplete;
-	private boolean allowRefreshActiveClass = true;
 
 
 	@FXML void nextBlank() {
@@ -613,7 +612,6 @@ public class Char_description {
 						
 					}
 					try{
-						System.out.println("Closing Secondary Stage");
 						browserController.secondaryStage.close();
 					}catch (Exception V){
 
@@ -1009,7 +1007,7 @@ public class Char_description {
 		
 		Tools.decorate_menubar(menubar,account);
 		//decorate_description_bar(false);
-		decorate_class_combobox();
+		decorate_class_combobox(true);
 		
 		
 		
@@ -1048,7 +1046,7 @@ public class Char_description {
 	}
 
 	
-	private void decorate_class_combobox() {
+	private void decorate_class_combobox(boolean allowRefreshActiveClass) {
 		classCombo.getItems().clear();
 		Unidecode unidecode = Unidecode.toAscii();
 		FxUtilTest.autoCompleteComboBoxPlus(classCombo, (typedText, itemToCompare) -> StringUtils.startsWithIgnoreCase(itemToCompare.getClassCode(),typedText) || unidecode.decodeAndTrim(itemToCompare.getclassName()).toLowerCase().contains(unidecode.decodeAndTrim(typedText).toLowerCase()));
@@ -1115,27 +1113,27 @@ public class Char_description {
 		classCombo.setOnHidden(new EventHandler<Event>() {
 			@Override
 			public void handle(Event event) {
-				allowRefreshActiveClass = false;
 				CharDescClassComboRow newValue = classCombo.getValue();
-				decorate_class_combobox();
-				classCombo.getSelectionModel().select(newValue);
-				allowRefreshActiveClass = true;
+				decorate_class_combobox(false);
+				classCombo.setValue(newValue);
 				//tableController.refresh_table_with_segment(newValue.getClassSegment());
-				KeyEvent press = new KeyEvent(classCombo, classCombo, KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false);
+				KeyEvent press = new KeyEvent(classCombo, classCombo, KeyEvent.KEY_RELEASED, "", "", KeyCode.ENTER, false, false, false, false);
 				classCombo.getEditor().fireEvent(press);
-
-
 			}
 		});
-		classCombo.setOnKeyPressed(new EventHandler<KeyEvent>() {
+		classCombo.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
 				if(event.getCode().equals(KeyCode.ENTER)){
-					try {
-						tableController.refresh_table_with_segment(classCombo.getValue().getClassSegment());
-					} catch (ClassNotFoundException | SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+					CharDescClassComboRow comboValue = FxUtilTest.getComboBoxValue(classCombo);
+					if(comboValue!=null){
+						try {
+							tableController.refresh_table_with_segment(FxUtilTest.getComboBoxValue(classCombo).getClassSegment());
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+						} catch (SQLException throwables) {
+							throwables.printStackTrace();
+						}
 					}
 				}
 			}
@@ -1176,7 +1174,7 @@ public class Char_description {
 		
 		tableController.setParent(this);
 		tableController.setUserAccount(account);
-		
+
 		tableController.setUserLanguageGcode(user_language_gcode);
 		/*
 		if(GlobalConstants.MANUAL_FETCH_ALL) {
@@ -1185,10 +1183,11 @@ public class Char_description {
 			tableController.fillTable_DYNAMIC((List<ItemFetcherRow>) ftc.currentList_DYNAMIC);
 		}*/
 		tableController.setCollapsedViewColumns(new String[] {"Completion status","Question status"});
+		TablePane_CharClassif.loadPreviousLayout();
 		tableController.refresh_table_with_segment(account.getUser_desc_class(classCombo.getItems().get(1).getClassSegment()));
+		tableController.restorePreviousLayout();
 		System.gc();
-		 
-		
+
 	}
 
 	@SuppressWarnings("static-access")

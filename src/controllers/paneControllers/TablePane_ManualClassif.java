@@ -951,7 +951,7 @@ public class TablePane_ManualClassif {
 	    
 	    
 	    try {
-			transversal.data_exchange_toolbox.ComplexMap2JdbcObject.saveAccountProjectPreference(account);
+			transversal.data_exchange_toolbox.ComplexMap2JdbcObject.saveAccountProjectPreferenceForClassification(account);
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

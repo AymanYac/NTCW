@@ -55,9 +55,12 @@ public class UserAccount {
 	}
 
 	public CustomKeyboardListener<KeyCode, Boolean> PRESSED_KEYBOARD = new CustomKeyboardListener<KeyCode,Boolean>(new HashMap<KeyCode,Boolean>());
-	private ArrayList<String> ManualSortColumns;
-	private ArrayList<String> ManualSortDirs;
-	private ArrayList<String> ManualPropositions;
+	private ArrayList<String> ManualSortColumns = new ArrayList<String>();
+	private ArrayList<String> DescriptionSortColumns = new ArrayList<String>();
+	private ArrayList<String> ManualSortDirs = new ArrayList<String>();
+	private ArrayList<String> DescriptionSortDirs = new ArrayList<String>();
+	private ArrayList<String> ManualPropositions = new ArrayList<String>();
+	private Integer DescriptionActiveIdx;
 	
 	
 	public UserAccount(){
@@ -140,9 +143,23 @@ public class UserAccount {
 		return new String [0];
 	}
 
+	public Object[] getDescriptionSortColumnsForJDBC() {
+		if(getDescriptionSortColumns()!=null) {
+			return getDescriptionSortColumns().toArray();
+		}
+		return new String [0];
+	}
+
 	public Object[] getManualSortDirsForJDBC() {
 		if(getManualSortDirs()!=null) {
 			return getManualSortDirs().toArray();
+		}
+		return new String [0];
+	}
+
+	public Object[] getDescriptionSortDirsForJDBC() {
+		if(getDescriptionSortDirs()!=null) {
+			return getDescriptionSortDirs().toArray();
 		}
 		return new String [0];
 	}
@@ -160,15 +177,39 @@ public class UserAccount {
 		this.ManualPropositions = new ArrayList<> ( Arrays.asList( ( (String[])array.getArray() )) );
 
 	}
+	public void setDescriptionActiveIdx(Integer intIndx) {
+		// TODO Auto-generated method stub
+		this.DescriptionActiveIdx = intIndx;
+
+	}
+	public Integer getDescriptionActiveIdx() {
+		return this.DescriptionActiveIdx;
+
+	}
 
 	public void setManualSortColumns(Array array) throws SQLException {
 		this.ManualSortColumns =  new ArrayList<> ( Arrays.asList( ( (String[])array.getArray() )) );
+	}
+	public void setDescriptionSortColumns(Array array) throws SQLException {
+		this.DescriptionSortColumns =  new ArrayList<> ( Arrays.asList( ( (String[])array.getArray() )) );
 	}
 
 	public void setManualSortDirs(Array array) throws SQLException {
 		 this.ManualSortDirs = new ArrayList<> ( Arrays.asList( ( (String[])array.getArray() )) );
 		
 	}
+	public void setDescriptionSortDirs(Array array) throws SQLException {
+		this.DescriptionSortDirs = new ArrayList<> ( Arrays.asList( ( (String[])array.getArray() )) );
 
+	}
+
+	public ArrayList<String> getDescriptionSortColumns() {
+		return this.DescriptionSortColumns;
+	}
+
+	public ArrayList<String> getDescriptionSortDirs() {
+		return this.DescriptionSortDirs;
+
+	}
 
 }
