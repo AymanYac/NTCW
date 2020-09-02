@@ -2,12 +2,9 @@ package transversal.dialog_toolbox;
 
 import controllers.Char_description;
 import javafx.event.EventHandler;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import model.CharValueTextSuggestion;
@@ -210,7 +207,13 @@ public class ValueTranslationDisambiguation {
 		alert.getButtonTypes().forEach(t->{
 			alert.getDialogPane().lookupButton(t).addEventHandler(
                     KeyEvent.KEY_PRESSED,
-                    fireOnEnter);	  
+                    fireOnEnter);
+			if(!t.equals(cancelButton)){
+				((Button) alert.getDialogPane().lookupButton(t)).setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
+				((Button) alert.getDialogPane().lookupButton(t)).setMaxSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
+				((Button) alert.getDialogPane().lookupButton(t)).setTextOverrun(OverrunStyle.CENTER_WORD_ELLIPSIS);
+			}
+
 		});
 		
 		alert.getButtonTypes().forEach(t->{

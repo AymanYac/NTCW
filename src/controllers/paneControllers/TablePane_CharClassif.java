@@ -22,6 +22,7 @@ import org.json.simple.parser.ParseException;
 import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.data_exchange_toolbox.QueryFormater;
+import transversal.dialog_toolbox.FxUtilTest;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -93,8 +94,7 @@ public class TablePane_CharClassif {
 	private List<String> classItems;
 	private boolean allowOverWriteAccountPreference = true;
 
-	public void restorePreviousLayout(){
-
+	public void restoreLastSessionLayout() {
 		try{
 			applySortOrder(account.getDescriptionSortColumns(),account.getDescriptionSortDirs());
 		}catch(Exception V) {
@@ -102,22 +102,44 @@ public class TablePane_CharClassif {
 		}
 	}
 
-	private void applySortOrder(ArrayList<String> SortColumns, ArrayList<String> SortDirs) {
-		allowOverWriteAccountPreference = false;
-		for (int ix = 0; ix < SortColumns.size(); ix++) {
-			for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getColumns()) {
-				if (c.getText().equals(SortColumns.get(ix))) {
-					tableGrid.getSortOrder().add(c);
-					c.setSortType(TableColumn.SortType.valueOf(SortDirs.get(ix)));
+	public void restorePreviousLayout(){
+		System.out.println("Restoring layout for "+FxUtilTest.getComboBoxValue(Parent.classCombo).getclassName());
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				try{
+					applySortOrder(Parent.DescriptionSortColumns.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()),Parent.DescriptionSortDirs.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()));
+				}catch(Exception V) {
+					V.printStackTrace(System.err);
 				}
 			}
-		}
-		selected_col = account.getDescriptionActiveIdx()-1;
-		nextChar();
-		allowOverWriteAccountPreference=true;
+		});
+
 	}
 
-	public static void loadPreviousLayout() throws SQLException, ClassNotFoundException {
+	private void applySortOrder(ArrayList<String> SortColumns, ArrayList<String> SortDirs) {
+		if(SortColumns!=null && SortDirs!=null){
+			allowOverWriteAccountPreference = false;
+			tableGrid.getSortOrder().clear();
+			for (int ix = 0; ix < SortColumns.size(); ix++) {
+				for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getColumns()) {
+					if (c.getText().equals(SortColumns.get(ix))) {
+						System.out.print(SortColumns.get(ix)+" ");
+						tableGrid.getSortOrder().add(c);
+						c.setSortType(TableColumn.SortType.valueOf(SortDirs.get(ix)));
+						System.out.println(SortDirs.get(ix));
+					}
+				}
+			}
+
+			selected_col = account.getDescriptionActiveIdx()-1;
+			nextChar();
+			allowOverWriteAccountPreference=true;
+		}
+
+	}
+
+	public static void loadLastSessionLayout() throws SQLException, ClassNotFoundException {
 
 		Connection conn = Tools.spawn_connection();
 		PreparedStatement stmt = conn.prepareStatement("select "
@@ -423,10 +445,10 @@ public class TablePane_CharClassif {
 			CharItemFetcher.generateItemArray(classItems,this);
 			
 			//Not needed any more loadAllClassCharWithKnownValues calls loadAllKnownValuesAssociated2Items
-			//assignValuesToItemsByClass_V2(active_class,this.Parent.classCombo.getSelectionModel().getSelectedItem().getclassName(),classItems);
-			
-			
-			
+			//assignValuesToItemsByClass_V2(active_class,FxUtilTest.getComboBoxValue(Parent.classCombo).getclassName(),classItems);
+
+
+			restorePreviousLayout();
 			
 			fillTable(false);
 			selectLastDescribedItem();
@@ -469,6 +491,8 @@ public class TablePane_CharClassif {
 				tableGrid.getSelectionModel().select(latestEditedItem.get());
 				tableGrid.scrollTo(tableGrid.getSelectionModel().getSelectedIndex());
 			}
+		}else{
+			tableGrid.getSelectionModel().clearAndSelect(0);
 		}
 
 	}
@@ -610,14 +634,14 @@ public class TablePane_CharClassif {
 	*/
 	
 	public void nextChar() {
-		if(Parent.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+		if(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			return;
 		}
 		selected_col+=1;
 		selectChartAtIndex(selected_col,Parent.charButton.isSelected());
 	}
 	public void previousChar() {
-		if(Parent.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+		if(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			return;
 		}
 		this.selected_col-=1;
@@ -627,10 +651,10 @@ public class TablePane_CharClassif {
 	@SuppressWarnings("rawtypes")
 	private void selectChartAtIndex(int i, boolean collapsedView) {
 		if(selected_col<0){
-			selected_col = selected_col + CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size();
+			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
 		}
-		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size());
-		List<String> char_headers = CharValuesLoader.returnSortedCopyOfClassCharacteristic(Parent.classCombo.getValue().getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
+		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
+		List<String> char_headers = CharValuesLoader.returnSortedCopyOfClassCharacteristic(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
 		for( Object col:this.tableGrid.getColumns()) {
 			int idx = char_headers.indexOf(((TableColumn)col).getText());
 			if(idx!=selected_col ) {
@@ -740,12 +764,12 @@ public class TablePane_CharClassif {
             descriptionColumn.setResizable(false);
             descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
 
-            CharValuesLoader.returnSortedCopyOfClassCharacteristic(Parent.classCombo.getValue().getClassSegment()).stream().forEach(characteristic->{
+            CharValuesLoader.returnSortedCopyOfClassCharacteristic(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().forEach(characteristic->{
 				TableColumn col = new TableColumn<>(characteristic.getCharacteristic_name());
 				col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 					public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
 						try{
-							return new ReadOnlyObjectWrapper(r.getValue().getData(Parent.classCombo.getSelectionModel().getSelectedItem().getClassSegment())[CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).indexOf(characteristic)].getDisplayValue(Parent));
+							return new ReadOnlyObjectWrapper(r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).indexOf(characteristic)].getDisplayValue(Parent));
 						}catch(Exception V) {
 							//Object has null data at daataIndex
 							return new ReadOnlyObjectWrapper("");
@@ -759,14 +783,14 @@ public class TablePane_CharClassif {
 				this.tableGrid.getColumns().add(col);
 			});
         	/*
-        	for(int i=0;i<CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size();i++) {
-                ClassCaracteristic characteristic = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).get(i);
+        	for(int i=0;i<CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();i++) {
+                ClassCaracteristic characteristic = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(i);
                 final int dataIndex = i;
                 TableColumn col = new TableColumn<>(characteristic.getCharacteristic_name());
                 col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
                      public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                         try{
-                            return new ReadOnlyObjectWrapper(r.getValue().getData(Parent.classCombo.getSelectionModel().getSelectedItem().getClassSegment())[dataIndex].getDisplayValue(Parent));
+                            return new ReadOnlyObjectWrapper(r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[dataIndex].getDisplayValue(Parent));
                         }catch(Exception V) {
                             //Object has null data at daataIndex
                             return new ReadOnlyObjectWrapper("");
@@ -963,19 +987,19 @@ public class TablePane_CharClassif {
 
 	public void fireScrollNBUp() {
 		try {
-			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size());
+			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
 			int min = (int) Collections.min(tableGrid.getSelectionModel().getSelectedIndices());
 			CharDescriptionRow thisItem = ((CharDescriptionRow) tableGrid.getItems().get(min));
 			CharDescriptionRow previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
 			String data_this = "";
 			String data_previous="";
 			try{
-				data_this = thisItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
+				data_this = thisItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
 			try{
-				data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
+				data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
@@ -986,7 +1010,7 @@ public class TablePane_CharClassif {
 					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
 					data_previous="";
 					try{
-						data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
+						data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}
@@ -999,7 +1023,7 @@ public class TablePane_CharClassif {
 					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
 					data_previous="";
 					try{
-						data_previous = previousItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
+						data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}
@@ -1017,19 +1041,19 @@ public class TablePane_CharClassif {
 	public void fireScrollNBDown() {
 
 		try {
-			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).size());
+			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
 			int max = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
 			CharDescriptionRow thisItem = ((CharDescriptionRow) tableGrid.getItems().get(max));
 			CharDescriptionRow nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
 			String data_this = "";
 			String data_next="";
 			try{
-				data_this = thisItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
+				data_this = thisItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
 			try{
-				data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
+				data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
@@ -1040,7 +1064,7 @@ public class TablePane_CharClassif {
 					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
 					data_next="";
 					try{
-						data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
+						data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}
@@ -1053,7 +1077,7 @@ public class TablePane_CharClassif {
 					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
 					data_next="";
 					try{
-						data_next = nextItem.getData(Parent.classCombo.getValue().getClassSegment())[active_char_index].getDisplayValue(Parent);
+						data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}
@@ -1089,19 +1113,17 @@ public class TablePane_CharClassif {
 		account.setDescriptionActiveIdx(selected_col);
 		int SI = tableGrid.getSelectionModel().getSelectedIndex();
 
-		refresh_table_with_segment(Parent.classCombo.getValue().getClassSegment());
+		refresh_table_with_segment(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment());
 
-		tableGrid.getSortOrder().clear();
 		if(account.getDescriptionSortColumns().stream().filter(tc->!tableGrid.getColumns().stream().map(c->c.getText()).collect(Collectors.toList()).contains(tc)).findAny().isPresent()){
 			//At least a sorting column is no longer available, do not restore order
 		}else{
 			//Restore order
-			restorePreviousLayout();
-
-			tableGrid.getSelectionModel().clearAndSelect(SI);
+			restoreLastSessionLayout();
+			//tableGrid.getSelectionModel().clearAndSelect(SI);
 		}
 		try{
-			Parent.charPaneController.tableGrid.scrollTo(Parent.charPaneController.tableGrid.getSelectionModel().getSelectedIndex());
+			//Parent.charPaneController.tableGrid.scrollTo(Parent.charPaneController.tableGrid.getSelectionModel().getSelectedIndex());
 		}catch (Exception E){
 
 		}
@@ -1109,12 +1131,18 @@ public class TablePane_CharClassif {
 	}
 
 	private void saveSortOrder() {
+		System.out.println("XXX Saving sort order for "+FxUtilTest.getComboBoxValue(Parent.classCombo).getclassName()+"XXX");
+		System.out.println(tableGrid.getSortOrder().stream().map(e->e.getText()).collect(Collectors.toList()));
 		account.getDescriptionSortColumns().clear();
+		Parent.DescriptionSortColumns.put(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment(), new ArrayList<String>());
 		account.getDescriptionSortDirs().clear();
+		Parent.DescriptionSortDirs.put(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment(), new ArrayList<String>());
 
 		for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getSortOrder()) {
 			account.getDescriptionSortColumns().add(c.getText());
+			Parent.DescriptionSortColumns.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).add(c.getText());
 			account.getDescriptionSortDirs().add(c.getSortType().toString());
+			Parent.DescriptionSortDirs.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).add(c.getSortType().toString());
 		}
 
 		account.setDescriptionActiveIdx(selected_col);
@@ -1127,4 +1155,6 @@ public class TablePane_CharClassif {
 		}
 
 	}
+
+
 }

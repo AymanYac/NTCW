@@ -119,8 +119,10 @@ public class Char_description {
 	
 	
 	public UserAccount account;
+	public HashMap<String,ArrayList<String>> DescriptionSortColumns = new HashMap<String,ArrayList<String>>();
+	public HashMap<String,ArrayList<String>> DescriptionSortDirs = new HashMap<String,ArrayList<String>>();
 
-	
+
 	private String user_language_gcode;
 	private String data_language_gcode;
 	public String user_language;
@@ -470,7 +472,7 @@ public class Char_description {
 			try{
 				int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
 				if(TranslationProcessResult!=null) {
-					if(classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+					if(FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 						CharValuesLoader.updateDefaultCharValue(idx,this);
 					}else {
 						CharValuesLoader.storeItemDatafromScreen(idx,this);
@@ -484,12 +486,12 @@ public class Char_description {
 	}
 	private Boolean CheckForTranslationValidity() {
 		ClassCaracteristic active_char;
-		if(this.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+		if(FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			active_char = CharItemFetcher.defaultCharValues.get(tableController.tableGrid.getSelectionModel().getSelectedIndex()).getKey();
 			 
 		}else {
-			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
-			active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
+			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
+			active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment())
 					.get(active_char_index);
 		}
 		
@@ -698,7 +700,7 @@ public class Char_description {
 		String selectedRowClass = row.getClass_segment_string().split("&&&")[0];
 		ClassCaracteristic active_char;
 		int active_char_index;
-		if(this.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+		if(FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			active_char_index = 0;
 			active_char = CharItemFetcher.defaultCharValues.get(tableController.tableGrid.getSelectionModel().getSelectedIndex()).getKey();
 			 
@@ -1088,6 +1090,7 @@ public class Char_description {
 						classCombo.getItems().add(tmp);
 						if(allowRefreshActiveClass && elem.split("&&&")[0].equals(account.getUser_desc_class())) {
 							classCombo.getSelectionModel().select(tmp);
+							classCombo.setValue(tmp);
 						}
 					}
 				}
@@ -1113,7 +1116,7 @@ public class Char_description {
 		classCombo.setOnHidden(new EventHandler<Event>() {
 			@Override
 			public void handle(Event event) {
-				CharDescClassComboRow newValue = classCombo.getValue();
+				CharDescClassComboRow newValue = FxUtilTest.getComboBoxValue(classCombo);
 				decorate_class_combobox(false);
 				classCombo.setValue(newValue);
 				//tableController.refresh_table_with_segment(newValue.getClassSegment());
@@ -1146,7 +1149,7 @@ public class Char_description {
 				}
 				if(newValue!=null){
 					try {
-						tableController.refresh_table_with_segment(classCombo.getValue().getClassSegment());
+						tableController.refresh_table_with_segment(FxUtilTest.getComboBoxValue(classCombo).getClassSegment());
 					} catch (ClassNotFoundException | SQLException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -1183,9 +1186,9 @@ public class Char_description {
 			tableController.fillTable_DYNAMIC((List<ItemFetcherRow>) ftc.currentList_DYNAMIC);
 		}*/
 		tableController.setCollapsedViewColumns(new String[] {"Completion status","Question status"});
-		TablePane_CharClassif.loadPreviousLayout();
+		TablePane_CharClassif.loadLastSessionLayout();
 		tableController.refresh_table_with_segment(account.getUser_desc_class(classCombo.getItems().get(1).getClassSegment()));
-		tableController.restorePreviousLayout();
+		tableController.restoreLastSessionLayout();
 		System.gc();
 
 	}
@@ -1296,7 +1299,6 @@ public class Char_description {
 			grid.setColumnSpan(leftAnchor, 9);
 		}
 		try{
-			;
 			tableController.collapseGrid(visibleRight,grid);
 		}catch(Exception V) {
 			//V.printStackTrace(System.err);
@@ -1401,7 +1403,7 @@ public class Char_description {
 			
 			ClassCaracteristic active_char = null;
 			int selected_col = 0;
-			if(!this.classCombo.getValue().getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+			if(!FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 				selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
 				active_char = CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col);
 				proposer.loadCharRuleProps(row,row.getClass_segment_string().split("&&&")[0],selected_col,CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
@@ -1726,17 +1728,17 @@ public class Char_description {
 	public void AssignValueOnSelectedItems(CaracteristicValue value) {
 
 		//uiDirectValueRefresh(pattern_value);
-		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
 		List<String> targetItemsIDs = tableController.tableGrid.getSelectionModel().getSelectedItems().stream().map(i->i.getItem_id()).collect(Collectors.toList());
 		CharItemFetcher.allRowItems.parallelStream().filter(e->targetItemsIDs.contains(e.getItem_id()))
 						.forEach(r->{
-							CharValuesLoader.updateRuntimeDataForItem(r,this.classCombo.getValue().getClassSegment(),active_char_index,value);
-							CharDescriptionExportServices.addItemCharDataToPush(r, this.classCombo.getValue().getClassSegment(), active_char_index,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
+							CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getClassSegment(),active_char_index,value);
+							CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), active_char_index,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
 							
 						});
 		CharDescriptionExportServices.flushItemDataToDB(account);
-		TranslationServices.beAwareOfNewValue(value, CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index));
-		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(this.classCombo.getValue().getClassSegment()).get(active_char_index),true);
+		TranslationServices.beAwareOfNewValue(value, CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index));
+		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index),true);
 		
 		refresh_ui_display();
 		tableController.tableGrid.refresh();
@@ -1747,8 +1749,8 @@ public class Char_description {
 		pattern_value.setSource(DataInputMethods.SEMI_CHAR_DESC);
 		pattern_value.setAuthor(account.getUser_id());
 		
-		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
-		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
+		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
+		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment())
 		.get(active_char_index);
 		
 		if(active_char.getIsNumeric()) {
@@ -1780,8 +1782,8 @@ public class Char_description {
 	
 	@SuppressWarnings("unused")
 	private void uiDirectValueRefresh(CaracteristicValue pattern_value) {
-		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(this.classCombo.getValue().getClassSegment()).size());
-		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(classCombo.getValue().getClassSegment())
+		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
+		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment())
 		.get(active_char_index);
 		
 		if(active_char.getIsNumeric()) {

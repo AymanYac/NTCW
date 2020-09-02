@@ -1,9 +1,11 @@
 package transversal.dialog_toolbox;
 
+import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -31,6 +33,13 @@ public class FxUtilTest {
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode() == KeyCode.UP) {
+                    if (!comboBox.isShowing()) {
+                        comboBox.show();
+                        comboBox.getSelectionModel().clearAndSelect(Math.max(comboBox.getSelectionModel().getSelectedIndex()-1,0));
+                        ListView<?> lv = ((ComboBoxListViewSkin) comboBox.getSkin()).getListView();
+                        lv.getFocusModel().focus(comboBox.getSelectionModel().getSelectedIndex());
+                        lv.scrollTo(comboBox.getSelectionModel().getSelectedIndex());
+                    }
                     caretPos = -1;
                     if (comboBox.getEditor().getText() != null) {
                         moveCaret(comboBox.getEditor().getText().length());
@@ -39,6 +48,10 @@ public class FxUtilTest {
                 } else if (event.getCode() == KeyCode.DOWN) {
                     if (!comboBox.isShowing()) {
                         comboBox.show();
+                        comboBox.getSelectionModel().clearAndSelect(Math.min(comboBox.getSelectionModel().getSelectedIndex()+1,comboBox.getItems().size()-1));
+                        ListView<?> lv = ((ComboBoxListViewSkin) comboBox.getSkin()).getListView();
+                        lv.getFocusModel().focus(comboBox.getSelectionModel().getSelectedIndex());
+                        lv.scrollTo(comboBox.getSelectionModel().getSelectedIndex());
                     }
                     caretPos = -1;
                     if (comboBox.getEditor().getText() != null) {
