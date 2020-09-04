@@ -16,7 +16,6 @@ public class CharValuesLoader {
 	static ArrayList<CaracteristicValue> knownValues;
 	static HashMap<String,Integer> indexedKnownValues = new HashMap<String,Integer>();
 	public static HashMap<String,ArrayList<ClassCaracteristic>> active_characteristics = new HashMap<String,ArrayList<ClassCaracteristic>>();
-	public static HashMap<String,HashMap<Integer,HashSet<Integer>>> itemDataMovementQueue = new HashMap<String,HashMap<Integer,HashSet<Integer>>>();
 	public static void fetchAllKnownValuesAssociated2Items(String active_project) throws SQLException, ClassNotFoundException {
 		if(knownValues!=null) {
 			return;
@@ -76,7 +75,7 @@ public class CharValuesLoader {
 				CharDescriptionRow row = CharItemFetcher.allRowItems.get(CharItemFetcher.indexedRowItems.get(item_id));
 				//row.allocateDataField(loop_class_id,tablePane_CharClassif.active_characteristics.get(loop_class_id).size());
 				try{
-					row.getData(loop_class_id)[charIdArrays.get(loop_class_id).indexOf(characteristic_id)]=val;
+					row.getData(loop_class_id).put(characteristic_id,val);
 				}catch(Exception V) {
 					System.out.println("Couldn't set data for char "+characteristic_id+" in class "+loop_class_id);
 				}
@@ -106,9 +105,9 @@ public class CharValuesLoader {
 
 
 
-	public static void updateRuntimeDataForItem(CharDescriptionRow r, String classSegment, int active_char_index, CaracteristicValue value) {
+	public static void updateRuntimeDataForItem(CharDescriptionRow r, String classSegment, String charId, CaracteristicValue value) {
 		if(r.getClass_segment_string().contains(classSegment)) {
-			r.getData(classSegment)[active_char_index]=value;
+			r.getData(classSegment).put(charId,value);
 		}
 	}
 
@@ -197,7 +196,7 @@ public class CharValuesLoader {
 		tmp.setAuthor(parent.account.getUser_id());
 		tmp.ManualValueReviewed=true;
 		
-		row.getData(GlobalConstants.DEFAULT_CHARS_CLASS)[0]=tmp;
+		row.getData(GlobalConstants.DEFAULT_CHARS_CLASS).put(GlobalConstants.DEFAULT_CHARS_CLASS,tmp);
 		row.setLong_desc(tmp.getDisplayValue(parent));
 		parent.refresh_ui_display();
 		parent.tableController.tableGrid.refresh();
@@ -273,60 +272,4 @@ public class CharValuesLoader {
 
 	}
 
-	public static void prepareItemMoveItemDataInArray(int offset, String segmentId, int targetIndex) {
-
-		try{
-			itemDataMovementQueue.get(segmentId).get(offset).add(targetIndex);
-		}catch (Exception V){
-			try{
-				itemDataMovementQueue.get(segmentId).put(offset,new HashSet<>(targetIndex));
-			}catch (Exception E){
-				HashMap<Integer, HashSet<Integer>> tmp = new HashMap<Integer, HashSet<Integer>>();
-				tmp.put(offset,new HashSet<>(targetIndex));
-				itemDataMovementQueue.put(segmentId,tmp);
-			}
-		}
-
-	}
-
-	public static void executeMoveItemDataInArray() {
-		itemDataMovementQueue.entrySet().stream().forEach(e->{
-			System.out.println(e.getValue());
-			String segmentID = e.getKey();
-			CharItemFetcher.allRowItems.parallelStream().filter(r->r.getData().containsKey(segmentID)).forEach(r->{
-				try {
-					ArrayList<Integer> negatives = new ArrayList<Integer>(e.getValue().get(-1));
-					negatives.sort(new Comparator<Integer>() {
-						@Override
-						public int compare(Integer o1, Integer o2) {
-							return o1.compareTo(o2);
-						}
-					});
-					negatives.stream().forEach(idx->{
-
-						r.getData(segmentID)[idx-1] = r.getData(segmentID)[idx];
-					});
-				}catch (Exception V){
-
-				}
-				try {
-					ArrayList<Integer> negatives = new ArrayList<Integer>(e.getValue().get(1));
-					negatives.sort(new Comparator<Integer>() {
-						@Override
-						public int compare(Integer o1, Integer o2) {
-							return o2.compareTo(o1);
-						}
-					});
-					negatives.stream().forEach(idx->{
-
-						r.getData(segmentID)[idx+1] = r.getData(segmentID)[idx];
-					});
-				}catch (Exception V){
-
-				}
-
-			});
-		});
-		itemDataMovementQueue.clear();
-	}
 }

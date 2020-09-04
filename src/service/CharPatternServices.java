@@ -2591,7 +2591,7 @@ public class CharPatternServices {
 			}
 		}
 		if(exitOnShortDesc || !(r.getLong_desc()!=null)) {
-			matchingSegments.forEach(segment->r.reEvaluateCharRules(segment,charIdArrays.get(segment).size()));
+			matchingSegments.forEach(segment->r.reEvaluateCharRules(segment));
 			return;
 		}
 		m = regexPattern.matcher(" "+r.getLong_desc()+" ");
@@ -2600,7 +2600,7 @@ public class CharPatternServices {
 					addCharResult2Row(r,activeCharRule,r.getLong_desc(),m.group(),parent)
 					);
 		}
-		matchingSegments.forEach(segment->r.reEvaluateCharRules(segment,charIdArrays.get(segment).size()));
+		matchingSegments.forEach(segment->r.reEvaluateCharRules(segment));
 		
 	}
 
@@ -2617,14 +2617,14 @@ public class CharPatternServices {
 		for(String segment:matchedRow.getData().keySet()) {
 			IntStream.range(0, charIdArrays.get(segment).size()).filter(i -> charIdArrays.get(segment).get(i).equals(matchedRule.getSourceChar().getCharacteristic_id()))
 			.forEach(charIdx->{
-				if(!(matchedRow.getData(segment)[charIdx]!=null)) {
-					matchedRow.getData(segment)[charIdx] = new CaracteristicValue();
-					matchedRow.getData(segment)[charIdx].setParentChar(CharValuesLoader.active_characteristics.get(segment).get(charIdx));
+				if(!(matchedRow.getData(segment).get(charIdArrays.get(segment).get(charIdx))!=null)) {
+					matchedRow.getData(segment).put(charIdArrays.get(segment).get(charIdx),new CaracteristicValue());
+					matchedRow.getData(segment).get(charIdArrays.get(segment).get(charIdx)).setParentChar(CharValuesLoader.active_characteristics.get(segment).get(charIdx));
 				}
 				
 				CharRuleResult newMatch = new CharRuleResult(matchedRule,matchedText,matchedGroup,CharValuesLoader.active_characteristics.get(segment).get(charIdx));
 				newMatch.ruleActionToValue(parent);
-				matchedRow.addCharRuleResult(newMatch,segment,charIdx,charIdArrays.get(segment).size());
+				matchedRow.addCharRuleResult(newMatch,segment,charIdArrays.get(segment).get(charIdx));
 				matchingSegments.add(segment);
 			});
 		}

@@ -380,28 +380,27 @@ public class TablePane_CharClassif {
 			if(row.getClass_segment_string().equals(itemPreviousClasses.get(row))) {
 				//No class change
 			}else {
-				for(int idx=0;idx<row.getData(row.getClass_segment_string().split("&&&")[0]).length;idx++) {
-					CaracteristicValue value = row.getData(row.getClass_segment_string().split("&&&")[0])[idx];
+				String itemClass = row.getClass_segment_string().split("&&&")[0];
+				row.getData(itemClass).entrySet().forEach(e->{
+					CaracteristicValue value = e.getValue();
 					if(value!=null) {
 						//Fresh value loaded during values assignement by new class
 					}else {
 						//Try to allign the new empty value on the old one
-						ClassCaracteristic new_char = CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(idx);
+						ClassCaracteristic new_char = CharValuesLoader.active_characteristics.get(itemClass).stream().filter(c->c.getCharacteristic_id().equals(e.getKey())).findAny().get();
 						//Search for an old char with the same name
-						for(int idx2=0;idx2<CharValuesLoader.active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).size();idx2++ ) {
-							ClassCaracteristic old_char = CharValuesLoader.active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).get(idx2);
+						CharValuesLoader.active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).stream().filter(old_char->{
 							if(
 									old_char.getCharacteristic_name().toLowerCase().equals(new_char.getCharacteristic_name().toLowerCase())
 							) {
-								row.getData(row.getClass_segment_string().split("&&&")[0])[idx]=row.getData(itemPreviousClasses.get(row).split("&&&")[0])[idx2];
-								CharDescriptionExportServices.addItemCharDataToPush(row,row.getClass_segment_string().split("&&&")[0],idx,CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
-								break;
+								row.getData(itemClass).put(new_char.getCharacteristic_id(),row.getData(itemPreviousClasses.get(row).split("&&&")[0]).get(old_char.getCharacteristic_id()));
+								CharDescriptionExportServices.addItemCharDataToPush(row,row.getClass_segment_string().split("&&&")[0],new_char.getCharacteristic_id());
+								return true;
 							}
-						}
-						
-						
+							return false;
+						}).findFirst();
 					}
-				}
+				});
 			}
 			CharDescriptionExportServices.flushItemDataToDB(account);
 		}
@@ -475,7 +474,7 @@ public class TablePane_CharClassif {
 
 	private void selectLastDescribedItem() {
 		Optional<LocalDateTime> latestDescriptionTimeInClass = tableGrid.getItems().stream().map(
-				r -> r.getData().values().stream().flatMap(a -> Arrays.stream(a.clone())).filter(v->v!=null && v.getDisplayValue(Parent).length()>0).map(v -> v.getDescriptionTime()).max(new Comparator<LocalDateTime>() {
+				r -> r.getData().values().stream().flatMap(a -> a.values().stream()).filter(v->v!=null && v.getDisplayValue(Parent).length()>0).map(v -> v.getDescriptionTime()).max(new Comparator<LocalDateTime>() {
 					@Override
 					public int compare(LocalDateTime o1, LocalDateTime o2) {
 						return o1.compareTo(o2);
@@ -484,7 +483,7 @@ public class TablePane_CharClassif {
 		).filter(m -> m.isPresent()).map(m -> m.get()).findAny();
 		if(latestDescriptionTimeInClass.isPresent()){
 			Optional<CharDescriptionRow> latestEditedItem = tableGrid.getItems().stream().filter(
-					r -> r.getData().values().stream().flatMap(a-> Arrays.stream(a.clone()))
+					r -> r.getData().values().stream().flatMap(a-> a.values().stream())
 							.filter(v -> v != null && v.getDescriptionTime().isEqual(latestDescriptionTimeInClass.get())).findAny().isPresent()).findAny();
 			if(latestEditedItem.isPresent()){
 				tableGrid.getSelectionModel().clearSelection();
@@ -712,11 +711,11 @@ public class TablePane_CharClassif {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void fillTable(boolean charClassActive) {
+	private void fillTable(boolean defaultValueCharClassActive) {
 		this.tableGrid.getItems().clear();
         this.tableGrid.getColumns().clear();
         
-        if(!charClassActive) {
+        if(!defaultValueCharClassActive) {
         	
         	for(String colname : this.collapsedViewColumns) {
             	TableColumn tmp = new TableColumn<>(colname);
@@ -769,7 +768,7 @@ public class TablePane_CharClassif {
 				col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 					public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
 						try{
-							return new ReadOnlyObjectWrapper(r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).indexOf(characteristic)].getDisplayValue(Parent));
+							return new ReadOnlyObjectWrapper(r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(characteristic.getCharacteristic_id()).getDisplayValue(Parent));
 						}catch(Exception V) {
 							//Object has null data at daataIndex
 							return new ReadOnlyObjectWrapper("");
@@ -809,7 +808,8 @@ public class TablePane_CharClassif {
             linkColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
                 public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                     try{
-                    	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment_string().split("&&&")[0])[selected_col].getUrl());
+						String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
+                    	return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getUrl());
                     }catch(Exception V) {
                    	 return new ReadOnlyObjectWrapper("");
                     }
@@ -846,8 +846,8 @@ public class TablePane_CharClassif {
         //sourceColumn.setCellValueFactory(new PropertyValueFactory<>("source"));
         sourceColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                try{
-                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment_string().split("&&&")[0])[selected_col].getSource());
+                try{String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
+					return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getSource());
                 }catch(Exception V) {
                	 return new ReadOnlyObjectWrapper("");
                 }
@@ -863,7 +863,8 @@ public class TablePane_CharClassif {
         ruleColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                 try{
-                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment_string().split("&&&")[0])[selected_col].getRule_id());
+                	String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
+					return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getRule_id());
                 }catch(Exception V) {
                	 return new ReadOnlyObjectWrapper("");
                 }
@@ -879,7 +880,8 @@ public class TablePane_CharClassif {
         authorColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                 try{
-                	return new ReadOnlyObjectWrapper(r.getValue().getData(r.getValue().getClass_segment_string().split("&&&")[0])[selected_col].getAuthorName());
+					String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
+					return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getAuthorName());
                 }catch(Exception V) {
                	 return new ReadOnlyObjectWrapper("");
                 }
@@ -994,12 +996,12 @@ public class TablePane_CharClassif {
 			String data_this = "";
 			String data_previous="";
 			try{
-				data_this = thisItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
+				data_this = thisItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
 			try{
-				data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
+				data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
@@ -1010,7 +1012,7 @@ public class TablePane_CharClassif {
 					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
 					data_previous="";
 					try{
-						data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
+						data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}
@@ -1023,7 +1025,7 @@ public class TablePane_CharClassif {
 					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
 					data_previous="";
 					try{
-						data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
+						data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}
@@ -1048,12 +1050,12 @@ public class TablePane_CharClassif {
 			String data_this = "";
 			String data_next="";
 			try{
-				data_this = thisItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
+				data_this = thisItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
 			try{
-				data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
+				data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
 			}catch (Exception V){
 
 			}
@@ -1064,7 +1066,7 @@ public class TablePane_CharClassif {
 					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
 					data_next="";
 					try{
-						data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
+						data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}
@@ -1077,7 +1079,7 @@ public class TablePane_CharClassif {
 					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
 					data_next="";
 					try{
-						data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[active_char_index].getDisplayValue(Parent);
+						data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
 					}catch (Exception V){
 
 					}

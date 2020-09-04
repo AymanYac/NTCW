@@ -103,8 +103,8 @@ public class CharItemFetcher {
 			fakeItem.setShort_desc(p.getKey().getCharacteristic_name());
 			fakeItem.setLong_desc(p.getValue().getDisplayValue(tableController.Parent));
 			fakeItem.setParent(tableController.Parent);
-			fakeItem.allocateDataField(GlobalConstants.DEFAULT_CHARS_CLASS, 1);
-			fakeItem.getData(GlobalConstants.DEFAULT_CHARS_CLASS)[0] = p.getValue();
+			fakeItem.allocateDataField(GlobalConstants.DEFAULT_CHARS_CLASS);
+			fakeItem.getData(GlobalConstants.DEFAULT_CHARS_CLASS).put(GlobalConstants.DEFAULT_CHARS_CLASS,p.getValue());
 			tableController.itemArray.add(fakeItem);
 			
 		});
@@ -132,7 +132,7 @@ public class CharItemFetcher {
 		
 		indexedRowItems.entrySet().parallelStream().filter(e->itemListIDs.contains(e.getKey()))
 		.forEach(e->{
-			allRowItems.get(e.getValue()).allocateDataField(target_class_id,CharValuesLoader.active_characteristics.get(target_class_id).size());
+			allRowItems.get(e.getValue()).allocateDataField(target_class_id);
 		});
 		
 		System.out.println("Class change :: allocated data fields for "+itemList.size()+" items");
@@ -141,7 +141,7 @@ public class CharItemFetcher {
 	public static void initClassDataFields(TablePane_CharClassif tablePane_CharClassif) {
 		allRowItems.forEach(r->{
 			String item_class_id = classifiedItems.get(r.getItem_id()).split("&&&")[4];
-			r.allocateDataField(item_class_id,CharValuesLoader.active_characteristics.get(item_class_id).size());
+			r.allocateDataField(item_class_id);
 			
 		});
 	}

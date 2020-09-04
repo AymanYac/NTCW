@@ -103,20 +103,20 @@ public class CharClassifProposer {
 		return buttonToData.get(currentLoopButtonIndex).getValue();
 	}
 
-	public void loadCharRuleProps(CharDescriptionRow row, String segment, int char_idx, int charIdxSize) {
+	public void loadCharRuleProps(CharDescriptionRow row, String segment, String charId) {
 		try {
 			lastestActiveCRIndex=0;
-			row.getRulePropositions().get(segment).get(char_idx).entrySet().stream().forEach(e->{
+			row.getRulePropositions().get(segment).get(charId).entrySet().stream().forEach(e->{
 				
 				Button btn = parent.propButtons.get(lastestActiveCRIndex);
 				btn.setText(e.getKey());
 				btn.setOpacity(1.0);
 				btn.setOnAction((event) -> {
-					CharValuesLoader.updateRuntimeDataForItem(row,segment,char_idx,e.getValue().getActionValue());
-					CharDescriptionExportServices.addItemCharDataToPush(row, segment, char_idx,charIdxSize);
+					CharValuesLoader.updateRuntimeDataForItem(row,segment,charId,e.getValue().getActionValue());
+					CharDescriptionExportServices.addItemCharDataToPush(row, segment, charId);
 					CharDescriptionExportServices.flushItemDataToDB(parent.account);
 					clearPropButtons();
-					row.getRulePropositions().get(segment).get(char_idx).clear();
+					row.getRulePropositions().get(segment).get(charId).clear();
 				});
 				lastestActiveCRIndex+=1;
 			});	

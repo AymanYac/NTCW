@@ -40,15 +40,14 @@ public class CharPane_CharClassif {
 			
 		}
 		if(this.selected_row!=null) {
-			for(int i=0;i<CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).size();i++) {
-				ClassCaracteristic carac = CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).get(i);
+			CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).forEach(carac->{
 				CharPaneRow tmp = new CharPaneRow(this.parent);
 				tmp.setItem(selected_row);
-				tmp.setChar_index(i);
+				tmp.setChar_index(CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).indexOf(carac));
 				tmp.setCarac(carac);
-				tmp.setValue(selected_row.getData(selected_row.getClass_segment_string().split("&&&")[0])[i]);
+				tmp.setValue(selected_row.getData(selected_row.getClass_segment_string().split("&&&")[0]).get(carac.getCharacteristic_id()));
 				this.paneRows.add(tmp);
-			}
+			});
 		}
 		this.tableGrid.getItems().clear();
 		this.paneRows.sort(new Comparator<CharPaneRow>() {

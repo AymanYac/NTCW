@@ -306,107 +306,103 @@ public class CharDescriptionExportServices {
 	}
 
 	private static void appendBaseItem(CharDescriptionRow item, Sheet baseSheet, ArrayList<ClassCaracteristic> itemChars, Char_description parent) {
-		
-		for(int i=0;i<itemChars.size();i++) {
-			if(item.getData(item.getClass_segment_string().split("&&&")[0])!=null && item.getData(item.getClass_segment_string().split("&&&")[0])[i]!=null) {
+		String itemClass = item.getClass_segment_string().split("&&&")[0];
+		itemChars.forEach(carac->{
+
+			if(item.getData(itemClass)!=null && item.getData(itemClass).get(carac.getCharacteristic_id())!=null) {
 				baseRowIdx+=1;
 				Row row = baseSheet.createRow(baseRowIdx);
 				Cell loopCell = row.createCell(0);
 				loopCell.setCellValue(item.getClient_item_number());
-				
+
 				loopCell = row.createCell(1);
-				loopCell.setCellValue(itemChars.get(i).getSequence());
-				
+				loopCell.setCellValue(carac.getSequence());
+
 				loopCell = row.createCell(2);
-				loopCell.setCellValue(itemChars.get(i).getCharacteristic_id());
-				
+				loopCell.setCellValue(carac.getCharacteristic_id());
+
 				loopCell = row.createCell(3);
-				loopCell.setCellValue(itemChars.get(i).getCharacteristic_name());
-				
+				loopCell.setCellValue(carac.getCharacteristic_name());
+
 				loopCell = row.createCell(4);
 				loopCell.setCellValue(
-					itemChars.get(i).getIsNumeric()?
-				((itemChars.get(i).getAllowedUoms()!=null && itemChars.get(i).getAllowedUoms().size()>0)?"NUM with UoM":"NUM w/o Uom")
-				:
-				(itemChars.get(i).getIsTranslatable()?"TXT translatable":"TXT non translatable")
-					);
-				
-				String itemClass = item.getClass_segment_string().split("&&&")[0];
+						carac.getIsNumeric()?
+								((carac.getAllowedUoms()!=null && carac.getAllowedUoms().size()>0)?"NUM with UoM":"NUM w/o Uom")
+								:
+								(carac.getIsTranslatable()?"TXT translatable":"TXT non translatable")
+				);
+
 				loopCell = row.createCell(5);
 				try{
-					loopCell.setCellValue(item.getData(itemClass)[i].getStdValue());
+					loopCell.setCellValue(item.getData(itemClass).get(carac.getCharacteristic_id()).getStdValue());
 				}catch(Exception V) {
-					
+
 				}
-				
+
 				loopCell = row.createCell(6);
 				try {
-					loopCell.setCellValue(UnitOfMeasure.RunTimeUOMS.get(item.getData(itemClass)[i].getUom_id()).toString());
+					loopCell.setCellValue(UnitOfMeasure.RunTimeUOMS.get(item.getData(itemClass).get(carac.getCharacteristic_id()).getUom_id()).toString());
 				}catch(Exception V) {
-					
+
 				}
-				
+
 				loopCell = row.createCell(7);
 				try{
-					loopCell.setCellValue(item.getData(itemClass)[i].getUserLanguageValue());
+					loopCell.setCellValue(item.getData(itemClass).get(carac.getCharacteristic_id()).getUserLanguageValue());
 				}catch(Exception V) {
-					
+
 				}
-				
+
 				loopCell = row.createCell(8);
 				try{
-					loopCell.setCellValue(item.getData(itemClass)[i].getMin_value());
+					loopCell.setCellValue(item.getData(itemClass).get(carac.getCharacteristic_id()).getMin_value());
 				}catch(Exception V) {
-					
+
 				}
-				
+
 				loopCell = row.createCell(9);
 				try{
-					loopCell.setCellValue(item.getData(itemClass)[i].getMax_value());
+					loopCell.setCellValue(item.getData(itemClass).get(carac.getCharacteristic_id()).getMax_value());
 				}catch(Exception V) {
-					
+
 				}
-				
+
 				loopCell = row.createCell(10);
 				try{
-					loopCell.setCellValue(item.getData(itemClass)[i].getNote());
+					loopCell.setCellValue(item.getData(itemClass).get(carac.getCharacteristic_id()).getNote());
 				}catch(Exception V) {
-					
+
 				}
-				
+
 				loopCell = row.createCell(11);
 				try{
-					loopCell.setCellValue(item.getData(itemClass)[i].getSource());
+					loopCell.setCellValue(item.getData(itemClass).get(carac.getCharacteristic_id()).getSource());
 				}catch(Exception V) {
-					
+
 				}
-				
+
 				loopCell = row.createCell(12);
 				try{
-					loopCell.setCellValue(item.getData(itemClass)[i].getRule_id());
+					loopCell.setCellValue(item.getData(itemClass).get(carac.getCharacteristic_id()).getRule_id());
 				}catch(Exception V) {
-					
+
 				}
-				
+
 				loopCell = row.createCell(13);
 				try{
-					loopCell.setCellValue(item.getData(itemClass)[i].getAuthorName());
+					loopCell.setCellValue(item.getData(itemClass).get(carac.getCharacteristic_id()).getAuthorName());
 				}catch(Exception V) {
-					
+
 				}
-				
+
 				loopCell = row.createCell(14);
 				try{
-					loopCell.setCellValue(item.getData(itemClass)[i].getUrl());
+					loopCell.setCellValue(item.getData(itemClass).get(carac.getCharacteristic_id()).getUrl());
 				}catch(Exception V) {
-					
+
 				}
-				
-				
-			}else {
-				continue;
 			}
-		}
+		});
 		
 	}
 
@@ -432,20 +428,21 @@ public class CharDescriptionExportServices {
 		
 		loopCell = row.createCell(5);
 		loopCell.setCellValue(item.getClass_segment_string().split("&&&")[1]);
-		
+
+
 		for(int i=0;i<itemChars.size();i++) {
 			loopCell = row.createCell(6+2*i);
 			loopCell.setCellValue(itemChars.get(i).getCharacteristic_name());
 			loopCell = row.createCell(7+2*i);
 			try{
-				loopCell.setCellValue(item.getData(item.getClass_segment_string().split("&&&")[0])[i].getDisplayValue(parent/*,itemChars.get(i)*/));
+				loopCell.setCellValue(item.getData(item.getClass_segment_string().split("&&&")[0]).get(itemChars.get(i).getCharacteristic_id()).getDisplayValue(parent/*,carac*/));
 			}catch(Exception V) {
-				
+
 			}
 		}
-		
-		
-		
+
+
+
 	}
 
 	private static void createKnownValuesHeader(Sheet knownValueSheet, SXSSFWorkbook wb, Char_description parent) {
@@ -576,10 +573,12 @@ public class CharDescriptionExportServices {
 		itemDataBuffer.add(queueItem);
 	}
 
-	public static void addItemCharDataToPush(CharDescriptionRow row, String segment, int charIdx, int charIdxSize) {
-		CaracteristicValue val = row.getData(segment)[charIdx];
-		ClassCaracteristic carac = CharValuesLoader.active_characteristics.get(segment).get(charIdx);
-		addItemCharDataToPush(row,val,carac);
+	public static void addItemCharDataToPush(CharDescriptionRow row, String segment, String charId) {
+		CaracteristicValue val = row.getData(segment).get(charId);
+		Optional<ClassCaracteristic> carac = CharValuesLoader.active_characteristics.get(segment).stream().filter(car->car.getCharacteristic_id().equals(charId)).findAny();
+		if(carac.isPresent()){
+			addItemCharDataToPush(row,val,carac.get());
+		}
 	}
 
 	public static void addCaracDefinitionToPush(ClassCaracteristic template,ClassSegment segment){

@@ -489,7 +489,6 @@ public class CaracDeclarationDialog {
 			public void handle(ActionEvent event) {
 				ClassCaracteristic newCarac = loadCaracFromDialog(editingCarac);
 				ArrayList<ClassSegment> droppedClassInsertions = dispatchCaracOnClassesReturnDropped(newCarac, charClassLink.getValue().getRowSegments(),currentItemSegment,account,parent);
-				CharValuesLoader.executeMoveItemDataInArray();
 				dialog.close();
 				showDroppedClassInsertions(droppedClassInsertions);
 			}
@@ -575,14 +574,12 @@ public class CaracDeclarationDialog {
 								if(charClassMatch.get().getSequence()<=copy.getSequence()){
 									//Advancing
 									if(c.getSequence()>= charClassMatch.get().getSequence() && c.getSequence() <= copy.getSequence()){
-										CharValuesLoader.prepareItemMoveItemDataInArray(-1,s.getSegmentId(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(c));
 										c.setSequence(c.getSequence()-1);
 										addCaracDefinitionToPush(c,s);
 									}
 								}else{
 									//Regressing
 									if(c.getSequence() <= charClassMatch.get().getSequence() && c.getSequence()>=copy.getSequence()){
-										CharValuesLoader.prepareItemMoveItemDataInArray(+1,s.getSegmentId(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(c));
 										c.setSequence(c.getSequence()+1);
 										addCaracDefinitionToPush(c,s);
 									}
@@ -619,7 +616,6 @@ public class CaracDeclarationDialog {
 							//Force use the config sequence if the sequence CB is selected
 							copy.setSequence(Math.min(copy.getSequence(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().map(ClassCaracteristic::getSequence).max(Integer::compare).get()+1));
 							CharValuesLoader.active_characteristics.get(s.getSegmentId()).stream().filter(c-> c.getSequence()>=copy.getSequence()).forEach(c->{
-								CharValuesLoader.prepareItemMoveItemDataInArray(+1,s.getSegmentId(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(c));
 								c.setSequence(c.getSequence()+1);
 								addCaracDefinitionToPush(c,s);
 							});
@@ -633,24 +629,20 @@ public class CaracDeclarationDialog {
 				}else{
 					//Current class advance other caracs
 					CharValuesLoader.active_characteristics.get(currentItemSegment.getSegmentId()).stream().filter(c-> c.getSequence()>=copy.getSequence()).forEach(c->{
-						CharValuesLoader.prepareItemMoveItemDataInArray(+1,s.getSegmentId(),CharValuesLoader.active_characteristics.get(s.getSegmentId()).indexOf(c));
 						c.setSequence(c.getSequence()+1);
 						addCaracDefinitionToPush(c,s);
 					});
 					parent.tableController.selected_col=copy.getSequence()-1;
 				}
 				CharValuesLoader.active_characteristics.get(s.getSegmentId()).add(copy);
-				/*CharValuesLoader.active_characteristics.get(s.getSegmentId()).sort(new Comparator<ClassCaracteristic>() {
-					@Override
-					public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
-						return o1.getSequence().compareTo(o2.getSequence());
-					}
-				});*/
-				CharItemFetcher.allRowItems.stream().filter(r->r.getClass_segment_string().startsWith(s.getSegmentId())).forEach(r->{
-					r.expandDataField(s.getSegmentId());
-				});
 				addCaracDefinitionToPush(copy,s);
 			}
+			CharValuesLoader.active_characteristics.get(s.getSegmentId()).sort(new Comparator<ClassCaracteristic>() {
+				@Override
+				public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
+					return o1.getSequence().compareTo(o2.getSequence());
+				}
+			});
 		});
 		try {
 			flushCaracDefinitionToDB(account);
@@ -1190,7 +1182,6 @@ public class CaracDeclarationDialog {
 				if(localCarac.isPresent()){
 					CharValuesLoader.active_characteristics.get(e.getKey()).stream().filter(c->c.getSequence() > localCarac.get().getSequence())
 							.forEach(c->{
-								CharValuesLoader.prepareItemMoveItemDataInArray(-1,e.getKey(),CharValuesLoader.active_characteristics.get(e.getKey()).indexOf(c));
 								c.setSequence(c.getSequence()-1);
 								addCaracDefinitionToPush(c,sid2Segment.get(e.getKey()));
 							});
@@ -1214,7 +1205,6 @@ public class CaracDeclarationDialog {
 		} catch (SQLException | ClassNotFoundException throwables) {
 			throwables.printStackTrace();
 		}
-		CharValuesLoader.executeMoveItemDataInArray();
 	}
 
 	public static void skipToNextField(Node node) {
