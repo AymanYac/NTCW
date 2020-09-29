@@ -1041,7 +1041,7 @@ public class TablePane_CharClassif {
 
 
 	public void fireScrollNBDown() {
-
+		System.out.println("Scroll NB down");
 		try {
 			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
 			int max = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
@@ -1089,7 +1089,7 @@ public class TablePane_CharClassif {
 
 			}
 		}catch(Exception V) {
-
+			V.printStackTrace(System.err);
 		}
 	}
 

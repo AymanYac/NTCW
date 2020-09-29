@@ -4,12 +4,13 @@ import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import model.CharDescriptionRow;
-import model.CharPaneRow;
-import model.ClassCaracteristic;
-import model.inputEventTableCell;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import model.*;
 import service.CharValuesLoader;
 import transversal.dialog_toolbox.CaracDeclarationDialog;
 import transversal.generic.Tools;
@@ -17,6 +18,9 @@ import transversal.generic.Tools;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
+
+import static transversal.data_exchange_toolbox.CharDescriptionExportServices.addCaracDefinitionToPush;
+import static transversal.data_exchange_toolbox.CharDescriptionExportServices.flushCaracDefinitionToDB;
 
 public class CharPane_CharClassif {
 
@@ -97,7 +101,7 @@ public class CharPane_CharClassif {
 
 					@Override
 					public void run() {
-
+						System.out.println("Reordering ");
 				    	parent.tableController.selected_col=((CharPaneRow) newSelection).getChar_index()-1;
 				    	parent.tableController.nextChar();
 					}
@@ -111,6 +115,79 @@ public class CharPane_CharClassif {
 				triggerItemTableRefresh = true;*/
 		    }
 		    
+		});
+		tableGrid.setRowFactory(tv -> {
+			TableRow<CharPaneRow> row = new TableRow<>();
+			row.setOnDragDetected(event -> {
+				System.out.println("start drag detected");
+				if (! row.isEmpty()) {
+					Integer index = row.getIndex();
+					Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
+					db.setDragView(row.snapshot(null, null));
+					ClipboardContent cc = new ClipboardContent();
+					cc.put(GlobalConstants.SERIALIZED_MIME_TYPE, index);
+					db.setContent(cc);
+					event.consume();
+				}
+				System.out.println("end drag detected");
+			});
+
+			row.setOnDragOver(event -> {
+				Dragboard db = event.getDragboard();
+				if (db.hasContent(GlobalConstants.SERIALIZED_MIME_TYPE)) {
+					if (row.getIndex() != ((Integer)db.getContent(GlobalConstants.SERIALIZED_MIME_TYPE)).intValue()) {
+						event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+						event.consume();
+					}
+				}
+			});
+
+			row.setOnDragDropped(event -> {
+				System.out.println("start drag drop");
+				Dragboard db = event.getDragboard();
+				if (db.hasContent(GlobalConstants.SERIALIZED_MIME_TYPE)) {
+					int draggedIndex = (Integer) db.getContent(GlobalConstants.SERIALIZED_MIME_TYPE);
+					CharPaneRow draggedRow = tableGrid.getItems().remove(draggedIndex);
+
+					int dropIndex ;
+
+					if (row.isEmpty()) {
+						dropIndex = tableGrid.getItems().size() ;
+					} else {
+						dropIndex = row.getIndex();
+					}
+
+					tableGrid.getItems().add(dropIndex, draggedRow);
+					for(int i=0;i<tableGrid.getItems().size();i++){
+						tableGrid.getItems().get(i).getCarac().setSequence(i+1);
+						tableGrid.getItems().get(i).setChar_index(i);
+						try {
+							addCaracDefinitionToPush(tableGrid.getItems().get(i).getCarac(),Tools.get_project_segments(parent.account).get(selected_row.getClass_segment_string().split("&&&")[0]));
+						} catch (SQLException throwables) {
+							throwables.printStackTrace();
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+						}
+					}
+					CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).sort(new Comparator<ClassCaracteristic>() {
+						@Override
+						public int compare(ClassCaracteristic o1, ClassCaracteristic o2) {
+							return o1.getSequence().compareTo(o2.getSequence());
+						}
+					});
+					event.setDropCompleted(true);
+					tableGrid.getSelectionModel().select(dropIndex);
+					event.consume();
+				}
+				System.out.println("end drag drop");
+				try {
+					flushCaracDefinitionToDB(parent.account);
+				} catch (SQLException | ClassNotFoundException throwables) {
+					throwables.printStackTrace();
+				}
+			});
+
+			return row ;
 		});
 		
 	}

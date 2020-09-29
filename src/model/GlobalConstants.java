@@ -1,5 +1,6 @@
 package model;
 
+import javafx.scene.input.DataFormat;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.FontPosture;
@@ -34,8 +35,9 @@ public class GlobalConstants {
 	
 	public static final int MANUAL_CLASSIF_SEPARATOR = 6;
 	public static final boolean AUTO_TEXT_FIELD_DUPLICATE_ACTION = true;
-	
-	public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
+    public static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
+
+    public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS = 5;
 	public static boolean USE_TAXOIMPORT_NEW_SCHEMA = true;
 	
@@ -46,7 +48,7 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
 	public static final boolean MANUAL_CLASSIF_PERSIST = false;
-	public static final String TOOL_VERSION = "4.1.9 BB";
+	public static final String TOOL_VERSION = "4.1.10 BB";
 	//public static final String HOST_ADDRESS = "localhost";
 	public static final String HOST_ADDRESS = "91.167.182.87";//"82.66.148.154";//"88.190.148.154";
 	//public static final String HOST_ADDRESS = "192.168.0.25";

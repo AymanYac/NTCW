@@ -25,6 +25,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextFlow;
@@ -107,7 +108,8 @@ public class Char_description {
 	//@FXML TextField uom_field;
 	@FXML public TextField value_field;
 	@FXML public TextField translated_value_field;
-	
+
+	@FXML Label deleteValueLabel;
 	@FXML Label custom_label_11;
 	@FXML Label custom_label_12;
 	@FXML Label custom_label_21;
@@ -277,7 +279,14 @@ public class Char_description {
 	}
 
 	private void listen_for_keyboard_events() {
-		
+
+		deleteValueLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				System.out.println("Deleting value");
+				AssignValueOnSelectedItems(new CaracteristicValue());
+			}
+		});
 		
 		uiDataFields = new TextField[] {value_field,uom_field,min_field_uom,max_field_uom,note_field_uom,rule_field,min_field,max_field,note_field,translated_value_field};
 		
@@ -518,7 +527,9 @@ public class Char_description {
 		
 		
 		
-		
+		if(keyEvent.getCode().equals(KeyCode.DELETE)){
+			account.PRESSED_KEYBOARD.put(KeyCode.DELETE,pressed);
+		}
 		if(keyEvent.getCode().equals(KeyCode.CONTROL)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.CONTROL, pressed);
 		}
@@ -683,9 +694,11 @@ public class Char_description {
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
 			tableController.fireScrollNBUp();
 		}
-		
-		
-		
+
+		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.DELETE)) {
+			System.out.println("Deleting value");
+			AssignValueOnSelectedItems(new CaracteristicValue());
+		}
 		
 		
 		
@@ -1413,6 +1426,8 @@ public class Char_description {
 				
 			}
 			String itemClass = row.getClass_segment_string().split("&&&")[0];
+			//deleteValueLabel.setTranslateX(custom_label_22.localToScene(custom_label_22.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX());
+
 			if(active_char.getIsNumeric()) {
 				if( (active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0)) {
 

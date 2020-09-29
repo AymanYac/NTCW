@@ -2,13 +2,16 @@ package transversal.dialog_toolbox;
 
 import controllers.Char_description;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import model.*;
+import org.controlsfx.control.ToggleSwitch;
 import service.CharClassifProposer;
 import transversal.generic.Tools;
 
@@ -47,12 +50,7 @@ public class UoMDeclarationDialog {
 
 		// Create the  uom labels and fields.
 
-		grid = new GridPane();
-		uomName = new TextField();
-		uomSymbol = new TextField();
-		uomAlt = new TextField();
-		uomMultiplier = new TextField();
-		uomChoice = new ComboBox<UomClassComboRow>();
+		createFields();
 
 		clear_fields(proposedUomSymbol,null);
 
@@ -115,12 +113,7 @@ public class UoMDeclarationDialog {
 
 		// Create the  uom labels and fields.
 
-		grid = new GridPane();
-		uomName = new TextField();
-		uomSymbol = new TextField();
-		uomAlt = new TextField();
-		uomMultiplier = new TextField();
-		uomChoice = new ComboBox<UomClassComboRow>();
+		createFields();
 
 		clear_fields(proposedUomSymbol, active_char);
 		
@@ -182,12 +175,7 @@ public class UoMDeclarationDialog {
 
 		// Create the  uom labels and fields.
 
-		grid = new GridPane();
-		uomName = new TextField();
-		uomSymbol = new TextField();
-		uomAlt = new TextField();
-		uomMultiplier = new TextField();
-		uomChoice = new ComboBox<UomClassComboRow>();
+		createFields();
 
 		clear_fields(proposedUomSymbol, active_char);
 		
@@ -219,6 +207,15 @@ public class UoMDeclarationDialog {
 		});
 		
 		
+	}
+
+	private static void createFields() {
+		grid = new GridPane();
+		uomName = new TextField();
+		uomSymbol = new TextField();
+		uomAlt = new TextField();
+		uomMultiplier = new TextField();
+		uomChoice = new ComboBox<UomClassComboRow>();
 	}
 
 	private static void setFieldListeners(Dialog<UnitOfMeasure> dialog, ButtonType validateButtonType,String proposedUomSymbol,ClassCaracteristic active_char) {
@@ -366,20 +363,49 @@ public class UoMDeclarationDialog {
 		uomAlt.setText("");
 		
 		grid.getChildren().clear();
-		grid.add(new Label("1 "+proposedUomSymbol+" ="), 0, 0);
-		grid.add(uomMultiplier, 1, 0);
-		grid.add(uomChoice, 2, 0);
+		int offset;
+		Label yesLink = new Label("yes");
+		Label noLink = new Label("no");
+		Label convLink = new Label("1 "+proposedUomSymbol+" =");
+		if(active_char!=null){
+			offset=0;
+		}else{
+			offset=1;
+			grid.add(new Label("Link this UoM with a base unit?"),0,0);
+			ToggleSwitch linkToggle = new ToggleSwitch();
+			grid.add(linkToggle,1,0);
+			yesLink.visibleProperty().bind(linkToggle.selectedProperty());
+			noLink.visibleProperty().bind(linkToggle.selectedProperty().not());
+			convLink.visibleProperty().bind(yesLink.visibleProperty());
+			uomMultiplier.visibleProperty().bind(yesLink.visibleProperty());
+			uomChoice.visibleProperty().bind(yesLink.visibleProperty());
+			grid.add(yesLink,1,0);
+			grid.add(noLink,1,0);
+			yesLink.setAlignment(Pos.BASELINE_RIGHT);
+			noLink.setAlignment(Pos.BASELINE_RIGHT);
+			linkToggle.setAlignment(Pos.BASELINE_LEFT);
+			linkToggle.selectedProperty().addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+					check_validation_disable();
+				}
+			});
+		}
+
+		grid.add(convLink, 0, 0+offset);
+		grid.add(uomMultiplier, 1, 0+offset);
+		grid.add(uomChoice, 2, 0+offset);
 		
-		grid.add(new Label("Unit's symbol"), 0, 1);
-		grid.add(uomSymbol, 1, 1);
+		grid.add(new Label("Unit's symbol"), 0, 1+offset);
+		grid.add(uomSymbol, 1, 1+offset);
 		GridPane.setColumnSpan(uomSymbol, 3);
 		
-		grid.add(new Label("Unit's name (in english):"), 0, 2);
-		grid.add(uomName, 1, 2);
+		grid.add(new Label("Unit's name (in english):"), 0, 2+offset);
+		grid.add(uomName, 1, 2+offset);
 		GridPane.setColumnSpan(uomName, 3);
 		
-		grid.add(new Label("Unit's alternative forms, separate with \",\":"), 0, 3);
-		grid.add(uomAlt, 1, 3);
+		grid.add(new Label("Unit's alternative forms, separate with \",\":"), 0, 3+offset);
+		grid.add(uomAlt, 1, 3+offset);
 		GridPane.setColumnSpan(uomAlt, 3);
 		
 		sortUomChoiceList(active_char!=null);
@@ -432,10 +458,16 @@ public class UoMDeclarationDialog {
     	newUom.setUom_id(Tools.generate_uuid());
     	newUom.setUom_name(uomName.getText());
     	newUom.setUom_symbols(uomSymbol.getText().split(","));
-    	newUom.setUom_base_id(uomChoice.getSelectionModel().getSelectedItem().getUnitOfMeasure().getUom_base_id());
-    	newUom.setUom_multiplier(uomChoice.getSelectionModel().getSelectedItem().getUnitOfMeasure()
-    			.getUom_multiplier().multiply(
-    			new BigDecimal(Double.valueOf(uomMultiplier.getText().replace(",", ".")))).toString());
+    	if(uomChoice.isVisible()){
+			newUom.setUom_base_id(uomChoice.getSelectionModel().getSelectedItem().getUnitOfMeasure().getUom_base_id());
+			newUom.setUom_multiplier(uomChoice.getSelectionModel().getSelectedItem().getUnitOfMeasure()
+					.getUom_multiplier().multiply(
+							new BigDecimal(Double.valueOf(uomMultiplier.getText().replace(",", ".")))).toString());
+		}else{
+    		newUom.setUom_base_id(newUom.getUom_id());
+    		newUom.setUom_multiplier("1.0");
+		}
+
     	
         return newUom;
 	}
@@ -454,8 +486,12 @@ public class UoMDeclarationDialog {
 			}
 			
 		}
-		validationButton.setDisable(falseNumberFormat || uomName.getText().trim().isEmpty() || uomSymbol.getText().split(",")[0].trim().isEmpty());
-	
+		Boolean baseIdChoice = uomChoice.getValue()!=null;
+		Boolean baseIdMandatory = uomChoice.isVisible();
+		validationButton.setDisable(
+						(baseIdMandatory && (falseNumberFormat|| !baseIdChoice))
+						|| uomName.getText().trim().isEmpty()
+						|| uomSymbol.getText().split(",")[0].trim().isEmpty());
 	}
 
 

@@ -1476,14 +1476,14 @@ public class CharPatternServices {
 											System.out.println("The 1st numerical value is followed by a known unit of measure");
 											CaracteristicValue preparedValue2 = new CaracteristicValue();;;; preparedValue2.setParentChar(active_char);
 											preparedValue2.setNominal_value(WordUtils.DoubleToString(numValuesInSelection.get(0)));
-											preparedValue2.setUom_id(uomsInSelection.get(1).getUom_id());
+											preparedValue2.setUom_id(uomsInSelection.get(0).getUom_id());
 											String preparedRule2 = "\""+selected_text.substring(0,selected_text.replace(",", ".").indexOf(
 													"%1"))+"\"(|+0)%1(|+0)\""
 													+inbetweenNumbersText+"\""+"(|+0)%2(|+0)"
 													+"\""+selected_text.substring(
 															selected_text.replace(",", ".").indexOf("%2")+
 																	"%2".length())
-													+"\""+"<NOM %1><UOM \""+uomsInSelection.get(1).getUom_symbol()+"\">";
+													+"\""+"<NOM %1><UOM \""+uomsInSelection.get(0).getUom_symbol()+"\">";
 											parent.sendPatternValue(preparedValue2);
 											parent.sendPatternRule(preparedRule2);
 											parent.sendSemiAutoPattern(preparedValue2,preparedRule2);
