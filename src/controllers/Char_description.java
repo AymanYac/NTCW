@@ -1,9 +1,6 @@
 package controllers;
 
-import controllers.paneControllers.Browser_CharClassif;
-import controllers.paneControllers.CharPane_CharClassif;
-import controllers.paneControllers.ImagePane_CharClassif;
-import controllers.paneControllers.TablePane_CharClassif;
+import controllers.paneControllers.*;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -11,6 +8,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -86,11 +84,12 @@ public class Char_description {
 	public Button exportButton;
 	@FXML ToggleButton googleButton;
 	@FXML ToggleButton tableButton;
-	@FXML ToggleButton taxoButton;
+	@FXML public ToggleButton ruleButton;
 	@FXML public ToggleButton imageButton;
 	@FXML public ToggleButton charButton;
 	@FXML public ToggleButton conversionToggle;
-	
+
+	@FXML Button editRuleButton;
 	@FXML Button prop1;
 	@FXML Button prop2;
 	@FXML Button prop3;
@@ -125,8 +124,8 @@ public class Char_description {
 	public HashMap<String,ArrayList<String>> DescriptionSortDirs = new HashMap<String,ArrayList<String>>();
 
 
-	private String user_language_gcode;
-	private String data_language_gcode;
+	public String user_language_gcode;
+	public String data_language_gcode;
 	public String user_language;
 	public String data_language;
 
@@ -138,8 +137,8 @@ public class Char_description {
 	public Browser_CharClassif browserController;
 	public StringProperty externalBrowserUrlProperty = new SimpleStringProperty();;
 	
-	private GridPane imageGrid;
-	private GridPane ruleGrid;
+	private GridPane rightAnchorImageGrid;
+	private GridPane rightAnchorContentGrid;
 	
 	public ArrayList<Button> propButtons;
 	
@@ -153,6 +152,7 @@ public class Char_description {
 
 	public ArrayList<String> CNAME_CID;
 	public CharPane_CharClassif charPaneController;
+	public RulePane_CharClassif rulePaneController;
 
 	public CharClassifProposer proposer;
 
@@ -213,8 +213,6 @@ public class Char_description {
 		sd_translated.setText("");
 		ld.setText("");
 		ld_translated.setText("");
-		
-		taxoButton.setDisable(true);
 		
 		toolBarButtonListener();
 		initializePropButtons();
@@ -279,7 +277,13 @@ public class Char_description {
 	}
 
 	private void listen_for_keyboard_events() {
-
+		editRuleButton.visibleProperty().bind(rule_field.textProperty().isNotNull().and(rule_field.textProperty().length().greaterThan(0)));
+		editRuleButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				PatternEditionDialog.editRule(TablePane_CharClassif.Parent);
+			}
+		});
 		deleteValueLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -376,6 +380,9 @@ public class Char_description {
 		}
 		if(keyEvent.getCode().equals(KeyCode.I)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.I, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.R)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.R, pressed);
 		}
 		if(keyEvent.getCode().equals(KeyCode.P)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.P, pressed);
@@ -545,6 +552,9 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.I)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.I, pressed);
 		}
+		if(keyEvent.getCode().equals(KeyCode.R)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.R, pressed);
+		}
 		if(keyEvent.getCode().equals(KeyCode.P)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.P, pressed);
 		}
@@ -616,7 +626,12 @@ public class Char_description {
 			}catch(Exception V) {
 				
 			}
-			
+			try {
+				rulePaneController.PaneClose();
+			}catch(Exception V) {
+
+			}
+
 			try {
 					//We clicked escape to close search
 					try {
@@ -645,13 +660,20 @@ public class Char_description {
 			
 			
 		}
-		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.I)) {
 			if(this.charButton.isSelected()) {
 				this.charPaneController.PaneClose();
 			}else {
 				charButton.setSelected(true);
 				load_char_pane();
+			}
+		}
+		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.R)) {
+			if(this.ruleButton.isSelected()) {
+				this.rulePaneController.PaneClose();
+			}else {
+				ruleButton.setSelected(true);
+				load_rule_pane();
 			}
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.P)) {
@@ -1216,11 +1238,11 @@ public class Char_description {
 		
 		setBottomRegionColumnSpans(true);
 		if(imagePaneController!=null) {
-			rightAnchor.getChildren().setAll(imageGrid);
-			rightAnchor.setTopAnchor(imageGrid, 0.0);
-			rightAnchor.setBottomAnchor(imageGrid, 0.0);
-			rightAnchor.setLeftAnchor(imageGrid, 0.0);
-			rightAnchor.setRightAnchor(imageGrid, 0.0);
+			rightAnchor.getChildren().setAll(rightAnchorImageGrid);
+			rightAnchor.setTopAnchor(rightAnchorImageGrid, 0.0);
+			rightAnchor.setBottomAnchor(rightAnchorImageGrid, 0.0);
+			rightAnchor.setLeftAnchor(rightAnchorImageGrid, 0.0);
+			rightAnchor.setRightAnchor(rightAnchorImageGrid, 0.0);
 			
 			imagePaneController.search_image(checkMethodSelect);
 			;
@@ -1228,12 +1250,12 @@ public class Char_description {
 		}else {
 			;
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/ImagePane_CharClassif.fxml"));
-			imageGrid = loader.load();
-			rightAnchor.getChildren().setAll(imageGrid);
-			rightAnchor.setTopAnchor(imageGrid, 0.0);
-			rightAnchor.setBottomAnchor(imageGrid, 0.0);
-			rightAnchor.setLeftAnchor(imageGrid, 0.0);
-			rightAnchor.setRightAnchor(imageGrid, 0.0);
+			rightAnchorImageGrid = loader.load();
+			rightAnchor.getChildren().setAll(rightAnchorImageGrid);
+			rightAnchor.setTopAnchor(rightAnchorImageGrid, 0.0);
+			rightAnchor.setBottomAnchor(rightAnchorImageGrid, 0.0);
+			rightAnchor.setLeftAnchor(rightAnchorImageGrid, 0.0);
+			rightAnchor.setRightAnchor(rightAnchorImageGrid, 0.0);
 			imagePaneController = loader.getController();
 			imagePaneController.setParent(this);
 			imagePaneController.search_image(checkMethodSelect);
@@ -1241,7 +1263,30 @@ public class Char_description {
 		
 		
 	}
-	
+
+	@SuppressWarnings("static-access")
+	public void load_rule_pane() throws IOException, ClassNotFoundException, SQLException {
+		if(!ruleButton.isSelected()) {
+			return;
+		}
+
+		setBottomRegionColumnSpans(true);
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/RulePane_CharClassif.fxml"));
+		rightAnchorContentGrid = loader.load();
+		rightAnchor.getChildren().setAll(rightAnchorContentGrid);
+
+		rightAnchor.setTopAnchor(rightAnchorContentGrid, 0.0);
+		rightAnchor.setBottomAnchor(rightAnchorContentGrid, 0.0);
+		rightAnchor.setLeftAnchor(rightAnchorContentGrid, 0.0);
+		rightAnchor.setRightAnchor(rightAnchorContentGrid, 0.0);
+
+		rulePaneController = loader.getController();
+		rulePaneController.setParent(this);
+		rulePaneController.load_description_patterns();
+
+
+	}
+
 	@SuppressWarnings("static-access")
 	public void load_char_pane() throws IOException, ClassNotFoundException, SQLException {
 		if(!charButton.isSelected()) {
@@ -1249,32 +1294,18 @@ public class Char_description {
 		}
 		
 		setBottomRegionColumnSpans(true);
-		if(charPaneController!=null) {
-			rightAnchor.getChildren().setAll(ruleGrid);
-			rightAnchor.setTopAnchor(ruleGrid, 0.0);
-			rightAnchor.setBottomAnchor(ruleGrid, 0.0);
-			rightAnchor.setLeftAnchor(ruleGrid, 0.0);
-			rightAnchor.setRightAnchor(ruleGrid, 0.0);
-			
-			charPaneController.load_item_chars();
-			;
-			
-		}else {
-			;
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/CharPane_CharClassif.fxml"));
-			ruleGrid = loader.load();
-			rightAnchor.getChildren().setAll(ruleGrid);
-			
-			rightAnchor.setTopAnchor(ruleGrid, 0.0);
-			rightAnchor.setBottomAnchor(ruleGrid, 0.0);
-			rightAnchor.setLeftAnchor(ruleGrid, 0.0);
-			rightAnchor.setRightAnchor(ruleGrid, 0.0);
-			
-			charPaneController = loader.getController();
-			charPaneController.setParent(this);
-			charPaneController.load_item_chars();
-			
-		}
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/CharPane_CharClassif.fxml"));
+		rightAnchorContentGrid = loader.load();
+		rightAnchor.getChildren().setAll(rightAnchorContentGrid);
+
+		rightAnchor.setTopAnchor(rightAnchorContentGrid, 0.0);
+		rightAnchor.setBottomAnchor(rightAnchorContentGrid, 0.0);
+		rightAnchor.setLeftAnchor(rightAnchorContentGrid, 0.0);
+		rightAnchor.setRightAnchor(rightAnchorContentGrid, 0.0);
+
+		charPaneController = loader.getController();
+		charPaneController.setParent(this);
+		charPaneController.load_item_chars();
 		
 		
 	}
@@ -1405,6 +1436,9 @@ public class Char_description {
 		clear_data_fields();
 		if(this.charButton.isSelected()) {
 			this.charPaneController.load_item_chars();
+		}
+		if(this.ruleButton.isSelected()) {
+			this.rulePaneController.load_description_patterns();
 		}
 		CharDescriptionRow row = (CharDescriptionRow) this.tableController.tableGrid.getSelectionModel().getSelectedItem();
 		if(row!=null) {

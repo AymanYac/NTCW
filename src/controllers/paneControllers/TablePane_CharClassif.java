@@ -460,8 +460,14 @@ public class TablePane_CharClassif {
 			}catch(Exception V) {
 				
 			}
+			try {
+				Parent.rulePaneController.PaneClose();
+			}catch(Exception V) {
+
+			}
 			Parent.charButton.setDisable(true);
-			
+			Parent.ruleButton.setDisable(true);
+
 			CharItemFetcher.generateDefaultCharEditingItems(this);
 			
 			fillTable(true);

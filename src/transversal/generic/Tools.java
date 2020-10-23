@@ -18,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import model.*;
 import org.apache.poi.util.IOUtils;
@@ -1412,7 +1413,27 @@ public class Tools {
 		return ret;
 	}
 
+	public static void deleteRow(GridPane grid, final int row) {
+		Set<Node> deleteNodes = new HashSet<>();
+		for (Node child : grid.getChildren()) {
+			// get index from child
+			Integer rowIndex = GridPane.getRowIndex(child);
 
+			// handle null values for index=0
+			int r = rowIndex == null ? 0 : rowIndex;
+
+			if (r > row) {
+				// decrement rows for rows after the deleted row
+				GridPane.setRowIndex(child, r-1);
+			} else if (r == row) {
+				// collect matching rows for deletion
+				deleteNodes.add(child);
+			}
+		}
+
+		// remove nodes from row
+		grid.getChildren().removeAll(deleteNodes);
+	}
 
 	public static void moveItemInCollection(int sourceIndex, int targetIndex, ObservableList<Node> list) {
 		if (sourceIndex <= targetIndex) {
