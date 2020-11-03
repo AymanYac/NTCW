@@ -2,6 +2,7 @@ package service;
 
 import controllers.Char_description;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.util.Pair;
 import model.CaracteristicValue;
 import model.CharDescriptionRow;
@@ -33,6 +34,7 @@ public class CharClassifProposer {
 				  
 			});
 			btn.setText("--");
+			btn.setTooltip(null);
 			btn.setOpacity(0.5);
 		}
 	}
@@ -103,20 +105,21 @@ public class CharClassifProposer {
 		return buttonToData.get(currentLoopButtonIndex).getValue();
 	}
 
-	public void loadCharRuleProps(CharDescriptionRow row, String segment, String charId) {
+	public void loadCharRuleProps(CharDescriptionRow row,String segment, String charId) {
 		try {
 			lastestActiveCRIndex=0;
-			row.getRulePropositions().get(segment).get(charId).entrySet().stream().forEach(e->{
+			row.getRulePropositions(charId).stream().forEach(result->{
 				
 				Button btn = parent.propButtons.get(lastestActiveCRIndex);
-				btn.setText(e.getKey());
+				btn.setText(result.getMatchedBlock()+" >>> "+result.getActionValue().getDisplayValue(false,false));
+				btn.setTooltip(new Tooltip(btn.getText()));
 				btn.setOpacity(1.0);
 				btn.setOnAction((event) -> {
-					CharValuesLoader.updateRuntimeDataForItem(row,segment,charId,e.getValue().getActionValue());
+					result.setStatus("Applied");
+					CharValuesLoader.updateRuntimeDataForItem(row,segment,result.getSourceChar().getCharacteristic_id(),result.getActionValue());
 					CharDescriptionExportServices.addItemCharDataToPush(row, segment, charId);
 					CharDescriptionExportServices.flushItemDataToDB(parent.account);
 					clearPropButtons();
-					row.getRulePropositions().get(segment).get(charId).clear();
 				});
 				lastestActiveCRIndex+=1;
 			});	

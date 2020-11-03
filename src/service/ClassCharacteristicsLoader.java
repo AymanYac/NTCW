@@ -12,11 +12,11 @@ import java.util.ArrayList;
 
 public class ClassCharacteristicsLoader {
 
-	public static void loadKnownValuesAssociated2Items(String active_project) throws ClassNotFoundException, SQLException {
+	public static void loadKnownValuesAssociated2Items(String active_project,boolean forceUpdate) throws ClassNotFoundException, SQLException {
 		
 		
 		//CharValuesLoader.loadAllKnownValues(active_project);
-		CharValuesLoader.fetchAllKnownValuesAssociated2Items(active_project);
+		CharValuesLoader.fetchAllKnownValuesAssociated2Items(active_project,forceUpdate);
 		/*HashSet<ClassCharacteristic> knownChars = new HashSet<ClassCharacteristic>();
 		tablePane_CharClassif.active_characteristics.forEach((k,v)->{
 			v.forEach(e -> knownChars.add(e));
@@ -28,8 +28,8 @@ public class ClassCharacteristicsLoader {
 		
 	}
 	
-	public static void loadAllClassCharacteristic(TablePane_CharClassif tablePane_CharClassif, String active_project) throws ClassNotFoundException, SQLException {
-		if(CharValuesLoader.knownValues!=null) {
+	public static void loadAllClassCharacteristic(String active_project, boolean forceUpdate) throws ClassNotFoundException, SQLException {
+		if(CharValuesLoader.knownValues!=null && !forceUpdate) {
 			return;
 		}
 		Connection conn = Tools.spawn_connection();

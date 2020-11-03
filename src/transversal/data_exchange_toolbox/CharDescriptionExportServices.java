@@ -1,5 +1,6 @@
 package transversal.data_exchange_toolbox;
 
+import com.google.gson.Gson;
 import controllers.Char_description;
 import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
@@ -16,13 +17,12 @@ import service.TranslationServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
@@ -35,6 +35,7 @@ public class CharDescriptionExportServices {
 	private static int knownValueRowIdx;
 
 	public static ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>> itemDataBuffer = new ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>>();
+	public static ConcurrentHashMap<String,CharDescriptionRow> itemRuleBuffer = new ConcurrentHashMap<String,CharDescriptionRow>();
 	public static ConcurrentLinkedQueue<Pair<CaracteristicValue,ClassCaracteristic>> caracDataBuffer = new ConcurrentLinkedQueue<Pair<CaracteristicValue,ClassCaracteristic>>();
 	public static ConcurrentLinkedQueue<Pair<ClassCaracteristic,ClassSegment>> caracDefBuffer = new ConcurrentLinkedQueue<Pair<ClassCaracteristic,ClassSegment>>();
 	public static ConcurrentLinkedQueue<Pair<ClassCaracteristic,String>> caracDeleteBuffer = new ConcurrentLinkedQueue<Pair<ClassCaracteristic,String>>();
@@ -569,16 +570,19 @@ public class CharDescriptionExportServices {
 	public static void addItemCharDataToPush(CharDescriptionRow row, CaracteristicValue val, ClassCaracteristic carac) {
 		Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
 		Pair<String, Pair<CaracteristicValue,ClassCaracteristic>> queueItem = new Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>(row.getItem_id(),valCaracPair);
-		System.out.println(val.getDescriptionTime());
 		itemDataBuffer.add(queueItem);
+		itemRuleBuffer.put(row.getItem_id(),row);
 	}
 
 	public static void addItemCharDataToPush(CharDescriptionRow row, String segment, String charId) {
 		CaracteristicValue val = row.getData(segment).get(charId);
-		Optional<ClassCaracteristic> carac = CharValuesLoader.active_characteristics.get(segment).stream().filter(car->car.getCharacteristic_id().equals(charId)).findAny();
-		if(carac.isPresent()){
-			addItemCharDataToPush(row,val,carac.get());
+		if(val!=null){
+			Optional<ClassCaracteristic> carac = CharValuesLoader.active_characteristics.get(segment).stream().filter(car->car.getCharacteristic_id().equals(charId)).findAny();
+			if(carac.isPresent()){
+				addItemCharDataToPush(row,val,carac.get());
+			}
 		}
+
 	}
 
 	public static void addCaracDefinitionToPush(ClassCaracteristic template,ClassSegment segment){
@@ -898,6 +902,31 @@ public class CharDescriptionExportServices {
 					conn.close();
 					conn2.close();
 					conn3.close();
+
+					conn = Tools.spawn_connection();
+					stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_items_x_pattern_results values(?,?,?,?) on conflict(item_id,characteristic_id) do update set char_rule_results = excluded.char_rule_results");
+					Connection finalConn = conn;
+					PreparedStatement finalStmt = stmt;
+					itemRuleBuffer.values().forEach(row->{
+						row.getRuleResults().entrySet().forEach(e->{
+							try {
+								String charId = e.getKey();
+								finalStmt.setString(1,row.getItem_id());
+								finalStmt.setString(2,charId);
+								//finalStmt.setArray(3,finalConn.createArrayOf("bytea",e.getValue().stream().map(CharRuleResult::serialize).toArray(byte[][]::new)));
+								finalStmt.setArray(3,null);
+								finalStmt.setString(4,ComplexMap2JdbcObject.serialize(e.getValue()));
+								finalStmt.addBatch();
+							} catch (SQLException throwables) {
+								throwables.printStackTrace();
+							}
+						});
+					});
+					stmt.executeBatch();
+					stmt.clearBatch();
+					stmt.close();
+					conn.close();
+
 			    	return null;
 			    }
 			};

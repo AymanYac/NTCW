@@ -60,7 +60,7 @@ EXECUTE format('
 )',  project_id);
 
 EXECUTE format('
-   CREATE TABLE IF NOT EXISTS %I.project_description_patterns(description_pattern_id character varying primary key,description_pattern_form character varying
+   CREATE TABLE IF NOT EXISTS %I.project_description_patterns(generic_char_rule_id character varying, generic_char_rule_json character varying, isSuppressed character varying, PRIMARY KEY (generic_char_rule_id)
 )',  project_id);
 
 EXECUTE format('
@@ -80,7 +80,7 @@ EXECUTE format('
 )',  project_id);
 
 EXECUTE format('
-   CREATE TABLE IF NOT EXISTS %I.project_characteristics_x_description_patterns(characteristic_id character varying, description_pattern_id character varying , PRIMARY KEY(characteristic_id,description_pattern_id)
+   CREATE TABLE IF NOT EXISTS %I.project_items_x_pattern_results(item_id character varying, characteristic_id character varying,char_rule_results bytea[], char_rule_results_json character varying, PRIMARY KEY(item_id,characteristic_id)
 )',  project_id);
 
 

@@ -9,6 +9,7 @@ import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class CaracteristicValue {
+public class CaracteristicValue implements Serializable {
 	public boolean ManualValueReviewed=false;
 	
 	public static HashMap<String,HashSet<CaracteristicValue>> loadedValues;
@@ -105,17 +106,21 @@ public class CaracteristicValue {
 		}
 		return getNominal_value();
 	}
-	
+
 	//Display value is user formatted display value (value column in table and item export)
 	public String getDisplayValue(Char_description parent) {
-		String ret = WordUtils.textFlowToString(getFormatedDisplayAndUomPair(parent,parentChar).getValue());
+		return getDisplayValue(parent.data_language!=parent.user_language,parent.conversionToggle.isSelected());
+	}
+	//Display value is user formatted display value (value column in table and item export)
+	public String getDisplayValue(boolean projectSupportsTranslation,boolean projectRequiresTranslation) {
+		String ret = WordUtils.textFlowToString(getFormatedDisplayAndUomPair(projectSupportsTranslation,projectRequiresTranslation,parentChar).getValue());
 		if(ManualValueReviewed && ret.length()==0) {
 			return "*UNKNOWN*";
 		}
 		return ret;
 	}
 	
-	public Pair<ArrayList<String>, TextFlow> getFormatedDisplayAndUomPair(Char_description parent,ClassCaracteristic parentChar) {
+	public Pair<ArrayList<String>, TextFlow> getFormatedDisplayAndUomPair(boolean projectSupportsTranslation,boolean projectRequiresTranslation, ClassCaracteristic parentChar) {
 		ArrayList<Text> textes = new ArrayList<Text>();
 		String local_uom_symbol="";
 		UnitOfMeasure local_uom = null;
@@ -128,7 +133,7 @@ public class CaracteristicValue {
 			tmp.setFill(GlobalConstants.CHAR_TXT_COLOR);
 			tmp.setFont(Font.font(GlobalConstants.CHAR_TXT_FONT,GlobalConstants.CHAR_TXT_WEIGHT,GlobalConstants.CHAR_TXT_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
 			textes.add(tmp);
-			if(parentChar.getIsTranslatable() && !parent.user_language.equals(parent.data_language) && getUserLanguageValue()!=null && getUserLanguageValue().length()>0) {
+			if(parentChar.getIsTranslatable() && projectSupportsTranslation && getUserLanguageValue()!=null && getUserLanguageValue().length()>0) {
 				//tmp = new Text(" ("+translateValue(this.getValue()).getNominal_value()+")");
 				tmp = new Text(" ("+getUserLanguageValue()+")");
 				tmp.setFill(GlobalConstants.RULE_DISPLAY_SYNTAX_COLOR);
@@ -142,7 +147,7 @@ public class CaracteristicValue {
 			try{
 				
 				UnitOfMeasure current_uom = UnitOfMeasure.RunTimeUOMS.get(getUom_id());
-				if((!(current_uom!=null)) || parentChar.getAllowedUoms().contains(current_uom.getUom_id()) || parent.conversionToggle.isSelected()) {
+				if((!(current_uom!=null)) || parentChar.getAllowedUoms().contains(current_uom.getUom_id()) || projectRequiresTranslation) {
 					//Either there's no uom or the uom is included in the allowed uoms
 					//Or the user doesn't want conversion
 					//No conversion and show the input value

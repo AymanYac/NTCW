@@ -2,10 +2,11 @@ package model;
 
 import javafx.util.Pair;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ClassCaracteristic {
+public class ClassCaracteristic implements Serializable {
 	//Char fields
 	private String characteristic_id;
 	private String characteristic_name;

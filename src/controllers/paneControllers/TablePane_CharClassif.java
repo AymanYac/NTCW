@@ -436,11 +436,12 @@ public class TablePane_CharClassif {
 			Parent.charButton.setDisable(false);
 
 			this.classItems = getActiveItemsID(active_class);
-			
-			CharItemFetcher.fetchAllItems(account.getActive_project(),this);
-			ClassCharacteristicsLoader.loadAllClassCharacteristic(this,account.getActive_project());
-			CharItemFetcher.initClassDataFields(this);
-			ClassCharacteristicsLoader.loadKnownValuesAssociated2Items(account.getActive_project());
+
+			CharPatternServices.loadDescriptionRules(account.getActive_project());
+			CharItemFetcher.fetchAllItems(account.getActive_project(),false);
+			ClassCharacteristicsLoader.loadAllClassCharacteristic(account.getActive_project(),false);
+			CharItemFetcher.initClassDataFields();
+			ClassCharacteristicsLoader.loadKnownValuesAssociated2Items(account.getActive_project(),false);
 			CharItemFetcher.generateItemArray(classItems,this);
 			
 			//Not needed any more loadAllClassCharWithKnownValues calls loadAllKnownValuesAssociated2Items
@@ -1165,4 +1166,15 @@ public class TablePane_CharClassif {
 	}
 
 
+    public void ReevaluateItems(HashSet<String> items2Update) {
+		 CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(r->{
+		 	 r.reEvaluateCharRules(Parent.account);
+			 String itemClass = r.getClass_segment_string().split("&&&")[0];
+			 CharValuesLoader.active_characteristics.get(itemClass).forEach(loopCarac->{
+			 	CharDescriptionExportServices.addItemCharDataToPush(r,itemClass,loopCarac.getCharacteristic_id());
+			 });
+
+		 });
+		 CharDescriptionExportServices.flushItemDataToDB(account);
+	}
 }

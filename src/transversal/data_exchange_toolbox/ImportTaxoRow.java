@@ -3,9 +3,9 @@ package transversal.data_exchange_toolbox;
 import javafx.util.Pair;
 import model.*;
 import org.apache.poi.ss.usermodel.Row;
+import service.CharPatternServices;
 import service.TranslationServices;
 import transversal.generic.Tools;
-import transversal.language_toolbox.WordUtils;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -375,7 +375,7 @@ public class ImportTaxoRow {
 	}
 	
 	
-	public void parseTaxoRow(Row current_row, UserAccount account) {
+	public Pair<GenericCharRule, ClassCaracteristic> parseTaxoRow(Row current_row, UserAccount account) {
 		segment = setSegment(current_row);
 		if(!segmentParseHasFailed() && rowHasCharNumber(current_row)) {
 			carac = setCarac(current_row,segment.getClassNumber());
@@ -384,8 +384,38 @@ public class ImportTaxoRow {
 			parseValue(current_row,account);
 			
 		}
+		if(!caracParseHasFailed()){
+			return parseRule(current_row,account);
+		}
+		return null;
 	}
-	
+
+	private Pair<GenericCharRule,ClassCaracteristic> parseRule(Row current_row, UserAccount account) {
+		GenericCharRule newRule = new GenericCharRule(current_row.getCell(columnMap.get("descriptionRule")).getStringCellValue());
+		if(!newRule.parseSuccess()){
+			Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be parsed. Check syntax");
+			rejectedRows.add(rejectedRow);
+			return null;
+		}
+		if(carac!=null){
+			newRule.generateRegex(carac);
+			if(newRule.parseSuccess()) {
+				newRule.storeGenericCharRule();
+				try {
+					CharPatternServices.suppressGenericRuleInDB(null,account.getActive_project(),newRule.getCharRuleId(),false);
+				} catch (SQLException throwables) {
+					throwables.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+				return new Pair<GenericCharRule,ClassCaracteristic>(newRule,carac);
+			}
+		}
+		Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be evaluated using characteristic '"+carac.getCharacteristic_name()+". Check semantics");
+		rejectedRows.add(rejectedRow);
+		return null;
+	}
+
 	private void parseValue(Row current_row, UserAccount account) {
 		if(carac!=null && !carac.getIsNumeric()) {
 			String dl=null;
@@ -514,6 +544,7 @@ public class ImportTaxoRow {
 		columnMap.put("charUoM", 15);
 		columnMap.put("value_DL", 16);
 		columnMap.put("value_UL", 17);
+		columnMap.put("descriptionRule",18);
 		
 	}
 	

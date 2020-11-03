@@ -1259,6 +1259,7 @@ public class Char_description {
 			imagePaneController = loader.getController();
 			imagePaneController.setParent(this);
 			imagePaneController.search_image(checkMethodSelect);
+			refresh_ui_display();
 		}
 		
 		
@@ -1282,7 +1283,7 @@ public class Char_description {
 
 		rulePaneController = loader.getController();
 		rulePaneController.setParent(this);
-		rulePaneController.load_description_patterns();
+		refresh_ui_display();
 
 
 	}
@@ -1305,8 +1306,8 @@ public class Char_description {
 
 		charPaneController = loader.getController();
 		charPaneController.setParent(this);
-		charPaneController.load_item_chars();
-		
+		refresh_ui_display();
+
 		
 	}
 	
@@ -1472,7 +1473,7 @@ public class Char_description {
 					
 					CaracteristicValue val = row.getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id());
 					try{
-						Pair<ArrayList<String>, TextFlow> tmp = val.getFormatedDisplayAndUomPair(this, active_char);
+						Pair<ArrayList<String>, TextFlow> tmp = val.getFormatedDisplayAndUomPair(data_language!=user_language,conversionToggle.isSelected(), active_char);
 						local_uom = UnitOfMeasure.RunTimeUOMS.get(tmp.getKey().get(0));
 						local_nom = tmp.getKey().get(1);
 						local_min = tmp.getKey().get(2);
@@ -1817,9 +1818,10 @@ public class Char_description {
 		}
 		pattern_value.setRule_id(ruleString);
 		rule_field.setText(ruleString);
-		CharPatternServices.applyItemRule(this);
 		AssignValueOnSelectedItems(pattern_value);
-		
+		CharPatternServices.applyItemRule(this);
+		refresh_ui_display();
+
 	}
 	
 	public void sendPatternRule(String ruleString) {

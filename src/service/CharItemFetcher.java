@@ -1,21 +1,18 @@
 package service;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import controllers.paneControllers.TablePane_CharClassif;
 import javafx.util.Pair;
-import model.CaracteristicValue;
-import model.CharDescriptionRow;
-import model.ClassCaracteristic;
-import model.GlobalConstants;
+import model.*;
+import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.generic.Tools;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CharItemFetcher {
@@ -27,8 +24,8 @@ public class CharItemFetcher {
 	public static ArrayList<Pair<ClassCaracteristic,CaracteristicValue>> defaultCharValues;
 
 	
-	public static void fetchAllItems(String active_project, TablePane_CharClassif tablePane_CharClassif) throws ClassNotFoundException, SQLException {
-		if(allRowItems!=null) {
+	public static void fetchAllItems(String active_project,boolean forceUpdate) throws ClassNotFoundException, SQLException {
+		if(allRowItems!=null && !forceUpdate) {
 			
 		}else {
 			System.out.println("Fetching all items");
@@ -37,7 +34,25 @@ public class CharItemFetcher {
 			Connection conn = Tools.spawn_connection();
 			PreparedStatement stmt;
 			ResultSet rs;
-			
+
+			stmt = conn.prepareStatement("select * from "+active_project+".project_items_x_pattern_results");
+			rs = stmt.executeQuery();
+			HashMap<String,HashMap<String, ArrayList<CharRuleResult>>> Item2RuleResults = new HashMap<String,HashMap<String, ArrayList<CharRuleResult>>>();
+			while (rs.next()){
+				//ArrayList<byte[] > byteArraySquared = new ArrayList<>(Arrays.asList(((byte[][]) rs.getArray("char_rule_results").getArray())));
+				//ArrayList<CharRuleResult> ruleResults = byteArraySquared.stream().map(CharRuleResult::deserialize).collect(Collectors.toCollection(ArrayList::new));
+				ArrayList<CharRuleResult> ruleResults = (ArrayList<CharRuleResult>) ComplexMap2JdbcObject.deserialize(rs.getString("char_rule_results_json"),new TypeToken<ArrayList<CharRuleResult>>(){}.getType());
+				try {
+					Item2RuleResults.get(rs.getString("item_id")).put(rs.getString("characteristic_id"), ruleResults);
+				}catch (Exception V){
+					Item2RuleResults.put(rs.getString("item_id"),new HashMap<String,ArrayList<CharRuleResult>>());
+					Item2RuleResults.get(rs.getString("item_id")).put(rs.getString("characteristic_id"), ruleResults);
+				}
+			}
+			rs.close();
+			stmt.close();
+
+
 			stmt = conn.prepareStatement("select item_id, client_item_number, short_description,short_description_translated, long_description,long_description_translated,material_group,pre_classification from "+active_project+".project_items");
 			rs = stmt.executeQuery();
 			
@@ -48,7 +63,6 @@ public class CharItemFetcher {
 					//String loop_class_id = tablePane_CharClassif.classifiedItems.get(rs.getString("item_id")).split("&&&")[4];
 					//CharDescriptionRow tmp = new CharDescriptionRow(loop_class_id,tablePane_CharClassif.active_characteristics.get(loop_class_id).size());
 					CharDescriptionRow tmp = new CharDescriptionRow();
-					tmp.setParent(tablePane_CharClassif.Parent);
 					tmp.setItem_id(rs.getString("item_id"));
 					i+=1;
 					indexedRowItems.put(tmp.getItem_id(), i);
@@ -65,7 +79,9 @@ public class CharItemFetcher {
 					String loop_class_name = loop_class_segment.split("&&&")[1];
 					String loop_class_number = loop_class_segment.split("&&&")[0];
 					tmp.setClass_segment_string(loop_class_id+"&&&"+loop_class_name+"&&&"+loop_class_number);
-					
+
+					tmp.setRuleResults(Item2RuleResults.get(tmp.getItem_id()));
+
 					allRowItems.add(tmp);
 				}catch(Exception V) {
 					V.printStackTrace(System.err);
@@ -102,7 +118,6 @@ public class CharItemFetcher {
 			fakeItem.setClass_segment_string(GlobalConstants.DEFAULT_CHARS_CLASS+"&&&"+GlobalConstants.DEFAULT_CHARS_CLASS+"&&&"+GlobalConstants.DEFAULT_CHARS_CLASS);
 			fakeItem.setShort_desc(p.getKey().getCharacteristic_name());
 			fakeItem.setLong_desc(p.getValue().getDisplayValue(tableController.Parent));
-			fakeItem.setParent(tableController.Parent);
 			fakeItem.allocateDataField(GlobalConstants.DEFAULT_CHARS_CLASS);
 			fakeItem.getData(GlobalConstants.DEFAULT_CHARS_CLASS).put(GlobalConstants.DEFAULT_CHARS_CLASS,p.getValue());
 			tableController.itemArray.add(fakeItem);
@@ -138,7 +153,7 @@ public class CharItemFetcher {
 		System.out.println("Class change :: allocated data fields for "+itemList.size()+" items");
 	}
 
-	public static void initClassDataFields(TablePane_CharClassif tablePane_CharClassif) {
+	public static void initClassDataFields() {
 		allRowItems.forEach(r->{
 			String item_class_id = classifiedItems.get(r.getItem_id()).split("&&&")[4];
 			r.allocateDataField(item_class_id);

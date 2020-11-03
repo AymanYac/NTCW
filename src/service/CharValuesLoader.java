@@ -16,8 +16,8 @@ public class CharValuesLoader {
 	static ArrayList<CaracteristicValue> knownValues;
 	static HashMap<String,Integer> indexedKnownValues = new HashMap<String,Integer>();
 	public static HashMap<String,ArrayList<ClassCaracteristic>> active_characteristics = new HashMap<String,ArrayList<ClassCaracteristic>>();
-	public static void fetchAllKnownValuesAssociated2Items(String active_project) throws SQLException, ClassNotFoundException {
-		if(knownValues!=null) {
+	public static void fetchAllKnownValuesAssociated2Items(String active_project,boolean forceUpdate) throws SQLException, ClassNotFoundException {
+		if(knownValues!=null && !forceUpdate) {
 			return;
 		}else {
 			fetchDefaultCharValues(active_project);

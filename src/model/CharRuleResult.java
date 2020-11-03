@@ -2,48 +2,44 @@ package model;
 
 import com.fathzer.soft.javaluator.DoubleEvaluator;
 import controllers.Char_description;
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
+import service.CharPatternServices;
 import service.TranslationServices;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CharRuleResult {
+public class CharRuleResult implements Serializable {
 
-	private GenericCharRule genericCharRule;
-	private String matchedText;
+	private String genericCharRuleID;
 	private String matchedBlock;
 	private CaracteristicValue actionValue;
 	private ArrayList<CharRuleResult> superRules= new ArrayList<CharRuleResult>();
 	private ClassCaracteristic parentChar;
+	private String status;
 	private static Unidecode unidecode;
 
-	public CharRuleResult(GenericCharRule matchedRule, String matchedText, String matchedGroup, ClassCaracteristic parentChar) {
-		this.genericCharRule = matchedRule;
-		this.matchedText = matchedText;
+	public CharRuleResult(GenericCharRule activeGenericCharRule, ClassCaracteristic parentChar, String matchedGroup) {
+		this.genericCharRuleID = activeGenericCharRule.getCharRuleId();
 		this.matchedBlock = matchedGroup;
 		this.parentChar = parentChar;
 	}
 
-	public GenericCharRule getGenericCharRule() {
-		return genericCharRule;
+
+	public String getGenericCharRuleID() {
+		return genericCharRuleID;
 	}
 
-	public void setGenericCharRule(GenericCharRule genericCharRule) {
-		this.genericCharRule = genericCharRule;
+	public void setGenericCharRuleID(String genericCharRuleID) {
+		this.genericCharRuleID = genericCharRuleID;
 	}
 
-	public String getMatchedText() {
-		return matchedText;
-	}
-
-	public void setMatchedText(String matchedText) {
-		this.matchedText = matchedText;
-	}
 
 	public String getMatchedBlock() {
 		return matchedBlock;
@@ -52,37 +48,49 @@ public class CharRuleResult {
 	public void setMatchedBlock(String matchedBlock) {
 		this.matchedBlock = matchedBlock;
 	}
-	
 
 	public CaracteristicValue getActionValue() {
 		return actionValue;
 	}
+	public String getStatus() {
+		return status;
+	}
 
-	public void ruleActionToValue(Char_description parent) {
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public void ruleActionToValue(Char_description parent){
+		ruleActionToValue(parent.account);
+	}
+	public void ruleActionToValue(UserAccount account) {
 		actionValue = new CaracteristicValue();
 		actionValue.setParentChar(parentChar);
-		for(String action:genericCharRule.getRuleActions()) {
+		actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
+
+		GenericCharRule genericCharRule = CharPatternServices.descriptionRules.get(genericCharRuleID);
+		for(String action: genericCharRule.getRuleActions()) {
 			if(action.startsWith("DL ")) {
 				action=action.substring(3).trim();
 				actionValue.setDataLanguageValue(action);
 				actionValue.setUserLanguageValue(TranslationServices.getEntryTranslation(action, true));
-				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><",genericCharRule.getRuleActions())+">");
-				actionValue.setAuthor(parent.account.getUser_id());
+				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+				actionValue.setAuthor(account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
 			}
 			if(action.startsWith("UL ")) {
 				action=action.substring(3).trim();
 				actionValue.setUserLanguageValue(action);
 				actionValue.setDataLanguageValue(TranslationServices.getEntryTranslation(action, false));
-				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><",genericCharRule.getRuleActions())+">");
-				actionValue.setAuthor(parent.account.getUser_id());
+				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+				actionValue.setAuthor(account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
 			}
 			if(action.startsWith("TXT ")) {
 				action=action.substring(4).trim();
 				actionValue.setTXTValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL(action,matchedBlock));
-				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><",genericCharRule.getRuleActions())+">");
-				actionValue.setAuthor(parent.account.getUser_id());
+				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+				actionValue.setAuthor(account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
 			}
 			if(action.startsWith("NOM ")) {
@@ -98,8 +106,8 @@ public class CharRuleResult {
 				    }
 				    action = sb.toString();
 				    actionValue.setNominal_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><",genericCharRule.getRuleActions())+">");
-					actionValue.setAuthor(parent.account.getUser_id());
+			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+					actionValue.setAuthor(account.getUser_id());
 					actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
 					
 		      } catch (Exception e) {
@@ -119,8 +127,8 @@ public class CharRuleResult {
 				    }
 				    action = sb.toString();
 			    	actionValue.setMin_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><",genericCharRule.getRuleActions())+">");
-					actionValue.setAuthor(parent.account.getUser_id());
+			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+					actionValue.setAuthor(account.getUser_id());
 					actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
 					
 		      } catch (Exception e) {
@@ -141,8 +149,8 @@ public class CharRuleResult {
 				    }
 				    action = sb.toString();
 			    	actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><",genericCharRule.getRuleActions())+">");
-					actionValue.setAuthor(parent.account.getUser_id());
+			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+					actionValue.setAuthor(account.getUser_id());
 					actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
 					
 		      } catch (Exception e) {
@@ -163,8 +171,8 @@ public class CharRuleResult {
 				    }
 				    action = sb.toString();
 			    	actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><",genericCharRule.getRuleActions())+">");
-					actionValue.setAuthor(parent.account.getUser_id());
+			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+					actionValue.setAuthor(account.getUser_id());
 					actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
 					
 		      } catch (Exception e) {
@@ -178,8 +186,8 @@ public class CharRuleResult {
 					Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->u.getUom_symbols().contains(symbol)).findAny();
 					if(uom.isPresent()) {
 						actionValue.setUom_id(uom.get().getUom_id());
-						actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><",genericCharRule.getRuleActions())+">");
-						actionValue.setAuthor(parent.account.getUser_id());
+						actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+						actionValue.setAuthor(account.getUser_id());
 						actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
 					}
 					
@@ -196,9 +204,17 @@ public class CharRuleResult {
 		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
 		String thisBlock = unidecode.decodeAndTrim(getMatchedBlock());
 		String targetBlock = unidecode.decodeAndTrim(r.getMatchedBlock());
-		return thisBlock.length()>targetBlock.length() && StringUtils.containsIgnoreCase(thisBlock, targetBlock);
+		String thisValue = unidecode.decodeAndTrim(getActionValue().getDisplayValue(false,false));
+		String targetValue = unidecode.decodeAndTrim(r.getActionValue().getDisplayValue(false,false));
+		return thisBlock.length()>targetBlock.length() && StringUtils.equalsIgnoreCase(thisValue, targetValue);
 	}
 
+	public boolean isSuperMarkerOf(CharRuleResult r) {
+		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
+		String thisPattern = unidecode.decodeAndTrim(getGenericCharRule().getRuleMarker());
+		String targetPattern = unidecode.decodeAndTrim(r.getGenericCharRule().getRuleMarker());
+		return thisPattern.length()>targetPattern.length() && StringUtils.containsIgnoreCase(thisPattern, targetPattern);
+	}
 	public void addSuperRule(Optional<CharRuleResult> superRule) {
 		superRules.add(superRule.get());
 	}
@@ -206,7 +222,38 @@ public class CharRuleResult {
 	public boolean isSubRule() {
 		return this.superRules.size()>0;
 	}
-	
-	
+
+
+	public GenericCharRule getGenericCharRule() {
+		return CharPatternServices.descriptionRules.get(getGenericCharRuleID());
+	}
+
+	public ClassCaracteristic getSourceChar() {return parentChar;}
+
+	public void clearSuperRules() {
+		superRules.clear();
+	}
+
+	public ByteArrayInputStream getByteArray() {
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(this);
+			oos.close();
+			ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+			return bais;
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+		}
+
+		return null;
+	}
+	public byte[] serialize(){
+		return SerializationUtils.serialize(this);
+	}
+	public static CharRuleResult deserialize(byte[] byteArray) {
+		CharRuleResult serializedResult = (CharRuleResult) SerializationUtils.deserialize(byteArray);
+		return serializedResult;
+	}
 
 }

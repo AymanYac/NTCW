@@ -1,16 +1,18 @@
 package transversal.data_exchange_toolbox;
 
 import com.monitorjbl.xlsx.StreamingReader;
+import controllers.paneControllers.TablePane_CharClassif;
+import javafx.util.Pair;
 import model.*;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import service.CharItemFetcher;
+import service.CharPatternServices;
 import service.CharValuesLoader;
-import service.TranslationServices;
+import service.ClassCharacteristicsLoader;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
 
@@ -19,9 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -36,6 +36,7 @@ public class CharDescriptionImportServices {
 	public static HashMap<String, CharDescriptionRow> client2Item;
 	private static int rejected_row_num;
 	private static SXSSFWorkbook ReportWorkbook;
+	private static ArrayList<Pair<GenericCharRule, ClassCaracteristic>> Patterns2Apply;
 
 	public static void upsertTaxoAndChar(String filePath,String taxoSheetName,String itemDataSheetName, String active_pid, int projectGranularity, UserAccount account) throws IOException, ClassNotFoundException, SQLException, InvalidFormatException {
 		active_project = active_pid;
@@ -55,7 +56,7 @@ public class CharDescriptionImportServices {
 */
 
 		CharDescriptionImportServices.projectGranularity=projectGranularity;
-		CharValuesLoader.fetchAllKnownValuesAssociated2Items(active_project);
+		CharValuesLoader.fetchAllKnownValuesAssociated2Items(active_project,true);
 		
 
 
@@ -67,8 +68,12 @@ public class CharDescriptionImportServices {
 		if(rows.hasNext()) {
 			taxoHeader = rows.next();
 		}
+		Patterns2Apply = new ArrayList<Pair<GenericCharRule,ClassCaracteristic>>();
 		while(rows.hasNext()) {
-			processTaxoRow(rows.next(),account);
+			Pair<GenericCharRule, ClassCaracteristic> pair = processTaxoRow(rows.next(), account);
+			if(pair!=null){
+				Patterns2Apply.add(pair);
+			}
 		}
 
 		
@@ -127,6 +132,27 @@ public class CharDescriptionImportServices {
 
 		}
 
+		try{
+			CharPatternServices.loadDescriptionRules(account.getActive_project());
+			CharItemFetcher.fetchAllItems(account.getActive_project(),true);
+			ClassCharacteristicsLoader.loadAllClassCharacteristic(account.getActive_project(),true);
+			CharItemFetcher.initClassDataFields();
+			ClassCharacteristicsLoader.loadKnownValuesAssociated2Items(account.getActive_project(),true);
+			HashSet<String> items2Update = new HashSet<String>();
+			Patterns2Apply.forEach(p->{
+				items2Update.addAll(CharPatternServices.applyRule(p.getKey(),p.getValue()));
+			});
+			CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(r->{
+				r.reEvaluateCharRules(account);
+				String itemClass = r.getClass_segment_string().split("&&&")[0];
+				CharValuesLoader.active_characteristics.get(itemClass).forEach(loopCarac->{
+					CharDescriptionExportServices.addItemCharDataToPush(r,itemClass,loopCarac.getCharacteristic_id());
+				});
+
+			});
+		}catch (Exception V){
+
+		}
 
 
 
@@ -341,9 +367,9 @@ public class CharDescriptionImportServices {
 		conn.close();
 	}
 
-	private static void processTaxoRow(Row current_row, UserAccount account) {
+	private static Pair<GenericCharRule, ClassCaracteristic> processTaxoRow(Row current_row, UserAccount account) {
 		ImportTaxoRow parsedRow = new ImportTaxoRow();
-		parsedRow.parseTaxoRow(current_row,account);
+		return parsedRow.parseTaxoRow(current_row,account);
 	}
 	
 	private static void processItemRow(Row current_row, UserAccount account) {

@@ -3,9 +3,9 @@ package model;
 import controllers.Char_description;
 import org.apache.commons.lang.StringUtils;
 import service.CharValuesLoader;
-import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CharDescriptionRow {
 
@@ -19,7 +19,6 @@ public class CharDescriptionRow {
 	//Author
 	//Article ID
 	
-		private Char_description parent;
 		Boolean completionStatus;
 		Boolean questionStatus;
 		String short_desc;
@@ -34,14 +33,10 @@ public class CharDescriptionRow {
 		String client_item_number;
 		String item_id;
 		private HashMap<String,HashMap<String,CaracteristicValue>> data = new HashMap<String,HashMap<String,CaracteristicValue>>();
-		private HashMap<String, HashMap<String,ArrayList<CharRuleResult>>> ruleResults = new HashMap<String, HashMap<String,ArrayList<CharRuleResult>>>();
-		private HashMap<String, HashMap<String,HashMap<String, CharRuleResult>>> rulePropositions = new HashMap<String, HashMap<String,HashMap<String, CharRuleResult>>>();
+		private HashMap<String,ArrayList<CharRuleResult>> ruleResults = new HashMap<String,ArrayList<CharRuleResult>>();
 		String class_segment_string;
 		ClassSegment class_segment;
 		
-		public void setParent(Char_description parent) {
-			this.parent = parent;
-		}
 		public void allocateDataField(String target_class) {
 			if(this.data.containsKey(target_class)) {
 				//This item class has already been initalized with the target class
@@ -132,9 +127,6 @@ public class CharDescriptionRow {
 		}
 		
 		
-		public HashMap<String, HashMap<String, HashMap<String, CharRuleResult>>> getRulePropositions() {
-			return rulePropositions;
-		}
 		public HashMap<String, HashMap<String, CaracteristicValue>> getData() {
 			return data;
 		}
@@ -155,35 +147,25 @@ public class CharDescriptionRow {
 			}
 			this.class_segment = class_segment;
 		}
-		
-		public boolean hasDataInSegments(List<String> targetClasses) {
-			return targetClasses.stream().anyMatch(s->hasDataDataInSegment(s));
-		}
-		
-		private boolean hasDataDataInSegment(String segment) {
-			return data.keySet().contains(segment);
-		}
-		
-		
-		public void addCharRuleResult(CharRuleResult newMatch, String segment, String charId) {
-			//System.out.println("New rule match for item "+getClient_item_number()+" : "+newMatch.getActionValue().getDisplayValue(parent));
-			try {
-				this.ruleResults.get(segment).get(charId).add(newMatch);
-			}catch(Exception V) {
-				HashMap<String,ArrayList<CharRuleResult>> al = new HashMap<String,ArrayList<CharRuleResult>>();
-				// initializing 
-		        al.put(charId,new ArrayList<CharRuleResult>());
-				this.ruleResults.put(segment, al);
-				this.ruleResults.get(segment).get(charId).add(newMatch);
+
+	public HashMap<String, ArrayList<CharRuleResult>> getRuleResults() {
+		return ruleResults;
+	}
+
+	public void setRuleResults( HashMap<String, ArrayList<CharRuleResult>> SerializedRuleResults) {
+			if(SerializedRuleResults!=null){
+				this.ruleResults = SerializedRuleResults;
 			}
-		}
+	}
+
+
 		
-		public void disableSubTextRules(String segment, String charId) {
+		public void disableSubTextRules(String charId) {
 			try {
-				ruleResults.get(segment).get(charId).stream().forEach(r->{
+				ruleResults.get(charId).stream().forEach(r->{
 					
-					Optional<CharRuleResult> SuperRule = ruleResults.get(segment).get(charId).stream()
-					.filter(rloop->rloop.isSuperBlockOf(r)).findAny();
+					Optional<CharRuleResult> SuperRule = ruleResults.get(charId).stream()
+					.filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r)) ).findAny();
 					if(SuperRule.isPresent()) {
 						//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
 						r.addSuperRule(SuperRule);
@@ -191,94 +173,126 @@ public class CharDescriptionRow {
 					
 				});
 			}catch(Exception V) {
-				V.printStackTrace(System.err);
+				//V.printStackTrace(System.err);
 			}
-		}
-		public HashMap<String, CharRuleResult> returnUnfilledResults(String segment, String charId) {
-			// Filter out subrules then return map of (value display) -> CharResult of unfilled results
-			HashMap<String, CharRuleResult> distinctUnfilledResult = new HashMap<String,CharRuleResult>();
-			HashSet<String> filledResultsMatched = new HashSet<String>();
-			try {
-				ruleResults.get(segment).get(charId).stream()
-				.filter(r->!r.isSubRule()).filter(r->!itemHasDisplayValue(r,segment,filledResultsMatched))
-				.forEach(r->distinctUnfilledResult.put(r.getActionValue().getDisplayValue(parent), r));;
-			}catch(Exception V) {
-				V.printStackTrace(System.err);
-			}
-			return distinctUnfilledResult;
-			
-		}
-		private boolean itemHasDisplayValue(CharRuleResult r, String segment, HashSet<String> filledResultsMatched) {
-			//filledResultsMatched tracks char idxes already matching a rule result
-			//For the input char result check if there's a filled value that matches it
-			//If it does, add the index to filledResultsMatched and return true
-			return CharValuesLoader.active_characteristics.get(segment).stream().anyMatch(carac->{
-				try {
-					if(filledResultsMatched.contains(carac.getCharacteristic_id())) {
-						return false;
-					}
-					String loopVal = getData(segment).get(carac.getCharacteristic_id()).getDisplayValue(parent);
-					String ruleVal = r.getActionValue().getDisplayValue(parent);
-					boolean ret = StringUtils.equalsIgnoreCase(loopVal, ruleVal);
-					if(ret) {
-						//System.out.println("known value "+ruleVal+" for rule "+r.getGenericCharRule().getRuleMarker()+" at index "+String.valueOf(idx+1));
-						filledResultsMatched.add(carac.getCharacteristic_id());
-					}
-					return ret;
-				}catch(Exception V) {
-					return false;
-				}
-			});
-		}
-		
-		public void setCharProp(String segment, String charId, HashMap<String, CharRuleResult> distinctResultsLeft) {
-			try {
-				this.rulePropositions.get(segment).put(charId,distinctResultsLeft);
-			}catch(Exception V) {
-				HashMap <String,HashMap<String, CharRuleResult>> al = new HashMap <String,HashMap<String, CharRuleResult>>();
-				this.rulePropositions.put(segment, al);
-				this.rulePropositions.get(segment).put(charId,distinctResultsLeft);
-			}
-		}
-		public void reEvaluateRulesForChar(String segment, String charId) {
-			//System.out.println("\tReevaluation rules for char "+charIdx+ " in segment "+segment);
-			//If the value is MANUAL or UPLOAD, continue
-			if(DataInputMethods.MANUAL.equals(getData(segment).get(charId).getSource())
-				||DataInputMethods.PROJECT_SETUP_UPLOAD.equals(getData(segment).get(charId).getSource())) {
-				return;
-			}
-			
-			disableSubTextRules(segment,charId);
-			HashMap<String, CharRuleResult> distinctResultsLeft = returnUnfilledResults(segment,charId);
-			//System.out.println("**\tDistinct results :"+distinctResultsLeft.size());
-			if(distinctResultsLeft.size()>0) {
-				if(distinctResultsLeft.size()==1) {
-					try{
-						getRulePropositions().get(segment).get(charId).clear();
-					}catch(Exception V) {
-						
-					}
-					getData(segment).put(charId,distinctResultsLeft.values().stream().findFirst().get().getActionValue());
-					CharDescriptionExportServices.addItemCharDataToPush(this,segment,charId);
-				}else {
-					setCharProp(segment,charId,distinctResultsLeft);
-				}
-			}
-		}
-		public void reEvaluateCharRules(String segment) {
-			//System.out.println("reEvaluating rules for item "+getClient_item_number()+" in segment "+segment);
-			CharValuesLoader.active_characteristics.get(segment).forEach(loopCarac->{
-				try{
-					reEvaluateRulesForChar(segment,loopCarac.getCharacteristic_id());
-				}catch(Exception V) {
-					
-				}
-			});
 		}
 
+		public boolean itemHasDisplayValue(CharRuleResult r){
+			String targetVal = r.getActionValue().getDisplayValue(false, false);
+			return getData(getClass_segment_string().split("&&&")[0]).values().stream().filter(loopVal->
+				loopVal!=null && StringUtils.equalsIgnoreCase(loopVal.getDisplayValue(false,false),targetVal)
+			).findAny().isPresent();
+		}
+
+		public void reEvaluateCharRules(UserAccount account){
+			CharDescriptionRow r = this;
+			//For each couple active item I / rule N
+			r.getRuleResults().values().forEach(a->{
+				a.stream().forEach(result->{
+					//The status of the rule N becomes empty for the item I
+					result.setStatus(null);
+					result.clearSuperRules();
+					result.ruleActionToValue(account);
+				});
+			});
+			//Supress all auto values on the item
+			r.getData(r.getClass_segment_string().split("&&&")[0]).entrySet()
+					.removeIf(e->e.getValue()!=null && e.getValue().getSource().equals(DataInputMethods.AUTO_CHAR_DESC));
+
+			//For each couple active item I / rule N
+			//The pattern of the rule is included in the pattern of another rule applying to the same item and characteristic
+			//The value of the rule is equal to the value of another rule N' applying to the same characteristic
+			// 	and The identified pattern of N is strictly longer than the identified pattern of N'
+			//The status remains empty
+			r.getRuleResults().keySet().forEach(charId ->r.disableSubTextRules(charId));
+
+			//The status of the row becomes "Suggestion j+1" for the item I,with j the highest suggestion # already present (initiated at 1)
+			HashMap<String, ArrayList<CaracteristicValue>> knownRuleValues = new HashMap<String, ArrayList<CaracteristicValue>>();
+			r.getRuleResults().entrySet().stream().forEach(e->e.getValue().stream().filter(result->!result.isSubRule()).forEach(result -> {
+				try{
+					int valIndx = knownRuleValues.get(e.getKey()).indexOf(result.getActionValue());
+					if(valIndx!=-1){
+						knownRuleValues.get(e.getKey()).add(result.getActionValue());
+						result.setStatus("Suggestion "+String.valueOf(knownRuleValues.get(e.getKey()).size()));
+					}else{
+						result.setStatus("Suggestion "+String.valueOf(valIndx)+1);
+					}
+				}catch (Exception V){
+					knownRuleValues.put(e.getKey(),new ArrayList<CaracteristicValue>());
+					knownRuleValues.get(e.getKey()).add(result.getActionValue());
+					result.setStatus("Suggestion "+String.valueOf(knownRuleValues.get(e.getKey()).size()));
+				}
+			}));
+
+			//For each couple active item I / rule N
+			r.getRuleResults().keySet().forEach(charId->{
+				ArrayList<CharRuleResult> suggestions = r.getRuleResults().get(charId).stream().filter(result -> result.getStatus().startsWith("Suggestion ")).collect(Collectors.toCollection(ArrayList::new));
+				if(suggestions.size()==1){
+					//The status is "Suggestion 1" and The value of the row is not similar to the the value of another row with a status different from "empty"
+					//There is no status different from "Suggestion 1" or "Empty" for another row related to the same characteristic
+					if(!r.itemHasDisplayValue(suggestions.get(0))) {
+						//The value of the row is not similar to the item value for another characteristic
+						suggestions.get(0).setStatus("Applied");
+					}
+				}
+			});
+
+			//The characteristic value is updated based on the applied rule
+			r.getRuleResults().keySet().forEach(charId->{
+				Optional<CharRuleResult> appliedResult = r.getRuleResults().get(charId).stream().filter(result -> result.getStatus().equals("Applied")).findAny();
+				if(appliedResult.isPresent()){
+					String itemClass=r.getClass_segment_string().split("&&&")[0];
+					if(r.getData(itemClass)!=null){
+						if(r.getData(itemClass).get(charId)!=null){
+							if(r.getData(itemClass).get(charId).getSource()!=null){
+								return;
+							}
+						}
+					}
+					//The remaining value can only be auto, assign the "Applied" Rule value
+					CharValuesLoader.updateRuntimeDataForItem(r,itemClass,charId,appliedResult.get().getActionValue());
+
+				}
+			});
+		}
 
     public boolean hasDataInCurrentClassForCarac(String characteristic_id) {
 			String itemClass = getClass_segment_string().split("&&&")[0];
 			return getData(itemClass).get(characteristic_id)!=null;
     }
+
+	public void addRuleResult2Row(CharRuleResult newMatch) {
+		try {
+			this.ruleResults.get(newMatch.getSourceChar().getCharacteristic_id()).add(newMatch);
+		}catch(Exception V) {
+			this.ruleResults.put(newMatch.getSourceChar().getCharacteristic_id(), new ArrayList<CharRuleResult>());
+			this.ruleResults.get(newMatch.getSourceChar().getCharacteristic_id()).add(newMatch);
+		}
+	}
+
+	public void dropRuleResultFromRow(CharRuleResult oldMatch) {
+		try {
+			String oldCharId = oldMatch.getSourceChar().getCharacteristic_id();
+			this.ruleResults.put(oldCharId,
+					this.ruleResults.get(oldCharId).stream().filter(result->!result.getGenericCharRuleID().equals(oldMatch.getGenericCharRuleID())).collect(Collectors.toCollection(ArrayList::new)));
+		}catch(Exception V) {
+
+		}
+	}
+
+	public ArrayList<CharRuleResult> getRulePropositions(String charId) {
+		ArrayList<CharRuleResult> ret = new ArrayList<CharRuleResult>();
+		if(getRuleResults().get(charId).stream().anyMatch(result -> result.getStatus()!=null && result.getStatus().equals("Applied"))){
+			return ret;
+		}
+		try{
+			ret = new ArrayList<CharRuleResult>(
+					getRuleResults().get(charId).stream()
+							.filter(result -> result.getStatus() != null && result.getStatus().startsWith("Suggestion "))
+							.collect(Collectors.toCollection(ArrayList::new)));
+		}catch (Exception V){
+
+		}
+		return ret;
+	}
 }

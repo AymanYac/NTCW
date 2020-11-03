@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.effect.InnerShadow?>
-<?import javafx.scene.layout.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Manual_classif">
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Manual_classif">
    <children>
       <Region layoutX="106.0" layoutY="78.0" minHeight="400.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url(&quot;pictures/Back.png&quot;); -fx-background-size: cover;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <GridPane fx:id="grid" layoutX="21.0" layoutY="68.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -192,10 +206,10 @@
             <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="9" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
             <AnchorPane fx:id="rightAnchor" style="-fx-background-color: transparent; -fx-border-color: white;" GridPane.columnIndex="7" GridPane.columnSpan="3" GridPane.rowIndex="14" />
             <AnchorPane fx:id="leftAnchor" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white;" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="14" />
-         	<TextArea fx:id="sd" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-            <TextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparentLight.css" text="Support de fixation" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-            <TextArea fx:id="ld" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5" />
-            <TextArea fx:id="ld_translated" prefHeight="300.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparentLight.css" text="Support de montage pour le type buzzer Werma 110¶Orderref.975 109 01 (support de capuchon de protection)" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="6" />
+         	<TextArea fx:id="sd" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparentLight.css" text="Support de fixation" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <TextArea fx:id="ld" prefHeight="200.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm" wrapText="true" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5" />
+            <TextArea fx:id="ld_translated" prefHeight="300.0" prefWidth="200.0" stylesheets="@../Styles/TextAreaTransparentLight.css" text="Support de montage pour le type buzzer Werma 110¶Orderref.975 109 01 (support de capuchon de protection)" wrapText="true" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="6" />
          </children>
       </GridPane>
    </children>

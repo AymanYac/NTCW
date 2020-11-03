@@ -5,12 +5,15 @@ import model.UserAccount;
 import org.postgresql.util.PGobject;
 import transversal.generic.Tools;
 
+import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 
 public class ComplexMap2JdbcObject {
+
+	private static final Gson gson = new Gson();
 
 	public static Object getObject(HashMap<?, ?> tmp) throws SQLException {
 		 PGobject jsonObject = new PGobject();
@@ -65,4 +68,11 @@ public class ComplexMap2JdbcObject {
 
 	}
 
+	public static String serialize(Object obj) {
+		return gson.toJson(obj);
+	}
+
+	public static Object deserialize(String string, Type type) {
+		return gson.fromJson(string,type);
+	}
 }

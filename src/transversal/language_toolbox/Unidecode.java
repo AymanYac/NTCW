@@ -2,10 +2,7 @@ package transversal.language_toolbox;
 
 import transversal.dialog_toolbox.ExceptionDialog;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -19,7 +16,7 @@ import static java.lang.String.format;
  * <p>This class is thread-safe.</p>
  *
  */
-public class Unidecode {
+public class Unidecode implements Serializable {
 
     
     private static final String
