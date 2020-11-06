@@ -384,31 +384,34 @@ public class ImportTaxoRow {
 			parseValue(current_row,account);
 			
 		}
-		if(!caracParseHasFailed()){
+		if(!segmentParseHasFailed()){
 			return parseRule(current_row,account);
 		}
 		return null;
 	}
 
 	private Pair<GenericCharRule,ClassCaracteristic> parseRule(Row current_row, UserAccount account) {
-		GenericCharRule newRule = new GenericCharRule(current_row.getCell(columnMap.get("descriptionRule")).getStringCellValue());
+		String row_rule_id=null;
+		String rowCharId=null;
+		try{
+			row_rule_id = current_row.getCell(columnMap.get("descriptionRule")).getStringCellValue();
+			rowCharId = current_row.getCell(columnMap.get("charId")).getStringCellValue();
+		}catch (Exception V){
+			return null;
+		}
+		System.out.println("Parsing row with rule_id "+row_rule_id);
+		GenericCharRule newRule = new GenericCharRule(row_rule_id);
 		if(!newRule.parseSuccess()){
 			Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be parsed. Check syntax");
 			rejectedRows.add(rejectedRow);
 			return null;
 		}
-		if(carac!=null){
-			newRule.generateRegex(carac);
+		if(rowCharId!=null && CharDescriptionImportServices.chid2Carac.get(rowCharId)!=null){
+			ClassCaracteristic rowCarac = CharDescriptionImportServices.chid2Carac.get(rowCharId);
+			newRule.generateRegex(rowCarac);
 			if(newRule.parseSuccess()) {
 				newRule.storeGenericCharRule();
-				try {
-					CharPatternServices.suppressGenericRuleInDB(null,account.getActive_project(),newRule.getCharRuleId(),false);
-				} catch (SQLException throwables) {
-					throwables.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-				return new Pair<GenericCharRule,ClassCaracteristic>(newRule,carac);
+				return new Pair<GenericCharRule,ClassCaracteristic>(newRule,rowCarac);
 			}
 		}
 		Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be evaluated using characteristic '"+carac.getCharacteristic_name()+". Check semantics");

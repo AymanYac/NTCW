@@ -184,7 +184,7 @@ public class CharDescriptionRow {
 			).findAny().isPresent();
 		}
 
-		public void reEvaluateCharRules(UserAccount account){
+		public void reEvaluateCharRules(){
 			CharDescriptionRow r = this;
 			//For each couple active item I / rule N
 			r.getRuleResults().values().forEach(a->{
@@ -192,7 +192,6 @@ public class CharDescriptionRow {
 					//The status of the rule N becomes empty for the item I
 					result.setStatus(null);
 					result.clearSuperRules();
-					result.ruleActionToValue(account);
 				});
 			});
 			//Supress all auto values on the item
@@ -262,6 +261,9 @@ public class CharDescriptionRow {
     }
 
 	public void addRuleResult2Row(CharRuleResult newMatch) {
+		if(!newMatch.action2ValueSuccess){
+			return;
+		}
 		try {
 			this.ruleResults.get(newMatch.getSourceChar().getCharacteristic_id()).add(newMatch);
 		}catch(Exception V) {

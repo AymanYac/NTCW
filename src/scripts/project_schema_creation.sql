@@ -60,7 +60,7 @@ EXECUTE format('
 )',  project_id);
 
 EXECUTE format('
-   CREATE TABLE IF NOT EXISTS %I.project_description_patterns(generic_char_rule_id character varying, generic_char_rule_json character varying, isSuppressed character varying, PRIMARY KEY (generic_char_rule_id)
+   CREATE TABLE IF NOT EXISTS %I.project_description_patterns(generic_char_rule_id character varying, generic_char_rule_json character varying, isSuppressed boolean, PRIMARY KEY (generic_char_rule_id)
 )',  project_id);
 
 EXECUTE format('

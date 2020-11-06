@@ -91,4 +91,25 @@ public class GenericCharRule {
 	public void dropGenericCharRule() {
 		CharPatternServices.descriptionRules.remove(getCharRuleId());
 	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o) {
+			return true;
+		}
+		if (o instanceof GenericCharRule) {
+			GenericCharRule p = (GenericCharRule) o;
+			return p.hashCode()==this.hashCode();
+		}
+		return false;
+	}
+	@Override
+	public int hashCode() {
+		return getCharRuleId().hashCode();
+	}
+	@Override
+	public String toString() {
+		return getRuleMarker();
+	}
 }

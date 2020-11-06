@@ -1,7 +1,6 @@
 package model;
 
 import com.fathzer.soft.javaluator.DoubleEvaluator;
-import controllers.Char_description;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
 import service.CharPatternServices;
@@ -17,6 +16,7 @@ import java.util.regex.Pattern;
 
 public class CharRuleResult implements Serializable {
 
+	public boolean action2ValueSuccess=false;
 	private String genericCharRuleID;
 	private String matchedBlock;
 	private CaracteristicValue actionValue;
@@ -25,10 +25,15 @@ public class CharRuleResult implements Serializable {
 	private String status;
 	private static Unidecode unidecode;
 
-	public CharRuleResult(GenericCharRule activeGenericCharRule, ClassCaracteristic parentChar, String matchedGroup) {
+	public CharRuleResult(GenericCharRule activeGenericCharRule, ClassCaracteristic parentChar, String matchedGroup, UserAccount account) {
 		this.genericCharRuleID = activeGenericCharRule.getCharRuleId();
 		this.matchedBlock = matchedGroup;
 		this.parentChar = parentChar;
+		try{
+			ruleActionToValue(account);
+		}catch (Exception V){
+			action2ValueSuccess=false;
+		}
 	}
 
 
@@ -60,9 +65,6 @@ public class CharRuleResult implements Serializable {
 		this.status = status;
 	}
 
-	public void ruleActionToValue(Char_description parent){
-		ruleActionToValue(parent.account);
-	}
 	public void ruleActionToValue(UserAccount account) {
 		actionValue = new CaracteristicValue();
 		actionValue.setParentChar(parentChar);
@@ -94,109 +96,98 @@ public class CharRuleResult implements Serializable {
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
 			}
 			if(action.startsWith("NOM ")) {
-				try {
-					action=action.substring(4).trim();
-					ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-					Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-				    StringBuffer sb = new StringBuffer();
-				    while(tmp.find()){
-				      String idx = tmp.group(1);
-				      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-				      tmp.appendReplacement(sb, replacement);
-				    }
-				    action = sb.toString();
-				    actionValue.setNominal_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
-					actionValue.setAuthor(account.getUser_id());
-					actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
-					
-		      } catch (Exception e) {
-		    	  e.printStackTrace(System.err);
-		      }
+
+				action=action.substring(4).trim();
+				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
+				Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+				StringBuffer sb = new StringBuffer();
+				while(tmp.find()){
+					String idx = tmp.group(1);
+					String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+					tmp.appendReplacement(sb, replacement);
+				}
+				action = sb.toString();
+				actionValue.setNominal_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+				actionValue.setAuthor(account.getUser_id());
+				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
+
 			}
 			if(action.startsWith("MIN ")) {
-				try {
-					action=action.substring(4).trim();
-					ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-					Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-				    StringBuffer sb = new StringBuffer();
-				    while(tmp.find()){
-				      String idx = tmp.group(1);
-				      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-				      tmp.appendReplacement(sb, replacement);
-				    }
-				    action = sb.toString();
-			    	actionValue.setMin_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
-					actionValue.setAuthor(account.getUser_id());
-					actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
-					
-		      } catch (Exception e) {
-		    	  e.printStackTrace(System.err);
-		      }
+
+				action=action.substring(4).trim();
+				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
+				Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+				StringBuffer sb = new StringBuffer();
+				while(tmp.find()){
+					String idx = tmp.group(1);
+					String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+					tmp.appendReplacement(sb, replacement);
+				}
+				action = sb.toString();
+				actionValue.setMin_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+				actionValue.setAuthor(account.getUser_id());
+				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
+
+
 			}
-			
+
 			if(action.startsWith("MAX ")) {
-				try {
-					action=action.substring(4).trim();
-					ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-					Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-				    StringBuffer sb = new StringBuffer();
-				    while(tmp.find()){
-				      String idx = tmp.group(1);
-				      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-				      tmp.appendReplacement(sb, replacement);
-				    }
-				    action = sb.toString();
-			    	actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
-					actionValue.setAuthor(account.getUser_id());
-					actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
-					
-		      } catch (Exception e) {
-		    	  e.printStackTrace(System.err);
-		      }
+
+				action=action.substring(4).trim();
+				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
+				Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+				StringBuffer sb = new StringBuffer();
+				while(tmp.find()){
+					String idx = tmp.group(1);
+					String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+					tmp.appendReplacement(sb, replacement);
+				}
+				action = sb.toString();
+				actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+				actionValue.setAuthor(account.getUser_id());
+				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
+
+
 			}
-			
+
 			if(action.startsWith("MINMAX ")) {
-				try {
-					action=action.substring(7).trim();
-					ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-					Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-				    StringBuffer sb = new StringBuffer();
-				    while(tmp.find()){
-				      String idx = tmp.group(1);
-				      String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-				      tmp.appendReplacement(sb, replacement);
-				    }
-				    action = sb.toString();
-			    	actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
-			        actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+
+				action=action.substring(7).trim();
+				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
+				Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
+				StringBuffer sb = new StringBuffer();
+				while(tmp.find()){
+					String idx = tmp.group(1);
+					String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
+					tmp.appendReplacement(sb, replacement);
+				}
+				action = sb.toString();
+				actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
+				actionValue.setAuthor(account.getUser_id());
+				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
+
+
+			}
+
+			if(action.startsWith("UOM ")) {
+
+				final String symbol=action.substring(5).substring(0,action.length()-6).trim();
+				Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->u.getUom_symbols().contains(symbol)).findAny();
+				if(uom.isPresent()) {
+					actionValue.setUom_id(uom.get().getUom_id());
+					actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 					actionValue.setAuthor(account.getUser_id());
 					actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
-					
-		      } catch (Exception e) {
-		    	  e.printStackTrace(System.err);
-		      }
+				}
+
+
+
 			}
-			
-			if(action.startsWith("UOM ")) {
-				try {
-					final String symbol=action.substring(5).substring(0,action.length()-6).trim();
-					Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->u.getUom_symbols().contains(symbol)).findAny();
-					if(uom.isPresent()) {
-						actionValue.setUom_id(uom.get().getUom_id());
-						actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
-						actionValue.setAuthor(account.getUser_id());
-						actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
-					}
-					
-					
-		      } catch (Exception e) {
-		    	  e.printStackTrace(System.err);
-		      }
-			}
-			
+
 		}
 	}
 
