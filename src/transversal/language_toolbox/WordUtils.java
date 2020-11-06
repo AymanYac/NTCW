@@ -579,6 +579,9 @@ public class WordUtils {
 			
 			if(roles!=null) {
 				for(int i=0;i<roles.length;i++) {
+					if(roles[i].length()==0){
+						roles[i]="NOM";
+					}
 					ruleString = ruleString+"<"+roles[i]+" "+players[i]+">";
 				}
 			}

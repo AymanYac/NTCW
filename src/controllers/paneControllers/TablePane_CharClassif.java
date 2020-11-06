@@ -132,7 +132,11 @@ public class TablePane_CharClassif {
 				}
 			}
 
-			selected_col = account.getDescriptionActiveIdx()-1;
+			try{
+				selected_col = account.getDescriptionActiveIdx()-1;
+			}catch (Exception V){
+				selected_col = -1;
+			}
 			nextChar();
 			allowOverWriteAccountPreference=true;
 		}
@@ -154,7 +158,7 @@ public class TablePane_CharClassif {
 			account.setDescriptionSortDirs(rs.getArray(2));
 			account.setDescriptionActiveIdx(rs.getInt(3));
 		}catch(Exception V) {
-			V.printStackTrace(System.err);
+
 		}
 		rs.close();
 		stmt.close();
@@ -193,7 +197,7 @@ public class TablePane_CharClassif {
 		this.Parent.CHANGING_CLASS=true;
 		this.Parent.classification.setText(tmp.getClass_segment_string().split("&&&")[1]);
 		this.Parent.CHANGING_CLASS=false;
-		if(tmp.getLong_desc().length()>0) {
+		if(tmp.getLong_desc()!=null && tmp.getLong_desc().length()>0) {
 			Parent.search_text.setText(WordUtils.getSearchWords(tmp.getLong_desc()));
 		}else {
 			Parent.search_text.setText(WordUtils.getSearchWords(tmp.getShort_desc()));
@@ -504,7 +508,7 @@ public class TablePane_CharClassif {
 	}
 
 
-	public  List<String> getActiveItemsID(String active_class) throws ClassNotFoundException, SQLException {
+	public static List<String> getActiveItemsID(String active_class) throws ClassNotFoundException, SQLException {
 		String joinStatement = "";
 		if(CharItemFetcher.classifiedItems!=null) {
 			
@@ -517,7 +521,7 @@ public class TablePane_CharClassif {
 		.forEach((k,v)->{
 			
 		});*/
-		
+
 		List<String> classItems = CharItemFetcher.classifiedItems.entrySet().stream().filter(m->m.getValue().contains(active_class)).map(Entry::getKey).collect(Collectors.toList());
 		return classItems;
 	}
@@ -1168,7 +1172,7 @@ public class TablePane_CharClassif {
 
     public void ReevaluateItems(HashSet<String> items2Update) {
 		 CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(r->{
-		 	 r.reEvaluateCharRules(Parent.account);
+		 	 r.reEvaluateCharRules();
 			 String itemClass = r.getClass_segment_string().split("&&&")[0];
 			 CharValuesLoader.active_characteristics.get(itemClass).forEach(loopCarac->{
 			 	CharDescriptionExportServices.addItemCharDataToPush(r,itemClass,loopCarac.getCharacteristic_id());

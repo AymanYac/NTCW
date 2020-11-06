@@ -2,7 +2,6 @@ package service;
 
 import com.google.gson.reflect.TypeToken;
 import controllers.Char_description;
-import controllers.paneControllers.TablePane_CharClassif;
 import model.*;
 import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.generic.Tools;
@@ -2596,7 +2595,7 @@ public class CharPatternServices {
 					preparedValue.setParentChar(active_char);
 					preparedValue.setNominal_value(String.valueOf(i+1));
 					preparedRule = WordUtils.generateRuleSyntax(
-							textBetweenNumbers, new String[] {""}, new String [] {(i + 1) +" "}, null);
+							textBetweenNumbers, new String[] {"NOM"}, new String [] {(i + 1) +" "}, null);
 					parent.preparePatternProposition(
 							preparedValue.getNominal_value_truncated(), preparedValue, preparedRule, active_char);
 					
@@ -2693,13 +2692,13 @@ public class CharPatternServices {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-			parent.tableController.ReevaluateItems(CharPatternServices.applyRule(newRule,activeChar));
+			parent.tableController.ReevaluateItems(CharPatternServices.applyRule(newRule,activeChar,parent.account));
 		}
 	}
 
 
 
-	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar) {
+	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar,UserAccount account) {
 		System.out.println("Applying rule "+newRule.getRuleMarker());
 		Pattern regexPattern = Pattern.compile("["+GenericCharRule.SEP_CLASS+"]"+newRule.getRegexMarker()+"["+GenericCharRule.SEP_CLASS+"]",Pattern.CASE_INSENSITIVE);
 		HashSet<String> items2Reevaluate = new HashSet<String>();
@@ -2710,7 +2709,7 @@ public class CharPatternServices {
 				m = regexPattern.matcher(" "+r.getLong_desc()+" ");
 			}
 			if(m.find()){
-				r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,m.group()));
+				r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,m.group(),account));
 				items2Reevaluate.add(r.getItem_id());
 			}
 		});
@@ -2722,7 +2721,7 @@ public class CharPatternServices {
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		CharItemFetcher.allRowItems.parallelStream().filter(r->r.getRuleResults().get(activeChar.getCharacteristic_id())!=null)
 													.filter(r->r.getRuleResults().get(activeChar.getCharacteristic_id()).stream().anyMatch(result->result.getGenericCharRuleID().equals(oldRule.getCharRuleId()))).forEach(r->{
-			r.dropRuleResultFromRow(new CharRuleResult(oldRule,activeChar,null));
+			r.dropRuleResultFromRow(new CharRuleResult(oldRule,activeChar,null, null));
 			items2Reevaluate.add(r.getItem_id());
 		});
 		return items2Reevaluate;

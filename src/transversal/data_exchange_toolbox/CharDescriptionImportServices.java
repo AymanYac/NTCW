@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.eclipse.swt.widgets.Table;
 import service.CharItemFetcher;
 import service.CharPatternServices;
 import service.CharValuesLoader;
@@ -132,7 +133,12 @@ public class CharDescriptionImportServices {
 
 		}
 
+		ArrayList<String> patterns2Store = Patterns2Apply.stream().map(p -> p.getKey()).collect(Collectors.toCollection(HashSet::new)).stream().map(r -> r.getCharRuleId()).collect(Collectors.toCollection(ArrayList::new));
+		CharPatternServices.suppressGenericRuleInDB(null,account.getActive_project(),patterns2Store,false);
+
 		try{
+			CharItemFetcher.classifiedItems = QueryFormater.FETCH_ITEM_CLASSES_WITH_UPLOAD_PRIORITY("",Tools.get_project_granularity(account.getActive_project()),account.getActive_project());
+			Tools.get_project_segments(account);
 			CharPatternServices.loadDescriptionRules(account.getActive_project());
 			CharItemFetcher.fetchAllItems(account.getActive_project(),true);
 			ClassCharacteristicsLoader.loadAllClassCharacteristic(account.getActive_project(),true);
@@ -140,18 +146,22 @@ public class CharDescriptionImportServices {
 			ClassCharacteristicsLoader.loadKnownValuesAssociated2Items(account.getActive_project(),true);
 			HashSet<String> items2Update = new HashSet<String>();
 			Patterns2Apply.forEach(p->{
-				items2Update.addAll(CharPatternServices.applyRule(p.getKey(),p.getValue()));
+				System.out.println("Applying rule "+p.getKey().getRuleMarker()+" for carac "+p.getValue().getCharacteristic_name());
+				items2Update.addAll(CharPatternServices.applyRule(p.getKey(),p.getValue(),account));
 			});
 			CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(r->{
-				r.reEvaluateCharRules(account);
+				r.reEvaluateCharRules();
 				String itemClass = r.getClass_segment_string().split("&&&")[0];
 				CharValuesLoader.active_characteristics.get(itemClass).forEach(loopCarac->{
 					CharDescriptionExportServices.addItemCharDataToPush(r,itemClass,loopCarac.getCharacteristic_id());
 				});
 
 			});
+			if(items2Update.size()>0){
+				ConfirmationDialog.show("Description rules applied", String.valueOf(items2Update.size())+" rule(s) have been applied", "OK", null);
+			}
 		}catch (Exception V){
-
+			V.printStackTrace(System.err);
 		}
 
 

@@ -340,7 +340,7 @@ public class RulePane_CharClassif {
         if(newRule.parseSuccess()) {
             newRule.storeGenericCharRule();
             CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),newRule.getCharRuleId(),false);
-            parent.tableController.ReevaluateItems(CharPatternServices.applyRule(newRule,caracCombo.getValue()));
+            parent.tableController.ReevaluateItems(CharPatternServices.applyRule(newRule,caracCombo.getValue(),parent.account));
         }
         parent.refresh_ui_display();
     }
@@ -367,7 +367,7 @@ public class RulePane_CharClassif {
         if(newRule.parseSuccess()) {
             newRule.storeGenericCharRule();
             CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),newRule.getCharRuleId(),false);
-            items2Reevaluate.addAll(CharPatternServices.applyRule(newRule, caracCombo.getValue()));
+            items2Reevaluate.addAll(CharPatternServices.applyRule(newRule, caracCombo.getValue(),parent.account));
         }
 
         parent.tableController.ReevaluateItems(items2Reevaluate);
