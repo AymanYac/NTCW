@@ -1,7 +1,7 @@
 package transversal.dialog_toolbox;
 
+import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import controllers.Char_description;
-import controllers.paneControllers.TablePane_CharClassif;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -1221,11 +1221,11 @@ public class CaracDeclarationDialog {
 				false
 		);
 		Event.fireEvent( node, newEvent );*/
-		if(node instanceof TextField){
+		/*if(node instanceof TextField){
 			((BehaviorSkinBase) ((TextField)node).getSkin()).getBehavior().traverseNext();
 		}
 		if(node instanceof ComboBox){
 			((BehaviorSkinBase) ((ComboBox)node).getSkin()).getBehavior().traverseNext();
-		}
+		}*/
 	}
 }
