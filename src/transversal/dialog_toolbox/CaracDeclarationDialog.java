@@ -1,6 +1,5 @@
 package transversal.dialog_toolbox;
 
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import controllers.Char_description;
 import controllers.paneControllers.TablePane_CharClassif;
 import javafx.application.Platform;
