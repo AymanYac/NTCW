@@ -1,6 +1,7 @@
 package model;
 
-import org.apache.commons.lang.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;

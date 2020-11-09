@@ -6,7 +6,7 @@ import model.CaracteristicValue;
 import model.CharValueTextSuggestion;
 import model.ClassCaracteristic;
 import model.GlobalConstants;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -55,7 +55,7 @@ public class TranslationServices {
                  response.append(inputLine);
              }
              in.close();
-             return StringEscapeUtils.unescapeHtml(response.toString());
+             return StringEscapeUtils.unescapeHtml4(response.toString());
         }catch(Exception V) {
         	return "";
         }

@@ -1,8 +1,8 @@
 package model;
 
 import com.fathzer.soft.javaluator.DoubleEvaluator;
-import org.apache.commons.lang.SerializationUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 import service.CharPatternServices;
 import service.TranslationServices;
 import transversal.language_toolbox.Unidecode;

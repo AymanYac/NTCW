@@ -3,7 +3,7 @@ package model;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import transversal.language_toolbox.Unidecode;
 
 import java.util.ArrayList;

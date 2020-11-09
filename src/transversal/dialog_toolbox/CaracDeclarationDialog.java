@@ -30,7 +30,7 @@ import javafx.util.Callback;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import model.*;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import service.CharItemFetcher;
 import service.CharValuesLoader;
 import transversal.generic.Tools;

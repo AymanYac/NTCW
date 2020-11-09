@@ -30,7 +30,7 @@ import javafx.scene.text.TextFlow;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import model.*;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.parser.ParseException;
 import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;

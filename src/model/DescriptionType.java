@@ -1,6 +1,7 @@
 package model;
 
-import org.apache.commons.lang.WordUtils;
+
+import org.apache.commons.lang3.text.WordUtils;
 
 public enum DescriptionType {
 	RAW_PREFERED("short_description, long_description"),

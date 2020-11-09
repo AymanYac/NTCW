@@ -3,7 +3,7 @@ package transversal.language_toolbox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import model.*;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import transversal.generic.Tools;
 
 import java.sql.Connection;

@@ -1,7 +1,6 @@
 package model;
 
-import controllers.Char_description;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import service.CharValuesLoader;
 
 import java.util.*;
