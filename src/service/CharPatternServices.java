@@ -2703,15 +2703,9 @@ public class CharPatternServices {
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		CharItemFetcher.allRowItems.parallelStream().forEach(r->{
 			Matcher m;
-			m = regexPattern.matcher(" "+r.getShort_desc()+" ");
-			if( (!m.find() || !(r.getShort_desc()!=null))  && r.getLong_desc()!=null ){
-				m = regexPattern.matcher(" "+r.getLong_desc()+" ");
-			}
-			if(m.find()){
+			m = regexPattern.matcher(" "+(r.getShort_desc()!=null?r.getShort_desc():"")+" "+(r.getLong_desc()!=null?r.getLong_desc():"")+" ");
+			while (m.find()){
 				r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,m.group(1),account));
-				while (m.find()){
-					r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,m.group(1),account));
-				}
 				items2Reevaluate.add(r.getItem_id());
 			}
 		});

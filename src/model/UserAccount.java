@@ -83,7 +83,6 @@ public class UserAccount {
 			this.setActive_project_name(Tools.get_project_name(active_project));
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	public String getUser_id() {

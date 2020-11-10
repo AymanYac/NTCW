@@ -155,10 +155,12 @@ public class CharDescriptionImportServices {
 				});
 
 			});
-			if(items2Update.size()>0){
-				ConfirmationDialog.show("Description rules applied", String.valueOf(items2Update.size())+" rule(s) have been applied", "OK", null);
+			storeItemsData(account);
+			if(Patterns2Apply.size()>0){
+				ConfirmationDialog.show("Description rules applied", String.valueOf(Patterns2Apply.size())+" rule(s) have been applied", "OK", null);
 			}
 		}catch (Exception V){
+			ConfirmationDialog.show("Description rules application failed", "Unable to apply pattern description rules", "OK", null);
 			V.printStackTrace(System.err);
 		}
 

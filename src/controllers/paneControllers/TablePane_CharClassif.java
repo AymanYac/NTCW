@@ -103,7 +103,6 @@ public class TablePane_CharClassif {
 	}
 
 	public void restorePreviousLayout(){
-		System.out.println("Restoring layout for "+FxUtilTest.getComboBoxValue(Parent.classCombo).getclassName());
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -127,7 +126,6 @@ public class TablePane_CharClassif {
 						System.out.print(SortColumns.get(ix)+" ");
 						tableGrid.getSortOrder().add(c);
 						c.setSortType(TableColumn.SortType.valueOf(SortDirs.get(ix)));
-						System.out.println(SortDirs.get(ix));
 					}
 				}
 			}
@@ -1052,7 +1050,7 @@ public class TablePane_CharClassif {
 
 
 	public void fireScrollNBDown() {
-		System.out.println("Scroll NB down");
+
 		try {
 			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
 			int max = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
@@ -1100,7 +1098,7 @@ public class TablePane_CharClassif {
 
 			}
 		}catch(Exception V) {
-			V.printStackTrace(System.err);
+			
 		}
 	}
 
@@ -1144,8 +1142,6 @@ public class TablePane_CharClassif {
 	}
 
 	private void saveSortOrder() {
-		System.out.println("XXX Saving sort order for "+FxUtilTest.getComboBoxValue(Parent.classCombo).getclassName()+"XXX");
-		System.out.println(tableGrid.getSortOrder().stream().map(e->e.getText()).collect(Collectors.toList()));
 		account.getDescriptionSortColumns().clear();
 		Parent.DescriptionSortColumns.put(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment(), new ArrayList<String>());
 		account.getDescriptionSortDirs().clear();

@@ -522,9 +522,6 @@ public class WordUtils {
 			while(m.find()){
 		    	ruleActions.add(m.group(1));
 		    }
-			System.out.println("Reducing rule :"+preparedRule);
-			System.out.println("ruleActions: "+(ruleActions.size()>0?"<":"")+String.join("><", ruleActions)+(ruleActions.size()>0?">":""));
-			System.out.println("first action: "+ruleActions.get(0));
 			ruleClause = preparedRule.substring(0,preparedRule.indexOf("<"+ruleActions.get(0)));
 			System.out.println("rule clause: "+ruleClause);
 			for(String sep:SEPARATORS) {

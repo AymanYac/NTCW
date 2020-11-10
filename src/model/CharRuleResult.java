@@ -91,7 +91,8 @@ public class CharRuleResult implements Serializable {
 			}
 			if(action.startsWith("TXT ")) {
 				action=action.substring(4).trim();
-				actionValue.setTXTValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL(action,matchedBlock));
+				//actionValue.setTXTValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL(action,matchedBlock));
+				actionValue.setTXTValue(action);
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);

@@ -291,7 +291,11 @@ public class CharDescriptionRow {
 
 	public ArrayList<CharRuleResult> getRulePropositions(String charId) {
 		ArrayList<CharRuleResult> ret = new ArrayList<CharRuleResult>();
-		if(getRuleResults().get(charId).stream().anyMatch(result -> result.getStatus()!=null && result.getStatus().equals("Applied"))){
+		CaracteristicValue charItemData = getData(getClass_segment_string().split("&&&")[0]).get(charId);
+		if(
+				(charItemData!=null && charItemData.getDisplayValue(false,false).length()>0)
+				|| (getRuleResults().get(charId).stream().anyMatch(result -> result.getStatus()!=null && result.getStatus().equals("Applied")))
+		){
 			return ret;
 		}
 		try{

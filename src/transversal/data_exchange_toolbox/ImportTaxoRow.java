@@ -399,7 +399,6 @@ public class ImportTaxoRow {
 		}catch (Exception V){
 			return null;
 		}
-		System.out.println("Parsing row with rule_id "+row_rule_id);
 		GenericCharRule newRule = new GenericCharRule(row_rule_id);
 		if(!newRule.parseSuccess()){
 			Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be parsed. Check syntax");
