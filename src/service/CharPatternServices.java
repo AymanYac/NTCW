@@ -2699,17 +2699,19 @@ public class CharPatternServices {
 
 
 	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar,UserAccount account) {
-		System.out.println("Applying rule "+newRule.getRuleMarker());
-		Pattern regexPattern = Pattern.compile("["+GenericCharRule.SEP_CLASS+"]"+newRule.getRegexMarker()+"["+GenericCharRule.SEP_CLASS+"]",Pattern.CASE_INSENSITIVE);
+		Pattern regexPattern = Pattern.compile("["+GenericCharRule.SEP_CLASS+"]("+newRule.getRegexMarker()+")["+GenericCharRule.SEP_CLASS+"]",Pattern.CASE_INSENSITIVE);
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		CharItemFetcher.allRowItems.parallelStream().forEach(r->{
 			Matcher m;
 			m = regexPattern.matcher(" "+r.getShort_desc()+" ");
-			if( (!m.find() && r.getLong_desc()!=null) || r.getShort_desc()!=null ){
+			if( (!m.find() || !(r.getShort_desc()!=null))  && r.getLong_desc()!=null ){
 				m = regexPattern.matcher(" "+r.getLong_desc()+" ");
 			}
 			if(m.find()){
-				r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,m.group(),account));
+				r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,m.group(1),account));
+				while (m.find()){
+					r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,m.group(1),account));
+				}
 				items2Reevaluate.add(r.getItem_id());
 			}
 		});
@@ -2717,7 +2719,6 @@ public class CharPatternServices {
 	}
 
 	public static HashSet<String> unApplyRule(GenericCharRule oldRule, ClassCaracteristic activeChar) {
-		System.out.println("Unapplying rule "+oldRule.getRuleMarker());
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		CharItemFetcher.allRowItems.parallelStream().filter(r->r.getRuleResults().get(activeChar.getCharacteristic_id())!=null)
 													.filter(r->r.getRuleResults().get(activeChar.getCharacteristic_id()).stream().anyMatch(result->result.getGenericCharRuleID().equals(oldRule.getCharRuleId()))).forEach(r->{

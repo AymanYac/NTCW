@@ -293,6 +293,7 @@ public class RulePane_CharClassif {
         valueLabelL2.setVisible(false);
         valueLabelR1.setVisible(false);
         valueLabelR2.setVisible(false);
+        valueFieldUoM.setVisible(false);
 
         patternColumn.setCellValueFactory(new PropertyValueFactory<>("MatchedBlock"));
         patternColumn.prefWidthProperty().bind(ruleView.widthProperty()

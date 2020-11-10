@@ -209,10 +209,12 @@ public class CharDescriptionRow {
 			r.getRuleResults().entrySet().stream().forEach(e->e.getValue().stream().filter(result->!result.isSubRule()).forEach(result -> {
 				try{
 					int valIndx = knownRuleValues.get(e.getKey()).indexOf(result.getActionValue());
-					if(valIndx!=-1){
+					if(valIndx==-1){
+						//New value
 						knownRuleValues.get(e.getKey()).add(result.getActionValue());
 						result.setStatus("Suggestion "+String.valueOf(knownRuleValues.get(e.getKey()).size()));
 					}else{
+						//Known value
 						result.setStatus("Suggestion "+String.valueOf(valIndx)+1);
 					}
 				}catch (Exception V){
@@ -224,7 +226,10 @@ public class CharDescriptionRow {
 
 			//For each couple active item I / rule N
 			r.getRuleResults().keySet().forEach(charId->{
-				ArrayList<CharRuleResult> suggestions = r.getRuleResults().get(charId).stream().filter(result -> result.getStatus().startsWith("Suggestion ")).collect(Collectors.toCollection(ArrayList::new));
+				ArrayList<CharRuleResult> suggestions = r.getRuleResults().get(charId)
+						.stream()
+						.filter(result -> result.getStatus()!=null && result.getStatus().startsWith("Suggestion "))
+						.collect(Collectors.toCollection(ArrayList::new));
 				if(suggestions.size()==1){
 					//The status is "Suggestion 1" and The value of the row is not similar to the the value of another row with a status different from "empty"
 					//There is no status different from "Suggestion 1" or "Empty" for another row related to the same characteristic
@@ -232,12 +237,15 @@ public class CharDescriptionRow {
 						//The value of the row is not similar to the item value for another characteristic
 						suggestions.get(0).setStatus("Applied");
 					}
+				}else if(!suggestions.stream().anyMatch(result -> result.getStatus().equals("Suggestion 2"))){
+					suggestions.forEach(result -> result.setStatus("Applied"));
 				}
 			});
 
 			//The characteristic value is updated based on the applied rule
 			r.getRuleResults().keySet().forEach(charId->{
-				Optional<CharRuleResult> appliedResult = r.getRuleResults().get(charId).stream().filter(result -> result.getStatus().equals("Applied")).findAny();
+				Optional<CharRuleResult> appliedResult = r.getRuleResults().get(charId).stream()
+						.filter(result -> result.getStatus()!=null).filter(result -> result.getStatus().equals("Applied")).findAny();
 				if(appliedResult.isPresent()){
 					String itemClass=r.getClass_segment_string().split("&&&")[0];
 					if(r.getData(itemClass)!=null){

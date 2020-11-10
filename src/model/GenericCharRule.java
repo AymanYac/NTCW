@@ -43,7 +43,8 @@ public class GenericCharRule {
 	
 	public GenericCharRule(String active_rule) {
 		//SEP_CLASS = " \\.,;:-=/";
-		SEP_CLASS = " [.],;:-[+]=/";
+		//SEP_CLASS = " [.],;:-[+]=/";
+		SEP_CLASS = " [.],;:[+]=/";
 		try {
 			parseRule(active_rule);
 			parseFailed = false;

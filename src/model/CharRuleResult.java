@@ -175,10 +175,6 @@ public class CharRuleResult implements Serializable {
 			}
 
 			if(action.startsWith("UOM ")) {
-				System.out.println(action);
-				System.out.println(action.substring(5));
-				System.out.println(action.length()-6);
-				System.out.println(action.substring(5).substring(0,action.length()-6));
 				final String symbol=action.substring(5).substring(0,action.length()-6).trim();
 				Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->u.getUom_symbols().contains(symbol)).findAny();
 				if(uom.isPresent()) {

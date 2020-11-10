@@ -145,7 +145,6 @@ public class CharDescriptionImportServices {
 			ClassCharacteristicsLoader.loadKnownValuesAssociated2Items(account.getActive_project(),true);
 			HashSet<String> items2Update = new HashSet<String>();
 			Patterns2Apply.forEach(p->{
-				System.out.println("Applying rule "+p.getKey().getRuleMarker()+" for carac "+p.getValue().getCharacteristic_name());
 				items2Update.addAll(CharPatternServices.applyRule(p.getKey(),p.getValue(),account));
 			});
 			CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(r->{
