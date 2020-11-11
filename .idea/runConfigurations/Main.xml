@@ -2,6 +2,7 @@
   <configuration default="false" name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="application.Main" />
     <module name="Brouillon_classif_refactored" />
+    <option name="VM_PARAMETERS" value="-Xmx4g" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

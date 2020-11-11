@@ -1,6 +1,5 @@
 package transversal.data_exchange_toolbox;
 
-import com.google.gson.Gson;
 import controllers.Char_description;
 import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
@@ -17,14 +16,16 @@ import service.TranslationServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.generic.Tools;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class CharDescriptionExportServices {
@@ -35,7 +36,8 @@ public class CharDescriptionExportServices {
 	private static int knownValueRowIdx;
 
 	public static ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>> itemDataBuffer = new ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>>();
-	public static ConcurrentHashMap<String,CharDescriptionRow> itemRuleBuffer = new ConcurrentHashMap<String,CharDescriptionRow>();
+	//public static ConcurrentHashMap<String,CharDescriptionRow> itemRuleBuffer = new ConcurrentHashMap<String,CharDescriptionRow>();
+	public static ConcurrentLinkedQueue<CharDescriptionRow> itemRuleBuffer = new ConcurrentLinkedQueue<CharDescriptionRow>();
 	public static ConcurrentLinkedQueue<Pair<CaracteristicValue,ClassCaracteristic>> caracDataBuffer = new ConcurrentLinkedQueue<Pair<CaracteristicValue,ClassCaracteristic>>();
 	public static ConcurrentLinkedQueue<Pair<ClassCaracteristic,ClassSegment>> caracDefBuffer = new ConcurrentLinkedQueue<Pair<ClassCaracteristic,ClassSegment>>();
 	public static ConcurrentLinkedQueue<Pair<ClassCaracteristic,String>> caracDeleteBuffer = new ConcurrentLinkedQueue<Pair<ClassCaracteristic,String>>();
@@ -571,7 +573,7 @@ public class CharDescriptionExportServices {
 		Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
 		Pair<String, Pair<CaracteristicValue,ClassCaracteristic>> queueItem = new Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>(row.getItem_id(),valCaracPair);
 		itemDataBuffer.add(queueItem);
-		itemRuleBuffer.put(row.getItem_id(),row);
+		itemRuleBuffer.add(row);
 	}
 
 	public static void addItemCharDataToPush(CharDescriptionRow row, String segment, String charId) {
@@ -907,21 +909,29 @@ public class CharDescriptionExportServices {
 					stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_items_x_pattern_results values(?,?,?,?) on conflict(item_id,characteristic_id) do update set char_rule_results = excluded.char_rule_results");
 					Connection finalConn = conn;
 					PreparedStatement finalStmt = stmt;
-					itemRuleBuffer.values().forEach(row->{
-						row.getRuleResults().entrySet().forEach(e->{
-							try {
-								String charId = e.getKey();
-								finalStmt.setString(1,row.getItem_id());
-								finalStmt.setString(2,charId);
-								//finalStmt.setArray(3,finalConn.createArrayOf("bytea",e.getValue().stream().map(CharRuleResult::serialize).toArray(byte[][]::new)));
-								finalStmt.setArray(3,null);
-								finalStmt.setString(4,ComplexMap2JdbcObject.serialize(e.getValue()));
-								finalStmt.addBatch();
-							} catch (SQLException throwables) {
-								throwables.printStackTrace();
-							}
-						});
+					itemRuleBuffer = itemRuleBuffer.stream().collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
+					int initRuleBufferSize = itemRuleBuffer.size();
+					System.out.println("Rule Buffer contains "+String.valueOf(initRuleBufferSize)+" items");
+					IntStream.range(0,20).forEach(loop->{
+						System.out.println("\t Buffer Block "+String.valueOf(loop+1)+"/20");
+						int bufferBlockIdx =0;
+						while (itemRuleBuffer.peek()!=null && bufferBlockIdx<(1.0*initRuleBufferSize)/20.0){
+							CharDescriptionRow row = itemRuleBuffer.poll();
+							bufferBlockIdx +=1;
+							addItemRuleBufferElement2StatementBatch(row,finalStmt);
+						}
+						try {
+							finalStmt.executeBatch();
+							finalStmt.clearBatch();
+						} catch (SQLException throwables) {
+
+						}
 					});
+					while (itemRuleBuffer.peek()!=null){
+						CharDescriptionRow row = itemRuleBuffer.poll();
+						addItemRuleBufferElement2StatementBatch(row,finalStmt);
+					}
+
 					stmt.executeBatch();
 					stmt.clearBatch();
 					stmt.close();
@@ -953,6 +963,21 @@ public class CharDescriptionExportServices {
 		return;
 	}
 
-	
-	
+	private static void addItemRuleBufferElement2StatementBatch(CharDescriptionRow row, PreparedStatement finalStmt) {
+		row.getRuleResults().entrySet().forEach(e->{
+			try {
+				String charId = e.getKey();
+				finalStmt.setString(1,row.getItem_id());
+				finalStmt.setString(2,charId);
+				//finalStmt.setArray(3,finalConn.createArrayOf("bytea",e.getValue().stream().map(CharRuleResult::serialize).toArray(byte[][]::new)));
+				finalStmt.setArray(3,null);
+				finalStmt.setString(4,ComplexMap2JdbcObject.serialize(e.getValue()));
+				finalStmt.addBatch();
+			} catch (SQLException throwables) {
+				throwables.printStackTrace();
+			}
+		});
+	}
+
+
 }

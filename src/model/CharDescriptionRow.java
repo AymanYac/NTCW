@@ -308,4 +308,19 @@ public class CharDescriptionRow {
 		}
 		return ret;
 	}
+
+	@Override
+	public int hashCode() {
+		return getItem_id().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj!=null){
+			if(obj instanceof CharDescriptionRow){
+				return ((CharDescriptionRow) obj).getItem_id().equals(this.getItem_id());
+			}
+		}
+		return false;
+	}
 }
