@@ -1,5 +1,6 @@
 package model;
 
+import org.apache.commons.lang3.StringUtils;
 import service.CharPatternServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
@@ -16,6 +17,7 @@ public class GenericCharRule {
 	private String regexMarker;
 	private Boolean parseFailed;
 	public static String SEP_CLASS;
+	private String ruleSyntax;
 
 	public String getCharRuleId() {
 		return charRuleId;
@@ -23,6 +25,10 @@ public class GenericCharRule {
 
 	public void setCharRuleId(String charRuleId) {
 		this.charRuleId = charRuleId;
+	}
+
+	public String getRuleSyntax() {
+		return ruleSyntax;
 	}
 
 	public String getRuleMarker() {
@@ -58,6 +64,7 @@ public class GenericCharRule {
 
 	private void parseRule(String active_rule) {
 		int ruleMarkerEndDelimiter = active_rule.indexOf('<');
+		ruleSyntax = active_rule;
 		ruleMarker = active_rule.substring(0,ruleMarkerEndDelimiter);
 		String ruleAction = active_rule.substring(ruleMarkerEndDelimiter);
 		Pattern regexPattern = Pattern.compile("<([^<>]*)>");
@@ -113,5 +120,9 @@ public class GenericCharRule {
 	@Override
 	public String toString() {
 		return getRuleMarker();
+	}
+
+	public boolean isEquivalent(GenericCharRule newRule) {
+		return StringUtils.equals(this.getCharRuleId(),newRule.getCharRuleId()) || StringUtils.equalsIgnoreCase(this.ruleSyntax,newRule.ruleSyntax);
 	}
 }

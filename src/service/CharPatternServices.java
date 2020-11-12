@@ -2701,7 +2701,13 @@ public class CharPatternServices {
 	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar,UserAccount account) {
 		Pattern regexPattern = Pattern.compile("["+GenericCharRule.SEP_CLASS+"]("+newRule.getRegexMarker()+")["+GenericCharRule.SEP_CLASS+"]",Pattern.CASE_INSENSITIVE);
 		HashSet<String> items2Reevaluate = new HashSet<String>();
-		CharItemFetcher.allRowItems.parallelStream().forEach(r->{
+		ArrayList<String> targetClasses = CharValuesLoader.active_characteristics.entrySet().stream()
+				.filter(e -> e.getValue().stream().map(car -> car.getCharacteristic_id())
+						.collect(Collectors.toCollection(ArrayList::new)).contains(activeChar.getCharacteristic_id())).map(e -> e.getKey())
+				.collect(Collectors.toCollection(ArrayList::new));
+		CharItemFetcher.allRowItems.parallelStream()
+		.filter(r->targetClasses.contains(r.getClass_segment_string().split("&&&")[0]))
+		.forEach(r->{
 			Matcher m;
 			m = regexPattern.matcher(" "+(r.getShort_desc()!=null?r.getShort_desc():"")+" "+(r.getLong_desc()!=null?r.getLong_desc():"")+" ");
 			while (m.find()){

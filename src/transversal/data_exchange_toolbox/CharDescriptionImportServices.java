@@ -1,7 +1,6 @@
 package transversal.data_exchange_toolbox;
 
 import com.monitorjbl.xlsx.StreamingReader;
-import controllers.paneControllers.TablePane_CharClassif;
 import javafx.util.Pair;
 import model.*;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -94,7 +93,7 @@ public class CharDescriptionImportServices {
 		storeDefaultValues(account);
 		
 		storeItemsWithClass(account);
-		storeItemsData(account);
+		storeItemsData(account, null);
 
 		Date instant = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat( "MMMMM_dd" );
@@ -155,10 +154,7 @@ public class CharDescriptionImportServices {
 				});
 
 			});
-			storeItemsData(account);
-			if(Patterns2Apply.size()>0){
-				ConfirmationDialog.show("Description rules applied", String.valueOf(Patterns2Apply.size())+" rule(s) have been applied", "OK", null);
-			}
+			storeItemsData(account,Patterns2Apply.size());
 		}catch (Exception V){
 			ConfirmationDialog.show("Description rules application failed", "Unable to apply pattern description rules", "OK", null);
 			V.printStackTrace(System.err);
@@ -170,8 +166,8 @@ public class CharDescriptionImportServices {
 
 
 
-	private static void storeItemsData(UserAccount account) {
-		CharDescriptionExportServices.flushItemDataToDB(account);
+	private static void storeItemsData(UserAccount account, Integer size) {
+		CharDescriptionExportServices.flushItemDataToDB(account,size);
 	}
 
 

@@ -248,4 +248,7 @@ public class CharRuleResult implements Serializable {
 		return serializedResult;
 	}
 
+    public boolean isEquivalentOf(CharRuleResult newMatch) {
+		return StringUtils.equalsIgnoreCase(this.getMatchedBlock(),newMatch.getMatchedBlock()) && this.getGenericCharRule().isEquivalent(newMatch.getGenericCharRule());
+    }
 }

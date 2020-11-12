@@ -271,6 +271,13 @@ public class CharDescriptionRow {
 		if(!newMatch.action2ValueSuccess){
 			return;
 		}
+		try{
+			if(this.ruleResults.get(newMatch.getSourceChar().getCharacteristic_id()).stream().anyMatch(result -> result.isEquivalentOf(newMatch))){
+				return;
+			}
+		}catch (Exception V){
+
+		}
 		try {
 			this.ruleResults.get(newMatch.getSourceChar().getCharacteristic_id()).add(newMatch);
 		}catch(Exception V) {

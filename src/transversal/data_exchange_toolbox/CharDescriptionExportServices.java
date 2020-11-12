@@ -837,7 +837,7 @@ public class CharDescriptionExportServices {
 		return;
 	}
 
-	public static void flushItemDataToDB(UserAccount account) {
+	public static void flushItemDataToDB(UserAccount account, Integer itemRuleBufferSize) {
 		if(itemDataBuffer.peek()!=null) {
 			Task<Void> dbFlushTask = new Task<Void>() {
 			    
@@ -909,27 +909,29 @@ public class CharDescriptionExportServices {
 					stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_items_x_pattern_results values(?,?,?,?) on conflict(item_id,characteristic_id) do update set char_rule_results = excluded.char_rule_results");
 					Connection finalConn = conn;
 					PreparedStatement finalStmt = stmt;
-					itemRuleBuffer = itemRuleBuffer.stream().collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
-					int initRuleBufferSize = itemRuleBuffer.size();
+					CharDescriptionExportServices.itemRuleBuffer = CharDescriptionExportServices.itemRuleBuffer.stream().collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
+					int initRuleBufferSize = CharDescriptionExportServices.itemRuleBuffer.size();
 					System.out.println("Rule Buffer contains "+String.valueOf(initRuleBufferSize)+" items");
-					IntStream.range(0,20).forEach(loop->{
-						System.out.println("\t Buffer Block "+String.valueOf(loop+1)+"/20");
-						int bufferBlockIdx =0;
-						while (itemRuleBuffer.peek()!=null && bufferBlockIdx<(1.0*initRuleBufferSize)/20.0){
-							CharDescriptionRow row = itemRuleBuffer.poll();
-							bufferBlockIdx +=1;
-							addItemRuleBufferElement2StatementBatch(row,finalStmt);
-						}
-						try {
-							finalStmt.executeBatch();
-							finalStmt.clearBatch();
-						} catch (SQLException throwables) {
+					if(GlobalConstants.PUSH_RULE_BUFFER_BY_BLOCK){
+						IntStream.range(0,20).forEach(loop->{
+							System.out.println("\t Buffer Block "+String.valueOf(loop+1)+"/20");
+							int bufferBlockIdx =0;
+							while (CharDescriptionExportServices.itemRuleBuffer.peek()!=null && bufferBlockIdx<(1.0*initRuleBufferSize)/20.0){
+								CharDescriptionRow row = CharDescriptionExportServices.itemRuleBuffer.poll();
+								bufferBlockIdx +=1;
+								addItemRuleBufferElement2StatementBatch(row,finalStmt);
+							}
+							try {
+								finalStmt.executeBatch();
+								finalStmt.clearBatch();
+							} catch (SQLException throwables) {
 
-						}
-					});
-					while (itemRuleBuffer.peek()!=null){
-						CharDescriptionRow row = itemRuleBuffer.poll();
-						addItemRuleBufferElement2StatementBatch(row,finalStmt);
+							}
+						});
+					}
+					while (CharDescriptionExportServices.itemRuleBuffer.peek()!=null){
+						CharDescriptionRow row = CharDescriptionExportServices.itemRuleBuffer.poll();
+						addItemRuleBufferElement2StatementBatch(row,stmt);
 					}
 
 					stmt.executeBatch();
@@ -941,7 +943,11 @@ public class CharDescriptionExportServices {
 			    }
 			};
 			dbFlushTask.setOnSucceeded(e -> {
-				
+				if(itemRuleBufferSize!=null){
+					if(itemRuleBufferSize>0){
+						ConfirmationDialog.show("Description rules applied", String.valueOf(itemRuleBufferSize)+" rule(s) have been applied", "OK", null);
+					}
+				}
 				
 				});
 			dbFlushTask.setOnFailed(e -> {

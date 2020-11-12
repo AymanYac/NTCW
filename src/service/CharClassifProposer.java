@@ -118,7 +118,7 @@ public class CharClassifProposer {
 					result.setStatus("Applied");
 					CharValuesLoader.updateRuntimeDataForItem(row,segment,result.getSourceChar().getCharacteristic_id(),result.getActionValue());
 					CharDescriptionExportServices.addItemCharDataToPush(row, segment, charId);
-					CharDescriptionExportServices.flushItemDataToDB(parent.account);
+					CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
 					clearPropButtons();
 				});
 				lastestActiveCRIndex+=1;

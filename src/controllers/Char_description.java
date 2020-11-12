@@ -1785,7 +1785,7 @@ public class Char_description {
 							CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id());
 							
 						});
-		CharDescriptionExportServices.flushItemDataToDB(account);
+		CharDescriptionExportServices.flushItemDataToDB(account, null);
 		TranslationServices.beAwareOfNewValue(value, CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index));
 		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index),true);
 		

@@ -32,7 +32,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -404,7 +403,7 @@ public class TablePane_CharClassif {
 					}
 				});
 			}
-			CharDescriptionExportServices.flushItemDataToDB(account);
+			CharDescriptionExportServices.flushItemDataToDB(account, null);
 		}
 	}
 	private void jumpNext() {
@@ -1175,6 +1174,6 @@ public class TablePane_CharClassif {
 			 });
 
 		 });
-		 CharDescriptionExportServices.flushItemDataToDB(account);
+		 CharDescriptionExportServices.flushItemDataToDB(account, null);
 	}
 }
