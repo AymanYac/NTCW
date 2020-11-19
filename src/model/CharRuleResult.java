@@ -75,7 +75,8 @@ public class CharRuleResult implements Serializable {
 		for(String action: genericCharRule.getRuleActions()) {
 			if(action.startsWith("DL ")) {
 				action=action.substring(3).trim();
-				actionValue.setDataLanguageValue(action);
+				actionValue.setDataLanguageValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL(action,matchedBlock));
+				//actionValue.setDataLanguageValue(action);
 				actionValue.setUserLanguageValue(TranslationServices.getEntryTranslation(action, true));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
@@ -83,7 +84,8 @@ public class CharRuleResult implements Serializable {
 			}
 			if(action.startsWith("UL ")) {
 				action=action.substring(3).trim();
-				actionValue.setUserLanguageValue(action);
+				actionValue.setUserLanguageValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL(action,matchedBlock));
+				//actionValue.setUserLanguageValue(action);
 				actionValue.setDataLanguageValue(TranslationServices.getEntryTranslation(action, false));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
@@ -91,8 +93,8 @@ public class CharRuleResult implements Serializable {
 			}
 			if(action.startsWith("TXT ")) {
 				action=action.substring(4).trim();
-				//actionValue.setTXTValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL(action,matchedBlock));
-				actionValue.setTXTValue(action);
+				actionValue.setTXTValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL(action,matchedBlock));
+				//actionValue.setTXTValue(action);
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
@@ -223,7 +225,7 @@ public class CharRuleResult implements Serializable {
 	public ClassCaracteristic getSourceChar() {return parentChar;}
 
 	public void clearSuperRules() {
-		superRules.clear();
+		superRules = new ArrayList<CharRuleResult>();
 	}
 
 	public ByteArrayInputStream getByteArray() {

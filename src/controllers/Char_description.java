@@ -21,9 +21,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextFlow;
@@ -209,6 +207,19 @@ public class Char_description {
 		
 	}
 	@FXML void initialize(){
+		aidLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				final Clipboard clipboard = Clipboard.getSystemClipboard();
+				final ClipboardContent content = new ClipboardContent();
+				try{
+					content.putString(aidLabel.getText().split("Article ID: ")[1]);
+					Clipboard.getSystemClipboard().setContent(content);
+				}catch (Exception V){
+
+				}
+			}
+		});
 		sd.setText("");
 		sd_translated.setText("");
 		ld.setText("");

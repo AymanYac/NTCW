@@ -112,7 +112,7 @@ public class CharValueTextSuggestion {
 	public boolean sourceTextEquals(String text) {
 		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
 		try{
-			return unidecode.decodeAndTrim(getSource_value().toLowerCase()).equals(unidecode.decodeAndTrim(text.toLowerCase()));
+			return unidecode.decodeAndTrim(getSource_value().toLowerCase()).equals(unidecode.decodeAndTrim(text.toLowerCase())) && text.replace(" ","").length()>0;
 		}catch(Exception V) {
 			return false;
 		}

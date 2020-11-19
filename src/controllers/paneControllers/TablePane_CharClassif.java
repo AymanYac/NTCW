@@ -482,7 +482,7 @@ public class TablePane_CharClassif {
 
 	private void selectLastDescribedItem() {
 		Optional<LocalDateTime> latestDescriptionTimeInClass = tableGrid.getItems().stream().map(
-				r -> r.getData().values().stream().flatMap(a -> a.values().stream()).filter(v->v!=null && v.getDisplayValue(Parent).length()>0).map(v -> v.getDescriptionTime()).max(new Comparator<LocalDateTime>() {
+				r -> r.getData().values().stream().flatMap(a -> a.values().stream()).filter(v->v!=null && v.getDisplayValue(Parent).length()>0).map(v -> v.getDescriptionTime()).filter(t->t!=null).max(new Comparator<LocalDateTime>() {
 					@Override
 					public int compare(LocalDateTime o1, LocalDateTime o2) {
 						return o1.compareTo(o2);
@@ -872,7 +872,12 @@ public class TablePane_CharClassif {
             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                 try{
                 	String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
-					return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getRule_id());
+					String activeCharId = CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id();
+					CaracteristicValue activeData = r.getValue().getData(itemClass).get(activeCharId);
+					if(activeData.getSource().equals(DataInputMethods.AUTO_CHAR_DESC)){
+						return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result -> result.getStatus()!=null && result.getStatus().equals("Applied")).findAny().get().getMatchedBlock());
+					}
+					return new ReadOnlyObjectWrapper(activeData.getRule_id());
                 }catch(Exception V) {
                	 return new ReadOnlyObjectWrapper("");
                 }

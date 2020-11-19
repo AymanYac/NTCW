@@ -570,19 +570,24 @@ public class CharDescriptionExportServices {
 	}
 
 	public static void addItemCharDataToPush(CharDescriptionRow row, CaracteristicValue val, ClassCaracteristic carac) {
-		Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
-		Pair<String, Pair<CaracteristicValue,ClassCaracteristic>> queueItem = new Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>(row.getItem_id(),valCaracPair);
-		itemDataBuffer.add(queueItem);
+		if(val!=null){
+			Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
+			Pair<String, Pair<CaracteristicValue,ClassCaracteristic>> queueItem = new Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>(row.getItem_id(),valCaracPair);
+			itemDataBuffer.add(queueItem);
+		}
 		itemRuleBuffer.add(row);
 	}
 
 	public static void addItemCharDataToPush(CharDescriptionRow row, String segment, String charId) {
-		CaracteristicValue val = row.getData(segment).get(charId);
-		if(val!=null){
-			Optional<ClassCaracteristic> carac = CharValuesLoader.active_characteristics.get(segment).stream().filter(car->car.getCharacteristic_id().equals(charId)).findAny();
-			if(carac.isPresent()){
-				addItemCharDataToPush(row,val,carac.get());
-			}
+		CaracteristicValue val = null;
+		try{
+			val = row.getData(segment).get(charId);
+		}catch (Exception V){
+
+		}
+		Optional<ClassCaracteristic> carac = CharValuesLoader.active_characteristics.get(segment).stream().filter(car->car.getCharacteristic_id().equals(charId)).findAny();
+		if(carac.isPresent()){
+			addItemCharDataToPush(row,val,carac.get());
 		}
 
 	}
@@ -911,7 +916,6 @@ public class CharDescriptionExportServices {
 					PreparedStatement finalStmt = stmt;
 					CharDescriptionExportServices.itemRuleBuffer = CharDescriptionExportServices.itemRuleBuffer.stream().collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
 					int initRuleBufferSize = CharDescriptionExportServices.itemRuleBuffer.size();
-					System.out.println("Rule Buffer contains "+String.valueOf(initRuleBufferSize)+" items");
 					if(GlobalConstants.PUSH_RULE_BUFFER_BY_BLOCK){
 						IntStream.range(0,20).forEach(loop->{
 							System.out.println("\t Buffer Block "+String.valueOf(loop+1)+"/20");

@@ -82,8 +82,8 @@ public class CharPatternServices {
 //					Value = "VAL"														
 //					Rule = [Selection]
 					parent.sendPatternValue(known_value);
-					parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(corrected_text,true)+"<DL "+known_value.getDataLanguageValue()+">");
-					parent.sendSemiAutoPattern(known_value, WordUtils.QUOTE_NON_SEP_TEXT(corrected_text,true)+"<DL "+known_value.getDataLanguageValue()+">");
+					parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(selected_text,true)+"<DL "+known_value.getDataLanguageValue()+">");
+					parent.sendSemiAutoPattern(known_value, WordUtils.QUOTE_NON_SEP_TEXT(selected_text,true)+"<DL "+known_value.getDataLanguageValue()+">");
 					System.out.println("=====>Match !");
 					return;
 				}
@@ -553,8 +553,8 @@ public class CharPatternServices {
 
 											parent.sendPatternValue(tmp);
 //												Rule = [Selection]
-											parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(selected_text,true)+"<TXT "+WordUtils.QUOTE_NON_SEP_TEXT(selected_text,false)+">");
-											parent.sendSemiAutoPattern(tmp, WordUtils.QUOTE_NON_SEP_TEXT(selected_text,true)+"<TXT "+WordUtils.QUOTE_NON_SEP_TEXT(selected_text,false)+">");
+											parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(selected_text,true)+"<TXT "+corrected_text+">");
+											parent.sendSemiAutoPattern(tmp, WordUtils.QUOTE_NON_SEP_TEXT(selected_text,true)+"<TXT "+corrected_text+">");
 											System.out.println("Default match");
 											return;
 										}
@@ -2699,7 +2699,9 @@ public class CharPatternServices {
 
 
 	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar,UserAccount account) {
-		Pattern regexPattern = Pattern.compile("["+GenericCharRule.SEP_CLASS+"]("+newRule.getRegexMarker()+")["+GenericCharRule.SEP_CLASS+"]",Pattern.CASE_INSENSITIVE);
+		Pattern regexPattern = Pattern.compile("["+GenericCharRule.SEP_CLASS
+				+"]("+newRule.getRegexMarker()+")["
+				+GenericCharRule.SEP_CLASS+"]",Pattern.CASE_INSENSITIVE);
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		ArrayList<String> targetClasses = CharValuesLoader.active_characteristics.entrySet().stream()
 				.filter(e -> e.getValue().stream().map(car -> car.getCharacteristic_id())

@@ -344,6 +344,7 @@ public class RulePane_CharClassif {
             parent.tableController.ReevaluateItems(CharPatternServices.applyRule(newRule,caracCombo.getValue(),parent.account));
         }
         parent.refresh_ui_display();
+        parent.tableController.tableGrid.refresh();
     }
     @FXML public void deleteRuleButtonAction() throws SQLException, ClassNotFoundException {
         if(ruleView.getSelectionModel().getSelectedItem()!=null){
@@ -353,6 +354,7 @@ public class RulePane_CharClassif {
             parent.tableController.ReevaluateItems(CharPatternServices.unApplyRule(oldRule,caracCombo.getValue()));
         }
         parent.refresh_ui_display();
+        parent.tableController.tableGrid.refresh();
     }
     @FXML public void saveRuleButtonAction() throws SQLException, ClassNotFoundException {
         HashSet<String> items2Reevaluate = new HashSet<String>();
@@ -373,6 +375,7 @@ public class RulePane_CharClassif {
 
         parent.tableController.ReevaluateItems(items2Reevaluate);
         parent.refresh_ui_display();
+        parent.tableController.tableGrid.refresh();
     }
 
     private String loadRuleFromPane() {

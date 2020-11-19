@@ -232,6 +232,7 @@ public class CharDescriptionRow {
 						.collect(Collectors.toCollection(ArrayList::new));
 				if(suggestions.size()==1){
 					//The status is "Suggestion 1" and The value of the row is not similar to the the value of another row with a status different from "empty"
+					//=>wording: The status is "Suggestion 1" and other rows with similar value are empty or suggestion 1
 					//There is no status different from "Suggestion 1" or "Empty" for another row related to the same characteristic
 					if(!r.itemHasDisplayValue(suggestions.get(0))) {
 						//The value of the row is not similar to the item value for another characteristic

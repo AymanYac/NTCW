@@ -51,7 +51,7 @@ public class GenericCharRule {
 		//SEP_CLASS = " \\.,;:-=/";
 		//SEP_CLASS = " [.],;:-[+]=/";
 		//SEP_CLASS = " [.],;:[+]=/";
-		SEP_CLASS = " \"'[.],;:[+]=/\\|\\[\\]";
+		SEP_CLASS = " \"'[.],;:[+]=/\\|\\[\\]\\(\\)";
 		try {
 			parseRule(active_rule);
 			parseFailed = false;
@@ -77,8 +77,9 @@ public class GenericCharRule {
 
 	public void generateRegex(ClassCaracteristic sourceChar) {
 		if(sourceChar.getIsNumeric()) {
-			regexMarker = WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.quote(ruleMarker),"\"",""),"%\\d","[-+]?[0-9]*[.,]?[0-9]+"),"(|+0)","["+SEP_CLASS+"]?"),"(|+1)","["+SEP_CLASS+"]+");
+			regexMarker = WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.quote(ruleMarker),"\"",""),"%\\d","[-+]?[0-9]+([. ,]?[0-9]{3,3})*[0-9]*([.,][0-9]+)?"),"(|+0)","["+SEP_CLASS+"]?"),"(|+1)","["+SEP_CLASS+"]+");
 		}else {
+			String SEP_CLASS=String.valueOf(GenericCharRule.SEP_CLASS+"-");
 			regexMarker = WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.quote(ruleMarker),"\"",""),"#","[0-9]"),"@","[a-z]"),"(|+0)","["+SEP_CLASS+"]?"),"(|+1)","["+SEP_CLASS+"]+");
 			if(sourceChar.getIsTranslatable()) {
 

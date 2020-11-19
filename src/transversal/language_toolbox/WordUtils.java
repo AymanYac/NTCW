@@ -270,18 +270,16 @@ public class WordUtils {
 		}
 
 	public static String ALPHANUM_PATTERN_RULE_EVAL(String action, String matchedBlock) {
-		String value = null;
-		//action = action.replace("\"","");
 		action = action.replace("#","[0-9]");
 		action = action.replace("@","[A-Z]");
 		action = action.replace("(|+0)","[\\W]*");
 		action = action.replace("(|+1)","[\\W]+");
-		Pattern p = Pattern.compile(action);
+		Pattern p = Pattern.compile(action,Pattern.CASE_INSENSITIVE);
 		Matcher matcher = p.matcher(matchedBlock);
 		if(matcher.find()){
 			return matcher.group(0);
 		}
-		return null;
+		return matchedBlock;
 		}
 
 
@@ -346,7 +344,9 @@ public class WordUtils {
 
 		public static boolean TermWiseInclusion(String toSearch, String searchIn,
 				boolean splitbySeparators) {
-			
+			if(!(toSearch!=null) || !(searchIn!=null) || toSearch.replace(" ","").length()==0 || searchIn.replace(" ","").length()==0){
+				return false;
+			}
 			Unidecode unidecode = Unidecode.toAscii();
 			toSearch = unidecode.decodeAndTrim(toSearch).toUpperCase();
 			searchIn = unidecode.decodeAndTrim(searchIn).toUpperCase();
@@ -380,8 +380,7 @@ public class WordUtils {
 			//"HQH-12.2 -212v -21hQH+29 QSD2+3" -> "-12.2,212,-21,29,2,3"
 			
 			Pattern p = Pattern.compile(numericPatternString);
-			Matcher m = p.matcher(selected_text.replace(",", "."));
-			
+			Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
 			while (m.find()) {
 				  ret.add(Double.valueOf( m.group(0)) );
 				}
@@ -405,13 +404,12 @@ public class WordUtils {
 			//"HQH-12.2 -212v -21hQH+29 QSD2+3" -> "-12.2,212,-21,29,2,3"
 			
 			Pattern p = Pattern.compile("(?<!%)"+numericPatternString);
-			Matcher m = p.matcher(selected_text.replace(",", "."));
+			Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
 			
 			int i=0;
 			while (m.find()) {
 				i+=1;
-				System.out.print(selected_text+"->");
-				selected_text = selected_text.replace(",", ".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
+				selected_text = selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______",".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
 				
 				//ret.add(Double.valueOf( m.group(0)) );
 				  
@@ -430,7 +428,7 @@ public class WordUtils {
 		    String patternPlusOverLaps = pattern+"(?=(" + "(.*)" + ")).";
 		    Pattern p = Pattern.compile(patternPlusOverLaps);
 		    
-		    Matcher m = p.matcher(selected_text.replace(",", "."));
+		    Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
 			
 			ArrayList<UnitOfMeasure> ret = new ArrayList<UnitOfMeasure>();
 			while (m.find()) {
@@ -523,7 +521,6 @@ public class WordUtils {
 		    	ruleActions.add(m.group(1));
 		    }
 			ruleClause = preparedRule.substring(0,preparedRule.indexOf("<"+ruleActions.get(0)));
-			System.out.println("rule clause: "+ruleClause);
 			for(String sep:SEPARATORS) {
 				if(exceptions.contains(sep)&&!sep.equals(" ")) {
 					continue;
