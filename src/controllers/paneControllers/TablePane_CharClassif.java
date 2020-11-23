@@ -199,6 +199,12 @@ public class TablePane_CharClassif {
 		}else {
 			Parent.search_text.setText(WordUtils.getSearchWords(tmp.getShort_desc()));
 		}
+		try{
+			scrollToSelectedItem(tmp);
+		}catch (Exception V){
+
+		}
+
 		Parent.refresh_ui_display();
 		
 		
@@ -288,7 +294,27 @@ public class TablePane_CharClassif {
 		
 		
 	}
-	
+
+	private void scrollToSelectedItem(CharDescriptionRow tmp) {
+		int selectedIdx = itemArray.indexOf(tmp);
+		int lvi = tvX.getLastVisibleIndex()-1;
+		if(lvi<selectedIdx){
+			System.out.println("lvi:"+lvi);
+			int offset = selectedIdx-lvi;
+			System.out.println("offset:"+offset);
+			tableGrid.scrollTo(tvX.getFirstVisibleIndex()+offset);
+		}
+		int fvi = tvX.getFirstVisibleIndex()+1;
+		if(fvi>selectedIdx){
+			System.out.println("fvi:"+fvi);
+			int offset = selectedIdx-fvi;
+			System.out.println("offset:"+offset);
+			tableGrid.scrollTo(tvX.getFirstVisibleIndex()+offset);
+
+		}
+		System.out.println("XXXXXXXXXX");
+	}
+
 	public String translate2UserLanguage(String description) throws IOException {
 		if(description!=null) {
 			
@@ -431,6 +457,7 @@ public class TablePane_CharClassif {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void refresh_table_with_segment(String active_class) throws ClassNotFoundException, SQLException {
+		tvX = new TableViewExtra(tableGrid);
 		account.setUser_desc_class(active_class);
 		Tools.set_desc_class(account);
 		if(!active_class.equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
@@ -657,6 +684,7 @@ public class TablePane_CharClassif {
 
 	@SuppressWarnings("rawtypes")
 	private void selectChartAtIndex(int i, boolean collapsedView) {
+		tvX = new TableViewExtra(tableGrid);
 		if(selected_col<0){
 			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
 		}
@@ -911,8 +939,7 @@ public class TablePane_CharClassif {
         articleColumn.setResizable(false);
         this.tableGrid.getColumns().add(articleColumn);
 
-		tvX = new TableViewExtra(tableGrid);
-        this.tableGrid.getItems().addAll(this.itemArray);
+		this.tableGrid.getItems().addAll(this.itemArray);
         //this.tableGrid.refresh();
 
 		tableGrid.getSortOrder().addListener((ListChangeListener)(c -> {
