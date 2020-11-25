@@ -296,7 +296,11 @@ public class TablePane_CharClassif {
 	}
 
 	private void scrollToSelectedItem(CharDescriptionRow tmp) {
-		int selectedIdx = itemArray.indexOf(tmp);
+		if(GlobalConstants.NATIVE_SELECTION_SCROLL){
+			tvX.scrollToIndex(tableGrid.getItems().indexOf(tmp));
+			return;
+		}
+		int selectedIdx = tableGrid.getItems().indexOf(tmp);
 		int lvi = tvX.getLastVisibleIndex()-1;
 		if(lvi<selectedIdx){
 			System.out.println("lvi:"+lvi);
@@ -436,7 +440,7 @@ public class TablePane_CharClassif {
 		
 		int currentIdx = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
 		tableGrid.getSelectionModel().clearAndSelect(1+ currentIdx);
-		scrollSelectedItemVisible();
+		scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 	}
 
 	public void setUserAccount(UserAccount account) {
@@ -1058,7 +1062,7 @@ public class TablePane_CharClassif {
 					}
 				}
 				tableGrid.getSelectionModel().clearAndSelect(Math.max(0,min));
-				scrollSelectedItemVisible();
+				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 			}else {
 				while(! ( data_previous.length()>0 ) ) {
 					min-=1;
@@ -1071,7 +1075,7 @@ public class TablePane_CharClassif {
 					}
 				}
 				tableGrid.getSelectionModel().clearAndSelect(Integer.max(min-1,0));
-				scrollSelectedItemVisible();
+				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 
 			}
 		}catch(Exception V) {
@@ -1112,7 +1116,7 @@ public class TablePane_CharClassif {
 					}
 				}
 				tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max));
-				scrollSelectedItemVisible();
+				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 			}else {
 				while(! ( data_next.length()>0 ) ) {
 					max+=1;
@@ -1125,22 +1129,12 @@ public class TablePane_CharClassif {
 					}
 				}
 				tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max+1));
-				scrollSelectedItemVisible();
+				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 
 			}
 		}catch(Exception V) {
 			
 		}
-	}
-
-	private void scrollSelectedItemVisible() {
-		int selectedIdx = tableGrid.getSelectionModel().getSelectedIndex();
-		int fvIdx = tvX.getFirstVisibleIndex();
-		int lvIdx = tvX.getLastVisibleIndex();
-		if( fvIdx<=selectedIdx && selectedIdx<=lvIdx){
-			return;
-		}
-		tableGrid.scrollTo(selectedIdx);
 	}
 
 	public void refresh_table_preserve_sort_order() throws SQLException, ClassNotFoundException {

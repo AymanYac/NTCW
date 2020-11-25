@@ -49,7 +49,7 @@ public class TablePane_ManualClassif {
 	//@FXML TableColumn authorColumn;
 	@FXML TableColumn reviewedClassificationColumn;
 	@FXML TableColumn reviewerColumn;
-	@FXML public TableView tableGrid;
+	@FXML public TableView<ItemFetcherRow> tableGrid;
 	
 	
 	
@@ -164,7 +164,7 @@ public class TablePane_ManualClassif {
 		}else {
 			return;
 		}
-		for(Object row: tableGrid.getItems()) {
+		for(ItemFetcherRow row: tableGrid.getItems()) {
 			if ( ((ItemFetcherRow) row).getItem_id().equals(last_id) ){
 				tableGrid.getSelectionModel().select(row);
 				tableGrid.scrollTo(tableGrid.getSelectionModel().getSelectedIndex());
@@ -434,18 +434,15 @@ public class TablePane_ManualClassif {
 		
 		if(cid_this!=null && cid_next!=null) {
 			try {
-			while(((ItemFetcherRow) tableGrid.getItems().get(max+1)).getDisplay_segment_id() != null ) {
+				while(((ItemFetcherRow) tableGrid.getItems().get(max+1)).getDisplay_segment_id() != null ) {
 					max+=1;
 				}
 			}catch(Exception V) {
 				max = tableGrid.getItems().size()-1;
 			}
 			tableGrid.getSelectionModel().clearAndSelect(max);
-			if(max > tvX.getLastVisibleIndex()) {
-				tableGrid.scrollTo(max-(tvX.getLastVisibleIndex()-tvX.getFirstVisibleIndex())+3);
-				
-			}
-			}else {
+			scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
+		}else {
 			try {
 				while(! ( ((ItemFetcherRow) tableGrid.getItems().get(max+1)).getDisplay_segment_id() != null ) ) {
 					max+=1;
@@ -453,14 +450,16 @@ public class TablePane_ManualClassif {
 			}catch(Exception V) {
 				//Last item reached
 			}
-			
 			tableGrid.getSelectionModel().clearAndSelect(max+1);
-			if(max+1 > tvX.getLastVisibleIndex() ){
-				tableGrid.scrollTo(max+1-(tvX.getLastVisibleIndex()-tvX.getFirstVisibleIndex())+3);
-			}
+			scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 			
 		}
 	}
+
+	private void scrollToSelectedItem(ItemFetcherRow selectedItem) {
+		tvX.scrollToIndex(tableGrid.getItems().indexOf(selectedItem));
+	}
+
 	public void fireScrollNBUp() {
 		;
 		try {
@@ -761,10 +760,7 @@ public class TablePane_ManualClassif {
 		
 		int currentIdx = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
 		tableGrid.getSelectionModel().clearAndSelect(1+ currentIdx);
-		if(1+currentIdx>tvX.getLastVisibleIndex()) {
-			tableGrid.scrollTo(currentIdx+1);
-			//tableGrid.scrollTo(tvX.getFirstVisibleIndex()+2);
-		}
+		scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 	}
 	public void fireClassSelection(int rowIndex, KeyCode kc) {
 		if(GlobalConstants.MANUAL_FETCH_ALL) {

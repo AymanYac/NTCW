@@ -37,6 +37,7 @@ public class GlobalConstants {
 	public static final boolean AUTO_TEXT_FIELD_DUPLICATE_ACTION = true;
     public static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
 	public static final boolean PUSH_RULE_BUFFER_BY_BLOCK = false;
+	public static final boolean NATIVE_SELECTION_SCROLL = true;
 
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS = 5;

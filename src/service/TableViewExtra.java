@@ -90,7 +90,7 @@ public class TableViewExtra<T> // com.sun.javafx: implements ChangeListener<Skin
       if (first >= 0 && last >= first)
           for (int idx : indices)
           {
-              if (first <= idx && idx <= last)
+              if (first < idx && idx <= last)
               {
                   changeScrollPos = false;
                   break;
