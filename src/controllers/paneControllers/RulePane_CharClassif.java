@@ -11,8 +11,12 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import model.*;
 import org.apache.commons.lang3.StringUtils;
+import org.controlsfx.control.textfield.TextFields;
 import service.CharPatternServices;
 import service.CharValuesLoader;
+import service.TranslationServices;
+import transversal.language_toolbox.Unidecode;
+import transversal.language_toolbox.WordUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -36,7 +40,6 @@ public class RulePane_CharClassif {
     @FXML TableView<CharRuleResult> ruleView;
     @FXML TextField patternField;
     @FXML TextField valueFieldL1;
-    @FXML TextField valueFieldL2;
     @FXML TextField valueFieldR1;
     @FXML TextField valueFieldR2;
     @FXML ComboBox<ClassCaracteristic> caracCombo;
@@ -51,6 +54,9 @@ public class RulePane_CharClassif {
     private static String userLanguage;
     private static String dataLanguageCode;
     private static String userLanguageCode;
+    private static Unidecode unidecode;
+    private ChangeListener<String> dataFieldCL;
+    private ChangeListener<String> userFieldCL;
 
 
     public void setParent(Char_description char_description) {
@@ -60,6 +66,10 @@ public class RulePane_CharClassif {
             public void changed(ObservableValue<? extends CharRuleResult> observable, CharRuleResult oldValue, CharRuleResult newValue) {
                 if(!(newValue!=null)){
                     return;
+                }
+                buttonSaveRule.setDisable(false);
+                if(newValue.isDraft()){
+                    buttonSaveRule.setDisable(true);
                 }
                 patternField.setText(newValue.getGenericCharRule().getRuleMarker());
                 if(newValue.getSourceChar().getIsNumeric()){
@@ -145,7 +155,16 @@ public class RulePane_CharClassif {
         caracCombo.valueProperty().addListener(new ChangeListener<ClassCaracteristic>() {
             @Override
             public void changed(ObservableValue<? extends ClassCaracteristic> observable, ClassCaracteristic oldValue, ClassCaracteristic newValue) {
+                if(ClassCaracteristic.caracsAreHomogenous(oldValue,newValue)){
+                    CharRuleResult oldResult = ruleView.getSelectionModel().getSelectedItem();
+                    if(oldResult!=null){
+                        CharRuleResult oldResultCopy = oldResult.shallowCopy(newValue,parent.account);
+                        oldResultCopy.setStatus("Draft");
+                        parent.tableController.tableGrid.getSelectionModel().getSelectedItem().addRuleResult2Row(oldResultCopy);
+                    }
+                }
                 if(newValue!=null){
+                    hideFields();
                     fetchRules(newValue);
                 }
 
@@ -158,9 +177,34 @@ public class RulePane_CharClassif {
             }
         };
         valueFieldL1.textProperty().addListener(fieldEditListener);
-        valueFieldL2.textProperty().addListener(fieldEditListener);
         valueFieldR1.textProperty().addListener(fieldEditListener);
         valueFieldR2.textProperty().addListener(fieldEditListener);
+        dataFieldCL = new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                unidecode = unidecode != null ? unidecode : Unidecode.toAscii();
+                if (newValue != null &&
+                        TranslationServices.getTextEntriesForCharOnLanguages(caracCombo.getValue(), true).stream()
+                                .anyMatch(e ->
+                                        StringUtils.equalsIgnoreCase(unidecode.decode(e.getSource_value()), unidecode.decode(newValue))
+                                )) {
+                    valueFieldR1.setText(null);
+                }
+            }
+        };
+        userFieldCL = new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                unidecode = unidecode != null ? unidecode : Unidecode.toAscii();
+                if (newValue != null &&
+                        TranslationServices.getTextEntriesForCharOnLanguages(caracCombo.getValue(), false).stream()
+                                .anyMatch(e ->
+                                        StringUtils.equalsIgnoreCase(unidecode.decode(e.getSource_value()), unidecode.decode(newValue))
+                                )) {
+                    valueFieldL1.setText(null);
+                }
+            }
+        };
 
     }
     public void load_description_patterns() {
@@ -197,7 +241,6 @@ public class RulePane_CharClassif {
         patternField.clear();
         valueFieldL1.clear();
         valueFieldR1.clear();
-        valueFieldL2.clear();
         valueFieldR2.clear();
 
         if(caracCombo.getValue().getIsNumeric()){
@@ -253,11 +296,15 @@ public class RulePane_CharClassif {
                 valueLabelL1.setVisible(true);
                 GridPane.setColumnSpan(valueFieldL1,3);
                 valueFieldL1.setVisible(true);
+                TextFields.bindAutoCompletion(valueFieldL1, TranslationServices.getTextEntriesForCharOnLanguages(caracCombo.getValue(),true));
+                valueFieldL1.textProperty().addListener(dataFieldCL);
                 GridPane.setColumnSpan(valueLabelR1,3);
                 valueLabelR1.setText("Value ("+userLanguageCode.toUpperCase()+")");
                 valueLabelR1.setVisible(true);
                 GridPane.setColumnSpan(valueFieldR1,3);
                 valueFieldR1.setVisible(true);
+                TextFields.bindAutoCompletion(valueFieldR1, TranslationServices.getTextEntriesForCharOnLanguages(caracCombo.getValue(),false));
+                valueFieldR1.textProperty().addListener(userFieldCL);
             }else{
                 GridPane.setColumnSpan(valueLabelL2,3);
                 valueLabelL2.setText("Value");
@@ -285,16 +332,9 @@ public class RulePane_CharClassif {
     }
 
     private void setLayoutAndDS() {
-        valueFieldL1.setVisible(false);
-        valueFieldL2.setVisible(false);
-        valueFieldR1.setVisible(false);
-        valueFieldR2.setVisible(false);
-        valueLabelL1.setVisible(false);
-        valueLabelL2.setVisible(false);
-        valueLabelR1.setVisible(false);
-        valueLabelR2.setVisible(false);
-        valueFieldUoM.setVisible(false);
-
+        TextFields.bindAutoCompletion(valueFieldL1,new ArrayList<String>());
+        TextFields.bindAutoCompletion(valueFieldR1,new ArrayList<String>());
+        hideFields();
         patternColumn.setCellValueFactory(new PropertyValueFactory<>("MatchedBlock"));
         patternColumn.prefWidthProperty().bind(ruleView.widthProperty()
                         .multiply(50 / 100.0));
@@ -330,14 +370,30 @@ public class RulePane_CharClassif {
 
     }
 
+    private void hideFields() {
+        valueFieldL1.setVisible(false);
+        valueFieldL1.textProperty().removeListener(dataFieldCL);
+        valueFieldR1.setVisible(false);
+        valueFieldR1.textProperty().removeListener(userFieldCL);
+        valueFieldR2.setVisible(false);
+        valueLabelL1.setVisible(false);
+        valueLabelL2.setVisible(false);
+        valueLabelR1.setVisible(false);
+        valueLabelR2.setVisible(false);
+        valueFieldUoM.setVisible(false);
+    }
+
     @FXML public void PaneClose() {
         parent.ruleButton.setSelected(false);
         parent.setBottomRegionColumnSpans(false);
 
     }
     @FXML public void addRuleButtonAction() throws SQLException, ClassNotFoundException {
+        if(ruleView.getSelectionModel().getSelectedItem()!=null && ruleView.getSelectionModel().getSelectedItem().isDraft()){
+            parent.tableController.tableGrid.getSelectionModel().getSelectedItem().dropRuleResultFromRow(ruleView.getSelectionModel().getSelectedItem());
+        }
         GenericCharRule newRule = new GenericCharRule(loadRuleFromPane());
-        newRule.generateRegex(caracCombo.getValue());
+        newRule.setRegexMarker(caracCombo.getValue());
         if(newRule.parseSuccess()) {
             newRule.storeGenericCharRule();
             CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),newRule.getCharRuleId(),false);
@@ -366,7 +422,7 @@ public class RulePane_CharClassif {
             items2Reevaluate.addAll(CharPatternServices.unApplyRule(oldRule,caracCombo.getValue()));
         }
         GenericCharRule newRule = new GenericCharRule(loadRuleFromPane());
-        newRule.generateRegex(caracCombo.getValue());
+        newRule.setRegexMarker(caracCombo.getValue());
         if(newRule.parseSuccess()) {
             newRule.storeGenericCharRule();
             CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),newRule.getCharRuleId(),false);
@@ -380,6 +436,7 @@ public class RulePane_CharClassif {
 
     private String loadRuleFromPane() {
         ClassCaracteristic activeChar = caracCombo.getValue();
+        correctRulePaneInputs(activeChar.getIsNumeric());
         String rule_id=patternField.getText();
         if(activeChar.getIsNumeric()){
             if(activeChar.getAllowedUoms()!=null && activeChar.getAllowedUoms().size()>0){
@@ -405,5 +462,12 @@ public class RulePane_CharClassif {
             }
         }
         return rule_id;
+    }
+
+    private void correctRulePaneInputs(boolean isNumeric) {
+        patternField.setText(WordUtils.correctDescriptionRuleSyntaxElement(patternField.getText(),false));
+        valueFieldL1.setText(WordUtils.correctDescriptionRuleSyntaxElement(valueFieldL1.getText(),isNumeric));
+        valueFieldR1.setText(WordUtils.correctDescriptionRuleSyntaxElement(valueFieldR1.getText(),isNumeric));
+        valueFieldR2.setText(WordUtils.correctDescriptionRuleSyntaxElement(valueFieldR2.getText(),isNumeric));
     }
 }

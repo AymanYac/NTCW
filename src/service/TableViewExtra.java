@@ -4,6 +4,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
+import model.CharDescriptionRow;
 
 import java.util.LinkedHashSet;
 
@@ -90,7 +91,7 @@ public class TableViewExtra<T> // com.sun.javafx: implements ChangeListener<Skin
       if (first >= 0 && last >= first)
           for (int idx : indices)
           {
-              if (first < idx && idx <= last)
+              if (first <= idx && idx <= last)
               {
                   changeScrollPos = false;
                   break;
@@ -142,21 +143,34 @@ public class TableViewExtra<T> // com.sun.javafx: implements ChangeListener<Skin
 
   private void recomputeVisibleIndexes()
   {
+
       firstIndex = -1;
       lastIndex = -1;
 
       // Work out which of the rows are visible
       double tblViewHeight = tableView.getHeight();
+
       double headerHeight = tableView.lookup(".column-header-background").getBoundsInLocal().getHeight();
+
       double viewPortHeight = tblViewHeight - headerHeight;
+
+
       for(TableRow<T> r : rows)
       {
+          try{
+
+          }catch (Exception V){
+
+          }
           double minY = r.getBoundsInParent().getMinY();
           double maxY = r.getBoundsInParent().getMaxY();
 
+
           boolean hidden  = (maxY < 0) || (minY > viewPortHeight);
-          // boolean fullyVisible = !hidden && (maxY <= viewPortHeight) && (minY >= 0);
-          if (!hidden)
+
+          boolean fullyVisible = !hidden && (maxY <= viewPortHeight) && (minY >= 0);
+
+          if (fullyVisible)
           {
               if (firstIndex < 0 || r.getIndex() < firstIndex)
               {
@@ -168,6 +182,8 @@ public class TableViewExtra<T> // com.sun.javafx: implements ChangeListener<Skin
               }
           }
       }
+
+
 
   }
   /**

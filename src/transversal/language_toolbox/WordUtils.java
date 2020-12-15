@@ -269,19 +269,142 @@ public class WordUtils {
 			return ret;
 		}
 
-	public static String ALPHANUM_PATTERN_RULE_EVAL(String action, String matchedBlock) {
-		action = action.replace("#","[0-9]");
-		action = action.replace("@","[A-Z]");
-		action = action.replace("(|+0)","[\\W]*");
-		action = action.replace("(|+1)","[\\W]+");
-		Pattern p = Pattern.compile(action,Pattern.CASE_INSENSITIVE);
+	public static String ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(GenericCharRule rule, String action, String matchedBlock) {
+		//Transformer la syntaxe de la rule pattern neonec en regex
+		String SEP_CLASS=GenericCharRule.SEP_CLASS +"-";
+		//StringBuilder markerToConsume = new StringBuilder(rule.neonecToRegexMarker(SEP_CLASS).replace("\\Q", "").replace("\\E", ""));
+		StringBuilder markerToConsume = new StringBuilder(WordUtils.quoteCompositionMarkerInDescPattern(rule.getRuleMarker()));
+		StringBuilder matchedBlockToConsume = new StringBuilder(matchedBlock);
+		//Créer les variables temporaires correspondant aux variables du rule pattern
+		ArrayList<String> mandatorySeparators = new ArrayList<String>();
+		ArrayList<String> optionalSeparators = new ArrayList<String>();
+		ArrayList<String> digitCharacters = new ArrayList<>();
+		ArrayList<String> alphaCharacters = new ArrayList<>();
+		ArrayList<String> mandatoryStrings = new ArrayList<>();
+		ArrayList<String> optionalStrings = new ArrayList<>();
+		//Chercher l'identified pattern dans la description, en assignant les variables
+		while (markerToConsume.length()>0){
+			if(
+					ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"#",digitCharacters,SEP_CLASS)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"@",alphaCharacters,SEP_CLASS)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(|+0)",optionalSeparators,SEP_CLASS)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(|+1)",mandatorySeparators,SEP_CLASS)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(*+0)",optionalStrings,SEP_CLASS)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(*+1)",mandatoryStrings,SEP_CLASS)!=null){
+			}else if(markerToConsume.toString().startsWith("\"")){
+				markerToConsume = new StringBuilder(markerToConsume.substring(1));
+			}else {
+				markerToConsume = new StringBuilder(markerToConsume.substring(1));
+				matchedBlockToConsume = new StringBuilder(matchedBlockToConsume.substring(1));
+			}
+		}
+
+		//Créer l'item value à partir de la rule value et des variables
+		StringBuilder value = new StringBuilder();
+		action = WordUtils.quoteStringsInDescPattern(action).replace("\\Q", "").replace("\\E", "");
+		while(action.length()>0){
+			if(action.startsWith("#")){
+				value.append(digitCharacters.get(0));
+				digitCharacters.remove(0);
+				action=action.substring(1);
+				continue;
+			}
+			if(action.startsWith("@")){
+				value.append(alphaCharacters.get(0));
+				alphaCharacters.remove(0);
+				action=action.substring(1);
+				continue;
+			}
+			if(action.startsWith("(|+0)")){
+				value.append(optionalSeparators.get(0));
+				optionalSeparators.remove(0);
+				action=action.substring("(|+0)".length());
+				continue;
+			}
+			if(action.startsWith("(|+1)")){
+				value.append(mandatorySeparators.get(0));
+				mandatorySeparators.remove(0);
+				action=action.substring("(|+1)".length());
+				continue;
+			}
+			if(action.startsWith("(*+0)")){
+				value.append(optionalStrings.get(0));
+				optionalStrings.remove(0);
+				action=action.substring("(*+0)".length());
+				continue;
+			}
+			if(action.startsWith("(*+1)")){
+				value.append(mandatoryStrings.get(0));
+				mandatoryStrings.remove(0);
+				action=action.substring("(*+1)".length());
+				continue;
+			}
+			value.append(action.substring(0,1));
+			action=action.substring(1);
+		}
+		return value.toString();
+	}
+	private static Boolean ALPHANUM_PATTERN_STEP_USING_NEONEC(StringBuilder markerToConsume, StringBuilder matchedBlockToConsume, String stepNeonec, ArrayList<String> stepValues,String SEP_CLASS) {
+		if(markerToConsume.toString().startsWith(stepNeonec)){
+			String stepRegex=WordUtils.neonecObjectSyntaxToRegex(stepNeonec,SEP_CLASS,false);
+			markerToConsume.replace(0,stepNeonec.length(),"");
+			Pattern p = Pattern.compile("("+stepRegex+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
+			Matcher m = p.matcher(matchedBlockToConsume);
+			if(m.find()){
+				String consumableMatch = String.valueOf(m.group(1));
+				stepValues.add(consumableMatch);
+				matchedBlockToConsume.replace(0,consumableMatch.length(),"");
+				return true;
+			}
+			return false;
+		}
+		return null;
+	}
+
+	public static String neonecObjectSyntaxToRegex(String markerToConsume, String SEP_CLASS,boolean dropQuotes) {
+		String ret = markerToConsume
+				.replaceAll("%\\d(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[-+]?[0-9]+(?=[. ,]?[0-9]{3,3})*[0-9]*(?=[.,][0-9]+)?")
+				.replaceAll("#(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[0-9]")
+				.replaceAll("@(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[a-z]")
+				.replaceAll("\\(\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + SEP_CLASS + "]?")
+				.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + SEP_CLASS + "]+")
+				.replaceAll("\\(\\*\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".*?")
+				.replaceAll("\\(\\*\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".+?");
+		if(dropQuotes){
+			return ret.replace("\"", "");
+		}
+		return ret;
+		}
+
+	private static Boolean ALPHANUM_PATTERN_STEP_USING_REGEX(StringBuilder markerToConsume, StringBuilder matchedBlockToConsume, String stepRegex, ArrayList<String> stepValues) {
+		if(markerToConsume.toString().startsWith(stepRegex)){
+			markerToConsume.replace(0,stepRegex.length(),"");
+			Pattern p = Pattern.compile("("+stepRegex+")"+markerToConsume,Pattern.CASE_INSENSITIVE);
+			Matcher m = p.matcher(matchedBlockToConsume);
+			if(m.find()){
+				String consumableMatch = m.group(1);
+				stepValues.add(consumableMatch);
+				matchedBlockToConsume.replace(0,consumableMatch.length(),"");
+				return true;
+			}
+			return false;
+		}
+		return null;
+	}
+
+
+	public static String ALPHANUM_PATTERN_RULE_EVAL_BLOCKWISE(String action, String matchedBlock) {
+		String actionCopy = action.replace("#","[0-9]");
+		actionCopy = actionCopy.replace("@","[A-Z]");
+		actionCopy = actionCopy.replace("(|+0)","[\\W]*");
+		actionCopy = actionCopy.replace("(|+1)","[\\W]+");
+		Pattern p = Pattern.compile(actionCopy,Pattern.CASE_INSENSITIVE);
 		Matcher matcher = p.matcher(matchedBlock);
 		if(matcher.find()){
 			return matcher.group(0);
 		}
-		return matchedBlock;
-		}
-
+		return action;
+	}
 
 		public static String ALPHANUM_PATTERN_RULE_INREPLACE(String selected_text, boolean keepAlphaBeforeFirstSep,boolean quoteOuterText) {
 			//e.g. "abcd ef12-gh34-ij56"
@@ -615,16 +738,33 @@ public class WordUtils {
 
 
 		public static String substituteRuleItemToRegexItem(String ruleMarker, String ancien, String nouveau) {
+			//matches ancien which is followed by any characters followed by a certain number of pairs of " or ', followed by a any characters till the end
 			if(ancien.equals("%\\d")) {
-				return ruleMarker.replaceAll(ancien, nouveau);
+				return ruleMarker.replaceAll(ancien+"(?=([^\"]*[\"][^\"]*[\"])*[^\"]*$)", nouveau);
 			}
-			return ruleMarker.replace(ancien, nouveau);
+			return ruleMarker.replaceAll(Pattern.quote(ancien)+"(?=([^\"]*[\"][^\"]*[\"])*[^\"]*$)", nouveau);
 		}
 
+		private static String removeStringsInDescPattern(String transformed) {
+			Pattern p = Pattern.compile("\"([^\"]*)\"");
+			Matcher m = p.matcher(transformed);
+			return m.replaceAll("");
+		}
 
-		public static String quote(String ruleMarker) {
-			String q = Pattern.quote(ruleMarker);
-			return q.substring(2).substring(0,q.length()-4);
+		public static String quoteStringsInDescPattern(String ruleMarker) {
+			Pattern p = Pattern.compile("\"([^\"]*)\"");
+			Matcher m = p.matcher(ruleMarker);
+			return m.replaceAll("\\\\Q"+"$1"+"\\\\E");
+			//String q = Pattern.quote(ruleMarker);
+			//return q.substring(2).substring(0,q.length()-4);
+		}
+
+		public static String quoteCompositionMarkerInDescPattern(String ruleMarker) {
+			Pattern p = Pattern.compile("\\+(?=[^ *\\d|%])(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+			Matcher m = p.matcher(ruleMarker);
+			return m.replaceAll("\""+"$0"+"\"");
+			//String q = Pattern.quote(ruleMarker);
+			//return q.substring(2).substring(0,q.length()-4);
 		}
 
 
@@ -654,5 +794,337 @@ public class WordUtils {
 			return className.split("&&&")[1].contains(typedText);
 		}
 
+	public static String correctDescriptionRuleSyntax(String ruleString) {
+		int ruleMarkerEndDelimiter = ruleString.indexOf('<');
+		String ruleMarker = ruleString.substring(0, ruleMarkerEndDelimiter);
+		ruleMarker = WordUtils.correctDescriptionRuleSyntaxElement(ruleMarker,false);
+		String ruleActions = ruleString.substring(ruleMarkerEndDelimiter);
+		Pattern regexPattern = Pattern.compile("<([^<>]*)>");
+		Matcher m = regexPattern.matcher(ruleActions);
 
+		ruleString=ruleMarker;
+		while(m.find()){
+			String action = m.group(1);
+			String actionPrefix = action.split(" ")[0];
+			String actionSuffix = action.substring(actionPrefix.length());
+			if(actionPrefix.startsWith("UOM")){
+
+			}
+			else if(actionPrefix.startsWith("NOM") || actionPrefix.startsWith("MIN") || actionPrefix.startsWith("MAX") || actionPrefix.startsWith("MINMAX")){
+				actionSuffix=WordUtils.correctDescriptionRuleSyntaxElement(actionSuffix,true);
+			}else{
+				actionSuffix=WordUtils.correctDescriptionRuleSyntaxElement(actionSuffix,false);
+			}
+			ruleString=ruleString+"<"+actionPrefix+" "+actionSuffix+">";
+		}
+		return ruleString;
+	}
+
+	public static String correctDescriptionRuleSyntaxElement(String initial, boolean processingNumericValue){
+		if(!(initial!=null) || initial.length()==0){
+			return null;
+		}
+		String transformed="";
+//Dim char As Integer 'caractère analysé
+//Dim numeric_value_index As Integer 'index n de la valeur numérique %n
+		int numericValueIndex;
+//Dim special_characters(19) As String 'liste de caractères spéciaux (ici designée pour les patterns/champs TXT)
+		ArrayList<String> specialCharacters;
+		if(processingNumericValue){
+			specialCharacters=new ArrayList<>(Arrays.asList("0","1","2","3","4","5","6","7","8","9","+","*","-","/","%","%1","%2","%3","%4","%5","%6","#","(#+0)","(#+1)","(#+2)","(#+3)","(#+4)","(#+5)","(#+6)"));
+		}else{
+			specialCharacters=new ArrayList<>(Arrays.asList("+","*","(*+0)","(*+1)","(*+2)","(*+3)","(*+4)","(*+5)","(*+6)","|","(|+0)","(|+1)","(|+2)","(|+3)","(|+4)","(|+5)","(|+6)","%","%1","%2","%3","%4","%5","%6","#","(#+0)","(#+1)","(#+2)","(#+3)","(#+4)","(#+5)","(#+6)","(@+0)","(@+1)","(@+2)","(@+3)","(@+4)","(@+5)","(@+6)"));
+		}
+//Dim sp_char_index As Integer 'index dans la liste des caractères spéciaux
+		int spCharIndex;
+//
+//Dim in_quotes As Variant '1 si entre "", -1 sinon
+		boolean inQuotes = false;
+//Dim is_special As Integer '1 si special character, 0 sinon
+		boolean isSpecial = false;
+//Dim is_previous_special As Integer '1 si le caractère précédent est un  special character, 0 sinon
+		boolean isPreviousSpecial = false;
+//'Correction du pattern
+//			transformed(row) = initial(row)
+		transformed = initial;
+
+//    'Passe de remplacement de "|" par "(|+1)" et "*" par "(*+1)" ///A étendre aux # et @\\\
+//    in_quotes = -1
+//    caractère analysé
+		int charIdx=0;
+//    While char <= Len(transformed(row))
+		while(charIdx<transformed.length()) {
+//        If Mid(transformed(row), char, 1) = """" Then
+			if(transformed.charAt(charIdx)=='"') {
+
+//            in_quotes = in_quotes * (-1)
+				inQuotes=!inQuotes;
+//        End If
+			}
+//        If Mid(transformed(row), char, 1) = "|" And in_quotes = -1 Then
+			if(transformed.charAt(charIdx)=='|' && !inQuotes) {
+//            transformed(row) = Left(transformed(row), char - 1) & "(|+1)" & Right(transformed(row), Len(transformed(row)) - char)
+				transformed = transformed.substring(0,charIdx)+"(|+1)"+transformed.substring(charIdx+1);
+//            char = char + 1
+				charIdx++;
+//        End If
+			}
+//        If Mid(transformed(row), char, 1) = "*" And in_quotes = -1 Then
+			if(transformed.charAt(charIdx)=='*' && !inQuotes) {
+//            transformed(row) = Left(transformed(row), char - 1) & "(*+1)" & Right(transformed(row), Len(transformed(row)) - char)
+				transformed = transformed.substring(0,charIdx)+"(*+1)"+transformed.substring(charIdx+1);
+//            char = char + 1
+				charIdx++;
+//        End If
+			}
+//        char = char + 1
+			charIdx++;
+//    Wend
+		}
+
+
+//    'Passe de remplacement de "((|+1)+" par "(|+" et "((*+1)+" par "(*+" ///A étendre aux # et @\\\
+//    in_quotes = -1
+		inQuotes=false;
+//    char = 1
+		charIdx=0;
+//    While char <= Len(transformed(row))
+		while(charIdx<transformed.length()) {
+//        If Mid(transformed(row), char, 1) = """" Then
+			if(transformed.charAt(charIdx)=='"') {
+//            in_quotes = in_quotes * -1
+				inQuotes=!inQuotes;
+//        End If
+			}
+//        If Mid(transformed(row), char, 7) = "((|+1)+" And in_quotes = -1 Then
+			if(transformed.substring(charIdx).startsWith("((|+1)+") && !inQuotes) {
+//            transformed(row) = Left(transformed(row), char - 1) & "(|+" & Right(transformed(row), Len(transformed(row)) - char - 6)
+				transformed = transformed.substring(0,charIdx)+"(|+"+transformed.substring(charIdx+7);
+//        End If
+			}
+//        If Mid(transformed(row), char, 7) = "((*+1)+" And in_quotes = -1 Then
+			if(transformed.substring(charIdx).startsWith("((*+1)+") && !inQuotes) {
+//            transformed(row) = Left(transformed(row), char - 1) & "(*+" & Right(transformed(row), Len(transformed(row)) - char - 6)
+				transformed = transformed.substring(0,charIdx)+"(*+"+transformed.substring(charIdx+7);
+//        End If
+			}
+//        char = char + 1
+			charIdx++;
+//    Wend
+		}
+
+
+//    'Passe de remplacement de "%" par "%n"
+//    in_quotes = -1
+		inQuotes=false;
+//    numeric_value_index = 1
+		numericValueIndex=1;
+//    char = 1
+		charIdx=0;
+//    While char <= Len(transformed(row)) - 1
+		while(charIdx<transformed.length()-1) {
+//        If Mid(transformed(row), char, 1) = """" Then
+			if (transformed.charAt(charIdx) == '"') {
+//            in_quotes = in_quotes * (-1)
+				inQuotes = !inQuotes;
+//        End If
+			}
+//        If Mid(transformed(row), char, 1) = "%" And IsNumeric(Mid(transformed(row), char + 1, 1)) = False And in_quotes = -1 Then
+			if(transformed.charAt(charIdx)=='%' && !inQuotes && !Character.isDigit(transformed.charAt(charIdx+1))) {
+//            transformed(row) = Left(transformed(row), char - 1) & "%" & numeric_value_index & Right(transformed(row), Len(transformed(row)) - char)
+				transformed=transformed.substring(0,charIdx)+"%"+String.valueOf(numericValueIndex)+transformed.substring(charIdx+1);
+//            numeric_value_index = numeric_value_index + 1
+				numericValueIndex++;
+//        End If
+			}
+//        char = char + 1
+			charIdx++;
+//    Wend
+		}
+//    If Right(transformed(row), 1) = "%" Then
+		if(transformed.endsWith("%")) {
+//        transformed(row) = transformed(row) & numeric_value_index
+			transformed=transformed+String.valueOf(numericValueIndex);
+			numericValueIndex++;
+//    End If
+		}
+//    'Passe de remplacement de String par "String"
+//    in_quotes = -1
+		inQuotes=false;
+//    is_special = 0
+		isSpecial=false;
+//    sp_length = 1
+		int specialLen=1;
+//
+//    'Vérification du premier caractère
+//    If Left(transformed(row), 1) = """" Then
+		if(transformed.startsWith("\"")) {
+//        in_quotes = in_quotes * -1
+			inQuotes=!inQuotes;
+//    End If
+		}
+//    For sp_char_index = 0 To 19
+		for(String specialCharacter:specialCharacters) {
+//        If Left(transformed(row), Len(special_characters(sp_char_index))) = special_characters(sp_char_index) And in_quotes = -1 Then
+			if(transformed.startsWith(specialCharacter) && !inQuotes){
+//                is_special = 1
+				isSpecial=true;
+//                sp_length = Len(special_characters(sp_char_index))
+				specialLen=specialCharacter.length();
+//        End If
+			}
+//    Next
+		}
+//    If is_special = 0 And Left(transformed(row), 1) <> """" Then
+		if(!isSpecial && !transformed.startsWith("\"")) {
+//        transformed(row) = """" & transformed(row)
+			transformed = "\""+transformed;
+//    End If
+		}
+//    char = 1 + sp_length
+		charIdx = specialLen;
+//
+//    'Vérification des caractères centraux
+//    While char <= Len(transformed(row))
+		while(charIdx<transformed.length()) {
+//        is_previous_special = is_special
+			isPreviousSpecial=isSpecial;
+//        If Mid(transformed(row), char, 1) = """" Then
+			if(transformed.charAt(charIdx)=='"') {
+//            in_quotes = in_quotes * -1
+				inQuotes=!inQuotes;
+//        End If
+			}
+//        is_special = 0
+			isSpecial=false;
+//        sp_length = 1
+			specialLen=1;
+//        For sp_char_index = 0 To 19
+			for(String specialCharacter:specialCharacters) {
+//            If Mid(transformed(row), char, Len(special_characters(sp_char_index))) = special_characters(sp_char_index) And in_quotes = -1 Then
+				if (transformed.substring(charIdx).startsWith(specialCharacter) && !inQuotes) {
+//                is_special = 1
+					isSpecial=true;
+//                sp_length = Len(special_characters(sp_char_index))
+					specialLen=specialCharacter.length();
+//            End If
+				}
+//        Next
+			}
+//        If is_previous_special = 1 And is_special = 0 And Mid(transformed(row), char, 1) <> """" Then
+			if(isPreviousSpecial && !isSpecial && transformed.charAt(charIdx)!='"') {
+//            transformed(row) = Left(transformed(row), char - 1) & """" & Right(transformed(row), Len(transformed(row)) - char + 1)
+				transformed=transformed.substring(0,charIdx)+"\""+transformed.substring(charIdx);
+//            char = char + 1
+				charIdx++;
+//        End If
+			}
+//        If is_previous_special = 0 And is_special = 1 And Mid(transformed(row), char - 1, 1) <> """" Then
+			if(!isPreviousSpecial && isSpecial && transformed.charAt(charIdx-1)!='"'){
+//            transformed(row) = Left(transformed(row), char - 1) & """" & Right(transformed(row), Len(transformed(row)) - char + 1)
+				transformed=transformed.substring(0,charIdx)+"\""+transformed.substring(charIdx);
+//            char = char + 1
+				charIdx++;
+//        End If
+			}
+//        char = char + sp_length
+			charIdx=charIdx+specialLen;
+//    Wend
+		}
+//    'Vérification du dernier caractère
+//    If is_special = 0 And Right(transformed(row), 1) <> """" Then
+		if(!isSpecial && !transformed.endsWith("\"")) {
+//        transformed(row) = transformed(row) & """"
+			transformed=transformed+"\"";
+//    End If
+		}
+		//Si valeur numérique, supprimer à la fin tous les caractères non-numériques hors caractères spéciaux
+		if(processingNumericValue){
+			transformed=WordUtils.removeStringsInDescPattern(transformed);
+		}
+//    'Affichage
+		return transformed;
+	}
+
+
+	public static String[] splitComposedPattern(String rulePattern) {
+		return rulePattern.split("(?<![\\|\\*])\\+(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+		//return rulePattern.split("\\+(?=[^ *\\d|%])(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+		//return rulePattern.split("\\+(?=(?:[^\"%\\d]*\"[^\"]*\")*[^\"]*$)");
+		//(?<!x), means "only if it doesn't have "x" before this point".
+		//(?=[^\d]), means "only if not followed by digit after this point".
+		//\\+           // Split on "+"sign
+		//(?=         // Followed by
+		//		(?:      // Start a non-capture group
+		//			[^"]*  // 0 or more non-quote characters
+		//			"      // 1 quote
+		//			[^"]*  // 0 or more non-quote characters
+		//			"      // 1 quote
+		//		)*       // 0 or more repetition of non-capture group (multiple of 2 quotes will be even)
+		//		[^"]*    // Finally 0 or more non-quotes
+		//		$        // Till the end  (This is necessary, else every comma will satisfy the condition))
+	}
+
+	public static String NUM_PATTERN_RULE_EVAL(String action, ArrayList<Double> numValuesInSelection) {
+		return (new WordUtils.Rewriter("%(\\d)")
+		{
+			public String replacement()
+			{
+				int intValue = Integer.parseInt(group(1));
+				Double finalValue = numValuesInSelection.get(intValue-1);
+				return String.valueOf(numValuesInSelection.get(intValue-1));
+			}
+		}.rewrite(action));
+	}
+
+	public static String trimTextField(String text) {
+		if(text!=null){
+			return text.trim();
+		}
+		return null;
+	}
+
+
+	public abstract static class Rewriter {
+		private Pattern pattern;
+		private Matcher matcher;
+
+		/**
+		 * Constructs a rewriter using the given regular expression; the syntax is
+		 * the same as for 'Pattern.compile'.
+		 */
+		public Rewriter(String regex) {
+			this.pattern = Pattern.compile(regex);
+		}
+
+		/**
+		 * Returns the input subsequence captured by the given group during the
+		 * previous match operation.
+		 */
+		public String group(int i) {
+			return matcher.group(i);
+		}
+
+		/**
+		 * Overridden to compute a replacement for each match. Use the method
+		 * 'group' to access the captured groups.
+		 */
+		public abstract String replacement();
+
+		/**
+		 * Returns the result of rewriting 'original' by invoking the method
+		 * 'replacement' for each match of the regular expression supplied to the
+		 * constructor.
+		 */
+		public String rewrite(CharSequence original) {
+			this.matcher = pattern.matcher(original);
+			StringBuffer result = new StringBuffer(original.length());
+			while (matcher.find()) {
+				matcher.appendReplacement(result, "");
+				result.append(replacement());
+			}
+			matcher.appendTail(result);
+			return result.toString();
+		}
+	}
 }

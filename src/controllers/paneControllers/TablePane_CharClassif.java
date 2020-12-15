@@ -2,19 +2,21 @@ package controllers.paneControllers;
 
 import controllers.Char_description;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.*;
 import javafx.scene.control.TableColumn.CellDataFeatures;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import model.*;
@@ -86,7 +88,7 @@ public class TablePane_CharClassif {
 
 
 	@SuppressWarnings("rawtypes")
-	private TableViewExtra tvX;
+	public TableViewExtra tvX;
 
 
 
@@ -287,7 +289,7 @@ public class TablePane_CharClassif {
 		
 		translationThread = new Thread(translationTask);; translationThread.setDaemon(true);
 		translationThread.setName("Trnsl");
-		//translationThread.start();
+		translationThread.start();
 		
 		
 		
@@ -296,27 +298,7 @@ public class TablePane_CharClassif {
 	}
 
 	private void scrollToSelectedItem(CharDescriptionRow tmp) {
-		if(GlobalConstants.NATIVE_SELECTION_SCROLL){
-			tvX.scrollToIndex(tableGrid.getItems().indexOf(tmp));
-			return;
-		}
-		int selectedIdx = tableGrid.getItems().indexOf(tmp);
-		int lvi = tvX.getLastVisibleIndex()-1;
-		if(lvi<selectedIdx){
-			System.out.println("lvi:"+lvi);
-			int offset = selectedIdx-lvi;
-			System.out.println("offset:"+offset);
-			tableGrid.scrollTo(tvX.getFirstVisibleIndex()+offset);
-		}
-		int fvi = tvX.getFirstVisibleIndex()+1;
-		if(fvi>selectedIdx){
-			System.out.println("fvi:"+fvi);
-			int offset = selectedIdx-fvi;
-			System.out.println("offset:"+offset);
-			tableGrid.scrollTo(tvX.getFirstVisibleIndex()+offset);
-
-		}
-		System.out.println("XXXXXXXXXX");
+		tvX.scrollToIndex(tableGrid.getItems().indexOf(tmp));
 	}
 
 	public String translate2UserLanguage(String description) throws IOException {
@@ -346,7 +328,31 @@ public class TablePane_CharClassif {
 
 	public void setParent(Char_description char_description) {
 		this.Parent=char_description;
-		
+		MenuItem addCustomValue = new MenuItem("Use current value as custom proposition");
+		addCustomValue.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				CharDescriptionRow row = tableGrid.getSelectionModel().getSelectedItem();
+				int activeCol = Math.floorMod(selected_col, CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
+				String itemClass = row.getClass_segment_string().split("&&&")[0];
+				String activeCharId = CharValuesLoader.active_characteristics.get(itemClass).get(activeCol).getCharacteristic_id();
+				CaracteristicValue activeData = row.getData(itemClass).get(activeCharId);
+				Parent.proposer.addCustomValue(activeCharId,activeData,Parent.account);
+				Parent.refresh_ui_display();
+			}
+		});
+
+		ContextMenu customMenu = new ContextMenu();
+		customMenu.getItems().add(addCustomValue);
+		tableGrid.setContextMenu(customMenu);
+		/*// only display context menu for non-empty rows:
+					row.contextMenuProperty().bind(
+							Bindings.when(row.emptyProperty().and(row.getItem().hasDataInCurrentClassForCurrentCarac(selected_col)))
+									.then(rowMenu)
+									.otherwise((ContextMenu)null));
+					return row;
+				});*/
 	}
 	
 	public void fireManualClassChange(String result,boolean jumpNext) throws ClassNotFoundException, SQLException {
@@ -461,7 +467,7 @@ public class TablePane_CharClassif {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void refresh_table_with_segment(String active_class) throws ClassNotFoundException, SQLException {
-		tvX = new TableViewExtra(tableGrid);
+		Parent.proposer.clearCustomValues();
 		account.setUser_desc_class(active_class);
 		Tools.set_desc_class(account);
 		if(!active_class.equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
@@ -486,7 +492,8 @@ public class TablePane_CharClassif {
 			selectLastDescribedItem();
 			this.selected_col = -1;
 			nextChar();
-
+			tvX = new TableViewExtra(tableGrid);
+			tableGrid.refresh();
 		}else {
 			try {
 				Parent.charPaneController.PaneClose();
@@ -676,19 +683,18 @@ public class TablePane_CharClassif {
 			return;
 		}
 		selected_col+=1;
-		selectChartAtIndex(selected_col,Parent.charButton.isSelected());
+		selectChartAtIndex(selected_col,Parent.charButton.isSelected()||Parent.ruleButton.isSelected());
 	}
 	public void previousChar() {
 		if(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			return;
 		}
 		this.selected_col-=1;
-		selectChartAtIndex(selected_col,Parent.charButton.isSelected());
+		selectChartAtIndex(selected_col,Parent.charButton.isSelected()||Parent.ruleButton.isSelected());
 	}
 
 	@SuppressWarnings("rawtypes")
 	private void selectChartAtIndex(int i, boolean collapsedView) {
-		tvX = new TableViewExtra(tableGrid);
 		if(selected_col<0){
 			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
 		}
@@ -909,6 +915,9 @@ public class TablePane_CharClassif {
 					if(activeData.getSource().equals(DataInputMethods.AUTO_CHAR_DESC)){
 						return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result -> result.getStatus()!=null && result.getStatus().equals("Applied")).findAny().get().getMatchedBlock());
 					}
+					if(activeData.getSource().equals(DataInputMethods.SEMI_CHAR_DESC)){
+						return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result -> result.getGenericCharRule().getRuleSyntax()!=null && result.getGenericCharRule().getRuleSyntax().equals(activeData.getRule_id())).findAny().get().getMatchedBlock());
+					}
 					return new ReadOnlyObjectWrapper(activeData.getRule_id());
                 }catch(Exception V) {
                	 return new ReadOnlyObjectWrapper("");
@@ -951,6 +960,7 @@ public class TablePane_CharClassif {
 				saveSortOrder();
 			}
 			tableGrid.scrollTo(tableGrid.getSelectionModel().getSelectedIndex());
+			tableGrid.refresh();
 		}));
 
 		tableGrid.setOnKeyPressed(new EventHandler<KeyEvent>() 

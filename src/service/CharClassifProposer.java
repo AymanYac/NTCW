@@ -4,13 +4,11 @@ import controllers.Char_description;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.util.Pair;
-import model.CaracteristicValue;
-import model.CharDescriptionRow;
-import model.ClassCaracteristic;
-import model.UnitOfMeasure;
+import model.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.UoMDeclarationDialog;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CharClassifProposer {
@@ -21,7 +19,8 @@ public class CharClassifProposer {
 	private static int lastestActiveCRIndex = -1;
 	
 	private static HashMap<Integer,Pair<CaracteristicValue,String>> buttonToData = new HashMap<Integer,Pair<CaracteristicValue,String>>();
-	
+	private static HashMap<String,ArrayList<CaracteristicValue>> customValues = new HashMap<String,ArrayList<CaracteristicValue>>();
+
 	public CharClassifProposer(Char_description parent) {
 		CharClassifProposer.parent = parent;
 	}
@@ -39,7 +38,9 @@ public class CharClassifProposer {
 		}
 	}
 
-	public void addSemiAutoProposition(String buttonText, CaracteristicValue preparedValue, String preparedRule,
+	public void
+
+	addSemiAutoProposition(String buttonText, CaracteristicValue preparedValue, String preparedRule,
 			ClassCaracteristic active_char) {
 		
 		for(int i=0;i<=lastestActiveSAIndex;i++) {
@@ -71,7 +72,7 @@ public class CharClassifProposer {
 			}else {
 				CaracteristicValue val = getValueForButton(currentLoopButtonIndex);
 				String rule = getRuleForButton(currentLoopButtonIndex);
-				parent.sendSemiAutoPattern(val, rule);
+				parent.sendSemiAutoPattern(val, rule, null);
 				
 			}
 			
@@ -109,7 +110,6 @@ public class CharClassifProposer {
 		try {
 			lastestActiveCRIndex=0;
 			row.getRulePropositions(charId).stream().forEach(result->{
-				
 				Button btn = parent.propButtons.get(lastestActiveCRIndex);
 				btn.setText(result.getMatchedBlock()+" >>> "+result.getActionValue().getDisplayValue(false,false));
 				btn.setTooltip(new Tooltip(btn.getText()));
@@ -120,6 +120,8 @@ public class CharClassifProposer {
 					CharDescriptionExportServices.addItemCharDataToPush(row, segment, charId);
 					CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
 					clearPropButtons();
+					parent.refresh_ui_display();
+					parent.tableController.tableGrid.refresh();
 				});
 				lastestActiveCRIndex+=1;
 			});	
@@ -130,4 +132,80 @@ public class CharClassifProposer {
 	}
 
 
+	public void loadCustomValues(ClassCaracteristic activeChar) {
+		ArrayList<CaracteristicValue> values = customValues.get(activeChar.getCharacteristic_id());
+		if(values!=null){
+			try {
+				lastestActiveCRIndex=0;
+				values.forEach(v->{
+					CaracteristicValue copy = v.shallowCopy(parent.account);
+					copy.setSource(DataInputMethods.MANUAL);
+					Button btn = parent.propButtons.get(lastestActiveCRIndex);
+					btn.setText(copy.getDisplayValue(parent));
+					btn.setOpacity(1.0);
+					btn.setOnAction((event) -> {
+						parent.tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(row->{
+							CharValuesLoader.updateRuntimeDataForItem(row,row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id(),copy);
+							CharDescriptionExportServices.addItemCharDataToPush(row, row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id());
+						});
+						CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
+						clearPropButtons();
+						parent.refresh_ui_display();
+						parent.tableController.tableGrid.refresh();
+					});
+					lastestActiveCRIndex+=1;
+				});
+			}catch(Exception V) {
+
+			}
+		}
+	}
+
+	public void addCustomValue(String activeCharId, CaracteristicValue copy, UserAccount account) {
+		if(copy!=null){
+			CaracteristicValue shallowCopy = copy.shallowCopy(account);
+			try{
+				customValues.get(activeCharId).add(shallowCopy);
+			}catch (Exception V){
+				customValues.put(activeCharId,new ArrayList<CaracteristicValue>());
+				customValues.get(activeCharId).add(shallowCopy);
+			}
+		}
+		
+	}
+
+	public void clearCustomValues() {
+		try{
+			customValues.clear();
+		}catch (Exception V){
+
+		}
+	}
+
+	public String getUserSelectedText() {
+		String selectedText = "";
+		selectedText = parent.ld.getSelectedText();
+		if(selectedText.length()==0) {
+			selectedText = parent.ld_translated.getSelectedText();
+			if(selectedText.length()==0) {
+				selectedText=parent.sd.getSelectedText();
+				if(selectedText.length()==0) {
+					selectedText=parent.sd_translated.getSelectedText();
+				}
+			}
+		}
+
+		try{
+			if(parent.browserController.showingPdf.getValue()) {
+				String pdfSelection = parent.browserController.iceController.getDocumentViewController().getSelectedText();
+				if (pdfSelection != null && pdfSelection.length() > 0) {
+					selectedText = pdfSelection;
+				}
+			}
+
+		}catch (Exception V){
+
+		}
+		return selectedText;
+	}
 }

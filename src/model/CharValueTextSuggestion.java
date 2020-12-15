@@ -143,6 +143,10 @@ public class CharValueTextSuggestion {
     			).hashCode();
     }
 
+	@Override
+	public String toString() {
+		return getDisplay_value();
+	}
 	
 	
 }

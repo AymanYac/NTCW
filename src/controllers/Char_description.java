@@ -165,6 +165,7 @@ public class Char_description {
 
 
 	public AutoCompleteBox_CharValue valueAutoComplete;
+	private boolean draftingRule=false;
 
 
 	@FXML void nextBlank() {
@@ -292,7 +293,18 @@ public class Char_description {
 		editRuleButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				PatternEditionDialog.editRule(TablePane_CharClassif.Parent);
+				if(ruleButton.isSelected()) {
+					rulePaneController.PaneClose();
+				}else {
+					imageButton.setSelected(false);
+					charButton.setSelected(false);
+					ruleButton.setSelected(true);
+					try {
+						load_rule_pane();
+					} catch (IOException | ClassNotFoundException  | SQLException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		});
 		deleteValueLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -405,6 +417,12 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.UP)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.UP, pressed);
 		}
+		if(keyEvent.getCode().equals(KeyCode.PAGE_DOWN)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.PAGE_DOWN, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.PAGE_UP)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.PAGE_UP, pressed);
+		}
 		if(keyEvent.getCode().equals(KeyCode.K)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.K, pressed);
 		}
@@ -474,11 +492,40 @@ public class Char_description {
 				});
 				
 			}
-			
+			if (this.account.PRESSED_KEYBOARD.get(KeyCode.PAGE_DOWN)) {
+				tableController.tableGrid.requestFocus();
+				duplicateKeyEvent(KeyCode.PAGE_DOWN);
+				//parent_controller.fireClassScroll(rowIndex+1,KeyCode.DOWN);
+			}
+			else if (this.account.PRESSED_KEYBOARD.get(KeyCode.PAGE_UP)) {
+				tableController.tableGrid.requestFocus();
+				duplicateKeyEvent(KeyCode.PAGE_UP);
+				//parent_controller.fireClassScroll(rowIndex-1,KeyCode.UP);
+			}
 						
 		}
 		
 	}
+
+	public void duplicateKeyEvent(KeyCode key) {
+		if(!GlobalConstants.AUTO_TEXT_FIELD_DUPLICATE_ACTION) {
+			return;
+		}
+		try {
+
+			Robot keyboardRobot = new Robot();
+			if(key.equals(KeyCode.PAGE_UP)){
+				keyboardRobot.keyPress(java.awt.event.KeyEvent.VK_PAGE_UP);
+			}
+			if(key.equals(KeyCode.PAGE_DOWN)){
+				keyboardRobot.keyPress(java.awt.event.KeyEvent.VK_PAGE_DOWN);
+			}
+
+		} catch (AWTException e) {
+
+		}
+	}
+
 	public void validateFieldsThenSkipToNext(Boolean TranslationProcessResult) {
 		Node pbNode = validateDataFields();
 		if(pbNode!=null) {
@@ -569,7 +616,12 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.P)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.P, pressed);
 		}
-		
+		if(keyEvent.getCode().equals(KeyCode.PAGE_DOWN)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.PAGE_DOWN, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.PAGE_UP)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.PAGE_UP, pressed);
+		}
 		if(keyEvent.getCode().equals(KeyCode.DOWN)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.DOWN, pressed);
 		}
@@ -612,9 +664,11 @@ public class Char_description {
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
 			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
 			try{
+				proposer.clearPropButtons();
+				String selectedText=proposer.getUserSelectedText();
 				CharPatternServices.scanSelectionForPatternDetection(this,
 						CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
-								.get(active_char_index));
+								.get(active_char_index),selectedText);
 			}catch (Exception V){
 				V.printStackTrace(System.err);
 			}
@@ -675,7 +729,9 @@ public class Char_description {
 			if(this.charButton.isSelected()) {
 				this.charPaneController.PaneClose();
 			}else {
+				imageButton.setSelected(false);
 				charButton.setSelected(true);
+				ruleButton.setSelected(false);
 				load_char_pane();
 			}
 		}
@@ -683,8 +739,28 @@ public class Char_description {
 			if(this.ruleButton.isSelected()) {
 				this.rulePaneController.PaneClose();
 			}else {
+				imageButton.setSelected(false);
+				charButton.setSelected(false);
 				ruleButton.setSelected(true);
-				load_rule_pane();
+				String selectedText = proposer.getUserSelectedText();
+				if(selectedText.length()>0){
+					draftingRule=true;
+					int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
+					CharPatternServices.scanSelectionForPatternDetection(this,
+							CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
+									.get(active_char_index),selectedText);
+					draftingRule=false;
+				}
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							load_rule_pane();
+						} catch (IOException | SQLException | ClassNotFoundException e) {
+							e.printStackTrace();
+						}
+					}
+				});
 			}
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.P)) {
@@ -692,6 +768,8 @@ public class Char_description {
 				this.imagePaneController.imagePaneClose();
 			}else {
 				imageButton.setSelected(true);
+				charButton.setSelected(false);
+				ruleButton.setSelected(false);
 				load_image_pane(true);
 			}
 		}
@@ -1178,10 +1256,8 @@ public class Char_description {
 					if(comboValue!=null){
 						try {
 							tableController.refresh_table_with_segment(FxUtilTest.getComboBoxValue(classCombo).getClassSegment());
-						} catch (ClassNotFoundException e) {
+						} catch (ClassNotFoundException | SQLException e) {
 							e.printStackTrace();
-						} catch (SQLException throwables) {
-							throwables.printStackTrace();
 						}
 					}
 				}
@@ -1449,7 +1525,7 @@ public class Char_description {
 		if(this.charButton.isSelected()) {
 			this.charPaneController.load_item_chars();
 		}
-		if(this.ruleButton.isSelected()) {
+		if(this.ruleButton.isSelected() && !draftingRule) {
 			this.rulePaneController.load_description_patterns();
 		}
 		CharDescriptionRow row = (CharDescriptionRow) this.tableController.tableGrid.getSelectionModel().getSelectedItem();
@@ -1465,6 +1541,7 @@ public class Char_description {
 			if(!FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 				selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
 				active_char = CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col);
+				proposer.loadCustomValues(CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col));
 				proposer.loadCharRuleProps(row,row.getClass_segment_string().split("&&&")[0],CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col).getCharacteristic_id());
 				
 			}else {
@@ -1804,7 +1881,7 @@ public class Char_description {
 		tableController.tableGrid.refresh();
 		
 	}
-	public void sendSemiAutoPattern(CaracteristicValue pattern_value, String ruleString) {
+	public void sendSemiAutoPattern(CaracteristicValue pattern_value, String ruleString, String selectedText) {
 		
 		pattern_value.setSource(DataInputMethods.SEMI_CHAR_DESC);
 		pattern_value.setAuthor(account.getUser_id());
@@ -1827,11 +1904,31 @@ public class Char_description {
 				ruleString = loopRule;
 			}
 		}
-		pattern_value.setRule_id(ruleString);
-		rule_field.setText(ruleString);
-		AssignValueOnSelectedItems(pattern_value);
-		CharPatternServices.applyItemRule(this);
-		refresh_ui_display();
+		ruleString = WordUtils.correctDescriptionRuleSyntax(ruleString);
+		if(draftingRule){
+			CharDescriptionRow activeRow = tableController.tableGrid.getSelectionModel().getSelectedItem();
+			String activeClass = tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
+			int activeCharIndex = tableController.selected_col;
+			ArrayList<ClassCaracteristic> activeChars = CharValuesLoader.active_characteristics.get(activeClass);
+			ClassCaracteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
+			GenericCharRule newRule = new GenericCharRule(ruleString);
+			newRule.setRegexMarker(activeChar);
+			if(newRule.parseSuccess()) {
+				newRule.storeGenericCharRule();
+				CharRuleResult draft = new CharRuleResult(newRule, activeChar, selectedText, account);
+				draft.setStatus("Draft");
+				draft.setActionValue(pattern_value);
+				activeRow.addRuleResult2Row(draft);
+			}
+
+		}else{
+			pattern_value.setRule_id(ruleString);
+			rule_field.setText(ruleString);
+			AssignValueOnSelectedItems(pattern_value);
+			CharPatternServices.applyItemRule(this);
+			refresh_ui_display();
+		}
+
 
 	}
 	

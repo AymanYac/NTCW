@@ -2539,13 +2539,15 @@ public class Project_parameters {
 				
 				stmt = conn.prepareStatement("delete from administration.users_x_projects where project_id='"+this.prj.getPid()+"' and user_project_profile is not null");
 				//#
+				stmt = conn.prepareStatement("update administration.users_x_projects set active_project_status = false where user_id = ?");
+				stmt.setString(1, account.getUser_id());
 				stmt.execute();
 				stmt = conn.prepareStatement("insert into administration.users_x_projects values(?,?,?,?)");
 				for(String login:this.prj.getLOGINS().keySet()) {
 					stmt.setString(1, this.prj.getLOGINS().get(login).get(0));
 					stmt.setString(2, this.prj.getPid());
 					stmt.setString(3, this.prj.getLOGINS().get(login).get(1));
-					stmt.setBoolean(4, false);
+					stmt.setBoolean(4, true);
 					stmt.addBatch();
 				}
 				//#

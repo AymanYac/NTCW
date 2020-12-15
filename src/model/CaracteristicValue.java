@@ -508,4 +508,20 @@ public class CaracteristicValue implements Serializable {
 	public LocalDateTime getDescriptionTime() {
 		return this.descriptionTime;
 	}
+
+    public CaracteristicValue shallowCopy(UserAccount account) {
+		CaracteristicValue tmp = new CaracteristicValue();
+		tmp.setValue_id(Tools.generate_uuid());
+		tmp.setDataLanguageValue(getDataLanguageValue());
+		tmp.setUserLanguageValue(getUserLanguageValue());
+		tmp.setNominal_value(getNominal_value());
+		tmp.setMax_value(getMax_value());
+		tmp.setMin_value(getMin_value());
+		tmp.setUom_id(getUom_id());
+		tmp.setParentChar(parentChar);
+		if(account!=null){
+			tmp.setAuthor(account.getUser_id());
+		}
+		return tmp;
+    }
 }

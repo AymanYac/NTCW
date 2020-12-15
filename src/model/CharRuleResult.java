@@ -33,6 +33,7 @@ public class CharRuleResult implements Serializable {
 			ruleActionToValue(account);
 			action2ValueSuccess=true;
 		}catch (Exception V){
+			V.printStackTrace(System.err);
 			action2ValueSuccess=false;
 		}
 	}
@@ -58,6 +59,10 @@ public class CharRuleResult implements Serializable {
 	public CaracteristicValue getActionValue() {
 		return actionValue;
 	}
+	public void setActionValue(CaracteristicValue pattern_value) {
+		action2ValueSuccess=true;
+		actionValue=pattern_value;
+	}
 	public String getStatus() {
 		return status;
 	}
@@ -70,12 +75,11 @@ public class CharRuleResult implements Serializable {
 		actionValue = new CaracteristicValue();
 		actionValue.setParentChar(parentChar);
 		actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
-
 		GenericCharRule genericCharRule = CharPatternServices.descriptionRules.get(genericCharRuleID);
 		for(String action: genericCharRule.getRuleActions()) {
 			if(action.startsWith("DL ")) {
 				action=action.substring(3).trim();
-				actionValue.setDataLanguageValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL(action,matchedBlock));
+				actionValue.setDataLanguageValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock));
 				//actionValue.setDataLanguageValue(action);
 				actionValue.setUserLanguageValue(TranslationServices.getEntryTranslation(action, true));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
@@ -84,7 +88,7 @@ public class CharRuleResult implements Serializable {
 			}
 			if(action.startsWith("UL ")) {
 				action=action.substring(3).trim();
-				actionValue.setUserLanguageValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL(action,matchedBlock));
+				actionValue.setUserLanguageValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock));
 				//actionValue.setUserLanguageValue(action);
 				actionValue.setDataLanguageValue(TranslationServices.getEntryTranslation(action, false));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
@@ -93,24 +97,16 @@ public class CharRuleResult implements Serializable {
 			}
 			if(action.startsWith("TXT ")) {
 				action=action.substring(4).trim();
-				actionValue.setTXTValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL(action,matchedBlock));
+				actionValue.setTXTValue(WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock));
 				//actionValue.setTXTValue(action);
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
 			}
 			if(action.startsWith("NOM ")) {
-
 				action=action.substring(4).trim();
 				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-				Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-				StringBuffer sb = new StringBuffer();
-				while(tmp.find()){
-					String idx = tmp.group(1);
-					String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-					tmp.appendReplacement(sb, replacement);
-				}
-				action = sb.toString();
+				action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
 				actionValue.setNominal_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
@@ -121,14 +117,7 @@ public class CharRuleResult implements Serializable {
 
 				action=action.substring(4).trim();
 				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-				Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-				StringBuffer sb = new StringBuffer();
-				while(tmp.find()){
-					String idx = tmp.group(1);
-					String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-					tmp.appendReplacement(sb, replacement);
-				}
-				action = sb.toString();
+				action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
 				actionValue.setMin_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
@@ -141,14 +130,7 @@ public class CharRuleResult implements Serializable {
 
 				action=action.substring(4).trim();
 				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-				Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-				StringBuffer sb = new StringBuffer();
-				while(tmp.find()){
-					String idx = tmp.group(1);
-					String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-					tmp.appendReplacement(sb, replacement);
-				}
-				action = sb.toString();
+				action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
 				actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
@@ -161,14 +143,7 @@ public class CharRuleResult implements Serializable {
 
 				action=action.substring(7).trim();
 				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-				Matcher tmp = Pattern.compile("%(\\d)").matcher(action);
-				StringBuffer sb = new StringBuffer();
-				while(tmp.find()){
-					String idx = tmp.group(1);
-					String replacement = String.valueOf(numValuesInSelection.get(Integer.valueOf(idx)-1));
-					tmp.appendReplacement(sb, replacement);
-				}
-				action = sb.toString();
+				action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
 				actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
@@ -223,6 +198,9 @@ public class CharRuleResult implements Serializable {
 	}
 
 	public ClassCaracteristic getSourceChar() {return parentChar;}
+	public void setParentChar(ClassCaracteristic newValue) {
+		parentChar=newValue;
+	}
 
 	public void clearSuperRules() {
 		superRules = new ArrayList<CharRuleResult>();
@@ -253,4 +231,14 @@ public class CharRuleResult implements Serializable {
     public boolean isEquivalentOf(CharRuleResult newMatch) {
 		return StringUtils.equalsIgnoreCase(this.getMatchedBlock(),newMatch.getMatchedBlock()) && this.getGenericCharRule().isEquivalent(newMatch.getGenericCharRule());
     }
+
+
+    public boolean isDraft() {
+		return getStatus()!=null && getStatus().equals("Draft");
+    }
+
+	public CharRuleResult shallowCopy(ClassCaracteristic newValue,UserAccount account) {
+		CharRuleResult tmp = new CharRuleResult(getGenericCharRule(),newValue,matchedBlock,account);
+		return tmp;
+	}
 }

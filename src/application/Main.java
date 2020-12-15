@@ -8,6 +8,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.GlobalConstants;
 import transversal.dialog_toolbox.ExceptionDialog;
+import transversal.language_toolbox.WordUtils;
 
 public class Main extends Application {
 	@Override
@@ -22,7 +23,6 @@ public class Main extends Application {
 			//primaryStage.setMinWidth(1024);
 			primaryStage.setMinHeight(768);primaryStage.setMinWidth(1024);primaryStage.setMaximized(true);primaryStage.setResizable(false);primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/pictures/NEONEC_Logo_Blue.png")));
 			primaryStage.show();
-			
 			
 			
 		} catch(Exception e) {

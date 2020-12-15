@@ -3,6 +3,7 @@ package model;
 import org.apache.commons.lang3.StringUtils;
 import service.CharPatternServices;
 import transversal.generic.Tools;
+import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
 import java.util.ArrayList;
@@ -17,7 +18,9 @@ public class GenericCharRule {
 	private String regexMarker;
 	private Boolean parseFailed;
 	public static String SEP_CLASS;
+	public static String SEP_CLASS_EVAL;
 	private String ruleSyntax;
+	private static  Unidecode unidecode;
 
 	public String getCharRuleId() {
 		return charRuleId;
@@ -42,6 +45,25 @@ public class GenericCharRule {
 	public String getRegexMarker() {
 		return regexMarker;
 	}
+	public void setRegexMarker(ClassCaracteristic sourceChar) {
+		regexMarker="";
+		unidecode=unidecode!=null?unidecode: Unidecode.toAscii();
+		String[] composedMarkers = WordUtils.splitComposedPattern(unidecode.decode(ruleMarker));
+		for(int i=0;i<composedMarkers.length;i++){
+			if(i!=composedMarkers.length-1){
+				regexMarker=regexMarker+"(?=.*("
+						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], String.valueOf(GenericCharRule.SEP_CLASS +(sourceChar.getIsNumeric()?"":"-")),false))
+						+").*)";
+			}else{
+				regexMarker=regexMarker+".*("
+						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], String.valueOf(GenericCharRule.SEP_CLASS + (sourceChar.getIsNumeric() ? "" : "-")),false))
+						+").*";
+			}
+		}
+		return;
+	}
+
+
 
 	public Boolean parseSuccess() {
 		return (parseFailed!=null)?!parseFailed:null;
@@ -51,7 +73,8 @@ public class GenericCharRule {
 		//SEP_CLASS = " \\.,;:-=/";
 		//SEP_CLASS = " [.],;:-[+]=/";
 		//SEP_CLASS = " [.],;:[+]=/";
-		SEP_CLASS = " \"'[.],;:[+]=/\\|\\[\\]\\(\\)";
+		SEP_CLASS = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)";
+		SEP_CLASS_EVAL = " '.,;:+=/\\|\\[\\]\\(\\)-";
 		try {
 			parseRule(active_rule);
 			parseFailed = false;
@@ -73,23 +96,6 @@ public class GenericCharRule {
 	    while(m.find()){
 	    	ruleActions.add(m.group(1));
 	    }
-	}
-
-	public void generateRegex(ClassCaracteristic sourceChar) {
-		if(sourceChar.getIsNumeric()) {
-			regexMarker = WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.quote(ruleMarker),"\"",""),"%\\d","[-+]?[0-9]+([. ,]?[0-9]{3,3})*[0-9]*([.,][0-9]+)?"),"(|+0)","["+SEP_CLASS+"]?"),"(|+1)","["+SEP_CLASS+"]+");
-		}else {
-			String SEP_CLASS=String.valueOf(GenericCharRule.SEP_CLASS+"-");
-			regexMarker = WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.substituteRuleItemToRegexItem(WordUtils.quote(ruleMarker),"\"",""),"#","[0-9]"),"@","[a-z]"),"(|+0)","["+SEP_CLASS+"]?"),"(|+1)","["+SEP_CLASS+"]+");
-			if(sourceChar.getIsTranslatable()) {
-
-			}
-		}
-		try{
-
-		}catch (Exception V){
-			parseFailed = true;
-		}
 	}
 
 
@@ -126,4 +132,12 @@ public class GenericCharRule {
 	public boolean isEquivalent(GenericCharRule newRule) {
 		return StringUtils.equals(this.getCharRuleId(),newRule.getCharRuleId()) || StringUtils.equalsIgnoreCase(this.ruleSyntax,newRule.ruleSyntax);
 	}
+
+	public boolean isCompositRule() {
+		return ruleCompositionRank()>1;
+	}
+	public int ruleCompositionRank() {
+		return WordUtils.splitComposedPattern(ruleMarker).length;
+	}
+
 }

@@ -38,8 +38,7 @@ public class GlobalConstants {
     public static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
 	public static final boolean PUSH_RULE_BUFFER_BY_BLOCK = false;
 	public static final boolean NATIVE_SELECTION_SCROLL = true;
-
-	public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
+    public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS = 5;
 	public static boolean USE_TAXOIMPORT_NEW_SCHEMA = true;
 	
@@ -50,7 +49,7 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
 	public static final boolean MANUAL_CLASSIF_PERSIST = false;
-	public static final String TOOL_VERSION = "4.5";
+	public static final String TOOL_VERSION = "4.6";
 	//public static final String HOST_ADDRESS = "localhost";
 	public static final String HOST_ADDRESS = "91.167.182.87";//"82.66.148.154";//"88.190.148.154";
 	//public static final String HOST_ADDRESS = "192.168.0.25";

@@ -52,7 +52,6 @@
       <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Characteristic" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" />
       <Label style="-fx-font-size: 12; -fx-text-fill: white; -fx-font-family: calibri; -fx-font-weight: bold;" text="Rule pattern" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
       <TextField fx:id="valueFieldL1" alignment="CENTER" stylesheets="@../../Styles/TextFieldBlue.css" visible="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="9" />
-      <TextField fx:id="valueFieldL2" alignment="CENTER" stylesheets="@../../Styles/TextFieldBlue.css" visible="false" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="9" />
       <TextField fx:id="valueFieldR1" alignment="CENTER" stylesheets="@../../Styles/TextFieldBlue.css" visible="false" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.rowIndex="9" />
       <ComboBox fx:id="caracCombo" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="1" GridPane.columnSpan="4" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
       <Button fx:id="buttonAddRule" mnemonicParsing="false" onAction="#addRuleButtonAction" prefWidth="500.0" style="-fx-font-size: 12;" stylesheets="@../../Styles/ButtonBlue.css" text="Add as a new Rule" GridPane.columnIndex="5" GridPane.rowIndex="11" />

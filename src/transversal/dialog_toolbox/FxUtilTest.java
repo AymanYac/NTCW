@@ -122,10 +122,10 @@ public class FxUtilTest {
 
     public static<T> T getComboBoxValue(ComboBox<T> comboBox){
         if (comboBox.getSelectionModel().getSelectedIndex() < 0) {
-            return null;
-        } else {
-            return comboBox.getItems().get(comboBox.getSelectionModel().getSelectedIndex());
+            comboBox.getSelectionModel().clearAndSelect(0);
+            return comboBox.getItems().get(0);
         }
+        return comboBox.getItems().get(comboBox.getSelectionModel().getSelectedIndex());
     }
 
 }

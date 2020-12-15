@@ -1,7 +1,10 @@
 package model;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import org.apache.commons.lang3.StringUtils;
 import service.CharValuesLoader;
+import transversal.language_toolbox.Unidecode;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,8 +38,9 @@ public class CharDescriptionRow {
 		private HashMap<String,ArrayList<CharRuleResult>> ruleResults = new HashMap<String,ArrayList<CharRuleResult>>();
 		String class_segment_string;
 		ClassSegment class_segment;
-		
-		public void allocateDataField(String target_class) {
+		private static Unidecode unidecode;
+
+	public void allocateDataField(String target_class) {
 			if(this.data.containsKey(target_class)) {
 				//This item class has already been initalized with the target class
 			}else {
@@ -187,7 +191,7 @@ public class CharDescriptionRow {
 			CharDescriptionRow r = this;
 			//For each couple active item I / rule N
 			r.getRuleResults().values().forEach(a->{
-				a.stream().forEach(result->{
+				a.stream().filter(result -> !result.isDraft()).forEach(result->{
 					//The status of the rule N becomes empty for the item I
 					result.setStatus(null);
 					result.clearSuperRules();
@@ -206,7 +210,7 @@ public class CharDescriptionRow {
 
 			//The status of the row becomes "Suggestion j+1" for the item I,with j the highest suggestion # already present (initiated at 1)
 			HashMap<String, ArrayList<CaracteristicValue>> knownRuleValues = new HashMap<String, ArrayList<CaracteristicValue>>();
-			r.getRuleResults().entrySet().stream().forEach(e->e.getValue().stream().filter(result->!result.isSubRule()).forEach(result -> {
+			r.getRuleResults().entrySet().stream().forEach(e->e.getValue().stream().filter(result->!result.isSubRule() && !result.isDraft()).forEach(result -> {
 				try{
 					int valIndx = knownRuleValues.get(e.getKey()).indexOf(result.getActionValue());
 					if(valIndx==-1){
@@ -330,5 +334,18 @@ public class CharDescriptionRow {
 			}
 		}
 		return false;
+	}
+
+	public String getAccentFreeDescriptions() {
+		unidecode = unidecode!=null?unidecode: Unidecode.toAscii();
+		return (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"");
+	}
+
+	public ObservableBooleanValue hasDataInCurrentClassForCurrentCarac(int selected_col) {
+		String itemClass = getClass_segment_string().split("&&&")[0];
+		String activeCharId = CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id();
+		SimpleBooleanProperty simp = new SimpleBooleanProperty();
+		simp.set(hasDataInCurrentClassForCarac(activeCharId));
+		return simp;
 	}
 }

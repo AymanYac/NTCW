@@ -3,9 +3,9 @@ package transversal.data_exchange_toolbox;
 import javafx.util.Pair;
 import model.*;
 import org.apache.poi.ss.usermodel.Row;
-import service.CharPatternServices;
 import service.TranslationServices;
 import transversal.generic.Tools;
+import transversal.language_toolbox.WordUtils;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -399,7 +399,7 @@ public class ImportTaxoRow {
 		}catch (Exception V){
 			return null;
 		}
-		GenericCharRule newRule = new GenericCharRule(row_rule_id);
+		GenericCharRule newRule = new GenericCharRule(WordUtils.correctDescriptionRuleSyntax(row_rule_id));
 		if(!newRule.parseSuccess()){
 			Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be parsed. Check syntax");
 			rejectedRows.add(rejectedRow);
@@ -407,7 +407,7 @@ public class ImportTaxoRow {
 		}
 		if(rowCharId!=null && CharDescriptionImportServices.chid2Carac.get(rowCharId)!=null){
 			ClassCaracteristic rowCarac = CharDescriptionImportServices.chid2Carac.get(rowCharId);
-			newRule.generateRegex(rowCarac);
+			newRule.setRegexMarker(rowCarac);
 			if(newRule.parseSuccess()) {
 				newRule.storeGenericCharRule();
 				return new Pair<GenericCharRule,ClassCaracteristic>(newRule,rowCarac);

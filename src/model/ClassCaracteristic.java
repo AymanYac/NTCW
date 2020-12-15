@@ -20,8 +20,32 @@ public class ClassCaracteristic implements Serializable {
 	private ArrayList<String> allowedValues;
 	private ArrayList<String> allowedUoms;
 	private Boolean isActive;
-	
-	public String getCharacteristic_id() {
+
+    public static boolean caracsAreHomogenous(ClassCaracteristic oldValue, ClassCaracteristic newValue) {
+    	if(oldValue!=null && newValue!=null){
+			if(newValue.getIsNumeric() && oldValue.getIsNumeric()){
+				//Both caracs are num
+				if(newValue.getAllowedUoms()!=null){
+					if(oldValue.getAllowedUoms()!=null){
+						return newValue.getAllowedUoms().equals(newValue.getAllowedUoms());
+					}
+					return false;
+				}else{
+					if(oldValue.getAllowedUoms()!=null && oldValue.getAllowedUoms().size()>0){
+						return false;
+					}
+					return true;
+				}
+			}else if(!newValue.getIsNumeric() && !oldValue.getIsNumeric()){
+				//Both caracs are TXT
+				return true;
+			}
+			return false;
+		}
+    	return false;
+    }
+
+    public String getCharacteristic_id() {
 		return characteristic_id;
 	}
 	public void setCharacteristic_id(String characteristic_id) {
