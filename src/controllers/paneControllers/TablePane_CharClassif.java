@@ -695,7 +695,7 @@ public class TablePane_CharClassif {
 
 	@SuppressWarnings("rawtypes")
 	private void selectChartAtIndex(int i, boolean collapsedView) {
-		if(selected_col<0){
+		while(selected_col<0){
 			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
 		}
 		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
@@ -827,35 +827,13 @@ public class TablePane_CharClassif {
 
 				this.tableGrid.getColumns().add(col);
 			});
-        	/*
-        	for(int i=0;i<CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();i++) {
-                ClassCaracteristic characteristic = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(i);
-                final int dataIndex = i;
-                TableColumn col = new TableColumn<>(characteristic.getCharacteristic_name());
-                col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
-                     public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                        try{
-                            return new ReadOnlyObjectWrapper(r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())[dataIndex].getDisplayValue(Parent));
-                        }catch(Exception V) {
-                            //Object has null data at daataIndex
-                            return new ReadOnlyObjectWrapper("");
-                        }
-                     }
-                  });
-                col.setVisible(false);
-                col.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
-                col.setResizable(false);
-                
-                this.tableGrid.getColumns().add(col);
-            }
-        	*/
         	TableColumn linkColumn = new TableColumn<>("Link");
             //linkColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
             linkColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
                 public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                     try{
 						String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
-                    	return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getUrl());
+                    	return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getUrl());
                     }catch(Exception V) {
                    	 return new ReadOnlyObjectWrapper("");
                     }
@@ -893,7 +871,7 @@ public class TablePane_CharClassif {
         sourceColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                 try{String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
-					return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getSource());
+					return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getSource());
                 }catch(Exception V) {
                	 return new ReadOnlyObjectWrapper("");
                 }
@@ -910,7 +888,7 @@ public class TablePane_CharClassif {
             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                 try{
                 	String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
-					String activeCharId = CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id();
+					String activeCharId = CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id();
 					CaracteristicValue activeData = r.getValue().getData(itemClass).get(activeCharId);
 					if(activeData.getSource().equals(DataInputMethods.AUTO_CHAR_DESC)){
 						return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result -> result.getStatus()!=null && result.getStatus().equals("Applied")).findAny().get().getMatchedBlock());
@@ -935,7 +913,7 @@ public class TablePane_CharClassif {
             public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                 try{
 					String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
-					return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getAuthorName());
+					return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getAuthorName());
                 }catch(Exception V) {
                	 return new ReadOnlyObjectWrapper("");
                 }

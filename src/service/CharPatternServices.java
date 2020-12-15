@@ -2703,11 +2703,11 @@ public class CharPatternServices {
 		return items2Reevaluate;
 	}
 
-	public static HashSet<String> unApplyRule(GenericCharRule oldRule, ClassCaracteristic activeChar) {
+	public static HashSet<String> unApplyRule(GenericCharRule oldRule, ClassCaracteristic activeChar, UserAccount account) {
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		CharItemFetcher.allRowItems.parallelStream().filter(r->r.getRuleResults().get(activeChar.getCharacteristic_id())!=null)
 				.filter(r->r.getRuleResults().get(activeChar.getCharacteristic_id()).stream().anyMatch(result->result.getGenericCharRuleID().equals(oldRule.getCharRuleId()))).forEach(r->{
-			r.dropRuleResultFromRow(new CharRuleResult(oldRule,activeChar,null, null));
+			r.dropRuleResultFromRow(new CharRuleResult(oldRule,activeChar,null, account));
 			items2Reevaluate.add(r.getItem_id());
 		});
 		return items2Reevaluate;

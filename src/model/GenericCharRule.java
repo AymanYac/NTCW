@@ -52,11 +52,11 @@ public class GenericCharRule {
 		for(int i=0;i<composedMarkers.length;i++){
 			if(i!=composedMarkers.length-1){
 				regexMarker=regexMarker+"(?=.*("
-						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], String.valueOf(GenericCharRule.SEP_CLASS +(sourceChar.getIsNumeric()?"":"-")),false))
+						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], String.valueOf(GenericCharRule.SEP_CLASS +(sourceChar.getIsNumeric()?"":"-")),true))
 						+").*)";
 			}else{
 				regexMarker=regexMarker+".*("
-						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], String.valueOf(GenericCharRule.SEP_CLASS + (sourceChar.getIsNumeric() ? "" : "-")),false))
+						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], String.valueOf(GenericCharRule.SEP_CLASS + (sourceChar.getIsNumeric() ? "" : "-")),true))
 						+").*";
 			}
 		}

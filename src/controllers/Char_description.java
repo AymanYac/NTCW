@@ -727,7 +727,7 @@ public class Char_description {
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.I)) {
 			if(this.charButton.isSelected()) {
-				this.charPaneController.PaneClose();
+				//this.charPaneController.PaneClose();
 			}else {
 				imageButton.setSelected(false);
 				charButton.setSelected(true);
@@ -736,36 +736,36 @@ public class Char_description {
 			}
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.R)) {
+			String selectedText = proposer.getUserSelectedText();
+			if(selectedText.length()>0){
+				draftingRule=true;
+				int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
+				CharPatternServices.scanSelectionForPatternDetection(this,
+						CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
+								.get(active_char_index),selectedText);
+				draftingRule=false;
+			}
 			if(this.ruleButton.isSelected()) {
-				this.rulePaneController.PaneClose();
+				//this.rulePaneController.PaneClose();
 			}else {
 				imageButton.setSelected(false);
 				charButton.setSelected(false);
 				ruleButton.setSelected(true);
-				String selectedText = proposer.getUserSelectedText();
-				if(selectedText.length()>0){
-					draftingRule=true;
-					int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
-					CharPatternServices.scanSelectionForPatternDetection(this,
-							CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
-									.get(active_char_index),selectedText);
-					draftingRule=false;
-				}
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							load_rule_pane();
-						} catch (IOException | SQLException | ClassNotFoundException e) {
-							e.printStackTrace();
-						}
-					}
-				});
 			}
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						load_rule_pane();
+					} catch (IOException | SQLException | ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+				}
+			});
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.P)) {
 			if(this.imageButton.isSelected()) {
-				this.imagePaneController.imagePaneClose();
+				//this.imagePaneController.imagePaneClose();
 			}else {
 				imageButton.setSelected(true);
 				charButton.setSelected(false);

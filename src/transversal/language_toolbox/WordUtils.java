@@ -4,6 +4,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import model.*;
 import org.apache.commons.lang3.StringUtils;
+import service.CharValuesLoader;
+import transversal.dialog_toolbox.FxUtilTest;
 import transversal.generic.Tools;
 
 import java.sql.Connection;
@@ -270,6 +272,9 @@ public class WordUtils {
 		}
 
 	public static String ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(GenericCharRule rule, String action, String matchedBlock) {
+		if(!(matchedBlock!=null)){
+			return null;
+		}
 		//Transformer la syntaxe de la rule pattern neonec en regex
 		String SEP_CLASS=GenericCharRule.SEP_CLASS +"-";
 		//StringBuilder markerToConsume = new StringBuilder(rule.neonecToRegexMarker(SEP_CLASS).replace("\\Q", "").replace("\\E", ""));
@@ -361,7 +366,13 @@ public class WordUtils {
 		return null;
 	}
 
-	public static String neonecObjectSyntaxToRegex(String markerToConsume, String SEP_CLASS,boolean dropQuotes) {
+	public static String neonecObjectSyntaxToRegex(String markerToConsume, String SEP_CLASS,boolean inSeparators) {
+		if(inSeparators && !markerToConsume.startsWith("(|+1)")){
+			markerToConsume="(|+1)"+markerToConsume;
+		}
+		if(inSeparators && !markerToConsume.endsWith("(|+1)")){
+			markerToConsume=markerToConsume+"(|+1)";
+		}
 		String ret = markerToConsume
 				.replaceAll("%\\d(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[-+]?[0-9]+(?=[. ,]?[0-9]{3,3})*[0-9]*(?=[.,][0-9]+)?")
 				.replaceAll("#(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[0-9]")
@@ -370,9 +381,6 @@ public class WordUtils {
 				.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + SEP_CLASS + "]+")
 				.replaceAll("\\(\\*\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".*?")
 				.replaceAll("\\(\\*\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".+?");
-		if(dropQuotes){
-			return ret.replace("\"", "");
-		}
 		return ret;
 		}
 
@@ -806,7 +814,7 @@ public class WordUtils {
 		while(m.find()){
 			String action = m.group(1);
 			String actionPrefix = action.split(" ")[0];
-			String actionSuffix = action.substring(actionPrefix.length());
+			String actionSuffix = action.substring(actionPrefix.length()+1);
 			if(actionPrefix.startsWith("UOM")){
 
 			}
@@ -1082,6 +1090,14 @@ public class WordUtils {
 			return text.trim();
 		}
 		return null;
+	}
+
+	public static int modColIndex(int selected_col, ArrayList<ClassCaracteristic> classCaracteristics) {
+		while(selected_col<0){
+			selected_col = selected_col + classCaracteristics.size();
+		}
+		return Math.floorMod(selected_col,classCaracteristics.size());
+
 	}
 
 

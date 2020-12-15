@@ -405,9 +405,9 @@ public class RulePane_CharClassif {
     @FXML public void deleteRuleButtonAction() throws SQLException, ClassNotFoundException {
         if(ruleView.getSelectionModel().getSelectedItem()!=null){
             GenericCharRule oldRule = ruleView.getSelectionModel().getSelectedItem().getGenericCharRule();
+            parent.tableController.ReevaluateItems(CharPatternServices.unApplyRule(oldRule,caracCombo.getValue(),parent.account));
             oldRule.dropGenericCharRule();
             CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),oldRule.getCharRuleId(),true);
-            parent.tableController.ReevaluateItems(CharPatternServices.unApplyRule(oldRule,caracCombo.getValue()));
         }
         parent.refresh_ui_display();
         parent.tableController.tableGrid.refresh();
@@ -417,9 +417,9 @@ public class RulePane_CharClassif {
 
         if(ruleView.getSelectionModel().getSelectedItem()!=null){
             GenericCharRule oldRule = ruleView.getSelectionModel().getSelectedItem().getGenericCharRule();
+            items2Reevaluate.addAll(CharPatternServices.unApplyRule(oldRule,caracCombo.getValue(), parent.account));
             oldRule.dropGenericCharRule();
             CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),oldRule.getCharRuleId(),true);
-            items2Reevaluate.addAll(CharPatternServices.unApplyRule(oldRule,caracCombo.getValue()));
         }
         GenericCharRule newRule = new GenericCharRule(loadRuleFromPane());
         newRule.setRegexMarker(caracCombo.getValue());
