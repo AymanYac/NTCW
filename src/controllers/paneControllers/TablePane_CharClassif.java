@@ -223,8 +223,20 @@ public class TablePane_CharClassif {
 			@Override
 		    protected Void call() throws Exception {
 				try {
-					
-						
+
+					translated_sd = tmp.getShort_desc_translated();
+					translated_ld = tmp.getLong_desc_translated();
+					Platform.runLater(new Runnable(){
+
+						@Override
+						public void run() {
+
+							Parent.sd_translated.setText(translated_sd+"\n\n\n\n\n");
+							Parent.ld_translated.setText(translated_ld+"\n\n\n\n\n");
+
+						}
+
+					});
 					TimeUnit.MILLISECONDS.sleep(800);
 					Platform.runLater(new Runnable(){
 
@@ -233,6 +245,10 @@ public class TablePane_CharClassif {
 
 							try {
 								Parent.load_image_pane(false);
+								if(GlobalConstants.ENABLE_TRANSLATION){
+									translated_sd = tmp.getShort_desc_translated()!=null?tmp.getShort_desc_translated():translate2UserLanguage(tmp.getShort_desc());
+									translated_ld = tmp.getLong_desc_translated()!=null?tmp.getLong_desc_translated():translate2UserLanguage(tmp.getLong_desc());
+								}
 							} catch (IOException | ParseException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -246,9 +262,6 @@ public class TablePane_CharClassif {
 				}
 				
 				stop_translation = false;
-				translated_sd = tmp.getShort_desc_translated()!=null?tmp.getShort_desc_translated():translate2UserLanguage(tmp.getShort_desc());
-	    		translated_ld = tmp.getLong_desc_translated()!=null?tmp.getLong_desc_translated():translate2UserLanguage(tmp.getLong_desc());
-	    	
 		    	advancement.refresh();
 		    	
 		    	
