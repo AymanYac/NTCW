@@ -2676,7 +2676,7 @@ public class CharPatternServices {
 
 
 	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar,UserAccount account) {
-		//System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
+		System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
 		Pattern regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE);
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		ArrayList<String> targetClasses = CharValuesLoader.active_characteristics.entrySet().stream()
@@ -2689,11 +2689,11 @@ public class CharPatternServices {
 					Matcher m;
 					m = regexPattern.matcher(" "+r.getAccentFreeDescriptions()+" ");
 					while (m.find()){
-						//System.out.println("matches desc: "+" "+(r.getShort_desc()!=null?r.getShort_desc():"")+" "+(r.getLong_desc()!=null?r.getLong_desc():"")+" ");
+						System.out.println("matches desc: "+" "+(r.getShort_desc()!=null?r.getShort_desc():"")+" "+(r.getLong_desc()!=null?r.getLong_desc():"")+" ");
 						String identifiedPattern="";
 						for(int j=1;j<=newRule.ruleCompositionRank();j++){
-							//System.out.println("\tfor identified pattern: "+m.group(j));
-							identifiedPattern=identifiedPattern+m.group(j)+"+";
+							System.out.println("\tfor identified pattern: "+m.group(j+1));
+							identifiedPattern=identifiedPattern+m.group(j+1)+"+";
 						}
 						identifiedPattern = identifiedPattern.substring(0,identifiedPattern.length()-1);
 						r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,identifiedPattern,account));

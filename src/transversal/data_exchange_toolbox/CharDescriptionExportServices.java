@@ -709,7 +709,7 @@ public class CharDescriptionExportServices {
 						+ "min_value = ?,"
 						+ "max_value = ?,"
 						+ "note = ?,"
-						+ "uom_id = ? where value_id = ?");
+						+ "uom_id = ?,manually_reviewed = ? where value_id = ?");
 				valuesToUpdate.stream().forEach(val->{	
 					try {
 						stmt.setString(1, val.getDataLanguageValue());
@@ -719,7 +719,8 @@ public class CharDescriptionExportServices {
 						stmt.setString(5, val.getMax_value());
 						stmt.setString(6, val.getNote());
 						stmt.setString(7, val.getUom_id());
-						stmt.setString(8, val.getValue_id());
+						stmt.setBoolean(8,val.getManually_Reviewed());
+						stmt.setString(9, val.getValue_id());
 						
 						
 						stmt.addBatch();
@@ -772,7 +773,7 @@ public class CharDescriptionExportServices {
 					stmt.close();
 					stmt2.close();
 					
-					stmt = conn.prepareStatement("insert into "+active_project+".project_values values(?,?,?,?,?,?,?,?)");
+					stmt = conn.prepareStatement("insert into "+active_project+".project_values values(?,?,?,?,?,?,?,?,?)");
 					stmt2 = conn2.prepareStatement("insert into "+active_project+".project_characteristics_x_values values (?,?,?,clock_timestamp(),?,?,?)");
 					while(caracDataBuffer.peek()!=null) {
 						try {
@@ -788,7 +789,8 @@ public class CharDescriptionExportServices {
 							stmt.setString(6, val.getMax_value());
 							stmt.setString(7, val.getNote());
 							stmt.setString(8, val.getUom_id());
-							
+							stmt.setBoolean(9,val.getManually_Reviewed());
+
 							stmt.addBatch();
 							
 							stmt2.setString(1, carac.getCharacteristic_id());
@@ -851,7 +853,7 @@ public class CharDescriptionExportServices {
 					Connection conn = Tools.spawn_connection();
 					Connection conn2 = Tools.spawn_connection();
 					Connection conn3 = Tools.spawn_connection();
-					PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_values values(?,?,?,?,?,?,?,?) on conflict(value_id) do nothing");
+					PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_values values(?,?,?,?,?,?,?,?,?) on conflict(value_id) do update set manually_reviewed = excluded.manually_reviewed");
 					PreparedStatement stmt2 = conn2.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values values (?,?,?,?,clock_timestamp(),?,?,?) on conflict (item_id,characteristic_id) do update set user_id = excluded.user_id, description_method = excluded.description_method, description_time=excluded.description_time, value_id = excluded.value_id, description_rule_id=excluded.description_rule_id,url_link = excluded.url_link");
 					PreparedStatement stmt3 = conn3.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values_history values (?,?,?,?,clock_timestamp(),?,?,?)");
 					while(itemDataBuffer.peek()!=null) {
@@ -869,7 +871,7 @@ public class CharDescriptionExportServices {
 							stmt.setString(6, val.getMax_value());
 							stmt.setString(7, val.getNote());
 							stmt.setString(8, val.getUom_id());
-							
+							stmt.setBoolean(9,val.getManually_Reviewed());
 							stmt.addBatch();
 							
 							stmt2.setString(1, item_id);

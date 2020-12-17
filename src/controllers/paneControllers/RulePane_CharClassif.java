@@ -1,6 +1,7 @@
 package controllers.paneControllers;
 
 import controllers.Char_description;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -57,9 +58,14 @@ public class RulePane_CharClassif {
     private static Unidecode unidecode;
     private ChangeListener<String> dataFieldCL;
     private ChangeListener<String> userFieldCL;
+    private AutoCompleteTextField autoL1;
+    private AutoCompleteTextField autoR1;
 
 
     public void setParent(Char_description char_description) {
+        autoL1=new AutoCompleteTextField(valueFieldL1,new ArrayList<>());
+        autoR1=new AutoCompleteTextField(valueFieldR1,new ArrayList<>());
+
         this.parent = char_description;
         ruleView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<CharRuleResult>() {
             @Override
@@ -296,14 +302,16 @@ public class RulePane_CharClassif {
                 valueLabelL1.setVisible(true);
                 GridPane.setColumnSpan(valueFieldL1,3);
                 valueFieldL1.setVisible(true);
-                TextFields.bindAutoCompletion(valueFieldL1, TranslationServices.getTextEntriesForCharOnLanguages(caracCombo.getValue(),true));
+                autoL1.getEntries().clear();
+                autoL1.getEntries().addAll(TranslationServices.getTextEntriesForCharOnLanguages(caracCombo.getValue(),true));
                 valueFieldL1.textProperty().addListener(dataFieldCL);
                 GridPane.setColumnSpan(valueLabelR1,3);
                 valueLabelR1.setText("Value ("+userLanguageCode.toUpperCase()+")");
                 valueLabelR1.setVisible(true);
                 GridPane.setColumnSpan(valueFieldR1,3);
                 valueFieldR1.setVisible(true);
-                TextFields.bindAutoCompletion(valueFieldR1, TranslationServices.getTextEntriesForCharOnLanguages(caracCombo.getValue(),false));
+                autoR1.getEntries().clear();
+                autoR1.getEntries().addAll(TranslationServices.getTextEntriesForCharOnLanguages(caracCombo.getValue(),false));
                 valueFieldR1.textProperty().addListener(userFieldCL);
             }else{
                 GridPane.setColumnSpan(valueLabelL2,3);
@@ -311,6 +319,8 @@ public class RulePane_CharClassif {
                 valueLabelL2.setVisible(true);
                 GridPane.setColumnSpan(valueFieldL1,7);
                 valueFieldL1.setVisible(true);
+                autoL1.getEntries().clear();
+                autoL1.getEntries().addAll(TranslationServices.getTextEntriesForCharOnLanguages(caracCombo.getValue(),true));
 
             }
         }
@@ -318,6 +328,11 @@ public class RulePane_CharClassif {
     }
 
     private void selectPrimaryRule() {
+        Optional<CharRuleResult> draftRule = ruleView.getItems().stream().filter(r -> r.getStatus() != null && r.getStatus().equals("Draft")).findAny();
+        if(draftRule.isPresent()){
+            ruleView.getSelectionModel().select(draftRule.get());
+            return;
+        }
         Optional<CharRuleResult> appliedRule = ruleView.getItems().stream().filter(r -> r.getStatus() != null && r.getStatus().equals("Applied")).findAny();
         if(appliedRule.isPresent()){
             ruleView.getSelectionModel().select(appliedRule.get());
@@ -332,8 +347,8 @@ public class RulePane_CharClassif {
     }
 
     private void setLayoutAndDS() {
-        TextFields.bindAutoCompletion(valueFieldL1,new ArrayList<String>());
-        TextFields.bindAutoCompletion(valueFieldR1,new ArrayList<String>());
+        autoL1.getEntries().clear();
+        autoR1.getEntries().clear();
         hideFields();
         patternColumn.setCellValueFactory(new PropertyValueFactory<>("MatchedBlock"));
         patternColumn.prefWidthProperty().bind(ruleView.widthProperty()
@@ -397,15 +412,24 @@ public class RulePane_CharClassif {
         if(newRule.parseSuccess()) {
             newRule.storeGenericCharRule();
             CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),newRule.getCharRuleId(),false);
-            parent.tableController.ReevaluateItems(CharPatternServices.applyRule(newRule,caracCombo.getValue(),parent.account));
+            new Thread(() -> {
+                parent.tableController.ReevaluateItems(CharPatternServices.applyRule(newRule,caracCombo.getValue(),parent.account));
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        parent.refresh_ui_display();
+                        parent.tableController.tableGrid.refresh();
+                    }
+                });
+            }).start();
         }
-        parent.refresh_ui_display();
-        parent.tableController.tableGrid.refresh();
     }
     @FXML public void deleteRuleButtonAction() throws SQLException, ClassNotFoundException {
         if(ruleView.getSelectionModel().getSelectedItem()!=null){
             GenericCharRule oldRule = ruleView.getSelectionModel().getSelectedItem().getGenericCharRule();
-            parent.tableController.ReevaluateItems(CharPatternServices.unApplyRule(oldRule,caracCombo.getValue(),parent.account));
+            new Thread(()->{
+                parent.tableController.ReevaluateItems(CharPatternServices.unApplyRule(oldRule,caracCombo.getValue(),parent.account));
+            }).start();
             oldRule.dropGenericCharRule();
             CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),oldRule.getCharRuleId(),true);
         }
@@ -413,25 +437,44 @@ public class RulePane_CharClassif {
         parent.tableController.tableGrid.refresh();
     }
     @FXML public void saveRuleButtonAction() throws SQLException, ClassNotFoundException {
-        HashSet<String> items2Reevaluate = new HashSet<String>();
+        new Thread(()-> {
+            HashSet<String> items2Reevaluate = new HashSet<String>();
 
-        if(ruleView.getSelectionModel().getSelectedItem()!=null){
-            GenericCharRule oldRule = ruleView.getSelectionModel().getSelectedItem().getGenericCharRule();
-            items2Reevaluate.addAll(CharPatternServices.unApplyRule(oldRule,caracCombo.getValue(), parent.account));
-            oldRule.dropGenericCharRule();
-            CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),oldRule.getCharRuleId(),true);
-        }
-        GenericCharRule newRule = new GenericCharRule(loadRuleFromPane());
-        newRule.setRegexMarker(caracCombo.getValue());
-        if(newRule.parseSuccess()) {
-            newRule.storeGenericCharRule();
-            CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),newRule.getCharRuleId(),false);
-            items2Reevaluate.addAll(CharPatternServices.applyRule(newRule, caracCombo.getValue(),parent.account));
-        }
+            if (ruleView.getSelectionModel().getSelectedItem() != null) {
+                GenericCharRule oldRule = ruleView.getSelectionModel().getSelectedItem().getGenericCharRule();
+                items2Reevaluate.addAll(CharPatternServices.unApplyRule(oldRule, caracCombo.getValue(), parent.account));
+                oldRule.dropGenericCharRule();
+                try {
+                    CharPatternServices.suppressGenericRuleInDB(null, parent.account.getActive_project(), oldRule.getCharRuleId(), true);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            GenericCharRule newRule = new GenericCharRule(loadRuleFromPane());
+            newRule.setRegexMarker(caracCombo.getValue());
+            if (newRule.parseSuccess()) {
+                newRule.storeGenericCharRule();
+                try {
+                    CharPatternServices.suppressGenericRuleInDB(null, parent.account.getActive_project(), newRule.getCharRuleId(), false);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                items2Reevaluate.addAll(CharPatternServices.applyRule(newRule, caracCombo.getValue(), parent.account));
+            }
 
-        parent.tableController.ReevaluateItems(items2Reevaluate);
-        parent.refresh_ui_display();
-        parent.tableController.tableGrid.refresh();
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    parent.tableController.ReevaluateItems(items2Reevaluate);
+                    parent.refresh_ui_display();
+                    parent.tableController.tableGrid.refresh();
+                }
+            });
+        }).start();
     }
 
     private String loadRuleFromPane() {

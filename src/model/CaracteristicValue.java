@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class CaracteristicValue implements Serializable {
-	public boolean ManualValueReviewed=false;
+
 	
 	public static HashMap<String,HashSet<CaracteristicValue>> loadedValues;
 	
@@ -30,7 +30,8 @@ public class CaracteristicValue implements Serializable {
 	private String max_value;
 	private String note;
 	private String uom_id;
-	
+	private boolean manualValueReviewed =false;
+
 	private String source;
 	private String author;
 	private String rule_id;
@@ -114,7 +115,7 @@ public class CaracteristicValue implements Serializable {
 	//Display value is user formatted display value (value column in table and item export)
 	public String getDisplayValue(boolean projectSupportsTranslation,boolean projectRequiresTranslation) {
 		String ret = WordUtils.textFlowToString(getFormatedDisplayAndUomPair(projectSupportsTranslation,projectRequiresTranslation,parentChar).getValue());
-		if(ManualValueReviewed && ret.length()==0) {
+		if(manualValueReviewed && ret.length()==0) {
 			return "*UNKNOWN*";
 		}
 		return ret;
@@ -524,4 +525,12 @@ public class CaracteristicValue implements Serializable {
 		}
 		return tmp;
     }
+
+	public boolean getManually_Reviewed() {
+		return manualValueReviewed;
+	}
+
+	public void setManually_Reviewed(boolean manually_reviewed) {
+		manualValueReviewed=manually_reviewed;
+	}
 }

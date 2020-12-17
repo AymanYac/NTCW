@@ -11,6 +11,8 @@ import javafx.scene.input.KeyEvent;
 
 public class FxUtilTest {
 
+    private static int latestValidIndex=0;
+
     public interface AutoCompleteComparator<T> {
         boolean matches(String typedText, T objectToCompare);
     }
@@ -18,7 +20,7 @@ public class FxUtilTest {
     public static<T> void autoCompleteComboBoxPlus(ComboBox<T> comboBox, AutoCompleteComparator<T> comparatorMethod) {
         ObservableList<T> data = comboBox.getItems();
 
-        comboBox.setEditable(true);
+        comboBox.setEditable(false);
         comboBox.getEditor().focusedProperty().addListener(observable -> {
             if (comboBox.getSelectionModel().getSelectedIndex() < 0) {
                 comboBox.getEditor().setText(null);
@@ -49,6 +51,12 @@ public class FxUtilTest {
                     if (!comboBox.isShowing()) {
                         comboBox.show();
                         comboBox.getSelectionModel().clearAndSelect(Math.min(comboBox.getSelectionModel().getSelectedIndex()+1,comboBox.getItems().size()-1));
+                        System.out.println("selected >"+comboBox.getSelectionModel().getSelectedItem().toString()+"<");
+                        try{
+                            System.out.println("should have been>"+ comboBox.getItems().stream().filter(e -> e.toString().equals(comboBox.getEditor().getText())).findAny().get().toString());
+                        }catch (Exception V){
+
+                        }
                         ListView<?> lv = ((ComboBoxListViewSkin) comboBox.getSkin()).getListView();
                         lv.getFocusModel().focus(comboBox.getSelectionModel().getSelectedIndex());
                         lv.scrollTo(comboBox.getSelectionModel().getSelectedIndex());
@@ -122,9 +130,10 @@ public class FxUtilTest {
 
     public static<T> T getComboBoxValue(ComboBox<T> comboBox){
         if (comboBox.getSelectionModel().getSelectedIndex() < 0) {
-            comboBox.getSelectionModel().clearAndSelect(0);
-            return comboBox.getItems().get(0);
+            comboBox.getSelectionModel().clearAndSelect(latestValidIndex);
+            return comboBox.getItems().get(latestValidIndex);
         }
+        latestValidIndex = comboBox.getSelectionModel().getSelectedIndex();
         return comboBox.getItems().get(comboBox.getSelectionModel().getSelectedIndex());
     }
 

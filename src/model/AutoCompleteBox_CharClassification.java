@@ -35,8 +35,8 @@ public class AutoCompleteBox_CharClassification extends TextField
   /** Construct a new AutoCompleteTextField. 
  * @param char_description 
  * @param style 
- * @param account 
- * @param rowIndex */
+ * @param account
+   * */
   public AutoCompleteBox_CharClassification( Char_description char_description, String style, UserAccount account) {
     super();
     try {

@@ -10,7 +10,6 @@ import transversal.language_toolbox.WordUtils;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class CharValuesLoader {
 
@@ -28,7 +27,7 @@ public class CharValuesLoader {
 			PreparedStatement stmt;
 			ResultSet rs;
 
-			stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,url_link,project_values.value_id,text_value_data_language, text_value_user_language,nominal_value,min_value,max_value,note,uom_id,description_time from "
+			stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,url_link,project_values.value_id,text_value_data_language, text_value_user_language,nominal_value,min_value,max_value,note,uom_id,description_time,manually_reviewed from "
 					+ "(select * from "+active_project+".project_items_x_values"
 					+ ") data left join "+active_project+".project_values "
 					+ "on data.value_id = project_values.value_id");
@@ -64,6 +63,7 @@ public class CharValuesLoader {
 				val.setRule_id(description_rule_id);
 				val.setUrl(rs.getString("url_link"));
 				val.setDescriptionTime(rs.getTimestamp("description_time"));
+				val.setManually_Reviewed(rs.getBoolean("manually_reviewed"));
 				try{
 					val.setParentChar(CharValuesLoader.active_characteristics.get(loop_class_id).get(charIdArrays.get(loop_class_id).indexOf(characteristic_id)));
 				}catch(Exception V) {
@@ -151,7 +151,7 @@ public class CharValuesLoader {
 		tmp.setNote(WordUtils.trimTextField(parent.note_field_uom.getText()));
 		tmp.setSource(DataInputMethods.MANUAL);
 		tmp.setAuthor(parent.account.getUser_id());
-		tmp.ManualValueReviewed=true;
+		tmp.setManually_Reviewed(true);
 		parent.AssignValueOnSelectedItems(tmp);
 
 	}
@@ -195,7 +195,7 @@ public class CharValuesLoader {
 		tmp.setNote(WordUtils.trimTextField(parent.note_field_uom.getText()));
 		tmp.setSource(DataInputMethods.MANUAL);
 		tmp.setAuthor(parent.account.getUser_id());
-		tmp.ManualValueReviewed=true;
+		tmp.setManually_Reviewed(true);
 
 		row.getData(GlobalConstants.DEFAULT_CHARS_CLASS).put(GlobalConstants.DEFAULT_CHARS_CLASS,tmp);
 		row.setLong_desc(tmp.getDisplayValue(parent));
@@ -235,7 +235,7 @@ public class CharValuesLoader {
 			val.setAuthor(user_id);
 			val.setSource(description_method);
 			val.setRule_id(description_rule_id);
-
+			val.setManually_Reviewed(false);
 
 			ClassCaracteristic carac = new ClassCaracteristic();
 			carac.setCharacteristic_id(rs.getString("characteristic_id"));

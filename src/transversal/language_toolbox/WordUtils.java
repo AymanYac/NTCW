@@ -367,6 +367,9 @@ public class WordUtils {
 	}
 
 	public static String neonecObjectSyntaxToRegex(String markerToConsume, String SEP_CLASS,boolean inSeparators) {
+		if(inSeparators){
+			markerToConsume="$$$$$$$$$"+markerToConsume+"$$$$$$$$$$$$$$$$$$";
+		}
 		if(inSeparators && !markerToConsume.startsWith("(|+1)")){
 			markerToConsume="(|+1)"+markerToConsume;
 		}
@@ -381,6 +384,9 @@ public class WordUtils {
 				.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + SEP_CLASS + "]+")
 				.replaceAll("\\(\\*\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".*?")
 				.replaceAll("\\(\\*\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".+?");
+
+		ret = ret.replace("$$$$$$$$$$$$$$$$$$",")");
+		ret = ret.replace("$$$$$$$$$","(");
 		return ret;
 		}
 
@@ -803,6 +809,9 @@ public class WordUtils {
 		}
 
 	public static String correctDescriptionRuleSyntax(String ruleString) {
+		if(!(ruleString!=null)){
+			return null;
+		}
 		int ruleMarkerEndDelimiter = ruleString.indexOf('<');
 		String ruleMarker = ruleString.substring(0, ruleMarkerEndDelimiter);
 		ruleMarker = WordUtils.correctDescriptionRuleSyntaxElement(ruleMarker,false);

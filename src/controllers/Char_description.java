@@ -312,6 +312,7 @@ public class Char_description {
 			public void handle(MouseEvent event) {
 				System.out.println("Deleting value");
 				AssignValueOnSelectedItems(new CaracteristicValue());
+				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::reEvaluateCharRules);
 			}
 		});
 		
@@ -1189,6 +1190,7 @@ public class Char_description {
 				}
 			}
 		});
+
 		classCombo.setConverter(new StringConverter<CharDescClassComboRow>() {
 
 			@Override
@@ -1201,8 +1203,10 @@ public class Char_description {
 			public CharDescClassComboRow fromString(String string) {
 				Optional<CharDescClassComboRow> match = classCombo.getItems().stream().filter(e -> e.toString().equals(string)).findAny();
 				if(match.isPresent()){
+					System.out.println("Found match for >"+string+"<");
 					return match.get();
 				}
+				System.out.println("No match for >"+string+"< returning first");
 				return classCombo.getItems().get(0);
 			}
 		});
@@ -1925,8 +1929,15 @@ public class Char_description {
 			pattern_value.setRule_id(ruleString);
 			rule_field.setText(ruleString);
 			AssignValueOnSelectedItems(pattern_value);
-			CharPatternServices.applyItemRule(this);
-			refresh_ui_display();
+			new Thread(()->{
+				CharPatternServices.applyItemRule(this);
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						refresh_ui_display();
+					}
+				});
+			}).start();
 		}
 
 

@@ -32,45 +32,7 @@ public class RulePaneRow {
 
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				/*
-				if(newValue) {
-					if(ManualRuleServices.assignClass2GR(gr,(ItemFetcherRow) manualClassifController.tableController.tableGrid.getSelectionModel().getSelectedItem())) {
-						//ManualRuleServices.benchmark(gr,manualClassifController);
-						ManualRuleServices.applyRule(gr,manualClassifController);
-					}else{
-						engageUncheckAction=false;
-						cb.setSelected(false);
-						engageUncheckAction=true;
-						return;
-					};
-					
-				}else if(engageUncheckAction) {
-					ManualRuleServices.unapplyRule(gr,manualClassifController);
-					
-				}
-				
-			*/
-				if(newValue) {
-					/*
-					if(ManualRuleServices.assignClass2GR(gr,(ItemFetcherRow) manualClassifController.tableController.tableGrid.getSelectionModel().getSelectedItem())) {
-						//ManualRuleServices.benchmark(gr,manualClassifController);
-						ManualRuleServices.applyRule(gr,manualClassifController);
-					}*/
-					manualClassifController.classification.requestFocus();
-				}else {
-					/*
-					try {
-						ItemFetcherRow row = (ItemFetcherRow) manualClassifController.tableController.tableGrid.getSelectionModel().getSelectedItem();
-						if(row.getSource_Display().equals("MANUAL")) {
-							ManualRuleServices.unapplyRule(gr,manualClassifController);
-							
-						}
-					}catch(Exception V) {
-						
-					}*/
-					manualClassifController.classification.requestFocus();
-					
-				}
+				manualClassifController.classification.requestFocus();
 			}
 		});
 		

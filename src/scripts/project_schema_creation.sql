@@ -56,7 +56,7 @@ EXECUTE format('
 )',  project_id);
 
 EXECUTE format('
-   CREATE TABLE IF NOT EXISTS %I.project_values(value_id character varying primary key,text_value_data_language character varying, text_value_user_language character varying, nominal_value character varying,min_value character varying,max_value character varying,note character varying,uom_id character varying
+   CREATE TABLE IF NOT EXISTS %I.project_values(value_id character varying primary key,text_value_data_language character varying, text_value_user_language character varying, nominal_value character varying,min_value character varying,max_value character varying,note character varying,uom_id character varying,manually_reviewed boolean
 )',  project_id);
 
 EXECUTE format('
