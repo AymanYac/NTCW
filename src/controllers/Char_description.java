@@ -857,52 +857,17 @@ public class Char_description {
 				return uom_field;
 			}
 		}
-		
-		/*
-		if(min_field.getText()!=null && min_field.getText().length()>0 && min_field.isVisible()) {
-			try {
-				Double.valueOf(min_field.getText().trim().replace(",", "."));
-			}catch(Exception V) {
-				min_field.setText(null);
-				return min_field;
-			}
-		}
-		if(max_field.getText()!=null && max_field.getText().length()>0 && max_field.isVisible()) {
-			try {
-				Double.valueOf(max_field.getText().trim().replace(",", "."));
-			}catch(Exception V) {
-				max_field.setText(null);
-				return max_field;
-			}
-		}
-		
-		if(min_field_uom.getText()!=null && min_field_uom.getText().length()>0 && min_field_uom.isVisible()) {
-			try {
-				Double.valueOf(min_field_uom.getText().trim().replace(",", "."));
-			}catch(Exception V) {
-				min_field_uom.setText(null);
-				return min_field_uom;
-			}
-		}
-		if(max_field_uom.getText()!=null && max_field_uom.getText().length()>0 && max_field_uom.isVisible()) {
-			try {
-				Double.valueOf(max_field_uom.getText().trim().replace(",", "."));
-			}catch(Exception V) {
-				max_field_uom.setText(null);
-				return max_field_uom;
-			}
-		}
-		*/
 		return null;
 	}
 	private boolean validateUomField(CharDescriptionRow row, int active_char_index) {
 		String uomFieldText = uom_field.getText();
 		if(uomFieldText!=null && uomFieldText.length()>0) {
 			String row_class_id = row.getClass_segment_string().split("&&&")[0];
-			Optional<UnitOfMeasure> matchinguom = UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->u.toString().equals(uomFieldText)).findAny();
+			Optional<UnitOfMeasure> matchinguom = UnitOfMeasure.RunTimeUOMS.values().parallelStream().filter(u->StringUtils.equalsIgnoreCase(u.getUom_symbol(),uomFieldText)||u.toString().equals(uomFieldText)).findAny();
 			if(matchinguom.isPresent()) {
 				
 				if(UnitOfMeasure.ConversionPathExists(matchinguom.get(), CharValuesLoader.active_characteristics.get(row_class_id).get(active_char_index).getAllowedUoms())) {
+					uom_field.setUom(matchinguom.get());
 					return false;
 				}else {
 					
@@ -1908,7 +1873,9 @@ public class Char_description {
 				ruleString = loopRule;
 			}
 		}
+		System.out.println("Sortie de l'arbre >"+ruleString);
 		ruleString = WordUtils.correctDescriptionRuleSyntax(ruleString);
+		System.out.println("Sortie de la correction >"+ruleString);
 		if(draftingRule){
 			CharDescriptionRow activeRow = tableController.tableGrid.getSelectionModel().getSelectedItem();
 			String activeClass = tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];

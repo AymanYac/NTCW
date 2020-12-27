@@ -199,7 +199,7 @@ public class CharDescriptionRow {
 			});
 			//Supress all auto values on the item
 			r.getData(r.getClass_segment_string().split("&&&")[0]).entrySet()
-					.removeIf(e->e.getValue()!=null && e.getValue().getSource().equals(DataInputMethods.AUTO_CHAR_DESC));
+					.removeIf(e->e.getValue()!=null && (!(e.getValue().getSource()!=null) ||e.getValue().getSource().equals(DataInputMethods.AUTO_CHAR_DESC)));
 
 			//For each couple active item I / rule N
 			//The pattern of the rule is included in the pattern of another rule applying to the same item and characteristic
@@ -295,7 +295,7 @@ public class CharDescriptionRow {
 		try {
 			String oldCharId = oldMatch.getSourceChar().getCharacteristic_id();
 			this.ruleResults.put(oldCharId,
-					this.ruleResults.get(oldCharId).stream().filter(result->!result.getGenericCharRuleID().equals(oldMatch.getGenericCharRuleID())).collect(Collectors.toCollection(ArrayList::new)));
+					this.ruleResults.get(oldCharId).stream().filter(result->result.getGenericCharRule()!=null && !result.getGenericCharRuleID().equals(oldMatch.getGenericCharRuleID())).collect(Collectors.toCollection(ArrayList::new)));
 		}catch(Exception V) {
 
 		}
@@ -305,7 +305,7 @@ public class CharDescriptionRow {
 		ArrayList<CharRuleResult> ret = new ArrayList<CharRuleResult>();
 		CaracteristicValue charItemData = getData(getClass_segment_string().split("&&&")[0]).get(charId);
 		if(
-				(charItemData!=null && charItemData.getDisplayValue(false,false).length()>0)
+				(!GlobalConstants.HIDE_RULE_RESULT_SUGGESTION_WHEN_KNOWN_VALUE && charItemData!=null && charItemData.getDisplayValue(false,false).length()>0)
 				|| (getRuleResults().get(charId).stream().anyMatch(result -> result.getStatus()!=null && result.getStatus().equals("Applied")))
 		){
 			return ret;
@@ -336,9 +336,9 @@ public class CharDescriptionRow {
 		return false;
 	}
 
-	public String getAccentFreeDescriptions() {
+	public String getAccentFreeDescriptionsNoCR() {
 		unidecode = unidecode!=null?unidecode: Unidecode.toAscii();
-		return (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"");
+		return (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ");
 	}
 
 	public ObservableBooleanValue hasDataInCurrentClassForCurrentCarac(int selected_col) {

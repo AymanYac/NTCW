@@ -128,9 +128,9 @@ public class AutoCompleteTextField {
                     String text = getText();
                     Pattern pattern;
                     if (isCaseSensitive()) {
-                        pattern = Pattern.compile(".*" + text + ".*");
+                        pattern = Pattern.compile(".*" + unidecode.decode(text) + ".*");
                     } else {
-                        pattern = Pattern.compile(".*" + text + ".*",
+                        pattern = Pattern.compile(".*" + unidecode.decode(text) + ".*",
                                 Pattern.CASE_INSENSITIVE);
                     }
 
@@ -148,8 +148,8 @@ public class AutoCompleteTextField {
                             public int compare(Object o1, Object o2) {
                                 int ret = getEntrySearchableText(o1).compareTo(
                                         getEntrySearchableText(o2));
-                                int av_1 =  unidecode.decodeAndTrim(getEntrySearchableText(o1)).toUpperCase().startsWith(unidecode.decodeAndTrim(getText()).toUpperCase())?1000000:0;
-                                int av_2 =  unidecode.decodeAndTrim(getEntrySearchableText(o2)).toUpperCase().startsWith(unidecode.decodeAndTrim(getText()).toUpperCase())?1000000:0;
+                                int av_1 =  getEntrySearchableText(o1).toUpperCase().startsWith(unidecode.decodeAndTrim(getText()).toUpperCase())?1000000:0;
+                                int av_2 =  getEntrySearchableText(o2).toUpperCase().startsWith(unidecode.decodeAndTrim(getText()).toUpperCase())?1000000:0;
 
                                 return ret - av_1 + av_2;
                             }
@@ -186,7 +186,10 @@ public class AutoCompleteTextField {
     }
 
     private String getText() {
-        return parentField.getText();
+        if(parentField!=null){
+            return parentField.getText();
+        }
+        return new TextField().getText();
     }
 
     private ObservableValue<String> textProperty() {
@@ -195,12 +198,12 @@ public class AutoCompleteTextField {
 
     private String getEntrySearchableText(Object entry) {
         if(entry instanceof CharValueTextSuggestion){
-            return ((CharValueTextSuggestion) entry).getSource_value();
+            return unidecode.decodeAndTrim(((CharValueTextSuggestion) entry).getSource_value());
         }
         if(entry instanceof String){
-            return (String) entry;
+            return unidecode.decodeAndTrim((String) entry);
         }
-        return entry.toString();
+        return unidecode.decodeAndTrim(entry.toString());
     }
 
     /**

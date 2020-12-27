@@ -39,6 +39,7 @@ public class GlobalConstants {
 	public static final boolean PUSH_RULE_BUFFER_BY_BLOCK = false;
 	public static final boolean NATIVE_SELECTION_SCROLL = true;
     public static final boolean ENABLE_TRANSLATION = false;
+    public static final boolean HIDE_RULE_RESULT_SUGGESTION_WHEN_KNOWN_VALUE = true;
     public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS = 5;
 	public static boolean USE_TAXOIMPORT_NEW_SCHEMA = true;
@@ -50,7 +51,7 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
 	public static final boolean MANUAL_CLASSIF_PERSIST = false;
-	public static final String TOOL_VERSION = "4.6.3";
+	public static final String TOOL_VERSION = "4.6.3 EOY";
 	//public static final String HOST_ADDRESS = "localhost";
 	public static final String HOST_ADDRESS = "91.167.182.87";//"82.66.148.154";//"88.190.148.154";
 	//public static final String HOST_ADDRESS = "192.168.0.25";
@@ -106,7 +107,7 @@ public class GlobalConstants {
 	
 	
 	public static final boolean MANUAL_CLASSIF_LOAD_LATEST_WITH_UPLOAD_PRIORITY = true;
-	public static final int CHAR_DESC_PATTERN_SELECTION_PHRASE_THRES = 4;
+	public static final int CHAR_DESC_PATTERN_SELECTION_PHRASE_THRES = 0;
 	public static final double MAX_UOM_MULTIPLIER_TOLERANCE = 0.05;
 	public static final boolean REFRESH_ALL_RULE_ITEMS_ON_UPLOAD = true;
 	public static final String DEFAULT_CHARS_CLASS = "DEFAULT_CHARS_CLASS_ID";

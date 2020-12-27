@@ -18,7 +18,6 @@ public class GenericCharRule {
 	private String regexMarker;
 	private Boolean parseFailed;
 	public static String SEP_CLASS;
-	public static String SEP_CLASS_EVAL;
 	private String ruleSyntax;
 	private static  Unidecode unidecode;
 
@@ -74,7 +73,6 @@ public class GenericCharRule {
 		//SEP_CLASS = " [.],;:-[+]=/";
 		//SEP_CLASS = " [.],;:[+]=/";
 		SEP_CLASS = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)";
-		SEP_CLASS_EVAL = " '.,;:+=/\\|\\[\\]\\(\\)-";
 		try {
 			parseRule(active_rule);
 			parseFailed = false;

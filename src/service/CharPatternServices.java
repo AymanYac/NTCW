@@ -2,6 +2,7 @@ package service;
 
 import com.google.gson.reflect.TypeToken;
 import controllers.Char_description;
+import javafx.application.Platform;
 import model.*;
 import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.generic.Tools;
@@ -2669,10 +2670,45 @@ public class CharPatternServices {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
+			quickApplyRule(newRule,activeChar,parent);
 			parent.tableController.ReevaluateItems(CharPatternServices.applyRule(newRule,activeChar,parent.account));
 		}
 	}
 
+	public static void quickApplyRule(GenericCharRule newRule, ClassCaracteristic activeChar, Char_description parent) {
+		try{
+			CharDescriptionRow r = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+			Pattern regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE);
+			ArrayList<String> targetClasses = CharValuesLoader.active_characteristics.entrySet().stream()
+					.filter(e -> e.getValue().stream().map(car -> car.getCharacteristic_id())
+							.collect(Collectors.toCollection(ArrayList::new)).contains(activeChar.getCharacteristic_id())).map(e -> e.getKey())
+					.collect(Collectors.toCollection(ArrayList::new));
+			if(targetClasses.contains(r.getClass_segment_string().split("&&&")[0])){
+				Matcher m;
+				m = regexPattern.matcher(" "+r.getAccentFreeDescriptionsNoCR()+" ");
+				while (m.find()){
+					System.out.println("matches desc: "+" "+(r.getShort_desc()!=null?r.getShort_desc():"")+" "+(r.getLong_desc()!=null?r.getLong_desc():"")+" ");
+					String identifiedPattern="";
+					for(int j=1;j<=newRule.ruleCompositionRank();j++){
+						System.out.println("\tfor identified pattern: "+m.group(j+1));
+						identifiedPattern=identifiedPattern+m.group(j+1)+"+";
+					}
+					identifiedPattern = identifiedPattern.substring(0,identifiedPattern.length()-1);
+					r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,identifiedPattern,parent.account));
+				}
+				r.reEvaluateCharRules();
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						parent.refresh_ui_display();
+						parent.tableController.tableGrid.refresh();
+					}
+				});
+			}
+		}catch (Exception V){
+
+		}
+	}
 
 
 	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar,UserAccount account) {
@@ -2687,7 +2723,7 @@ public class CharPatternServices {
 				.filter(r->targetClasses.contains(r.getClass_segment_string().split("&&&")[0]))
 				.forEach(r->{
 					Matcher m;
-					m = regexPattern.matcher(" "+r.getAccentFreeDescriptions()+" ");
+					m = regexPattern.matcher(" "+r.getAccentFreeDescriptionsNoCR()+" ");
 					while (m.find()){
 						System.out.println("matches desc: "+" "+(r.getShort_desc()!=null?r.getShort_desc():"")+" "+(r.getLong_desc()!=null?r.getLong_desc():"")+" ");
 						String identifiedPattern="";
@@ -2703,10 +2739,11 @@ public class CharPatternServices {
 		return items2Reevaluate;
 	}
 
+
 	public static HashSet<String> unApplyRule(GenericCharRule oldRule, ClassCaracteristic activeChar, UserAccount account) {
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		CharItemFetcher.allRowItems.parallelStream().filter(r->r.getRuleResults().get(activeChar.getCharacteristic_id())!=null)
-				.filter(r->r.getRuleResults().get(activeChar.getCharacteristic_id()).stream().anyMatch(result->result.getGenericCharRuleID().equals(oldRule.getCharRuleId()))).forEach(r->{
+				.filter(r->r.getRuleResults().get(activeChar.getCharacteristic_id()).stream().anyMatch(result->result.getGenericCharRule()!=null && result.getGenericCharRuleID().equals(oldRule.getCharRuleId()))).forEach(r->{
 			r.dropRuleResultFromRow(new CharRuleResult(oldRule,activeChar,null, account));
 			items2Reevaluate.add(r.getItem_id());
 		});
@@ -2719,6 +2756,7 @@ public class CharPatternServices {
 		suppressGenericRuleInDB(conn,active_project,charRuleIds,isSuppressed);
 	}
 	public static void suppressGenericRuleInDB(Connection conn, String active_project, ArrayList<String> charRuleIds, boolean isSuppressed) throws SQLException, ClassNotFoundException {
+		if(1==1){return;}
 		boolean closeConnAtEnd = true;
 		if(conn!=null){
 			closeConnAtEnd=false;

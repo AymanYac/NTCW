@@ -154,7 +154,7 @@ public class CharRuleResult implements Serializable {
 
 			if(action.startsWith("UOM ")) {
 				final String symbol=action.substring(5).substring(0,action.length()-6).trim();
-				Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->u.getUom_symbols().contains(symbol)).findAny();
+				Optional<UnitOfMeasure> uom = UnitOfMeasure.RunTimeUOMS.values().stream().filter(u->u.toString().equals(symbol) || u.getUom_symbols().contains(symbol)).findAny();
 				if(uom.isPresent()) {
 					actionValue.setUom_id(uom.get().getUom_id());
 					actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");

@@ -845,6 +845,9 @@ public class CharDescriptionExportServices {
 	}
 
 	public static void flushItemDataToDB(UserAccount account, Integer itemRuleBufferSize) {
+		if(1==1){
+			return;
+		}
 		if(itemDataBuffer.peek()!=null) {
 			Task<Void> dbFlushTask = new Task<Void>() {
 			    

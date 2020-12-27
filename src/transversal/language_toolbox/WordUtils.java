@@ -369,19 +369,15 @@ public class WordUtils {
 	public static String neonecObjectSyntaxToRegex(String markerToConsume, String SEP_CLASS,boolean inSeparators) {
 		if(inSeparators){
 			markerToConsume="$$$$$$$$$"+markerToConsume+"$$$$$$$$$$$$$$$$$$";
-		}
-		if(inSeparators && !markerToConsume.startsWith("(|+1)")){
 			markerToConsume="(|+1)"+markerToConsume;
-		}
-		if(inSeparators && !markerToConsume.endsWith("(|+1)")){
 			markerToConsume=markerToConsume+"(|+1)";
 		}
 		String ret = markerToConsume
-				.replaceAll("%\\d(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[-+]?[0-9]+(?=[. ,]?[0-9]{3,3})*[0-9]*(?=[.,][0-9]+)?")
+				.replaceAll("%\\d(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?")
 				.replaceAll("#(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[0-9]")
 				.replaceAll("@(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[a-z]")
-				.replaceAll("\\(\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + SEP_CLASS + "]?")
-				.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + SEP_CLASS + "]+")
+				.replaceAll("\\(\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + SEP_CLASS + "]*?")
+				.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + SEP_CLASS + "]+?")
 				.replaceAll("\\(\\*\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".*?")
 				.replaceAll("\\(\\*\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".+?");
 
@@ -423,6 +419,7 @@ public class WordUtils {
 		public static String ALPHANUM_PATTERN_RULE_INREPLACE(String selected_text, boolean keepAlphaBeforeFirstSep,boolean quoteOuterText) {
 			//e.g. "abcd ef12-gh34-ij56"
 			//Rule = ["ab"#"cd"#(|+0)@@##(|+0)@@##]
+			quoteOuterText=false;//Quoting is done in the next step, self correcting syntax
 			String rule="";
 			boolean firstSepPassed=!keepAlphaBeforeFirstSep;
 			boolean last_is_alpha=false;
@@ -546,8 +543,8 @@ public class WordUtils {
 			int i=0;
 			while (m.find()) {
 				i+=1;
-				selected_text = selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______",".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
-				
+				//selected_text = selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______",".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
+				selected_text = selected_text.replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______",".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
 				//ret.add(Double.valueOf( m.group(0)) );
 				  
 				}
@@ -850,7 +847,7 @@ public class WordUtils {
 		if(processingNumericValue){
 			specialCharacters=new ArrayList<>(Arrays.asList("0","1","2","3","4","5","6","7","8","9","+","*","-","/","%","%1","%2","%3","%4","%5","%6","#","(#+0)","(#+1)","(#+2)","(#+3)","(#+4)","(#+5)","(#+6)"));
 		}else{
-			specialCharacters=new ArrayList<>(Arrays.asList("+","*","(*+0)","(*+1)","(*+2)","(*+3)","(*+4)","(*+5)","(*+6)","|","(|+0)","(|+1)","(|+2)","(|+3)","(|+4)","(|+5)","(|+6)","%","%1","%2","%3","%4","%5","%6","#","(#+0)","(#+1)","(#+2)","(#+3)","(#+4)","(#+5)","(#+6)","(@+0)","(@+1)","(@+2)","(@+3)","(@+4)","(@+5)","(@+6)"));
+			specialCharacters=new ArrayList<>(Arrays.asList("+","*","(*+0)","(*+1)","(*+2)","(*+3)","(*+4)","(*+5)","(*+6)","|","(|+0)","(|+1)","(|+2)","(|+3)","(|+4)","(|+5)","(|+6)","%","%1","%2","%3","%4","%5","%6","#","(#+0)","(#+1)","(#+2)","(#+3)","(#+4)","(#+5)","(#+6)","@","(@+0)","(@+1)","(@+2)","(@+3)","(@+4)","(@+5)","(@+6)"));
 		}
 //Dim sp_char_index As Integer 'index dans la liste des caractères spéciaux
 		int spCharIndex;

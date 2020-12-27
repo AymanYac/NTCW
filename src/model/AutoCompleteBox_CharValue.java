@@ -65,12 +65,10 @@ public class AutoCompleteBox_CharValue {
 
 						@Override
 						public int compare(Object o1, Object o2) {
-							int ret = (new Integer(
-									((CharValueTextSuggestion)o1).getSource_value().compareTo(
-									((CharValueTextSuggestion)o2).getSource_value())
-									));
-							int av_1 =  ((CharValueTextSuggestion)o1).getSource_value().toUpperCase().startsWith(unidecode.decodeAndTrim(textField.getText()).toUpperCase())?1000000:0;
-							int av_2 =  ((CharValueTextSuggestion)o1).getSource_value().toUpperCase().startsWith(unidecode.decodeAndTrim(textField.getText()).toUpperCase())?1000000:0;
+							int ret = (unidecode.decodeAndTrim(((CharValueTextSuggestion) o1).getSource_value()).compareTo(
+									unidecode.decodeAndTrim(((CharValueTextSuggestion) o2).getSource_value())));
+							int av_1 =  unidecode.decodeAndTrim(((CharValueTextSuggestion)o1).getSource_value()).toUpperCase().startsWith(unidecode.decodeAndTrim(textField.getText()).toUpperCase())?1000000:0;
+							int av_2 =  unidecode.decodeAndTrim(((CharValueTextSuggestion)o2).getSource_value()).toUpperCase().startsWith(unidecode.decodeAndTrim(textField.getText()).toUpperCase())?1000000:0;
 
 							return ret - av_1 + av_2;
 						}
