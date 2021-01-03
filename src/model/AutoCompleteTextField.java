@@ -186,7 +186,7 @@ public class AutoCompleteTextField {
     }
 
     private String getText() {
-        if(parentField!=null){
+        if(parentField!=null && parentField.getText()!=null){
             return parentField.getText();
         }
         return new TextField().getText();

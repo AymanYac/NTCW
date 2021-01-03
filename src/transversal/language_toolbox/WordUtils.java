@@ -4,8 +4,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import model.*;
 import org.apache.commons.lang3.StringUtils;
-import service.CharValuesLoader;
-import transversal.dialog_toolbox.FxUtilTest;
 import transversal.generic.Tools;
 
 import java.sql.Connection;
@@ -276,7 +274,7 @@ public class WordUtils {
 			return null;
 		}
 		//Transformer la syntaxe de la rule pattern neonec en regex
-		String SEP_CLASS=GenericCharRule.SEP_CLASS +"-";
+		String SEP_CLASS=GenericCharRule.SEP_CLASS_TXT;
 		//StringBuilder markerToConsume = new StringBuilder(rule.neonecToRegexMarker(SEP_CLASS).replace("\\Q", "").replace("\\E", ""));
 		StringBuilder markerToConsume = new StringBuilder(WordUtils.quoteCompositionMarkerInDescPattern(rule.getRuleMarker()));
 		StringBuilder matchedBlockToConsume = new StringBuilder(matchedBlock);

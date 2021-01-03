@@ -17,7 +17,8 @@ public class GenericCharRule {
 	private ArrayList<String> ruleActions;
 	private String regexMarker;
 	private Boolean parseFailed;
-	public static String SEP_CLASS;
+	public static String SEP_CLASS_TXT;
+	public static String SEP_CLASS_NUM;
 	private String ruleSyntax;
 	private static  Unidecode unidecode;
 
@@ -48,17 +49,36 @@ public class GenericCharRule {
 		regexMarker="";
 		unidecode=unidecode!=null?unidecode: Unidecode.toAscii();
 		String[] composedMarkers = WordUtils.splitComposedPattern(unidecode.decode(ruleMarker));
+		/*
+		dead code : removed .*( at the beggining of the regex rank element and removed ).* to fix : Regression: Nombre avec décimale tronqué pour cause d'expression régulière avare
+		=>new bug : composed markers are not matched
 		for(int i=0;i<composedMarkers.length;i++){
 			if(i!=composedMarkers.length-1){
 				regexMarker=regexMarker+"(?=.*("
-						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], String.valueOf(GenericCharRule.SEP_CLASS +(sourceChar.getIsNumeric()?"":"-")),true))
+						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], sourceChar.getIsNumeric()?GenericCharRule.SEP_CLASS_NUM:GenericCharRule.SEP_CLASS_TXT,true))
 						+").*)";
 			}else{
 				regexMarker=regexMarker+".*("
-						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], String.valueOf(GenericCharRule.SEP_CLASS + (sourceChar.getIsNumeric() ? "" : "-")),true))
+						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], sourceChar.getIsNumeric()?GenericCharRule.SEP_CLASS_NUM:GenericCharRule.SEP_CLASS_TXT,true))
 						+").*";
 			}
 		}
+
+		 */
+		if(composedMarkers.length>1){
+			//The rule rank is supp to 1, the rule is composed
+			for(int i=0;i<composedMarkers.length;i++){
+				regexMarker=regexMarker+"(?=.*("
+						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], sourceChar.getIsNumeric()?GenericCharRule.SEP_CLASS_NUM:GenericCharRule.SEP_CLASS_TXT,true))
+						+"))";
+			}
+		}else {
+			//The rule rank is == 1, the rule is simple
+			//removed .*(
+			//removed ).*
+			regexMarker=WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[0], sourceChar.getIsNumeric()?GenericCharRule.SEP_CLASS_NUM:GenericCharRule.SEP_CLASS_TXT,true));
+		}
+
 		return;
 	}
 
@@ -72,7 +92,9 @@ public class GenericCharRule {
 		//SEP_CLASS = " \\.,;:-=/";
 		//SEP_CLASS = " [.],;:-[+]=/";
 		//SEP_CLASS = " [.],;:[+]=/";
-		SEP_CLASS = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)";
+		SEP_CLASS_TXT = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)";
+		SEP_CLASS_TXT = SEP_CLASS_TXT+"-";
+		SEP_CLASS_NUM = " '[\\.(?=[^\\\\d])][,(?=[^\\\\d])];:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)";
 		try {
 			parseRule(active_rule);
 			parseFailed = false;

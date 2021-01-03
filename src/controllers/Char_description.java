@@ -310,7 +310,6 @@ public class Char_description {
 		deleteValueLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				System.out.println("Deleting value");
 				AssignValueOnSelectedItems(new CaracteristicValue());
 				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::reEvaluateCharRules);
 			}

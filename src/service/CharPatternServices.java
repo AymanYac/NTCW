@@ -2687,13 +2687,14 @@ public class CharPatternServices {
 				Matcher m;
 				m = regexPattern.matcher(" "+r.getAccentFreeDescriptionsNoCR()+" ");
 				while (m.find()){
-					System.out.println("matches desc: "+" "+(r.getShort_desc()!=null?r.getShort_desc():"")+" "+(r.getLong_desc()!=null?r.getLong_desc():"")+" ");
+					//System.out.println("matches desc> "+r.getAccentFreeDescriptionsNoCR()+" ");
 					String identifiedPattern="";
 					for(int j=1;j<=newRule.ruleCompositionRank();j++){
-						System.out.println("\tfor identified pattern: "+m.group(j+1));
-						identifiedPattern=identifiedPattern+m.group(j+1)+"+";
+						//System.out.println("\tfor identified pattern in group("+String.valueOf(j)+"): "+m.group((newRule.ruleCompositionRank()>1?2:1)*j));
+						identifiedPattern=identifiedPattern+m.group((newRule.ruleCompositionRank()>1?2:1)*j)+"+";
 					}
 					identifiedPattern = identifiedPattern.substring(0,identifiedPattern.length()-1);
+					//System.out.println("\t\t=>Full Match >"+identifiedPattern);
 					r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,identifiedPattern,parent.account));
 				}
 				r.reEvaluateCharRules();
@@ -2712,7 +2713,7 @@ public class CharPatternServices {
 
 
 	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar,UserAccount account) {
-		System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
+		//System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
 		Pattern regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE);
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		ArrayList<String> targetClasses = CharValuesLoader.active_characteristics.entrySet().stream()
@@ -2725,13 +2726,14 @@ public class CharPatternServices {
 					Matcher m;
 					m = regexPattern.matcher(" "+r.getAccentFreeDescriptionsNoCR()+" ");
 					while (m.find()){
-						System.out.println("matches desc: "+" "+(r.getShort_desc()!=null?r.getShort_desc():"")+" "+(r.getLong_desc()!=null?r.getLong_desc():"")+" ");
+						//System.out.println("matches desc> "+r.getAccentFreeDescriptionsNoCR()+" ");
 						String identifiedPattern="";
 						for(int j=1;j<=newRule.ruleCompositionRank();j++){
-							System.out.println("\tfor identified pattern: "+m.group(j+1));
-							identifiedPattern=identifiedPattern+m.group(j+1)+"+";
+							//System.out.println("\tfor identified pattern in group("+String.valueOf(j)+"): "+m.group((newRule.ruleCompositionRank()>1?2:1)*j));
+							identifiedPattern=identifiedPattern+m.group((newRule.ruleCompositionRank()>1?2:1)*j)+"+";
 						}
 						identifiedPattern = identifiedPattern.substring(0,identifiedPattern.length()-1);
+						//System.out.println("\t\t=>Full Match >"+identifiedPattern);
 						r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,identifiedPattern,account));
 						items2Reevaluate.add(r.getItem_id());
 					}
@@ -2756,7 +2758,6 @@ public class CharPatternServices {
 		suppressGenericRuleInDB(conn,active_project,charRuleIds,isSuppressed);
 	}
 	public static void suppressGenericRuleInDB(Connection conn, String active_project, ArrayList<String> charRuleIds, boolean isSuppressed) throws SQLException, ClassNotFoundException {
-		if(1==1){return;}
 		boolean closeConnAtEnd = true;
 		if(conn!=null){
 			closeConnAtEnd=false;
