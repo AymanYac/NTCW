@@ -94,7 +94,8 @@ public class GenericCharRule {
 		//SEP_CLASS = " [.],;:[+]=/";
 		SEP_CLASS_TXT = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)";
 		SEP_CLASS_TXT = SEP_CLASS_TXT+"-";
-		SEP_CLASS_NUM = " '[\\.(?=[^\\\\d])][,(?=[^\\\\d])];:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)";
+		//SEP_CLASS_NUM = " '[\\.(?=[^\\\\d])][,(?=[^\\\\d])];:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)";
+		SEP_CLASS_NUM = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)";
 		try {
 			parseRule(active_rule);
 			parseFailed = false;
