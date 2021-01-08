@@ -115,13 +115,22 @@
 	-fx-background-color:transparent;
 }
 
+.combo-box .text-field{
+	-fx-font-size:16px;
+	-fx-border-color:#445469;
+	-fx-font-weight:normal;
+	-fx-border-radius:0;
+	-fx-background-radius:0;
+	-fx-text-fill:#445469;
+	-fx-pref-width:500px;
+}
+
 .combo-box:focused{
 	-fx-text-fill:#445469;
 	-fx-font-weight:normal;
 	-fx-padding:0 0 0 0;
 	-fx-background-color:transparent;
 	-fx-faint-focus-color: transparent;
-	-fx-border-width: 5px;
     -fx-border-color: #9BBB5C
 }
 
@@ -139,16 +148,6 @@
 	-fx-border-color:white;
 }
 
-.combo-box .text-field{
-	-fx-font-size:16px;
-	-fx-border-color:#445469;
-	-fx-font-weight:normal;
-	-fx-border-radius:0;
-	-fx-background-radius:0;
-	-fx-text-fill:#445469;
-	-fx-pref-width:500px;
-
-}
 
 .combo-box .list-cell{
 	-fx-background-color:white;

@@ -26,29 +26,32 @@ public class WordUtils {
 
 
 	public static String getSearchWords(String description) {
-		
-		List<String> tmp = Arrays.asList( getRawCut(description).split(" "));
-		
-		int i=0;
-		String w1 =tmp.get(0);
-		String w2 = null;
-		for(String word:tmp) {
-			
-			if(i==1) {
-				w2 = word;
-				if(w2.length()>=GlobalConstants.SEARCH_WORD_LARGE) {
-					return w1+" "+w2;
+		if(description!=null){
+			List<String> tmp = Arrays.asList( getRawCut(description).split(" "));
+
+			int i=0;
+			String w1 =tmp.get(0);
+			String w2 = null;
+			for(String word:tmp) {
+
+				if(i==1) {
+					w2 = word;
+					if(w2.length()>=GlobalConstants.SEARCH_WORD_LARGE) {
+						return w1+" "+w2;
+					}
 				}
-			}
-			if(i==2) {
-				if(word.length()>=GlobalConstants.SEARCH_WORD_LARGE) {
-					return w1+" "+w2+" "+word;
+				if(i==2) {
+					if(word.length()>=GlobalConstants.SEARCH_WORD_LARGE) {
+						return w1+" "+w2+" "+word;
+					}
+					return w1;
 				}
-				return w1;
+				i++;
 			}
-			i++;
-			}
-		return w1;
+			return w1;
+
+		}
+		return "";
 		}
 
 

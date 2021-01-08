@@ -241,4 +241,8 @@ public class CharRuleResult implements Serializable {
 		CharRuleResult tmp = new CharRuleResult(getGenericCharRule(),newValue,matchedBlock,account);
 		return tmp;
 	}
+
+	public boolean isOrphan() {
+		return !(getGenericCharRule()!=null);
+	}
 }

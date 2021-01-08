@@ -87,7 +87,7 @@ public class Char_description {
 	@FXML public ToggleButton charButton;
 	@FXML public ToggleButton conversionToggle;
 
-	@FXML Button editRuleButton;
+	@FXML Button searchSettingButton;
 	@FXML Button prop1;
 	@FXML Button prop2;
 	@FXML Button prop3;
@@ -288,25 +288,11 @@ public class Char_description {
 
 	}
 
+	@FXML public void editSearchSettings() {
+		SearchBarCustomizerDialog.editSearchPrefrence(this);
+	}
+
 	private void listen_for_keyboard_events() {
-		editRuleButton.visibleProperty().bind(rule_field.textProperty().isNotNull().and(rule_field.textProperty().length().greaterThan(0)));
-		editRuleButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				if(ruleButton.isSelected()) {
-					rulePaneController.PaneClose();
-				}else {
-					imageButton.setSelected(false);
-					charButton.setSelected(false);
-					ruleButton.setSelected(true);
-					try {
-						load_rule_pane();
-					} catch (IOException | ClassNotFoundException  | SQLException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		});
 		deleteValueLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -552,7 +538,9 @@ public class Char_description {
 						CharValuesLoader.storeItemDatafromScreen(idx,this);
 					}
 				}
-				tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
+				if(!charButton.isSelected()){
+					tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
+				}
 			}catch(Exception V) {
 				V.printStackTrace(System.err);
 			}
@@ -735,8 +723,13 @@ public class Char_description {
 				load_char_pane();
 			}
 		}
+		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.R) && account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
+			System.out.println("Reevaluating all items");
+			CharItemFetcher.allRowItems.parallelStream().forEach(CharDescriptionRow::reEvaluateCharRules);
+		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.R)) {
 			String selectedText = proposer.getUserSelectedText();
+			//SearchBarCustomizerDialog.editSearchPrefrence(this);
 			if(selectedText.length()>0){
 				draftingRule=true;
 				int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
@@ -2003,7 +1996,7 @@ public class Char_description {
 			
 		}
 	}
-	
-	
-	
+
+
+
 }

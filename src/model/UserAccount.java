@@ -21,6 +21,7 @@ public class UserAccount {
 	
 	String user_desc_class;
 	String[] user_desc_classes;
+	static HashMap<String,ArrayList<ArrayList<String>>> searchPreferences = new HashMap<String,ArrayList<ArrayList<String>>>();
 	
 	
 	public String getUser_desc_class(String defaultSegment) {
@@ -211,4 +212,20 @@ public class UserAccount {
 
 	}
 
+    public ArrayList<ArrayList<String>> getSearchSettings(String sourceSegment) {
+		if(searchPreferences.get(sourceSegment)!=null){
+			return searchPreferences.get(sourceSegment);
+		}
+		ArrayList<ArrayList<String>> ret = new ArrayList<ArrayList<String>>();
+		ArrayList<String> elem = new ArrayList<String>();
+		elem.add(CustomSearchElements.DESCRIPTION_OVERVIEW);
+		elem.add(CustomSearchElements.LONG_OR_SHORT);
+		elem.add(CustomSearchElements.DL_OR_UL);
+		ret.add(elem);
+		return ret;
+	}
+
+	public void putSearchSettings(String sourceSegment, ArrayList<ArrayList<String>> concatElems) {
+		searchPreferences.put(sourceSegment,concatElems);
+	}
 }

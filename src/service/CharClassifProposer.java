@@ -116,12 +116,22 @@ public class CharClassifProposer {
 				btn.setOpacity(1.0);
 				btn.setOnAction((event) -> {
 					result.setStatus("Applied");
-					CharValuesLoader.updateRuntimeDataForItem(row,segment,result.getSourceChar().getCharacteristic_id(),result.getActionValue());
+					CaracteristicValue sc = result.getActionValue().shallowCopy(parent.account);
+					sc.setSource(DataInputMethods.SEMI_CHAR_DESC);
+					CharValuesLoader.updateRuntimeDataForItem(row,segment,result.getSourceChar().getCharacteristic_id(),sc);
 					CharDescriptionExportServices.addItemCharDataToPush(row, segment, charId);
 					CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
 					clearPropButtons();
-					parent.refresh_ui_display();
-					parent.tableController.tableGrid.refresh();
+					//parent.refresh_ui_display();
+					//parent.tableController.tableGrid.refresh();
+					if(!parent.charButton.isSelected()){
+						try {
+							int idx = parent.tableController.tableGrid.getSelectionModel().getSelectedIndex();
+							parent.tableController.tableGrid.getSelectionModel().clearAndSelect(idx + 1);
+						}catch (Exception V){
+
+						}
+					}
 				});
 				lastestActiveCRIndex+=1;
 			});	

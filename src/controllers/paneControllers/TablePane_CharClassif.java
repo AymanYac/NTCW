@@ -25,6 +25,7 @@ import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.dialog_toolbox.FxUtilTest;
+import transversal.dialog_toolbox.SearchBarCustomizerDialog;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -196,10 +197,17 @@ public class TablePane_CharClassif {
 		this.Parent.CHANGING_CLASS=true;
 		this.Parent.classification.setText(tmp.getClass_segment_string().split("&&&")[1]);
 		this.Parent.CHANGING_CLASS=false;
-		if(tmp.getLong_desc()!=null && tmp.getLong_desc().length()>0) {
-			Parent.search_text.setText(WordUtils.getSearchWords(tmp.getLong_desc()));
-		}else {
-			Parent.search_text.setText(WordUtils.getSearchWords(tmp.getShort_desc()));
+		if(GlobalConstants.ALLOW_DESC_SEARCH_BAR_CUSTOMIZATION){
+			CharDescriptionRow sourceItem = tableGrid.getSelectionModel().getSelectedItem();
+			String sourceSegment = sourceItem.getClass_segment_string().split("&&&")[0];
+			ArrayList<ArrayList<String>> settings = account.getSearchSettings(sourceSegment);
+			Parent.search_text.setText(SearchBarCustomizerDialog.evaluateSearchSentence(settings,sourceItem,sourceSegment));
+		}else{
+			if(tmp.getLong_desc()!=null && tmp.getLong_desc().length()>0) {
+				Parent.search_text.setText(WordUtils.getSearchWords(tmp.getLong_desc()));
+			}else {
+				Parent.search_text.setText(WordUtils.getSearchWords(tmp.getShort_desc()));
+			}
 		}
 		try{
 			scrollToSelectedItem(tmp);

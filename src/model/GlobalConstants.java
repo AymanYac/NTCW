@@ -40,6 +40,7 @@ public class GlobalConstants {
 	public static final boolean NATIVE_SELECTION_SCROLL = true;
     public static final boolean ENABLE_TRANSLATION = false;
     public static final boolean HIDE_RULE_RESULT_SUGGESTION_WHEN_KNOWN_VALUE = true;
+    public static final boolean ALLOW_DESC_SEARCH_BAR_CUSTOMIZATION = true;
     public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS = 5;
 	public static boolean USE_TAXOIMPORT_NEW_SCHEMA = true;
@@ -51,7 +52,7 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
 	public static final boolean MANUAL_CLASSIF_PERSIST = false;
-	public static final String TOOL_VERSION = "4.6.4";
+	public static final String TOOL_VERSION = "4.7";
 	//public static final String HOST_ADDRESS = "localhost";
 	public static final String HOST_ADDRESS = "91.167.182.87";//"82.66.148.154";//"88.190.148.154";
 	//public static final String HOST_ADDRESS = "192.168.0.25";

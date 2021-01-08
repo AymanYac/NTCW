@@ -2714,8 +2714,14 @@ public class CharPatternServices {
 
 	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar,UserAccount account) {
 		//System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
-		Pattern regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE);
 		HashSet<String> items2Reevaluate = new HashSet<String>();
+		Pattern regexPattern;
+		try {
+			regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE);
+		}catch (Exception V){
+			V.printStackTrace(System.err);
+			return items2Reevaluate;
+		}
 		ArrayList<String> targetClasses = CharValuesLoader.active_characteristics.entrySet().stream()
 				.filter(e -> e.getValue().stream().map(car -> car.getCharacteristic_id())
 						.collect(Collectors.toCollection(ArrayList::new)).contains(activeChar.getCharacteristic_id())).map(e -> e.getKey())

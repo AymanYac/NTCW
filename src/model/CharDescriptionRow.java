@@ -4,8 +4,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import org.apache.commons.lang3.StringUtils;
 import service.CharValuesLoader;
+import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -140,7 +142,15 @@ public class CharDescriptionRow {
 			this.class_segment_string = class_segment_string;
 		}
 		public ClassSegment getClass_segment() {
-			return class_segment;
+			if(class_segment!=null){
+				return class_segment;
+			}
+			try {
+				return Tools.get_project_segments(null).get(class_segment_string.split("&&&")[0]);
+			} catch (SQLException | ClassNotFoundException throwables) {
+				throwables.printStackTrace();
+				return null;
+			}
 		}
 		public void setClass_segment(ClassSegment class_segment) {
 			try {
@@ -210,7 +220,7 @@ public class CharDescriptionRow {
 
 			//The status of the row becomes "Suggestion j+1" for the item I,with j the highest suggestion # already present (initiated at 1)
 			HashMap<String, ArrayList<CaracteristicValue>> knownRuleValues = new HashMap<String, ArrayList<CaracteristicValue>>();
-			r.getRuleResults().entrySet().stream().forEach(e->e.getValue().stream().filter(result->!result.isSubRule() && !result.isDraft()).forEach(result -> {
+			r.getRuleResults().entrySet().stream().forEach(e->e.getValue().stream().filter(result->!result.isSubRule() && !result.isDraft() && !result.isOrphan()).forEach(result -> {
 				try{
 					int valIndx = knownRuleValues.get(e.getKey()).indexOf(result.getActionValue());
 					if(valIndx==-1){
@@ -297,7 +307,6 @@ public class CharDescriptionRow {
 			this.ruleResults.put(oldCharId,
 					this.ruleResults.get(oldCharId).stream().filter(result->result.getGenericCharRule()!=null && !result.getGenericCharRuleID().equals(oldMatch.getGenericCharRuleID())).collect(Collectors.toCollection(ArrayList::new)));
 		}catch(Exception V) {
-
 		}
 	}
 
@@ -313,7 +322,7 @@ public class CharDescriptionRow {
 		try{
 			ret = new ArrayList<CharRuleResult>(
 					getRuleResults().get(charId).stream()
-							.filter(result -> result.getStatus() != null && result.getStatus().startsWith("Suggestion "))
+							.filter(result -> result.getStatus() != null && result.getStatus().startsWith("Suggestion ") && !result.isOrphan())
 							.collect(Collectors.toCollection(ArrayList::new)));
 		}catch (Exception V){
 
