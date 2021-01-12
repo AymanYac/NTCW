@@ -285,6 +285,7 @@ public class WordUtils {
 		ArrayList<String> mandatorySeparators = new ArrayList<String>();
 		ArrayList<String> optionalSeparators = new ArrayList<String>();
 		ArrayList<String> digitCharacters = new ArrayList<>();
+		ArrayList<String> numerals = new ArrayList<>();
 		ArrayList<String> alphaCharacters = new ArrayList<>();
 		ArrayList<String> mandatoryStrings = new ArrayList<>();
 		ArrayList<String> optionalStrings = new ArrayList<>();
@@ -293,6 +294,7 @@ public class WordUtils {
 			if(
 					ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"#",digitCharacters,SEP_CLASS)!=null ||
 							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"@",alphaCharacters,SEP_CLASS)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"%d",numerals,SEP_CLASS)!=null ||
 							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(|+0)",optionalSeparators,SEP_CLASS)!=null ||
 							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(|+1)",mandatorySeparators,SEP_CLASS)!=null ||
 							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(*+0)",optionalStrings,SEP_CLASS)!=null ||
@@ -345,13 +347,37 @@ public class WordUtils {
 				action=action.substring("(*+1)".length());
 				continue;
 			}
+			if(action.startsWith("%")){
+				if(Character.isDigit(action.charAt(1)))
+				value.append(numerals.get(0));
+				numerals.remove(0);
+				action=action.substring("%d".length());
+				continue;
+			}
 			value.append(action.substring(0,1));
 			action=action.substring(1);
 		}
 		return value.toString();
 	}
 	private static Boolean ALPHANUM_PATTERN_STEP_USING_NEONEC(StringBuilder markerToConsume, StringBuilder matchedBlockToConsume, String stepNeonec, ArrayList<String> stepValues,String SEP_CLASS) {
-		if(markerToConsume.toString().startsWith(stepNeonec)){
+		if(stepNeonec.equals("%d")){
+			if(markerToConsume.toString().startsWith("%")){
+				if(Character.isDigit(markerToConsume.toString().charAt(1))){
+					markerToConsume.replace(0,2,"");
+					Pattern p = Pattern.compile("("+"[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
+					Matcher m = p.matcher(matchedBlockToConsume);
+					if(m.find()){
+						String consumableMatch = String.valueOf(m.group(1));
+						stepValues.add(consumableMatch);
+						matchedBlockToConsume.replace(0,consumableMatch.length(),"");
+						return true;
+					}
+					return false;
+
+				}
+			}
+		}
+		else if(markerToConsume.toString().startsWith(stepNeonec)){
 			String stepRegex=WordUtils.neonecObjectSyntaxToRegex(stepNeonec,SEP_CLASS,false);
 			markerToConsume.replace(0,stepNeonec.length(),"");
 			Pattern p = Pattern.compile("("+stepRegex+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);

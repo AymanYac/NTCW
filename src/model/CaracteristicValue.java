@@ -533,4 +533,8 @@ public class CaracteristicValue implements Serializable {
 	public void setManually_Reviewed(boolean manually_reviewed) {
 		manualValueReviewed=manually_reviewed;
 	}
+
+	public ClassCaracteristic getParentChar() {
+		return parentChar;
+	}
 }

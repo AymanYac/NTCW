@@ -2,14 +2,28 @@ package model;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableBooleanValue;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextBoundsType;
 import org.apache.commons.lang3.StringUtils;
 import service.CharValuesLoader;
+import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static transversal.data_exchange_toolbox.CharDescriptionExportServices.addCaracDefinitionToPush;
 
 public class CharDescriptionRow {
 
@@ -23,7 +37,6 @@ public class CharDescriptionRow {
 	//Author
 	//Article ID
 	
-		Boolean completionStatus;
 		Boolean questionStatus;
 		String short_desc;
 		String short_desc_translated;
@@ -108,12 +121,29 @@ public class CharDescriptionRow {
 			this.preclassification = preclassif;
 		}
 		
-		public Boolean getCompletionStatus() {
-			return completionStatus;
-		}
-		public void setCompletionStatus(Boolean completionStatus) {
-			this.completionStatus = completionStatus;
-		}
+		public StackPane getCompletionStatus() {
+		Circle tmp = new Circle(8,8,8);
+
+		Stop[] stops = new Stop[] { new Stop(0, Color.web("#DE827A")), new Stop(1, Color.web("#BD392F"))};
+		LinearGradient empty = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
+		stops = new Stop[] { new Stop(0, Color.web("#ACB9CA")), new Stop(1, Color.web("#8496AE"))};
+		LinearGradient full = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
+
+
+		tmp.setFill(( itemIsComplete()!=null )?full:empty);
+		tmp.setStrokeWidth(1);
+		tmp.setStroke(Color.WHITE);
+
+		Text text = new Text((itemIsComplete()!=null)?(itemIsComplete()?"":"*"):"");
+		text.setFill(Color.WHITE);
+		text.setBoundsType(TextBoundsType.VISUAL);
+		text.setFont(Font.font(GlobalConstants.CHAR_UOM_FONT,GlobalConstants.CHAR_UOM_WEIGHT,GlobalConstants.CHAR_UOM_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
+
+		StackPane stack = new StackPane();
+		stack.getChildren().addAll(tmp, text);
+		stack.setOpacity(1.0);
+		return stack;
+	}
 		public Boolean getQuestionStatus() {
 			return questionStatus;
 		}
@@ -282,6 +312,39 @@ public class CharDescriptionRow {
 			return getData(itemClass).get(characteristic_id)!=null;
     }
 
+	public Boolean hasUnknownDataInCurrentClassForCarac(String characteristic_id) {
+		String itemClass = getClass_segment_string().split("&&&")[0];
+		CaracteristicValue itemDataForCarac = getData(itemClass).get(characteristic_id);
+		if(itemDataForCarac!=null && itemDataForCarac.getParentChar()!=null){
+			String itemData = itemDataForCarac.getDisplayValue(false, false);
+			if(itemData!=null){
+				if(itemData.length()>0){
+					return itemDataForCarac.getDisplayValue(false,false).equals("*UNKNOWN*");
+				}
+			}
+			return null;
+		}
+		return null;
+	}
+
+	public Boolean itemIsComplete(){
+		String itemClass = getClass_segment_string().split("&&&")[0];
+		boolean unknownCritical = false;
+		for (ClassCaracteristic c : CharValuesLoader.active_characteristics.get(itemClass)) {
+			if (c.getIsCritical()) {
+				Boolean itemDataForCaracIsUnknown = hasUnknownDataInCurrentClassForCarac(c.getCharacteristic_id());
+				if (itemDataForCaracIsUnknown != null) {
+					if(itemDataForCaracIsUnknown){
+						unknownCritical=true;
+					}
+				} else {
+					return null;
+				}
+			}
+		}
+		return !unknownCritical;
+	}
+
 	public void addRuleResult2Row(CharRuleResult newMatch) {
 		if(!newMatch.action2ValueSuccess){
 			return;
@@ -356,5 +419,26 @@ public class CharDescriptionRow {
 		SimpleBooleanProperty simp = new SimpleBooleanProperty();
 		simp.set(hasDataInCurrentClassForCarac(activeCharId));
 		return simp;
+	}
+
+	public void clearUnknownValues(){
+		String itemClass = getClass_segment_string().split("&&&")[0];
+		getData(getClass_segment_string().split("&&&")[0]).entrySet()
+				.removeIf(e->e.getValue()!=null && e.getValue().getDisplayValue(false,false).equals("*UNKNOWN*"));
+		CharDescriptionExportServices.addItemCharDataToPush(this);
+	}
+	public void markUnknownClearValues(){
+		String itemClass = getClass_segment_string().split("&&&")[0];
+		CharValuesLoader.active_characteristics.get(itemClass).forEach(c->{
+			if(getData(itemClass).get(c.getCharacteristic_id())!=null && getData(itemClass).get(c.getCharacteristic_id()).getParentChar()!=null && getData(itemClass).get(c.getCharacteristic_id()).getDisplayValue(false,false).length()>0){
+
+			}else{
+				CaracteristicValue val = new CaracteristicValue();
+				val.setParentChar(c);
+				val.setManually_Reviewed(true);
+				CharValuesLoader.updateRuntimeDataForItem(this, itemClass, c.getCharacteristic_id(), val);
+			}
+		});
+		CharDescriptionExportServices.addItemCharDataToPush(this);
 	}
 }

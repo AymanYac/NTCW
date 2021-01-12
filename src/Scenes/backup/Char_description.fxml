@@ -170,7 +170,7 @@
                   <Separator disable="true" maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
                   <Button fx:id="exportButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#export" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_export.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
                   <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
-                  <TextField fx:id="search_text" maxHeight="20.0" maxWidth="800.0" minHeight="20.0" minWidth="800.0" prefHeight="20.0" prefWidth="800.0" />
+                  <TextField fx:id="search_text" maxHeight="30.0" maxWidth="800.0" minHeight="20.0" minWidth="800.0" prefHeight="20.0" prefWidth="800.0" />
                   <ToggleButton fx:id="googleButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#search_google_inplace" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_google_search.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
                   <ToggleButton fx:id="tableButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#show_table" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_table_view.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
                   <Separator maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" orientation="VERTICAL" prefHeight="15.0" prefWidth="15.0" />

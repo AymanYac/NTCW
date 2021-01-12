@@ -741,7 +741,7 @@ public class Manual_classif {
 	public void setUserAccount(UserAccount account) throws IOException, ClassNotFoundException, SQLException, InterruptedException {
 		this.account = account;
 		Tools.decorate_menubar(menubar,account);
-		decorate_menubar_with_rule_eval(this);
+		decorate_menubar_with_classif_specific_menus();
 		this.user_language_gcode = Tools.get_project_user_language_code(account.getActive_project());
 		
 		this.proposer = new ManualClassifProposer(account.getActive_project());
@@ -770,13 +770,14 @@ public class Manual_classif {
 	}
 
 	
-	private void decorate_menubar_with_rule_eval(Manual_classif parent) {
+	private void decorate_menubar_with_classif_specific_menus() {
 		
 		Menu manual_classif = menubar.getMenus().get(3);
 		menubar.setOnMouseEntered(e->{
 			manual_classif.show();
 		});
 		MenuItem reeval_rules_true = new MenuItem("Refresh rules on all items");
+		Manual_classif parent = this;
 		reeval_rules_true.setOnAction(new EventHandler<ActionEvent>() {
 		    public void handle(ActionEvent t) {
 		    	try {

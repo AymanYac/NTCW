@@ -316,5 +316,30 @@ public class ConfirmationDialog {
 			return false;
 		}
 	}
+
+    public static boolean WarningClearingUnknownValues() {
+		Alert alert = new Alert(AlertType.WARNING);
+		alert.setTitle("Confirm action");
+		alert.setHeaderText("All empty values of the current class' items will be marked as *UNKNOWN*");
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+
+		ButtonType yesButton = new ButtonType("Proceed anyway");
+		ButtonType noButton = new ButtonType("Cancel");
+
+
+		alert.getButtonTypes().setAll(yesButton, noButton);
+
+		Optional<ButtonType> option = alert.showAndWait();
+		if(option.isPresent()){
+			if (option.get() == yesButton) {
+				return true;
+			} else {
+				return false;
+			}
+		}else{
+			return false;
+		}
+    }
 }
 

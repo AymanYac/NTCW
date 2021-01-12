@@ -105,8 +105,9 @@ public class CharRuleResult implements Serializable {
 			}
 			if(action.startsWith("NOM ")) {
 				action=action.substring(4).trim();
-				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-				action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
+				//ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
+				//action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
+				action = WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock);
 				actionValue.setNominal_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
@@ -116,8 +117,9 @@ public class CharRuleResult implements Serializable {
 			if(action.startsWith("MIN ")) {
 
 				action=action.substring(4).trim();
-				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-				action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
+				//ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
+				//action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
+				action = WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock);
 				actionValue.setMin_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
@@ -129,8 +131,9 @@ public class CharRuleResult implements Serializable {
 			if(action.startsWith("MAX ")) {
 
 				action=action.substring(4).trim();
-				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-				action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
+				//ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
+				//action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
+				action = WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock);
 				actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
@@ -142,8 +145,9 @@ public class CharRuleResult implements Serializable {
 			if(action.startsWith("MINMAX ")) {
 
 				action=action.substring(7).trim();
-				ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
-				action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
+				//ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
+				//action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
+				action = WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock);
 				actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());

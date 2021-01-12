@@ -10,6 +10,8 @@ import model.GlobalConstants;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.language_toolbox.WordUtils;
 
+import java.util.Locale;
+
 public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
@@ -32,6 +34,7 @@ public class Main extends Application {
 	}
 	
 	public static void main(String[] args) {
+		Locale.setDefault(Locale.ENGLISH);
 		launch(args);
 	}
 }

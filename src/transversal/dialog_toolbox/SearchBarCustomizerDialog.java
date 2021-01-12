@@ -45,8 +45,9 @@ public class SearchBarCustomizerDialog {
         dialog.getDialogPane().getStyleClass().add("customDialog");
 
         // Set the button types.
-        ButtonType applyBT = new ButtonType("Save");
-        dialog.getDialogPane().getButtonTypes().addAll(applyBT,ButtonType.CANCEL);
+        ButtonType clearBT = new ButtonType("Clear", ButtonBar.ButtonData.LEFT);
+        ButtonType applyBT = new ButtonType("Save", ButtonBar.ButtonData.APPLY);
+        dialog.getDialogPane().getButtonTypes().addAll(clearBT,applyBT,ButtonType.CANCEL);
         dialog.getDialogPane().lookupButton(applyBT).addEventFilter(ActionEvent.ACTION, event -> {
             // handle cancel button code here
             event.consume();
@@ -55,6 +56,13 @@ public class SearchBarCustomizerDialog {
             String itemSearchSentence = evaluateSearchSentence(concatElems, sourceItem, sourceSegment);
             parent.search_text.setText(itemSearchSentence);
             dialog.close();
+        });
+        dialog.getDialogPane().lookupButton(clearBT).addEventFilter(ActionEvent.ACTION, event -> {
+            // handle cancel button code here
+            event.consume();
+            for(int i=0;i<20;i++){
+                Tools.deleteRow(elemBlocks,0);
+            }
         });
         contentGrid = new GridPane();
         contentGrid.setHgap(10);

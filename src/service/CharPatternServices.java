@@ -2677,35 +2677,42 @@ public class CharPatternServices {
 
 	public static void quickApplyRule(GenericCharRule newRule, ClassCaracteristic activeChar, Char_description parent) {
 		try{
-			CharDescriptionRow r = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+
+			CharDescriptionRow row = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+			String itemClass = row.getClass_segment_string().split("&&&")[0];
 			Pattern regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE);
 			ArrayList<String> targetClasses = CharValuesLoader.active_characteristics.entrySet().stream()
+					.filter(e->e.getKey().equals(itemClass))
 					.filter(e -> e.getValue().stream().map(car -> car.getCharacteristic_id())
 							.collect(Collectors.toCollection(ArrayList::new)).contains(activeChar.getCharacteristic_id())).map(e -> e.getKey())
 					.collect(Collectors.toCollection(ArrayList::new));
-			if(targetClasses.contains(r.getClass_segment_string().split("&&&")[0])){
-				Matcher m;
-				m = regexPattern.matcher(" "+r.getAccentFreeDescriptionsNoCR()+" ");
-				while (m.find()){
-					//System.out.println("matches desc> "+r.getAccentFreeDescriptionsNoCR()+" ");
-					String identifiedPattern="";
-					for(int j=1;j<=newRule.ruleCompositionRank();j++){
-						//System.out.println("\tfor identified pattern in group("+String.valueOf(j)+"): "+m.group((newRule.ruleCompositionRank()>1?2:1)*j));
-						identifiedPattern=identifiedPattern+m.group((newRule.ruleCompositionRank()>1?2:1)*j)+"+";
+			CharItemFetcher.allRowItems.parallelStream()
+					.filter(r->targetClasses.contains(r.getClass_segment_string().split("&&&")[0]))
+					.forEach(r->{
+				if(targetClasses.contains(r.getClass_segment_string().split("&&&")[0])){
+					Matcher m;
+					m = regexPattern.matcher(" "+r.getAccentFreeDescriptionsNoCR()+" ");
+					while (m.find()){
+						//System.out.println("matches desc> "+r.getAccentFreeDescriptionsNoCR()+" ");
+						String identifiedPattern="";
+						for(int j=1;j<=newRule.ruleCompositionRank();j++){
+							//System.out.println("\tfor identified pattern in group("+String.valueOf(j)+"): "+m.group((newRule.ruleCompositionRank()>1?2:1)*j));
+							identifiedPattern=identifiedPattern+m.group((newRule.ruleCompositionRank()>1?2:1)*j)+"+";
+						}
+						identifiedPattern = identifiedPattern.substring(0,identifiedPattern.length()-1);
+						//System.out.println("\t\t=>Full Match >"+identifiedPattern);
+						r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,identifiedPattern,parent.account));
 					}
-					identifiedPattern = identifiedPattern.substring(0,identifiedPattern.length()-1);
-					//System.out.println("\t\t=>Full Match >"+identifiedPattern);
-					r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,identifiedPattern,parent.account));
+					r.reEvaluateCharRules();
 				}
-				r.reEvaluateCharRules();
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						parent.refresh_ui_display();
-						parent.tableController.tableGrid.refresh();
-					}
-				});
-			}
+			});
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					parent.refresh_ui_display();
+					parent.tableController.tableGrid.refresh();
+				}
+			});
 		}catch (Exception V){
 
 		}

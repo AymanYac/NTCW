@@ -569,6 +569,9 @@ public class CharDescriptionExportServices {
 		return headerRow;
 	}
 
+	public static void addItemCharDataToPush(CharDescriptionRow row) {
+		itemRuleBuffer.add(row);
+	}
 	public static void addItemCharDataToPush(CharDescriptionRow row, CaracteristicValue val, ClassCaracteristic carac) {
 		if(val!=null){
 			Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
@@ -990,6 +993,7 @@ public class CharDescriptionExportServices {
 			}
 		});
 	}
+
 
 
 }

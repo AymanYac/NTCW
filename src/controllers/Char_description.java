@@ -18,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
@@ -296,7 +297,12 @@ public class Char_description {
 		deleteValueLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				AssignValueOnSelectedItems(new CaracteristicValue());
+				CaracteristicValue val = new CaracteristicValue();
+				int active_char_index = Math.floorMod(tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
+				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment())
+						.get(active_char_index);
+				val.setParentChar(active_char);
+				AssignValueOnSelectedItems(val);
 				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::reEvaluateCharRules);
 			}
 		});
@@ -723,10 +729,6 @@ public class Char_description {
 				load_char_pane();
 			}
 		}
-		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.R) && account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
-			System.out.println("Reevaluating all items");
-			CharItemFetcher.allRowItems.parallelStream().forEach(CharDescriptionRow::reEvaluateCharRules);
-		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.R)) {
 			String selectedText = proposer.getUserSelectedText();
 			//SearchBarCustomizerDialog.editSearchPrefrence(this);
@@ -801,7 +803,12 @@ public class Char_description {
 
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.DELETE)) {
 			System.out.println("Deleting value");
-			AssignValueOnSelectedItems(new CaracteristicValue());
+			CaracteristicValue val = new CaracteristicValue();
+			int active_char_index = Math.floorMod(tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
+			ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment())
+					.get(active_char_index);
+			val.setParentChar(active_char);
+			AssignValueOnSelectedItems(val);
 		}
 		
 		
@@ -1090,7 +1097,7 @@ public class Char_description {
 		}
 		
 		Tools.decorate_menubar(menubar,account);
-		//decorate_description_bar(false);
+		decorate_menubar_with_desc_specific_menus();
 		decorate_class_combobox(true);
 		
 		
@@ -1129,7 +1136,66 @@ public class Char_description {
 		
 	}
 
-	
+	private void decorate_menubar_with_desc_specific_menus() {
+		Menu desc = menubar.getMenus().get(4);
+		menubar.setOnMouseEntered(e->{
+			desc.show();
+		});
+		Char_description parent = this;
+		MenuItem reeval_rules_true = new MenuItem("Refresh rules on all items");
+		reeval_rules_true.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent t) {
+				CharItemFetcher.allRowItems.parallelStream().forEach(CharDescriptionRow::reEvaluateCharRules);
+				refresh_ui_display();
+				tableController.tableGrid.refresh();
+				CharDescriptionExportServices.flushItemDataToDB(account,null);
+			}
+		});
+
+		MenuItem clear_unknowns = new MenuItem("Clear unknown values on selected items");
+		clear_unknowns.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent t) {
+				tableController.tableGrid.getItems().forEach(CharDescriptionRow::clearUnknownValues);
+				refresh_ui_display();
+				tableController.tableGrid.refresh();
+				CharDescriptionExportServices.flushItemDataToDB(account,null);
+			}
+		});
+		MenuItem mark_as_known = new MenuItem("Mark clear values on selected items as unknowns");
+		mark_as_known.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent t) {
+				tableController.tableGrid.getItems().forEach(CharDescriptionRow::markUnknownClearValues);
+				refresh_ui_display();
+				tableController.tableGrid.refresh();
+				CharDescriptionExportServices.flushItemDataToDB(account,null);
+			}
+		});
+
+		MenuItem clear_unknowns_class = new MenuItem("Clear unknown values for current class");
+		clear_unknowns_class.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent t) {
+				CharItemFetcher.allRowItems.parallelStream().forEach(CharDescriptionRow::clearUnknownValues);
+				refresh_ui_display();
+				tableController.tableGrid.refresh();
+				CharDescriptionExportServices.flushItemDataToDB(account,null);
+			}
+		});
+		MenuItem mark_as_known_class = new MenuItem("Mark clear values for current class as unknowns");
+		mark_as_known_class.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent t) {
+				if(!ConfirmationDialog.WarningClearingUnknownValues()){
+					return;
+				}
+				CharItemFetcher.allRowItems.parallelStream().forEach(CharDescriptionRow::markUnknownClearValues);
+				refresh_ui_display();
+				tableController.tableGrid.refresh();
+			}
+		});
+
+		desc.getItems().addAll(reeval_rules_true,clear_unknowns,mark_as_known,clear_unknowns_class,mark_as_known_class);
+	}
+
+
 	private void decorate_class_combobox(boolean allowRefreshActiveClass) {
 		classCombo.getItems().clear();
 		Unidecode unidecode = Unidecode.toAscii();
@@ -1268,7 +1334,7 @@ public class Char_description {
 		}else {
 			tableController.fillTable_DYNAMIC((List<ItemFetcherRow>) ftc.currentList_DYNAMIC);
 		}*/
-		tableController.setCollapsedViewColumns(new String[] {"Completion status","Question status"});
+		tableController.setCollapsedViewColumns(new String[] {"Completion Status","Question Status"});
 		TablePane_CharClassif.loadLastSessionLayout();
 		tableController.refresh_table_with_segment(account.getUser_desc_class(classCombo.getItems().get(1).getClassSegment()));
 		tableController.restoreLastSessionLayout();
