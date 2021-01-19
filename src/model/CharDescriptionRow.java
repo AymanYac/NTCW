@@ -413,7 +413,7 @@ public class CharDescriptionRow {
 
 	public String getAccentFreeDescriptionsNoCR() {
 		unidecode = unidecode!=null?unidecode: Unidecode.toAscii();
-		return (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ");
+		return (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
 	}
 
 	public ObservableBooleanValue hasDataInCurrentClassForCurrentCarac(int selected_col) {
