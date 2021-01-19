@@ -146,14 +146,7 @@ public class CharDescriptionImportServices {
 			Patterns2Apply.forEach(p->{
 				items2Update.addAll(CharPatternServices.applyRule(p.getKey(),p.getValue(),account));
 			});
-			CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(r->{
-				r.reEvaluateCharRules();
-				String itemClass = r.getClass_segment_string().split("&&&")[0];
-				CharValuesLoader.active_characteristics.get(itemClass).forEach(loopCarac->{
-					CharDescriptionExportServices.addItemCharDataToPush(r,itemClass,loopCarac.getCharacteristic_id());
-				});
-
-			});
+			CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(CharDescriptionRow::reEvaluateCharRules);
 			storeItemsData(account,Patterns2Apply.size());
 		}catch (Exception V){
 			ConfirmationDialog.show("Description rules application failed", "Unable to apply pattern description rules", "OK", null);

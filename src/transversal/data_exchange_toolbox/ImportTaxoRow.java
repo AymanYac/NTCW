@@ -413,7 +413,12 @@ public class ImportTaxoRow {
 				return new Pair<GenericCharRule,ClassCaracteristic>(newRule,rowCarac);
 			}
 		}
-		Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be evaluated using characteristic '"+carac.getCharacteristic_name()+". Check semantics");
+		Pair<Row,String> rejectedRow;
+		try{
+			rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be evaluated using characteristic '"+carac.getCharacteristic_name()+". Check semantics");
+		}catch (Exception V){
+			rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be evaluated");
+		}
 		rejectedRows.add(rejectedRow);
 		return null;
 	}

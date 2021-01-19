@@ -277,7 +277,7 @@ public class WordUtils {
 			return null;
 		}
 		//Transformer la syntaxe de la rule pattern neonec en regex
-		String SEP_CLASS=GenericCharRule.SEP_CLASS_TXT;
+		String SEP_CLASS=GenericCharRule.SEP_CLASS;
 		//StringBuilder markerToConsume = new StringBuilder(rule.neonecToRegexMarker(SEP_CLASS).replace("\\Q", "").replace("\\E", ""));
 		StringBuilder markerToConsume = new StringBuilder(WordUtils.quoteCompositionMarkerInDescPattern(rule.getRuleMarker()));
 		StringBuilder matchedBlockToConsume = new StringBuilder(matchedBlock);
@@ -364,7 +364,7 @@ public class WordUtils {
 			if(markerToConsume.toString().startsWith("%")){
 				if(Character.isDigit(markerToConsume.toString().charAt(1))){
 					markerToConsume.replace(0,2,"");
-					Pattern p = Pattern.compile("("+"[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
+					Pattern p = Pattern.compile("("+"([-]?((?:\\d+|(?:\\d{1,3}(?:,\\d{3})*))(?:\\.\\d+)?))"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					Matcher m = p.matcher(matchedBlockToConsume);
 					if(m.find()){
 						String consumableMatch = String.valueOf(m.group(1));
@@ -400,7 +400,7 @@ public class WordUtils {
 			markerToConsume=markerToConsume+"(|+1)";
 		}
 		String ret = markerToConsume
-				.replaceAll("%\\d(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?")
+				.replaceAll("%\\d(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", GenericCharRule.NUM_CLASS)
 				.replaceAll("#(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[0-9]")
 				.replaceAll("@(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[a-z]")
 				.replaceAll("\\(\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + SEP_CLASS + "]*?")

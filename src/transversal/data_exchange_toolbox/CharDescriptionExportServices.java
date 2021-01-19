@@ -570,14 +570,21 @@ public class CharDescriptionExportServices {
 	}
 
 	public static void addItemCharDataToPush(CharDescriptionRow row) {
-		itemRuleBuffer.add(row);
+		String itemClass = row.getClass_segment_string().split("&&&")[0];
+		CharValuesLoader.active_characteristics.get(itemClass).forEach(c->{
+			addItemCharDataToPush(row,itemClass,c);
+		});
 	}
 	public static void addItemCharDataToPush(CharDescriptionRow row, CaracteristicValue val, ClassCaracteristic carac) {
 		if(val!=null){
-			Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
-			Pair<String, Pair<CaracteristicValue,ClassCaracteristic>> queueItem = new Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>(row.getItem_id(),valCaracPair);
-			itemDataBuffer.add(queueItem);
+
+		}else{
+			val = new CaracteristicValue();
+			val.setParentChar(carac);
 		}
+		Pair<CaracteristicValue,ClassCaracteristic> valCaracPair = new Pair<CaracteristicValue,ClassCaracteristic>(val,carac);
+		Pair<String, Pair<CaracteristicValue,ClassCaracteristic>> queueItem = new Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>(row.getItem_id(),valCaracPair);
+		itemDataBuffer.add(queueItem);
 		itemRuleBuffer.add(row);
 	}
 
@@ -592,6 +599,16 @@ public class CharDescriptionExportServices {
 		if(carac.isPresent()){
 			addItemCharDataToPush(row,val,carac.get());
 		}
+
+	}
+	public static void addItemCharDataToPush(CharDescriptionRow row, String segment, ClassCaracteristic carac) {
+		CaracteristicValue val = null;
+		try{
+			val = row.getData(segment).get(carac.getCharacteristic_id());
+		}catch (Exception V){
+
+		}
+		addItemCharDataToPush(row,val,carac);
 
 	}
 
@@ -916,7 +933,7 @@ public class CharDescriptionExportServices {
 					conn3.close();
 
 					conn = Tools.spawn_connection();
-					stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_items_x_pattern_results values(?,?,?,?) on conflict(item_id,characteristic_id) do update set char_rule_results = excluded.char_rule_results");
+					stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_items_x_pattern_results values(?,?,?,?) on conflict(item_id,characteristic_id) do update set char_rule_results_json = excluded.char_rule_results_json");
 					Connection finalConn = conn;
 					PreparedStatement finalStmt = stmt;
 					CharDescriptionExportServices.itemRuleBuffer = CharDescriptionExportServices.itemRuleBuffer.stream().collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
@@ -987,6 +1004,7 @@ public class CharDescriptionExportServices {
 				//finalStmt.setArray(3,finalConn.createArrayOf("bytea",e.getValue().stream().map(CharRuleResult::serialize).toArray(byte[][]::new)));
 				finalStmt.setArray(3,null);
 				finalStmt.setString(4,ComplexMap2JdbcObject.serialize(e.getValue()));
+				//System.out.println(finalStmt.toString());
 				finalStmt.addBatch();
 			} catch (SQLException throwables) {
 				throwables.printStackTrace();

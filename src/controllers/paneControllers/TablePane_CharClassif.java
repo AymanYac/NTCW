@@ -1201,14 +1201,7 @@ public class TablePane_CharClassif {
 
 
     public void ReevaluateItems(HashSet<String> items2Update) {
-		 CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(r->{
-		 	 r.reEvaluateCharRules();
-			 String itemClass = r.getClass_segment_string().split("&&&")[0];
-			 CharValuesLoader.active_characteristics.get(itemClass).forEach(loopCarac->{
-			 	CharDescriptionExportServices.addItemCharDataToPush(r,itemClass,loopCarac.getCharacteristic_id());
-			 });
-
-		 });
+		 CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(CharDescriptionRow::reEvaluateCharRules);
 		 CharDescriptionExportServices.flushItemDataToDB(account, null);
 	}
 }

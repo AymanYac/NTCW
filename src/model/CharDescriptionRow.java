@@ -2,8 +2,6 @@ package model;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableBooleanValue;
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -22,8 +20,6 @@ import transversal.language_toolbox.Unidecode;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static transversal.data_exchange_toolbox.CharDescriptionExportServices.addCaracDefinitionToPush;
 
 public class CharDescriptionRow {
 
@@ -208,7 +204,7 @@ public class CharDescriptionRow {
 				ruleResults.get(charId).stream().forEach(r->{
 					
 					Optional<CharRuleResult> SuperRule = ruleResults.get(charId).stream()
-					.filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r)) ).findAny();
+					.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r)||rloop.isRedudantWith(r)) ).findAny();
 					if(SuperRule.isPresent()) {
 						//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
 						r.addSuperRule(SuperRule);
@@ -305,6 +301,13 @@ public class CharDescriptionRow {
 
 				}
 			});
+			r.getRuleResults().values().forEach(a->{
+				a.stream().filter(result -> !result.isDraft()).forEach(result->{
+					//The status of the rule N becomes empty for the item I
+					result.clearSuperRules();
+				});
+			});
+			CharDescriptionExportServices.addItemCharDataToPush(r);
 		}
 
     public boolean hasDataInCurrentClassForCarac(String characteristic_id) {

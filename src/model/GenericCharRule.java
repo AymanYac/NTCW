@@ -12,13 +12,14 @@ import java.util.regex.Pattern;
 
 public class GenericCharRule {
 
-	private String charRuleId;
+    private String charRuleId;
 	private String ruleMarker;
 	private ArrayList<String> ruleActions;
 	private String regexMarker;
 	private Boolean parseFailed;
-	public static String SEP_CLASS_TXT;
-	public static String SEP_CLASS_NUM;
+	public static String SEP_CLASS;
+	//public static final String NUM_CLASS = "[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?";
+	public static final String NUM_CLASS = "[-]?((?:\\\\d+|(?:\\\\d{1,3}(?:,\\\\d{3})*))(?:\\\\.\\\\d+)?)";
 	private String ruleSyntax;
 	private static  Unidecode unidecode;
 
@@ -69,14 +70,14 @@ public class GenericCharRule {
 			//The rule rank is supp to 1, the rule is composed
 			for(int i=0;i<composedMarkers.length;i++){
 				regexMarker=regexMarker+"(?=.*("
-						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], sourceChar.getIsNumeric()?GenericCharRule.SEP_CLASS_NUM:GenericCharRule.SEP_CLASS_TXT,true))
+						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], GenericCharRule.SEP_CLASS,true))
 						+"))";
 			}
 		}else {
 			//The rule rank is == 1, the rule is simple
 			//removed .*(
 			//removed ).*
-			regexMarker=WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[0], sourceChar.getIsNumeric()?GenericCharRule.SEP_CLASS_NUM:GenericCharRule.SEP_CLASS_TXT,true));
+			regexMarker=WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[0], GenericCharRule.SEP_CLASS,true));
 		}
 
 		return;
@@ -92,10 +93,7 @@ public class GenericCharRule {
 		//SEP_CLASS = " \\.,;:-=/";
 		//SEP_CLASS = " [.],;:-[+]=/";
 		//SEP_CLASS = " [.],;:[+]=/";
-		SEP_CLASS_TXT = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)"+"-";;
-		SEP_CLASS_TXT = SEP_CLASS_TXT+"-";
-		//SEP_CLASS_NUM = " '[\\.(?=[^\\\\d])][,(?=[^\\\\d])];:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)";
-		SEP_CLASS_NUM = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)";
+		SEP_CLASS = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)"+"-_";;
 		try {
 			parseRule(active_rule);
 			parseFailed = false;

@@ -115,15 +115,13 @@ public class CharClassifProposer {
 				btn.setTooltip(new Tooltip(btn.getText()));
 				btn.setOpacity(1.0);
 				btn.setOnAction((event) -> {
-					result.setStatus("Applied");
+					//result.setStatus("Applied");
 					CaracteristicValue sc = result.getActionValue().shallowCopy(parent.account);
 					sc.setSource(DataInputMethods.SEMI_CHAR_DESC);
 					CharValuesLoader.updateRuntimeDataForItem(row,segment,result.getSourceChar().getCharacteristic_id(),sc);
 					CharDescriptionExportServices.addItemCharDataToPush(row, segment, charId);
 					CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
 					clearPropButtons();
-					//parent.refresh_ui_display();
-					//parent.tableController.tableGrid.refresh();
 					if(!parent.charButton.isSelected()){
 						try {
 							int idx = parent.tableController.tableGrid.getSelectionModel().getSelectedIndex();
@@ -132,6 +130,8 @@ public class CharClassifProposer {
 
 						}
 					}
+					parent.refresh_ui_display();
+					parent.tableController.tableGrid.refresh();
 				});
 				lastestActiveCRIndex+=1;
 			});	

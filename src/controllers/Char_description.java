@@ -304,6 +304,7 @@ public class Char_description {
 				val.setParentChar(active_char);
 				AssignValueOnSelectedItems(val);
 				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::reEvaluateCharRules);
+				CharDescriptionExportServices.flushItemDataToDB(account,null);
 			}
 		});
 		
@@ -801,18 +802,6 @@ public class Char_description {
 			tableController.fireScrollNBUp();
 		}
 
-		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.DELETE)) {
-			System.out.println("Deleting value");
-			CaracteristicValue val = new CaracteristicValue();
-			int active_char_index = Math.floorMod(tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
-			ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment())
-					.get(active_char_index);
-			val.setParentChar(active_char);
-			AssignValueOnSelectedItems(val);
-		}
-		
-		
-		
 		return;
 		
 	}
@@ -1155,7 +1144,7 @@ public class Char_description {
 		MenuItem clear_unknowns = new MenuItem("Clear unknown values on selected items");
 		clear_unknowns.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				tableController.tableGrid.getItems().forEach(CharDescriptionRow::clearUnknownValues);
+				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::clearUnknownValues);
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
 				CharDescriptionExportServices.flushItemDataToDB(account,null);
@@ -1164,7 +1153,7 @@ public class Char_description {
 		MenuItem mark_as_known = new MenuItem("Mark clear values on selected items as unknowns");
 		mark_as_known.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				tableController.tableGrid.getItems().forEach(CharDescriptionRow::markUnknownClearValues);
+				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::markUnknownClearValues);
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
 				CharDescriptionExportServices.flushItemDataToDB(account,null);
@@ -1174,7 +1163,7 @@ public class Char_description {
 		MenuItem clear_unknowns_class = new MenuItem("Clear unknown values for current class");
 		clear_unknowns_class.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				CharItemFetcher.allRowItems.parallelStream().forEach(CharDescriptionRow::clearUnknownValues);
+				tableController.tableGrid.getItems().forEach(CharDescriptionRow::clearUnknownValues);
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
 				CharDescriptionExportServices.flushItemDataToDB(account,null);
@@ -1186,9 +1175,10 @@ public class Char_description {
 				if(!ConfirmationDialog.WarningClearingUnknownValues()){
 					return;
 				}
-				CharItemFetcher.allRowItems.parallelStream().forEach(CharDescriptionRow::markUnknownClearValues);
+				tableController.tableGrid.getItems().forEach(CharDescriptionRow::markUnknownClearValues);
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
+				CharDescriptionExportServices.flushItemDataToDB(account,null);
 			}
 		});
 
@@ -1900,7 +1890,6 @@ public class Char_description {
 							CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id());
 							
 						});
-		CharDescriptionExportServices.flushItemDataToDB(account, null);
 		TranslationServices.beAwareOfNewValue(value, CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index));
 		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index),true);
 		
@@ -1956,6 +1945,7 @@ public class Char_description {
 			AssignValueOnSelectedItems(pattern_value);
 			new Thread(()->{
 				CharPatternServices.applyItemRule(this);
+				CharDescriptionExportServices.flushItemDataToDB(account,null);
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
