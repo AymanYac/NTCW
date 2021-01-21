@@ -255,7 +255,9 @@ public class CharDescriptionRow {
 						result.setStatus("Suggestion "+String.valueOf(knownRuleValues.get(e.getKey()).size()));
 					}else{
 						//Known value
-						result.setStatus("Suggestion "+String.valueOf(valIndx)+1);
+						//result.setStatus("Suggestion "+String.valueOf(valIndx)+1);
+						//Clear this value for visibility
+						result.setStatus(null);
 					}
 				}catch (Exception V){
 					knownRuleValues.put(e.getKey(),new ArrayList<CaracteristicValue>());

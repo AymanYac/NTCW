@@ -106,13 +106,7 @@ public class CharRuleResult implements Serializable {
 				//ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
 				//action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
 				action = WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock);
-				try{
-					String.valueOf(new DoubleEvaluator().evaluate(action));
-				}catch (Exception V){
-					action = action.split(" ")[1];
-					System.out.println(action);
-				}
-				actionValue.setNominal_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+				actionValue.setNominal_value(String.valueOf(WordUtils.EVALUATE_ARITHMETIC(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
@@ -124,7 +118,7 @@ public class CharRuleResult implements Serializable {
 				//ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
 				//action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
 				action = WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock);
-				actionValue.setMin_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+				actionValue.setMin_value(String.valueOf(WordUtils.EVALUATE_ARITHMETIC(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
@@ -138,7 +132,7 @@ public class CharRuleResult implements Serializable {
 				//ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
 				//action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
 				action = WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock);
-				actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+				actionValue.setMax_value(String.valueOf(WordUtils.EVALUATE_ARITHMETIC(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
@@ -152,7 +146,7 @@ public class CharRuleResult implements Serializable {
 				//ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
 				//action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
 				action = WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock);
-				actionValue.setMax_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
+				actionValue.setMax_value(String.valueOf(WordUtils.EVALUATE_ARITHMETIC(action)));
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
@@ -183,20 +177,20 @@ public class CharRuleResult implements Serializable {
 		String targetBlock = unidecode.decodeAndTrim(r.getMatchedBlock());
 		String thisValue = unidecode.decodeAndTrim(getActionValue().getDisplayValue(false,false));
 		String targetValue = unidecode.decodeAndTrim(r.getActionValue().getDisplayValue(false,false));
-		return StringUtils.equalsIgnoreCase(thisValue, targetValue) && thisBlock.length()>=targetBlock.length() && !r.isSubRuleOf(this);
+		return StringUtils.equalsIgnoreCase(thisValue, targetValue) && thisBlock.length()>targetBlock.length();
 	}
 
 	public boolean isSuperMarkerOf(CharRuleResult r) {
 		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
 		String thisPattern = unidecode.decodeAndTrim(getGenericCharRule().getRuleMarker());
 		String targetPattern = unidecode.decodeAndTrim(r.getGenericCharRule().getRuleMarker());
-		return StringUtils.containsIgnoreCase(thisPattern, targetPattern) &&!StringUtils.equalsIgnoreCase(thisPattern, targetPattern) && !r.isSubRuleOf(this);
+		return StringUtils.containsIgnoreCase(thisPattern, targetPattern) && thisPattern.length()>targetPattern.length();
 	}
 	public boolean isSuperBlockOf(CharRuleResult r) {
 		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
 		String thisBlock = unidecode.decodeAndTrim(getMatchedBlock());
 		String targetBlock = unidecode.decodeAndTrim(r.getMatchedBlock());
-		return StringUtils.containsIgnoreCase(thisBlock, targetBlock) && !StringUtils.equalsIgnoreCase(thisBlock, targetBlock) && !r.isSubRuleOf(this);
+		return StringUtils.containsIgnoreCase(thisBlock, targetBlock) && thisBlock.length()>targetBlock.length();
 	}
 	public void addSuperRule(Optional<CharRuleResult> superRule) {
 		superRules.add(superRule.get());
@@ -204,9 +198,6 @@ public class CharRuleResult implements Serializable {
 
 	public boolean isSubRule() {
 		return this.superRules.size()>0;
-	}
-	public boolean isSubRuleOf( CharRuleResult parentRule){
-		return this.superRules.contains(parentRule);
 	}
 
 

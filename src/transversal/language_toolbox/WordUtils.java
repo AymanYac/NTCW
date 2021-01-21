@@ -1,5 +1,6 @@
 package transversal.language_toolbox;
 
+import com.fathzer.soft.javaluator.DoubleEvaluator;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import model.*;
@@ -286,6 +287,9 @@ public class WordUtils {
 		ArrayList<String> optionalSeparators = new ArrayList<String>();
 		ArrayList<String> digitCharacters = new ArrayList<>();
 		ArrayList<String> numerals = new ArrayList<>();
+		for(int i=0;i<10;i++){
+			numerals.add(null);
+		}
 		ArrayList<String> alphaCharacters = new ArrayList<>();
 		ArrayList<String> mandatoryStrings = new ArrayList<>();
 		ArrayList<String> optionalStrings = new ArrayList<>();
@@ -348,11 +352,12 @@ public class WordUtils {
 				continue;
 			}
 			if(action.startsWith("%")){
-				if(Character.isDigit(action.charAt(1)))
-				value.append(numerals.get(0));
-				numerals.remove(0);
-				action=action.substring("%d".length());
-				continue;
+				char idx = action.charAt(1);
+				if(Character.isDigit(idx)){
+					value.append(numerals.get(Integer.parseInt(String.valueOf(idx))-1));
+					action=action.substring("%d".length());
+					continue;
+				}
 			}
 			value.append(action.substring(0,1));
 			action=action.substring(1);
@@ -362,14 +367,15 @@ public class WordUtils {
 	private static Boolean ALPHANUM_PATTERN_STEP_USING_NEONEC(StringBuilder markerToConsume, StringBuilder matchedBlockToConsume, String stepNeonec, ArrayList<String> stepValues,String SEP_CLASS) {
 		if(stepNeonec.equals("%d")){
 			if(markerToConsume.toString().startsWith("%")){
-				if(Character.isDigit(markerToConsume.toString().charAt(1))){
+				char idx = markerToConsume.toString().charAt(1);
+				if(Character.isDigit(idx)){
 					markerToConsume.replace(0,2,"");
 					Pattern p = Pattern.compile("("+"[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					//Pattern p = Pattern.compile("("+"([-]?((?:\\d+|(?:\\d{1,3}(?:,\\d{3})*))(?:\\.\\d+)?))"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					Matcher m = p.matcher(matchedBlockToConsume);
 					if(m.find()){
 						String consumableMatch = String.valueOf(m.group(1));
-						stepValues.add(consumableMatch);
+						stepValues.set(Integer.parseInt(String.valueOf(idx))-1,consumableMatch);
 						matchedBlockToConsume.replace(0,consumableMatch.length(),"");
 						return true;
 					}
@@ -1132,6 +1138,16 @@ public class WordUtils {
 		}
 		return Math.floorMod(selected_col,classCaracteristics.size());
 
+	}
+
+	public static String EVALUATE_ARITHMETIC(String action) {
+		try{
+			action = action.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______",".");
+			return String.valueOf(new DoubleEvaluator().evaluate(action));
+		}catch (Exception V){
+			System.out.println("=> Arith Error on> "+action);
+			return String.valueOf(new DoubleEvaluator().evaluate(action));
+		}
 	}
 
 
