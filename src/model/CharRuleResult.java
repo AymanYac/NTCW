@@ -109,6 +109,7 @@ public class CharRuleResult implements Serializable {
 				try{
 					String.valueOf(new DoubleEvaluator().evaluate(action));
 				}catch (Exception V){
+					action = action.split(" ")[1];
 					System.out.println(action);
 				}
 				actionValue.setNominal_value(String.valueOf(new DoubleEvaluator().evaluate(action)));
@@ -189,13 +190,13 @@ public class CharRuleResult implements Serializable {
 		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
 		String thisPattern = unidecode.decodeAndTrim(getGenericCharRule().getRuleMarker());
 		String targetPattern = unidecode.decodeAndTrim(r.getGenericCharRule().getRuleMarker());
-		return StringUtils.containsIgnoreCase(thisPattern, targetPattern) && !r.isSubRuleOf(this);
+		return StringUtils.containsIgnoreCase(thisPattern, targetPattern) &&!StringUtils.equalsIgnoreCase(thisPattern, targetPattern) && !r.isSubRuleOf(this);
 	}
 	public boolean isSuperBlockOf(CharRuleResult r) {
 		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
 		String thisBlock = unidecode.decodeAndTrim(getMatchedBlock());
 		String targetBlock = unidecode.decodeAndTrim(r.getMatchedBlock());
-		return StringUtils.containsIgnoreCase(thisBlock, targetBlock) && !r.isSubRuleOf(this);
+		return StringUtils.containsIgnoreCase(thisBlock, targetBlock) && !StringUtils.equalsIgnoreCase(thisBlock, targetBlock) && !r.isSubRuleOf(this);
 	}
 	public void addSuperRule(Optional<CharRuleResult> superRule) {
 		superRules.add(superRule.get());
