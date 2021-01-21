@@ -55,7 +55,7 @@ public class ImportItemRow {
 	private CaracteristicValue setCaracValue(Row current_row, CharDescriptionRow item, String charID) {
 		
 		CaracteristicValue current_value = new CaracteristicValue();
-		current_value.setManually_Reviewed(true); //Be able to load empty rows as *unknown*
+		
 		ClassCaracteristic knownCarac = CharDescriptionImportServices.chid2Carac.get(charID);
 		if(knownCarac!=null) {
 			//The carac is known
@@ -152,13 +152,11 @@ public class ImportItemRow {
 								return null;
 							}
 						}else {
-							current_value = new CaracteristicValue();
-							current_value.setManually_Reviewed(true);
-							/*Be able to load empty rows as *unknown*
+							
 							//The row has no uom symbol
 							rejectedRows.add(new Pair<Row,String>(current_row,"Uom is required for characteristic: "+charID));
 							valueParseHasFailed=true;
-							return null;*/
+							return null;
 						}
 					}
 				}else {
@@ -207,6 +205,7 @@ public class ImportItemRow {
 			return null;
 		}
 		current_value.setSource(DataInputMethods.PROJECT_SETUP_UPLOAD);
+		current_value.setManually_Reviewed(true);
 		return current_value;
 	}
 

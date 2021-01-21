@@ -2676,6 +2676,7 @@ public class CharPatternServices {
 	}
 
 	public static void quickApplyRule(GenericCharRule newRule, ClassCaracteristic activeChar, Char_description parent) {
+		//System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
 		try{
 
 			CharDescriptionRow row = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();

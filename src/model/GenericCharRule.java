@@ -18,8 +18,10 @@ public class GenericCharRule {
 	private String regexMarker;
 	private Boolean parseFailed;
 	public static String SEP_CLASS;
-	//public static final String NUM_CLASS = "[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?";
-	public static final String NUM_CLASS = "[-]?((?:\\\\d+|(?:\\\\d{1,3}(?:,\\\\d{3})*))(?:\\\\.\\\\d+)?)";
+	public static final String NUM_CLASS = "[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?";
+	//public static final String NUM_CLASS = "[-]?((?:\\\\d+|(?:\\\\d{1,3}(?:,\\\\d{3})*))(?:\\\\.\\\\d+)?)";
+	//public static final String NUM_CLASS = "(?!0+\\.00)(?=.{1,9}(?:\\.|$))(?!0(?!\\.))\\d{1,3}(?:[, ]\\d{3})*(?:\\.\\d+)?";
+	//public static final String NUM_CLASS = "(?!0+\\\\.00)(?=.{1,9}(?:\\\\.|$))(?!0(?!\\\\.))\\\\d{1,3}(?:[, ]\\\\d{3})*(?:\\\\.\\\\d+)?";
 	private String ruleSyntax;
 	private static  Unidecode unidecode;
 
