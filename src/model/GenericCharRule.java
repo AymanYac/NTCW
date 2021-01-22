@@ -18,7 +18,9 @@ public class GenericCharRule {
 	private String regexMarker;
 	private Boolean parseFailed;
 	public static String SEP_CLASS;
-	public static final String NUM_CLASS = "[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?";
+	//public static final String NUM_CLASS = "[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?";
+	//public static final String NUM_CLASS = "[-+]?[0-9]{0,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+(?:[.,][0-9]+)?";
+	public static final String NUM_CLASS = "[-+]?(?:[0-9]{1,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?";
 	//public static final String NUM_CLASS = "[-]?((?:\\\\d+|(?:\\\\d{1,3}(?:,\\\\d{3})*))(?:\\\\.\\\\d+)?)";
 	//public static final String NUM_CLASS = "(?!0+\\.00)(?=.{1,9}(?:\\.|$))(?!0(?!\\.))\\d{1,3}(?:[, ]\\d{3})*(?:\\.\\d+)?";
 	//public static final String NUM_CLASS = "(?!0+\\\\.00)(?=.{1,9}(?:\\\\.|$))(?!0(?!\\\\.))\\\\d{1,3}(?:[, ]\\\\d{3})*(?:\\\\.\\\\d+)?";
@@ -79,7 +81,7 @@ public class GenericCharRule {
 			//The rule rank is == 1, the rule is simple
 			//removed .*(
 			//removed ).*
-			regexMarker=WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[0], GenericCharRule.SEP_CLASS,true));
+			regexMarker="(?="+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[0], GenericCharRule.SEP_CLASS,true))+")";
 		}
 
 		return;

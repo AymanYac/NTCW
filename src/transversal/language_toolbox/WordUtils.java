@@ -370,14 +370,18 @@ public class WordUtils {
 				char idx = markerToConsume.toString().charAt(1);
 				if(Character.isDigit(idx)){
 					markerToConsume.replace(0,2,"");
-					Pattern p = Pattern.compile("("+"[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
+                    //Pattern p = Pattern.compile("(?=("+"^(?=\\s*\\S).*$[-+]?[0-9]{0,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false))+")",Pattern.CASE_INSENSITIVE);
+					Pattern p = Pattern.compile("("+"[-+]?[0-9]{0,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
+					//Pattern p = Pattern.compile("("+"[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					//Pattern p = Pattern.compile("("+"([-]?((?:\\d+|(?:\\d{1,3}(?:,\\d{3})*))(?:\\.\\d+)?))"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					Matcher m = p.matcher(matchedBlockToConsume);
-					if(m.find()){
+					while(m.find()){
 						String consumableMatch = String.valueOf(m.group(1));
-						stepValues.set(Integer.parseInt(String.valueOf(idx))-1,consumableMatch);
-						matchedBlockToConsume.replace(0,consumableMatch.length(),"");
-						return true;
+						if(consumableMatch!=null && consumableMatch.length()>0){
+							stepValues.set(Integer.parseInt(String.valueOf(idx))-1,consumableMatch);
+							matchedBlockToConsume.replace(0,consumableMatch.length(),"");
+							return true;
+						}
 					}
 					return false;
 
@@ -1143,6 +1147,9 @@ public class WordUtils {
 	public static String EVALUATE_ARITHMETIC(String action) {
 		try{
 			action = action.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______",".");
+			if(action.startsWith("+")){
+				action=action.substring(1);
+			}
 			return String.valueOf(new DoubleEvaluator().evaluate(action));
 		}catch (Exception V){
 			System.out.println("=> Arith Error on> "+action);

@@ -2676,7 +2676,7 @@ public class CharPatternServices {
 	}
 
 	public static void quickApplyRule(GenericCharRule newRule, ClassCaracteristic activeChar, Char_description parent) {
-		//System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
+		System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
 		try{
 
 			CharDescriptionRow row = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
@@ -2721,7 +2721,7 @@ public class CharPatternServices {
 
 
 	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar,UserAccount account) {
-		//System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
+		System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		Pattern regexPattern;
 		try {
