@@ -27,6 +27,7 @@ public class CharRuleResult implements Serializable {
 		this.genericCharRuleID = activeGenericCharRule.getCharRuleId();
 		this.matchedBlock = matchedGroup;
 		this.parentChar = parentChar;
+		//ruleActionToValue(account);
 		try{
 			ruleActionToValue(account);
 			action2ValueSuccess=true;

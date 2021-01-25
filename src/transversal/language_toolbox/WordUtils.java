@@ -371,7 +371,7 @@ public class WordUtils {
 				if(Character.isDigit(idx)){
 					markerToConsume.replace(0,2,"");
                     //Pattern p = Pattern.compile("(?=("+"^(?=\\s*\\S).*$[-+]?[0-9]{0,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false))+")",Pattern.CASE_INSENSITIVE);
-					Pattern p = Pattern.compile("("+"[-+]?[0-9]{0,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
+					Pattern p = Pattern.compile("("+"-?(?:[0-9]{1,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					//Pattern p = Pattern.compile("("+"[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					//Pattern p = Pattern.compile("("+"([-]?((?:\\d+|(?:\\d{1,3}(?:,\\d{3})*))(?:\\.\\d+)?))"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					Matcher m = p.matcher(matchedBlockToConsume);
@@ -796,7 +796,7 @@ public class WordUtils {
 
 		private static String removeStringsInDescPattern(String transformed) {
 			Pattern p = Pattern.compile("\"([^\"]*)\"");
-			Matcher m = p.matcher(transformed);
+			Matcher m = p.matcher(transformed.replace("\".\"","."));
 			return m.replaceAll("");
 		}
 
@@ -922,7 +922,7 @@ public class WordUtils {
 //        End If
 			}
 //        If Mid(transformed(row), char, 1) = "*" And in_quotes = -1 Then
-			if(transformed.charAt(charIdx)=='*' && !inQuotes) {
+			if(transformed.charAt(charIdx)=='*' && !inQuotes && !processingNumericValue) {
 //            transformed(row) = Left(transformed(row), char - 1) & "(*+1)" & Right(transformed(row), Len(transformed(row)) - char)
 				transformed = transformed.substring(0,charIdx)+"(*+1)"+transformed.substring(charIdx+1);
 //            char = char + 1
@@ -1146,10 +1146,8 @@ public class WordUtils {
 
 	public static String EVALUATE_ARITHMETIC(String action) {
 		try{
-			action = action.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______",".");
-			if(action.startsWith("+")){
-				action=action.substring(1);
-			}
+			//action = action.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______",".");
+			action = action.replace(" ","").replaceAll("([0-9]{1,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+)[.,]([0-9]+)","$1______$2").replace(",", "").replace(".","").replace("______",".");
 			return String.valueOf(new DoubleEvaluator().evaluate(action));
 		}catch (Exception V){
 			System.out.println("=> Arith Error on> "+action);

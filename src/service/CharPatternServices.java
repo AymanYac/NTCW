@@ -2687,7 +2687,7 @@ public class CharPatternServices {
 					.filter(e -> e.getValue().stream().map(car -> car.getCharacteristic_id())
 							.collect(Collectors.toCollection(ArrayList::new)).contains(activeChar.getCharacteristic_id())).map(e -> e.getKey())
 					.collect(Collectors.toCollection(ArrayList::new));
-			CharItemFetcher.allRowItems.parallelStream()
+			CharItemFetcher.allRowItems.stream()
 					.filter(r->targetClasses.contains(r.getClass_segment_string().split("&&&")[0]))
 					.forEach(r->{
 				if(targetClasses.contains(r.getClass_segment_string().split("&&&")[0])){
@@ -2721,7 +2721,7 @@ public class CharPatternServices {
 
 
 	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar,UserAccount account) {
-		System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
+		//System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		Pattern regexPattern;
 		try {
