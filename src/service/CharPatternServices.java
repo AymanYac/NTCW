@@ -2687,7 +2687,7 @@ public class CharPatternServices {
 					.filter(e -> e.getValue().stream().map(car -> car.getCharacteristic_id())
 							.collect(Collectors.toCollection(ArrayList::new)).contains(activeChar.getCharacteristic_id())).map(e -> e.getKey())
 					.collect(Collectors.toCollection(ArrayList::new));
-			CharItemFetcher.allRowItems.stream()
+			CharItemFetcher.allRowItems.parallelStream()
 					.filter(r->targetClasses.contains(r.getClass_segment_string().split("&&&")[0]))
 					.forEach(r->{
 				if(targetClasses.contains(r.getClass_segment_string().split("&&&")[0])){
