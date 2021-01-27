@@ -314,7 +314,7 @@ public class CharDescriptionRow {
 
     public boolean hasDataInCurrentClassForCarac(String characteristic_id) {
 			String itemClass = getClass_segment_string().split("&&&")[0];
-			return getData(itemClass).get(characteristic_id)!=null;
+			return getData(itemClass).get(characteristic_id)!=null && getData(itemClass).get(characteristic_id).getDisplayValue(false,false).length()>0;
     }
 
 	public Boolean hasUnknownDataInCurrentClassForCarac(String characteristic_id) {

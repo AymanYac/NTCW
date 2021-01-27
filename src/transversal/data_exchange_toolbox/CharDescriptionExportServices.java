@@ -14,6 +14,7 @@ import service.CharItemFetcher;
 import service.CharValuesLoader;
 import service.TranslationServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
+import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
 
 import java.io.File;
@@ -917,9 +918,14 @@ public class CharDescriptionExportServices {
 							V.printStackTrace(System.err);
 						}
 					}
-					stmt.executeBatch();
-					stmt2.executeBatch();
-					stmt3.executeBatch();
+					try{
+						stmt.executeBatch();
+						stmt2.executeBatch();
+						stmt3.executeBatch();
+					}catch (Exception V){
+					ExceptionDialog.show("Connection Error","Could not reach server","Item values could not be saved. Please restart");
+					}
+
 					
 					stmt.clearBatch();
 					stmt.close();
@@ -950,8 +956,8 @@ public class CharDescriptionExportServices {
 							try {
 								finalStmt.executeBatch();
 								finalStmt.clearBatch();
-							} catch (SQLException throwables) {
-
+							}catch (Exception V){
+								ExceptionDialog.show("Connection Error","Could not reach server","Rule results could not be saved. Please restart");
 							}
 						});
 					}

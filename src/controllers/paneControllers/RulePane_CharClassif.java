@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import service.CharPatternServices;
 import service.CharValuesLoader;
 import service.TranslationServices;
+import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
@@ -435,7 +436,11 @@ public class RulePane_CharClassif {
         newRule.setRegexMarker(caracCombo.getValue());
         if(newRule.parseSuccess()) {
             newRule.storeGenericCharRule();
-            CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),newRule.getCharRuleId(),false);
+            try{
+                CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),newRule.getCharRuleId(),false);
+            }catch (Exception V){
+                ExceptionDialog.show("Connection Error","Could not reach server","Rule could not be saved. Please restart");
+            }
             CharPatternServices.quickApplyRule(newRule,caracCombo.getValue(),parent);
             new Thread(() -> {
                 parent.tableController.ReevaluateItems(CharPatternServices.applyRule(newRule,caracCombo.getValue(),parent.account));
