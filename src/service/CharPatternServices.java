@@ -230,7 +230,7 @@ public class CharPatternServices {
 					parent.sendPatternValue(VALUES_CONTAINING_SELECTION.iterator().next());
 //								Rule = [Selection]
 					parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(processedText,true)+"<DL "+VALUES_CONTAINING_SELECTION.iterator().next()+">");
-					parent.sendSemiAutoPattern(VALUES_CONTAINING_SELECTION.iterator().next(), WordUtils.QUOTE_NON_SEP_TEXT(processedText,true)+"<DL "+VALUES_CONTAINING_SELECTION.iterator().next()+">", selectedText);
+					parent.sendSemiAutoPattern(VALUES_CONTAINING_SELECTION.iterator().next(), WordUtils.QUOTE_NON_SEP_TEXT(processedText,true)+"<DL "+VALUES_CONTAINING_SELECTION.iterator().next().getDataLanguageValue()+">", selectedText);
 					System.out.println("=====> Match!");
 					return;
 				}else {

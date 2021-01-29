@@ -208,18 +208,21 @@ public class Char_description {
 		}
 		
 	}
+	@FXML void copyClientNumber2ClipBoard(){
+		final Clipboard clipboard = Clipboard.getSystemClipboard();
+		final ClipboardContent content = new ClipboardContent();
+		try{
+			content.putString(aidLabel.getText().split("Article ID: ")[1]);
+			Clipboard.getSystemClipboard().setContent(content);
+		}catch (Exception V){
+
+		}
+	}
 	@FXML void initialize(){
 		aidLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				final Clipboard clipboard = Clipboard.getSystemClipboard();
-				final ClipboardContent content = new ClipboardContent();
-				try{
-					content.putString(aidLabel.getText().split("Article ID: ")[1]);
-					Clipboard.getSystemClipboard().setContent(content);
-				}catch (Exception V){
-
-				}
+				copyClientNumber2ClipBoard();
 			}
 		});
 		sd.setText("");

@@ -1,5 +1,6 @@
 package controllers.paneControllers;
 
+import com.google.gson.reflect.TypeToken;
 import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -23,6 +24,7 @@ import model.*;
 import org.json.simple.parser.ParseException;
 import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
+import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.dialog_toolbox.FxUtilTest;
 import transversal.dialog_toolbox.SearchBarCustomizerDialog;
@@ -147,7 +149,7 @@ public class TablePane_CharClassif {
 
 		Connection conn = Tools.spawn_connection();
 		PreparedStatement stmt = conn.prepareStatement("select "
-				+ "user_description_sorting_columns, user_description_sorting_order, user_description_active_index"
+				+ "user_description_sorting_columns, user_description_sorting_order, user_description_active_index,search_preferences"
 				+ " from administration.users_x_projects where project_id = ? and user_id = ?");
 		stmt.setString(1, account.getActive_project());
 		stmt.setString(2, account.getUser_id());
@@ -157,8 +159,9 @@ public class TablePane_CharClassif {
 			account.setDescriptionSortColumns(rs.getArray(1));
 			account.setDescriptionSortDirs(rs.getArray(2));
 			account.setDescriptionActiveIdx(rs.getInt(3));
+			account.setSearchSettings(ComplexMap2JdbcObject.deserialize(rs.getString("search_preferences"),new TypeToken<ArrayList<ArrayList<String>>>(){}.getType()));
 		}catch(Exception V) {
-
+			V.printStackTrace(System.err);
 		}
 		rs.close();
 		stmt.close();

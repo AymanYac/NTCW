@@ -227,6 +227,7 @@
             <Label fx:id="custom_label_value" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
             <ComboBox fx:id="classCombo" maxWidth="1.7976931348623157E308" scaleX="0.8" scaleY="0.8" stylesheets="@../Styles/ComboBoxBlue.css" GridPane.columnIndex="9" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
             <Label fx:id="deleteValueLabel" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="⦻" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
+            <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onMouseClicked="#copyClientNumber2ClipBoard" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_add_copy.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
          </children>
       </GridPane>
    </children>

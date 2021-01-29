@@ -1,14 +1,17 @@
 package model;
 
+import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
+import service.CharValuesLoader;
+import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.generic.CustomKeyboardListener;
 import transversal.generic.Tools;
 
-import java.sql.Array;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Optional;
 
 public class UserAccount {
 	String user_id;
@@ -21,7 +24,7 @@ public class UserAccount {
 	
 	String user_desc_class;
 	String[] user_desc_classes;
-	static HashMap<String,ArrayList<ArrayList<String>>> searchPreferences = new HashMap<String,ArrayList<ArrayList<String>>>();
+	static ArrayList<ArrayList<String>> searchPreferences = new ArrayList<ArrayList<String>>();
 	
 	
 	public String getUser_desc_class(String defaultSegment) {
@@ -213,8 +216,8 @@ public class UserAccount {
 	}
 
     public ArrayList<ArrayList<String>> getSearchSettings(String sourceSegment) {
-		if(searchPreferences.get(sourceSegment)!=null){
-			return searchPreferences.get(sourceSegment);
+		if(searchPreferences!=null){
+			return FilterSearchSettingsForSegment(searchPreferences,sourceSegment);
 		}
 		ArrayList<ArrayList<String>> ret = new ArrayList<ArrayList<String>>();
 		ArrayList<String> elem = new ArrayList<String>();
@@ -225,7 +228,44 @@ public class UserAccount {
 		return ret;
 	}
 
-	public void putSearchSettings(String sourceSegment, ArrayList<ArrayList<String>> concatElems) {
-		searchPreferences.put(sourceSegment,concatElems);
+	private ArrayList<ArrayList<String>> FilterSearchSettingsForSegment(ArrayList<ArrayList<String>> searchPreferences, String sourceSegment) {
+		ArrayList<ArrayList<String>> ret = new ArrayList<ArrayList<String>>();
+		searchPreferences.forEach(elem->{
+			if(elem.get(0).matches("[1-9]+-.*")){
+				String caracName = elem.get(0).split("[1-9]+" + "-")[1];
+				Optional<ClassCaracteristic> matchingCarac = CharValuesLoader.active_characteristics.get(sourceSegment).stream().filter(car -> car.getCharacteristic_name().equals(caracName)).findAny();
+				if(matchingCarac.isPresent()){
+					elem.set(0,(String.valueOf(matchingCarac.get().getSequence()) + "-" + matchingCarac.get().getCharacteristic_name()));
+					ret.add(elem);
+				}
+			}else{
+				ret.add(elem);
+			}
+		});
+		return ret;
+	}
+
+	public void saveSearchSettings(ArrayList<ArrayList<String>> concatElems) {
+		searchPreferences = concatElems;
+		new Thread (()->{
+			Connection conn = null;
+			try {
+				conn = Tools.spawn_connection();
+				PreparedStatement stmt = conn.prepareStatement("update users_x_projects set search_preferences = ? where project_id = ? and user_id = ?");
+				stmt.setString(1, ComplexMap2JdbcObject.serialize(searchPreferences));
+				stmt.setString(2,getActive_project());
+				stmt.setString(3,getUser_id());
+				stmt.execute();
+				//System.out.println(stmt.toString());
+				stmt.close();
+				conn.close();
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			}
+		}).start();
+	}
+
+	public void setSearchSettings(Object search_preferences) {
+		searchPreferences = (ArrayList<ArrayList<String>>) search_preferences;
 	}
 }

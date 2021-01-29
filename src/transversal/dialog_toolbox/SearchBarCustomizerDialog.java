@@ -81,9 +81,8 @@ public class SearchBarCustomizerDialog {
     }
 
     private static void saveSearchPreference(UserAccount account) {
-        System.out.println("Saving");
         ArrayList<ArrayList<String>> concatElems = loadSettingsFromScreen();
-        account.putSearchSettings(sourceSegment,concatElems);
+        account.saveSearchSettings(concatElems);
         dialog.close();
     }
 
@@ -262,7 +261,8 @@ public class SearchBarCustomizerDialog {
                 String.valueOf(carac.getSequence())+"-"+carac.getCharacteristic_name()).collect(Collectors.toCollection(ArrayList::new)));
         addFirstElemListener(addCombo,null,null,true);
         previewLabel = new Label();
-        contentGrid.add(previewLabel,1,2);
+        contentGrid.add(previewLabel,0,2);
+        GridPane.setColumnSpan(previewLabel,GridPane.REMAINING);
         contentGrid.add(addCombo,1,3);
         contentGrid.add(new Label("Add a new search element:"),0,3);
     }
@@ -570,7 +570,7 @@ public class SearchBarCustomizerDialog {
 
         elemBlocks.getColumnConstraints().setAll(cc0,cc1,cc2,cc3);
         elemBlocks.getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
-
+        previewLabel.setStyle("-fx-fill: #8496AE;-fx-font-style: italic");
     }
 
 }
