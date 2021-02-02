@@ -297,10 +297,16 @@ public class RulePane_CharClassif {
                 GridPane.setColumnSpan(valueFieldR2,1);
                 GridPane.setColumnSpan(valueFieldUoM,1);
 
-                valueFieldUoM.getItems().setAll(
+                /*valueFieldUoM.getItems().setAll(
                         new ArrayList<>(
                                 caracCombo.getValue().getAllowedUoms().stream()
                                         .map(uid->UnitOfMeasure.RunTimeUOMS.get(uid))
+                                        .collect(Collectors.toCollection(ArrayList::new))
+                        ));*/
+                valueFieldUoM.getItems().setAll(
+                        new ArrayList<>(
+                                UnitOfMeasure.RunTimeUOMS.values().stream()
+                                        .filter(uom->UnitOfMeasure.ConversionPathExists(uom,caracCombo.getValue().getAllowedUoms()))
                                         .collect(Collectors.toCollection(ArrayList::new))
                         ));
             }else{

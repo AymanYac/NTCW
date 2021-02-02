@@ -32,7 +32,9 @@ public class CharRuleResult implements Serializable {
 			ruleActionToValue(account);
 			action2ValueSuccess=true;
 		}catch (Exception V){
-			V.printStackTrace(System.err);
+			if(matchedGroup!=null){
+				V.printStackTrace(System.err);
+			}
 			action2ValueSuccess=false;
 		}
 	}

@@ -2681,7 +2681,7 @@ public class CharPatternServices {
 
 			CharDescriptionRow row = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
 			String itemClass = row.getClass_segment_string().split("&&&")[0];
-			Pattern regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE);
+			Pattern regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 			ArrayList<String> targetClasses = CharValuesLoader.active_characteristics.entrySet().stream()
 					.filter(e->e.getKey().equals(itemClass))
 					.filter(e -> e.getValue().stream().map(car -> car.getCharacteristic_id())
@@ -2725,7 +2725,7 @@ public class CharPatternServices {
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		Pattern regexPattern;
 		try {
-			regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE);
+			regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 		}catch (Exception V){
 			V.printStackTrace(System.err);
 			return items2Reevaluate;

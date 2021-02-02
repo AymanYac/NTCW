@@ -51,7 +51,6 @@ public class GenericCharRule {
 		return regexMarker;
 	}
 	public void setRegexMarker(ClassCaracteristic sourceChar) {
-		regexMarker="";
 		unidecode=unidecode!=null?unidecode: Unidecode.toAscii();
 		String[] composedMarkers = WordUtils.splitComposedPattern(unidecode.decode(ruleMarker));
 		/*
@@ -72,11 +71,13 @@ public class GenericCharRule {
 		 */
 		if(composedMarkers.length>1){
 			//The rule rank is supp to 1, the rule is composed
+			regexMarker="^";
 			for(int i=0;i<composedMarkers.length;i++){
-				regexMarker=regexMarker+"(?=.*("
+				regexMarker+="(?=.*("
 						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], GenericCharRule.SEP_CLASS,true))
 						+"))";
 			}
+			regexMarker+=".*$";
 		}else {
 			//The rule rank is == 1, the rule is simple
 			//removed .*(
