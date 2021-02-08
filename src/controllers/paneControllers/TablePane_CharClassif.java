@@ -729,7 +729,14 @@ public class TablePane_CharClassif {
 			if(idx!=selected_col ) {
 				if(collapsedViewColumns.contains(((TableColumn)col).getText())) {
 					//Hide/Show collapse only columns
-					((TableColumn)col).setVisible(collapsedView);
+					((TableColumn)col).setVisible(collapsedView || Arrays.asList(GlobalConstants.COLLAPSED_COLOMNS_TO_KEEP_VISIBLE).contains(((TableColumn)col).getText()));
+					if(collapsedView){
+						((TableColumn)col).prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(GlobalConstants.COLLAPSED_COLOMNS_VISIBLE_WIDTH_MULTIPLIER/(this.collapsedViewColumns.size())));
+					}else{
+						if(Arrays.asList(GlobalConstants.COLLAPSED_COLOMNS_TO_KEEP_VISIBLE).contains(((TableColumn)col).getText())){
+							((TableColumn)col).prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(GlobalConstants.COLLAPSED_COLOMNS_TO_KEEP_VISIBLE_WIDTH_MULTIPLIER));
+						}
+					}
 					continue;
 				}
 				
@@ -737,7 +744,12 @@ public class TablePane_CharClassif {
 					//keep full view columns visible if not in collapsed views , hide otherwise
 					//Unless column is description column
 					if(((TableColumn)col).getText().equals("Description")) {
-						((TableColumn)col).prefWidthProperty().bind(tableGrid.widthProperty().multiply(collapsedView?0.68:0.3));;
+						int no_VisibleCollapsed = GlobalConstants.COLLAPSED_COLOMNS_TO_KEEP_VISIBLE.length;
+						double widthMutliplierVisibleCollapsed=0;
+						if(no_VisibleCollapsed>0){
+							widthMutliplierVisibleCollapsed = GlobalConstants.COLLAPSED_COLOMNS_TO_KEEP_VISIBLE_WIDTH_MULTIPLIER / no_VisibleCollapsed;
+						}
+						((TableColumn)col).prefWidthProperty().bind(tableGrid.widthProperty().multiply(collapsedView?0.68:0.3-(no_VisibleCollapsed*widthMutliplierVisibleCollapsed)));;
 						((TableColumn)col).setVisible(true);
 						continue;
 					}
@@ -790,7 +802,6 @@ public class TablePane_CharClassif {
         	for(String colname : this.collapsedViewColumns) {
             	TableColumn tmp = new TableColumn<>(colname);
             	tmp.setCellValueFactory(new PropertyValueFactory<>(colname.replace(" ", "")));
-                tmp.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
                 tmp.setResizable(false);
                 tmp.setVisible(false);
                 this.tableGrid.getColumns().add(tmp);

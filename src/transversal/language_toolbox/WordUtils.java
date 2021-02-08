@@ -372,7 +372,7 @@ public class WordUtils {
 					markerToConsume.replace(0,2,"");
                     //Pattern p = Pattern.compile("(?=("+"^(?=\\s*\\S).*$[-+]?[0-9]{0,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false))+")",Pattern.CASE_INSENSITIVE);
 					//Pattern p = Pattern.compile("("+"-?(?:[0-9]{1,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
-					Pattern p = Pattern.compile("^("+"-?(?:[0-9]{1,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)+"$"),Pattern.CASE_INSENSITIVE);
+					Pattern p = Pattern.compile("^("+"-?(?:[0-9]{1,3}(?:[. ,]+[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)+"$"),Pattern.CASE_INSENSITIVE);
 					//Pattern p = Pattern.compile("("+"[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					//Pattern p = Pattern.compile("("+"([-]?((?:\\d+|(?:\\d{1,3}(?:,\\d{3})*))(?:\\.\\d+)?))"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					Matcher m = p.matcher(matchedBlockToConsume);
@@ -382,7 +382,7 @@ public class WordUtils {
 						matchedBlockToConsume.replace(0,consumableMatch.length(),"");
 						return true;
 					}else{
-						p = Pattern.compile("("+"-?(?:[0-9]{1,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
+						/*p = Pattern.compile("("+"-?(?:[0-9]{1,3}(?:[. ,]+[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 						m = p.matcher(matchedBlockToConsume);
 						while(m.find()){
 							String consumableMatch = String.valueOf(m.group(1));
@@ -391,9 +391,9 @@ public class WordUtils {
 								matchedBlockToConsume.replace(0,consumableMatch.length(),"");
 								return true;
 							}
-						}
+						}*/
+						return false;
 					}
-					return false;
 
 				}
 			}
@@ -1157,7 +1157,7 @@ public class WordUtils {
 	public static String EVALUATE_ARITHMETIC(String action) {
 		try{
 			//action = action.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______",".");
-			action = action.replace(" ","").replaceAll("([0-9]{1,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+)[.,]([0-9]+)","$1______$2").replace(",", "").replace(".","").replace("______",".");
+			action = action.replace(" ","").replaceAll("([0-9]{1,3}(?:[. ,]+[0-9]{3,3})*|[0-9]+)[.,]([0-9]+)","$1______$2").replace(",", "").replace(".","").replace("______",".");
 			return String.valueOf(new DoubleEvaluator().evaluate(action));
 		}catch (Exception V){
 			System.out.println("=> Arith Error on> "+action);

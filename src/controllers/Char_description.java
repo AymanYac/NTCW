@@ -1327,7 +1327,8 @@ public class Char_description {
 		}else {
 			tableController.fillTable_DYNAMIC((List<ItemFetcherRow>) ftc.currentList_DYNAMIC);
 		}*/
-		tableController.setCollapsedViewColumns(new String[] {"Completion Status","Question Status"});
+		//tableController.setCollapsedViewColumns(new String[] {"Completion Status","Question Status"});
+		tableController.setCollapsedViewColumns(new String[] {"Completion Status"});
 		TablePane_CharClassif.loadLastSessionLayout();
 		tableController.refresh_table_with_segment(account.getUser_desc_class(classCombo.getItems().get(1).getClassSegment()));
 		tableController.restoreLastSessionLayout();

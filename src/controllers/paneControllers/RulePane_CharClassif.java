@@ -71,6 +71,15 @@ public class RulePane_CharClassif {
             @Override
             public void changed(ObservableValue<? extends CharRuleResult> observable, CharRuleResult oldValue, CharRuleResult newValue) {
                 disableSaveAndEditButton(false);
+                try{
+                    valueFieldUoM.getSelectionModel().clearSelection();
+                }catch (Exception V){
+
+                }
+                patternField.clear();
+                valueFieldL1.clear();
+                valueFieldR1.clear();
+                valueFieldR2.clear();
                 if(!(newValue!=null)){
                     return;
                 }
@@ -94,7 +103,7 @@ public class RulePane_CharClassif {
 
                             if(action.startsWith("MINMAX ")) {
                                 action=action.substring(7).trim();
-                                if(valueFieldR1.isVisible()){
+                                if(valueFieldR1.getText()!=null && valueFieldR1.getText().length()>0){
                                     valueFieldR2.setText(action);
                                 }else{
                                     valueFieldR1.setText(action);
@@ -309,6 +318,12 @@ public class RulePane_CharClassif {
                                         .filter(uom->UnitOfMeasure.ConversionPathExists(uom,caracCombo.getValue().getAllowedUoms()))
                                         .collect(Collectors.toCollection(ArrayList::new))
                         ));
+                UnitOfMeasure defaultUom = new ArrayList<>(
+                        caracCombo.getValue().getAllowedUoms().stream()
+                                .map(uid -> UnitOfMeasure.RunTimeUOMS.get(uid))
+                                .collect(Collectors.toCollection(ArrayList::new))
+                ).get(0);
+                valueFieldUoM.setValue(defaultUom);
             }else{
                 GridPane.setColumnSpan(valueLabelL1,3);
                 valueLabelL1.setText("Nominal Value");

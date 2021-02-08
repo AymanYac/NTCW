@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import org.apache.commons.codec.language.bm.Languages;
 
 public class GlobalConstants {
 
@@ -41,6 +42,13 @@ public class GlobalConstants {
     public static final boolean ENABLE_TRANSLATION = false;
     public static final boolean HIDE_RULE_RESULT_SUGGESTION_WHEN_KNOWN_VALUE = true;
     public static final boolean ALLOW_DESC_SEARCH_BAR_CUSTOMIZATION = true;
+    public static final String[] COLLAPSED_COLOMNS_TO_KEEP_VISIBLE = new String[] {"Completion Status"};
+	public static final double COLLAPSED_COLOMNS_TO_KEEP_VISIBLE_WIDTH_MULTIPLIER = 0.085;
+	public static final double COLLAPSED_COLOMNS_VISIBLE_WIDTH_MULTIPLIER = 0.2;
+	public static final String OUT_LOG = "ntcw_out.log.log";
+	public static final String ERR_LOG = "ntcw_err.log.log";
+
+
     public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS = 5;
 	public static boolean USE_TAXOIMPORT_NEW_SCHEMA = true;
@@ -52,7 +60,8 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
 	public static final boolean MANUAL_CLASSIF_PERSIST = false;
-	public static final String TOOL_VERSION = "4.8.7";
+	public static final boolean REDIRECT_OUTSTREAM = true;
+	public static final String TOOL_VERSION = "4.8.8";
 	//public static final String HOST_ADDRESS = "localhost";
 	public static final String HOST_ADDRESS = "91.167.182.87";//"82.66.148.154";//"88.190.148.154";
 	//public static final String HOST_ADDRESS = "192.168.0.25";

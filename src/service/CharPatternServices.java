@@ -2694,14 +2694,14 @@ public class CharPatternServices {
 					Matcher m;
 					m = regexPattern.matcher(" "+r.getAccentFreeDescriptionsNoCR()+" ");
 					while (m.find()){
-						//System.out.println("matches desc> "+r.getAccentFreeDescriptionsNoCR()+" ");
+						System.out.println("matches desc> "+r.getAccentFreeDescriptionsNoCR()+" ");
 						String identifiedPattern="";
 						for(int j=1;j<=newRule.ruleCompositionRank();j++){
-							//System.out.println("\tfor identified pattern in group("+String.valueOf(j)+"): "+m.group((newRule.ruleCompositionRank()>1?2:1)*j));
+							System.out.println("\tfor identified pattern in group("+String.valueOf(j)+"): "+m.group((newRule.ruleCompositionRank()>1?2:1)*j));
 							identifiedPattern=identifiedPattern+m.group((newRule.ruleCompositionRank()>1?2:1)*j)+"+";
 						}
 						identifiedPattern = identifiedPattern.substring(0,identifiedPattern.length()-1);
-						//System.out.println("\t\t=>Full Match >"+identifiedPattern);
+						System.out.println("\t\t=>Full Match >"+identifiedPattern);
 						r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,identifiedPattern,parent.account));
 					}
 					r.reEvaluateCharRules();

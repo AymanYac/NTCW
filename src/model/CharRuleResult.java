@@ -27,7 +27,6 @@ public class CharRuleResult implements Serializable {
 		this.genericCharRuleID = activeGenericCharRule.getCharRuleId();
 		this.matchedBlock = matchedGroup;
 		this.parentChar = parentChar;
-		//ruleActionToValue(account);
 		try{
 			ruleActionToValue(account);
 			action2ValueSuccess=true;
@@ -149,7 +148,11 @@ public class CharRuleResult implements Serializable {
 				//ArrayList<Double> numValuesInSelection = WordUtils.parseNumericalValues(matchedBlock);
 				//action = WordUtils.NUM_PATTERN_RULE_EVAL(action,numValuesInSelection);
 				action = WordUtils.ALPHANUM_PATTERN_RULE_EVAL_STEPWISE(genericCharRule,action,matchedBlock);
-				actionValue.setMax_value(String.valueOf(WordUtils.EVALUATE_ARITHMETIC(action)));
+				if(actionValue.getMin_value()!=null && actionValue.getMin_value().length()>0){
+					actionValue.setMax_value(String.valueOf(WordUtils.EVALUATE_ARITHMETIC(action)));
+				}else{
+					actionValue.setMin_value(String.valueOf(WordUtils.EVALUATE_ARITHMETIC(action)));
+				}
 				actionValue.setRule_id(genericCharRule.getRuleMarker()+"<"+String.join("><", genericCharRule.getRuleActions())+">");
 				actionValue.setAuthor(account.getUser_id());
 				actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);

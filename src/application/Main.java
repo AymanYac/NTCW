@@ -10,6 +10,10 @@ import model.GlobalConstants;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.language_toolbox.WordUtils;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 public class Main extends Application {
@@ -33,8 +37,14 @@ public class Main extends Application {
 		}
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
 		Locale.setDefault(Locale.ENGLISH);
+		if(GlobalConstants.REDIRECT_OUTSTREAM){
+			System.setOut(new PrintStream(new FileOutputStream(GlobalConstants.OUT_LOG, true)));
+			System.setErr(new PrintStream(new FileOutputStream(GlobalConstants.OUT_LOG, true)));
+			System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX >" + LocalDateTime.now() + "< XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+			System.err.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX >" + LocalDateTime.now() + "< XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+		}
 		launch(args);
 	}
 }

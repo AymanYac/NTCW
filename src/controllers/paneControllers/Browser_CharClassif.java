@@ -45,6 +45,7 @@ import transversal.pdf_toolbox.PdfCapableBrowser;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
