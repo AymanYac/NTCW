@@ -207,7 +207,7 @@ public class Project_selection {
 		
 		//Persists the active project in for the user in the database
 		try {
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			PreparedStatement stmt = conn.prepareStatement("update administration.users_x_projects set active_project_status = false where user_id = ?");
 			stmt.setString(1, account.getUser_id());
 			stmt.execute();
@@ -403,7 +403,7 @@ public class Project_selection {
 					
 					
 					//Create a first connection to the list the administration schema projects
-					Connection conn = Tools.spawn_connection();
+					Connection conn = Tools.spawn_connection_from_pool();
 					//Get the list of the projects the current user is able to see ( the public projects or the private projects where the user has a role defined and unsupressed)
 					Statement st = conn.createStatement();
 					String eligible_pids = null;
@@ -420,7 +420,7 @@ public class Project_selection {
 					}
 					//#
 					VIEWTABLE.clear();
-					Connection connX = Tools.spawn_connection();
+					Connection connX = Tools.spawn_connection_from_pool();
 					Statement stX = connX.createStatement();
 					ResultSet rsX;
 					//Stores the known mappings language_id <-> language_name
@@ -629,7 +629,7 @@ public class Project_selection {
 		Connection conn;
 		//Create a connection
 		try {
-			conn = Tools.spawn_connection();
+			conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			//Update the project by setting its suppressed status column to True
 			//#

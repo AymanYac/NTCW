@@ -413,8 +413,8 @@ public class AutoClassificationBenchmark {
 
 		cardinal_counted=true;
 		
-		Connection conn = Tools.spawn_connection();
-		Connection conn2 = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
+		Connection conn2 = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		Statement stmt2 = conn2.createStatement();
 		ResultSet rs = null;
@@ -496,7 +496,7 @@ public class AutoClassificationBenchmark {
 		
 		
 		
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		String query=null;
 		if(isREFERENCE) {
 			query="select client_item_number,short_description,long_description,material_group,level_1_number,level_1_name_translated,level_2_number,level_2_name_translated,level_3_number,level_3_name_translated,level_4_number,level_4_name_translated from (select item_id , level_1_number,level_1_name_translated,level_2_number,level_2_name_translated,level_3_number,level_3_name_translated,level_4_number,level_4_name_translated from  ( select item_id, segment_id from ( select item_id, segment_id, local_rn, max(local_rn) over (partition by  item_id) as max_rn from ( select item_id, segment_id, row_number() over (partition by item_id order by global_rn asc ) as local_rn from  ( SELECT  item_id,segment_id, row_number() over ( order by (select 0) ) as global_rn  FROM "+pid+".project_classification_event where item_id in (select distinct item_id from "+pid+".project_items ) ) as global_rank ) as ranked_events ) as maxed_events where local_rn = max_rn ) as latest_events left join  "+pid+".project_segments on project_segments.segment_id = latest_events.segment_id ) as rich_events left join "+pid+".project_items on rich_events.item_id = project_items.item_id"+" limit "+String.valueOf(mAX_CARD);

@@ -409,15 +409,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/pgjdbc-ng-0.8.4.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/poi-3.17.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -464,15 +455,6 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/poi-ooxml-schemas-4.0.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/postgresql-42.1.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -619,6 +601,33 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/jpedal_lgpl.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/HikariCP-4.0.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/pgjdbc-ng-0.8.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/postgresql-42.2.18.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

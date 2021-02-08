@@ -27,7 +27,7 @@ public class ComplexMap2JdbcObject {
 	}
 
 	public static void saveAccountProjectPreferenceForClassification(UserAccount account) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		PreparedStatement stmt = conn.prepareStatement("update administration.users_x_projects set "
 				+ "user_manual_propositions=?,"
 				+ "user_manual_sorting_columns=?,"
@@ -48,7 +48,7 @@ public class ComplexMap2JdbcObject {
 	}
 
 	public static void saveAccountProjectPreferenceForDescription(UserAccount account) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		PreparedStatement stmt = conn.prepareStatement("update administration.users_x_projects set "
 				+ "user_description_active_index=?,"
 				+ "user_description_sorting_columns=?,"

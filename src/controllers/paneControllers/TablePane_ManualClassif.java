@@ -115,7 +115,7 @@ public class TablePane_ManualClassif {
 		
 		
 		
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		PreparedStatement stmt = conn.prepareStatement("select user_manual_propositions, "
 				+ "user_manual_sorting_columns, user_manual_sorting_order"
 				+ " from administration.users_x_projects where project_id = ? and user_id = ?");

@@ -132,7 +132,7 @@ public class CharDescriptionImportServices {
 		}
 
 		ArrayList<String> patterns2Store = Patterns2Apply.stream().map(p -> p.getKey()).collect(Collectors.toCollection(HashSet::new)).stream().map(r -> r.getCharRuleId()).collect(Collectors.toCollection(ArrayList::new));
-		CharPatternServices.suppressGenericRuleInDB(null,account.getActive_project(),patterns2Store,false);
+		CharPatternServices.suppressGenericRuleInDB(account.getActive_project(),patterns2Store,false);
 
 		try{
 			CharItemFetcher.classifiedItems = QueryFormater.FETCH_ITEM_CLASSES_WITH_UPLOAD_PRIORITY("",Tools.get_project_granularity(account.getActive_project()),account.getActive_project());
@@ -168,7 +168,7 @@ public class CharDescriptionImportServices {
 
 	private static void storeItemsWithClass(UserAccount account) throws SQLException, ClassNotFoundException {
 		//Uploading items
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		stmt = conn.prepareStatement("delete from "+account.getActive_project()+".project_items");
 		stmt.execute();
 		stmt.close();
@@ -258,7 +258,7 @@ public class CharDescriptionImportServices {
 	}
 
 	private static void storeChars() throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		
 		stmt = conn.prepareStatement("delete from "+active_project+".project_characteristics");
 		stmt.execute();
@@ -334,7 +334,7 @@ public class CharDescriptionImportServices {
   	        tmp_preparedStatementClause += ", ";
   	      }
   	    }
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		stmt = conn.prepareStatement("delete from "+active_project+".project_segments");
 		stmt.execute();
 		stmt.close();

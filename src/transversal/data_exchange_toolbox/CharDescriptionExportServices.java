@@ -520,7 +520,7 @@ public class CharDescriptionExportServices {
 
 	private static File openExportFile(Char_description parent) throws ClassNotFoundException, SQLException {
 		String PROJECT_NAME;
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 	    Statement stmt = conn.createStatement();
 	    ResultSet rs = stmt.executeQuery("select project_name from projects where project_id='"+parent.account.getActive_project()+"'");
 	    rs.next();
@@ -623,7 +623,7 @@ public class CharDescriptionExportServices {
 	}
 
 	public static void flushCaracDefinitionToDB(UserAccount account) throws SQLException, ClassNotFoundException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		stmt = conn.prepareStatement("insert into " + account.getActive_project() + ".project_characteristics values(?,?,?,?,?) on conflict(characteristic_id) do update set characteristic_name=excluded.characteristic_name, characteristic_name_translated=excluded.characteristic_name_translated, isNumeric=excluded.isNumeric, isTranslatable=excluded.isTranslatable");
 		//characteristic_id , characteristic_name , characteristic_name_translated , isNumeric , isTranslatable 
 		caracDefBuffer.stream().map(Pair::getKey).collect(Collectors.toCollection(HashSet::new)).forEach(car->{
@@ -678,7 +678,7 @@ public class CharDescriptionExportServices {
 	}
 
 	public static void flushCaracDeleteToDB(UserAccount account) throws SQLException, ClassNotFoundException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_characteristics_x_segments values(?,?,?,?,?,?,?) on conflict(characteristic_id,segment_id) do update set isActive=excluded.isActive");
 		//characteristic_id,segment_id,sequence,isCritical,allowedValues[],allowedUoMs[],isActive
 
@@ -721,7 +721,7 @@ public class CharDescriptionExportServices {
 		    
 			@Override
 		    protected Void call() throws Exception {
-				Connection conn = Tools.spawn_connection();
+				Connection conn = Tools.spawn_connection_from_pool();
 				//value_id,text_value_data_language,text_value_user_language,nominal_value,min_value,max_value,note,uom_id
 				PreparedStatement stmt = conn.prepareStatement("update "+active_project+".project_values set "
 						+ "text_value_data_language = ?,"
@@ -785,8 +785,8 @@ public class CharDescriptionExportServices {
 			    
 				@Override
 			    protected Void call() throws Exception {
-					Connection conn = Tools.spawn_connection();
-					Connection conn2 = Tools.spawn_connection();
+					Connection conn = Tools.spawn_connection_from_pool();
+					Connection conn2 = Tools.spawn_connection_from_pool();
 					PreparedStatement stmt = conn.prepareStatement("delete from "+active_project+".project_values");
 					PreparedStatement stmt2 = conn.prepareStatement("delete from "+active_project+".project_characteristics_x_values");
 					stmt.execute();
@@ -871,9 +871,9 @@ public class CharDescriptionExportServices {
 			    
 				@Override
 			    protected Void call() throws Exception {
-					Connection conn = Tools.spawn_connection();
-					Connection conn2 = Tools.spawn_connection();
-					Connection conn3 = Tools.spawn_connection();
+					Connection conn = Tools.spawn_connection_from_pool();
+					Connection conn2 = Tools.spawn_connection_from_pool();
+					Connection conn3 = Tools.spawn_connection_from_pool();
 					PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_values values(?,?,?,?,?,?,?,?,?) on conflict(value_id) do update set manually_reviewed = excluded.manually_reviewed");
 					PreparedStatement stmt2 = conn2.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values values (?,?,?,?,clock_timestamp(),?,?,?) on conflict (item_id,characteristic_id) do update set user_id = excluded.user_id, description_method = excluded.description_method, description_time=excluded.description_time, value_id = excluded.value_id, description_rule_id=excluded.description_rule_id,url_link = excluded.url_link");
 					PreparedStatement stmt3 = conn3.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values_history values (?,?,?,?,clock_timestamp(),?,?,?)");
@@ -938,7 +938,7 @@ public class CharDescriptionExportServices {
 					conn2.close();
 					conn3.close();
 
-					conn = Tools.spawn_connection();
+					conn = Tools.spawn_connection_from_pool();
 					stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_items_x_pattern_results values(?,?,?,?) on conflict(item_id,characteristic_id) do update set char_rule_results_json = excluded.char_rule_results_json");
 					Connection finalConn = conn;
 					PreparedStatement finalStmt = stmt;

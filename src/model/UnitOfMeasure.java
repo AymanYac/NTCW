@@ -95,7 +95,7 @@ public class UnitOfMeasure {
 	}
 	public static  HashMap<String, UnitOfMeasure> fetch_units_of_measures(String language_code) throws SQLException, ClassNotFoundException {
 		HashMap<String,UnitOfMeasure> ret = new HashMap<String,UnitOfMeasure>();
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs;
 		try{
@@ -332,7 +332,7 @@ public class UnitOfMeasure {
 	public static void storeNewUom(UnitOfMeasure newUom) {
 		RunTimeUOMS.put(newUom.getUom_id(), newUom);
 		try{
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			PreparedStatement stmt = conn.prepareStatement("INSERT INTO public_ressources.units_of_measure(\n" +
 					"\tuom_id, uom_multiplier, uom_base_id, uom_name_en, uom_symbols)\n" +
 					"\tVALUES (?, ?, ?, ?, ?);");

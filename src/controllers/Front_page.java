@@ -146,7 +146,7 @@ public class Front_page {
 				if(activated_pid!=null) {
 					
 				    try {
-				    	Connection conn = Tools.spawn_connection();
+				    	Connection conn = Tools.spawn_connection_from_pool();
 				    	Statement stmt = conn.createStatement();
 				    	ResultSet rs = stmt.executeQuery("select target_quality from administration.projects where project_id='"+activated_pid+"'");
 				    	rs.next();

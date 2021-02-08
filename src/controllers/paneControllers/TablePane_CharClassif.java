@@ -3,7 +3,6 @@ package controllers.paneControllers;
 import com.google.gson.reflect.TypeToken;
 import controllers.Char_description;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -16,8 +15,6 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import model.*;
@@ -147,7 +144,7 @@ public class TablePane_CharClassif {
 
 	public static void loadLastSessionLayout() throws SQLException, ClassNotFoundException {
 
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		PreparedStatement stmt = conn.prepareStatement("select "
 				+ "user_description_sorting_columns, user_description_sorting_order, user_description_active_index,search_preferences"
 				+ " from administration.users_x_projects where project_id = ? and user_id = ?");

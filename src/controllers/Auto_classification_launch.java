@@ -652,7 +652,7 @@ public class Auto_classification_launch {
 			e1.printStackTrace();
 		}
 		
-		Connection conn3 = Tools.spawn_connection();
+		Connection conn3 = Tools.spawn_connection_from_pool();
 		Statement ps3 = conn3.createStatement();
 		//Set the taxoID variable
 		//Set the languageID variable
@@ -666,11 +666,11 @@ public class Auto_classification_launch {
 		conn3.close();
 		
 		
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement ps = conn.createStatement();
 		ResultSet rs = ps.executeQuery("select * from administration.projects where classification_system_name is not null and suppression_status=false");
 		
-		Connection conn2 = Tools.spawn_connection();
+		Connection conn2 = Tools.spawn_connection_from_pool();
 		Statement ps2 = conn2.createStatement();
 		//For every known projects
 		while(rs.next()) {
@@ -1053,7 +1053,7 @@ public class Auto_classification_launch {
 		
 		
 		
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement ps = conn.createStatement();
 		ResultSet rs = ps.executeQuery("select project_id,classification_system_name from administration.projects");
 		preclass_taxo_combo.getItems().add("All classification systems");

@@ -1,6 +1,5 @@
 package service;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import controllers.paneControllers.TablePane_CharClassif;
 import javafx.util.Pair;
@@ -31,7 +30,7 @@ public class CharItemFetcher {
 			System.out.println("Fetching all items");
 			Tools.userID2Author = Tools.get_user_names();
 			allRowItems = new ArrayList<CharDescriptionRow>();
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			PreparedStatement stmt;
 			ResultSet rs;
 

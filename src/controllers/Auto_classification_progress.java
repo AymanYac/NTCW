@@ -603,7 +603,7 @@ public class Auto_classification_progress {
 						    	}
 				    		}
 							
-					    	Connection conn = Tools.spawn_connection();
+					    	Connection conn = Tools.spawn_connection_from_pool();
 					    	Statement stmt = conn.createStatement();
 					    	ResultSet rs = stmt.executeQuery("select target_quality from administration.projects where project_id='"+activated_pid+"'");
 					    	rs.next();
@@ -794,7 +794,7 @@ public class Auto_classification_progress {
 
 	private void load_abaque() {
 		try {
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			Statement ps = conn.createStatement();
 			ResultSet rs;
 			//#
@@ -1705,7 +1705,7 @@ public class Auto_classification_progress {
 		HashMap<String, HashMap<String, String>> p_info = new HashMap<String,HashMap<String,String>>();
 		
 		LinkedHashMap<String, String> LANGUAGES = load_languages();
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery("select * from administration.projects");
 		while(rs.next()) {
@@ -1713,7 +1713,7 @@ public class Auto_classification_progress {
 			tmp.put("project_name", rs.getString("project_name"));
 			tmp.put("project_language",LANGUAGES.get(rs.getString("data_language")));
 			tmp.put("classification_system",rs.getString("classification_system_name"));
-			Connection conn2 = Tools.spawn_connection();
+			Connection conn2 = Tools.spawn_connection_from_pool();
 			Statement stmt2 = conn2.createStatement();
 			ResultSet rs2 = stmt2.executeQuery("select count(distinct client_item_number) from "+rs.getString("project_id")+".project_items");
 			rs2.next();
@@ -1735,7 +1735,7 @@ public class Auto_classification_progress {
 	//Useful function to load all the known languages mapping
 	private LinkedHashMap<String, String> load_languages() throws ClassNotFoundException, SQLException {
 		//For every known mapping language_id<-> language store in temporary variable
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select * from administration.languages");
 		LinkedHashMap<String, String> ret = new LinkedHashMap<String,String>();
@@ -1767,7 +1767,7 @@ public class Auto_classification_progress {
 		    @Override
 		    protected Void call() throws Exception {
 		    	
-		    	Connection conn = Tools.spawn_connection();
+		    	Connection conn = Tools.spawn_connection_from_pool();
 		    	HashMap<String, ArrayList<String>> items_x_rules = new HashMap<String,ArrayList<String>>();
 		    	HashMap<String,GenericClassRule> staticRules = new HashMap<String,GenericClassRule>();
 		    	Statement st = conn.createStatement();
@@ -1816,8 +1816,8 @@ public class Auto_classification_progress {
 				
 				
 		    	
-		    	Connection conn1 = Tools.spawn_connection();
-		    	Connection conn2 = Tools.spawn_connection();
+		    	Connection conn1 = Tools.spawn_connection_from_pool();
+		    	Connection conn2 = Tools.spawn_connection_from_pool();
 		    	
 		    	PreparedStatement ps1 = conn1.prepareStatement("update "+pid+".project_items set pre_classification = ? where item_id = ?");
 		    	PreparedStatement ps2 = conn2.prepareStatement("insert into "+pid+".project_classification_event(classification_event_id,item_id,segment_id,classification_method,rule_id,user_id,classification_date,classification_time) values (?,?,?,'"+DataInputMethods.BINARY_CLASSIFICATION+"',?,'"+account.getUser_id()+"',?,clock_timestamp())");
@@ -1825,7 +1825,7 @@ public class Auto_classification_progress {
 		    	ArrayList<DescriptionFetchRow> rws = DESCS.get(pid);
 	    		
 		    	HashMap<String,String> CID2UUID = new HashMap<String,String>();
-		    	Connection conn4 = Tools.spawn_connection();
+		    	Connection conn4 = Tools.spawn_connection_from_pool();
 		    	Statement st4 = conn4.createStatement();
 		    	ResultSet rs4 = st4.executeQuery("select segment_id,level_"+binaryClassificationParameters.getClassif_granularity().toString()+"_number from "+pid+".project_segments");
 		    	while(rs4.next()) {
@@ -2411,7 +2411,7 @@ public class Auto_classification_progress {
 		}
 		
 		try {
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			//#
 			PreparedStatement stmt = conn.prepareStatement("select class_accuracy,coverage from public_ressources.abacus_values where base_sample_size = ? and rule_accuracy_threshold = ? and rule_baseline_threshold = ?");
 			stmt.setInt(1, closest_bs);
@@ -2474,7 +2474,7 @@ public class Auto_classification_progress {
 			closest_bs = GlobalConstants.MAX_BS;
 		}
 		try {
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			//#
 			PreparedStatement stmt = conn.prepareStatement("select class_accuracy,coverage from public_ressources.abacus_values where base_sample_size = ? and rule_accuracy_threshold = ? and rule_baseline_threshold = ?");
 			stmt.setInt(1, closest_bs);
@@ -2691,8 +2691,8 @@ public class Auto_classification_progress {
 		this.preclassif_downloadSegmenter = new DownloadSegmenter();
 		cardinal_counted=true;
 		
-		Connection conn = Tools.spawn_connection();
-		Connection conn2 = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
+		Connection conn2 = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		Statement stmt2 = conn2.createStatement();
 		ResultSet rs = null;
@@ -2756,7 +2756,7 @@ public class Auto_classification_progress {
 		
 		increment_data_progressbars(IS_PRECLASSIF);
 		
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		String query=null;
 		if(isREFERENCE) {
 			//Example query: select client_item_number,short_description,long_description,material_group,level_4_number,level_1_name_translated,level_2_name_translated,level_3_name_translated,level_4_name_translated from (select item_id , level_4_number,level_1_name_translated,level_2_name_translated,level_3_name_translated,level_4_name_translated from  ( select item_id, segment_id from ( select item_id, segment_id, local_rn, max(local_rn) over (partition by  item_id) as max_rn from ( select item_id, segment_id, row_number() over (partition by item_id order by global_rn asc ) as local_rn from  ( SELECT  item_id,segment_id, row_number() over ( order by (select 0) ) as global_rn  FROM u95a5fb608e6a47548432695ae0f78968.project_classification_event where item_id in (select distinct item_id from u95a5fb608e6a47548432695ae0f78968.project_items where row_number between 20000 and 40000) ) as global_rank ) as ranked_events ) as maxed_events where local_rn = max_rn ) as latest_events left join  u95a5fb608e6a47548432695ae0f78968.project_segments on project_segments.segment_id = latest_events.segment_id ) as rich_events left join u95a5fb608e6a47548432695ae0f78968.project_items on rich_events.item_id = project_items.item_id

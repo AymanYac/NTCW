@@ -77,7 +77,7 @@ public class QueryFormater {
 
 	public static HashMap<String, String> FETCH_ITEM_CLASSES_NO_UPLOAD_PRIORITY( String joinStatement, Integer projectGranularity, String active_project) throws SQLException, ClassNotFoundException {
 		
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement st = conn.createStatement();
 		
 		ResultSet rs =st.executeQuery(QueryFormater.ManualFetchLatestClassifiedItems(projectGranularity, active_project,null,null)
@@ -110,7 +110,7 @@ public class QueryFormater {
 		acceptBlanks.add(true);
 		acceptBlanks.add(true);
 		
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement st = conn.createStatement();
 		
 		ResultSet rs =st.executeQuery(QueryFormater.ManualFetchLatestClassifiedItems(projectGranularity, active_project,methods,acceptBlanks)
@@ -168,7 +168,7 @@ public class QueryFormater {
 			methods.add(DataInputMethods.PROJECT_SETUP_UPLOAD);
 			ArrayList<Boolean> acceptBlanks = new ArrayList<Boolean>();
 			acceptBlanks.add(true);
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			Statement st = conn.createStatement();
 			
 			ResultSet rs =st.executeQuery(QueryFormater.ManualFetchLatestClassifiedItems(projectGranularity, active_project,methods,acceptBlanks));

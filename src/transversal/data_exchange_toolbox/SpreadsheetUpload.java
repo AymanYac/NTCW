@@ -41,7 +41,7 @@ public class SpreadsheetUpload {
 	        List < String > rowValues = null;
 	        
 	        
-	        Connection conn = Tools.spawn_connection();
+	        Connection conn = Tools.spawn_connection_from_pool();
 	        String query = "";
 	        PreparedStatement ps = conn.prepareStatement(query);
 	        
@@ -178,11 +178,11 @@ public class SpreadsheetUpload {
         	}
         }
         
-        Connection conn = Tools.spawn_connection();
+        Connection conn = Tools.spawn_connection_from_pool();
         String query = "";
         PreparedStatement ps = null ;
         
-        Connection conn2 = Tools.spawn_connection();
+        Connection conn2 = Tools.spawn_connection_from_pool();
 	    HashMap<String,String> CID2SEGMENT = new HashMap<String,String>();
 	    HashMap<String,String> AID2CAID = new HashMap<String,String>();
 	    String taxo_table = tableName.split("\\.")[0]+".project_segments";
@@ -407,7 +407,7 @@ public class SpreadsheetUpload {
 	
 	public static void CopySheetFromDatabase(String source, String target) {
 		try {
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			//#
 			;
@@ -429,7 +429,7 @@ public class SpreadsheetUpload {
 	public static ArrayList<GenericClassRule> importClassRules(String source, String target) throws ClassNotFoundException, SQLException {
 		
 		ArrayList<GenericClassRule> newImportedRules = new ArrayList<GenericClassRule>();
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		stmt.execute("CREATE TEMP table IF NOT EXISTS rules_temp_view as select * from "+source+".project_rules limit 0");
 		stmt.execute("delete from rules_temp_view");
@@ -459,7 +459,7 @@ public class SpreadsheetUpload {
 
 	public static ArrayList<GenericClassRule> getKnownClassificationRules(String pid) throws ClassNotFoundException, SQLException {
 		ArrayList<GenericClassRule> knownRules = new ArrayList<GenericClassRule>();
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select * from "+pid+".project_rules where active_status");
 		while(rs.next()) {

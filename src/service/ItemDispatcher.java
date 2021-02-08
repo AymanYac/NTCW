@@ -22,7 +22,7 @@ public class ItemDispatcher {
 		this.orderClause = "";
 		
 		
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select count(item_id) from "+active_project+".project_items where item_id not in (select distinct item_id from "+active_project+".project_classification_event)");
 		rs.next();
@@ -35,7 +35,7 @@ public class ItemDispatcher {
 	}
 
 	private void load_next_batch() throws SQLException, ClassNotFoundException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		
 		PreparedStatement ps = conn.prepareStatement("select * from "+activeProject+".project_items where row_number>"+this.last_row_number.toString()+" and item_id not in (select distinct item_id from "+activeProject+".project_classification_event) "+(orderClause.length()>0?orderClause:""+"limit "+GlobalConstants.MANUAL_SEGMENT_SIZE.toString()));
 

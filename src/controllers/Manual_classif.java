@@ -197,7 +197,7 @@ public class Manual_classif {
 	    String time = sdf.format( instant );
 	    
 	    String PROJECT_NAME;
-	    Connection conn = Tools.spawn_connection();
+	    Connection conn = Tools.spawn_connection_from_pool();
 	    Statement stmt = conn.createStatement();
 	    ResultSet rs = stmt.executeQuery("select project_name from projects where project_id='"+account.getActive_project()+"'");
 	    rs.next();

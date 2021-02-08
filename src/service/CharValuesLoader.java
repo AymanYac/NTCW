@@ -23,7 +23,7 @@ public class CharValuesLoader {
 			fetchDefaultCharValues(active_project);
 			knownValues = new ArrayList<CaracteristicValue>();
 
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			PreparedStatement stmt;
 			ResultSet rs;
 
@@ -212,7 +212,7 @@ public class CharValuesLoader {
 
 	public static void fetchDefaultCharValues(String activeProject) throws ClassNotFoundException, SQLException {
 		CharItemFetcher.defaultCharValues = new ArrayList<Pair<ClassCaracteristic,CaracteristicValue>>();
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery(
 				"select * from (select characteristic_id,user_id,description_method,description_rule_id,"

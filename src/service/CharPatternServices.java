@@ -2592,7 +2592,7 @@ public class CharPatternServices {
 				LinkedHashSet<String> tmp_for = new LinkedHashSet<String>();
 				LinkedHashSet<String> tmp_dw = new LinkedHashSet<String>();
 				LinkedHashSet<String> tmp_stop = new LinkedHashSet<String>();
-				Connection connX = Tools.spawn_connection();
+				Connection connX = Tools.spawn_connection_from_pool();
 				Statement stmtX = connX.createStatement();
 
 				//Load the application special words
@@ -2664,7 +2664,7 @@ public class CharPatternServices {
 		if(newRule.parseSuccess()) {
 			newRule.storeGenericCharRule();
 			try {
-				CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),newRule.getCharRuleId(),false);
+				CharPatternServices.suppressGenericRuleInDB(parent.account.getActive_project(),newRule.getCharRuleId(),false);
 			} catch (SQLException throwables) {
 				throwables.printStackTrace();
 			} catch (ClassNotFoundException e) {
@@ -2766,18 +2766,13 @@ public class CharPatternServices {
 		return items2Reevaluate;
 	}
 
-	public static void suppressGenericRuleInDB(Connection conn, String active_project, String charRuleId, boolean isSuppressed) throws SQLException, ClassNotFoundException {
+	public static void suppressGenericRuleInDB(String active_project, String charRuleId, boolean isSuppressed) throws SQLException, ClassNotFoundException {
 		ArrayList<String> charRuleIds = new ArrayList<String>();
 		charRuleIds.add(charRuleId);
-		suppressGenericRuleInDB(conn,active_project,charRuleIds,isSuppressed);
+		suppressGenericRuleInDB(active_project,charRuleIds,isSuppressed);
 	}
-	public static void suppressGenericRuleInDB(Connection conn, String active_project, ArrayList<String> charRuleIds, boolean isSuppressed) throws SQLException, ClassNotFoundException {
-		boolean closeConnAtEnd = true;
-		if(conn!=null){
-			closeConnAtEnd=false;
-		}else{
-			conn=Tools.spawn_connection();
-		}
+	public static void suppressGenericRuleInDB(String active_project, ArrayList<String> charRuleIds, boolean isSuppressed) throws SQLException, ClassNotFoundException {
+		Connection conn = Tools.spawn_connection_from_pool();
 		PreparedStatement stmt = conn.prepareStatement("insert into "+active_project+".project_description_patterns values (?,?,?) on conflict(generic_char_rule_id) do update set issuppressed = excluded.issuppressed");
 		charRuleIds.forEach(charRuleId->{
 			try {
@@ -2793,13 +2788,11 @@ public class CharPatternServices {
 		stmt.executeBatch();
 		stmt.clearBatch();
 		stmt.close();
-		if(closeConnAtEnd){
-			conn.close();
-		}
+		conn.close();
 	}
 
 	public static void loadDescriptionRules(String active_project) throws SQLException, ClassNotFoundException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select generic_char_rule_id, generic_char_rule_json from "+active_project+".project_description_patterns where not issuppressed");
 		while (rs.next()){

@@ -1,6 +1,5 @@
 package service;
 
-import controllers.paneControllers.TablePane_CharClassif;
 import model.ClassCaracteristic;
 import transversal.generic.Tools;
 
@@ -32,7 +31,7 @@ public class ClassCharacteristicsLoader {
 		if(CharValuesLoader.knownValues!=null && !forceUpdate) {
 			return;
 		}
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		PreparedStatement stmt = conn.prepareStatement(
 				"select * from ("
 				+ "select segment_id,characteristic_id,sequence,isCritical,allowedValues,allowedUoms,isActive from "

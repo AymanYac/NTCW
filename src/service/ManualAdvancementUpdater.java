@@ -24,7 +24,7 @@ public class ManualAdvancementUpdater {
 	public void refresh() {
 		
 		try {
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			
 			String SUMquery = "select sum(count) from ("
 					+QueryFormater.FetchClassifProgresionByDateByUser(account.getActive_project())

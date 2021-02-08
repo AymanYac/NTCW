@@ -223,7 +223,7 @@ public class Project_parameters {
 		LEVELS.add("4");
 		
 		try {
-			Connection connX= Tools.spawn_connection();
+			Connection connX= Tools.spawn_connection_from_pool();
 			Statement stmt = connX.createStatement();
 			//#
 			//Set the TAXOS variable with the appropriate available classification systems
@@ -329,7 +329,7 @@ public class Project_parameters {
 		Connection conn;
 		try {
 			//Create a connection
-			conn = Tools.spawn_connection();
+			conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			// Get the count of the items with classified events associated
 			//#
@@ -363,7 +363,7 @@ public class Project_parameters {
 		Connection conn;
 		try {
 			//Create a connection
-			conn = Tools.spawn_connection();
+			conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			// Get the count of the items with classified events associated
 			//#
@@ -398,7 +398,7 @@ public class Project_parameters {
 		Connection conn;
 		//Create a connection
 		try {
-			conn = Tools.spawn_connection();
+			conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			//Update the project by setting its suppressed status column to True
 			//#
@@ -420,7 +420,7 @@ public class Project_parameters {
 	private ProjectTemplate load_project(String pid2) throws SQLException, ClassNotFoundException {
 		ProjectTemplate nouveau = new ProjectTemplate();
 		nouveau.setPid(pid2);
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		//Create a connection to fetch the project's info
 		//#
@@ -446,7 +446,7 @@ public class Project_parameters {
 		//Call the load_special routine
 		load_special(nouveau,specialwords,true);
 		
-		Connection connX = Tools.spawn_connection();
+		Connection connX = Tools.spawn_connection_from_pool();
 		Statement stmtX = connX.createStatement();
 		//Load the project's users
 		LinkedHashMap<String,ArrayList<String>> users = new LinkedHashMap<String,ArrayList<String>> ();
@@ -491,7 +491,7 @@ public class Project_parameters {
 			LinkedHashSet<String> tmp_for = new LinkedHashSet<String>();
 			LinkedHashSet<String> tmp_dw = new LinkedHashSet<String>();
 			LinkedHashSet<String> tmp_stop = new LinkedHashSet<String>();
-			Connection connX = Tools.spawn_connection();
+			Connection connX = Tools.spawn_connection_from_pool();
 			Statement stmtX = connX.createStatement();
 			
 			//Load the application special words
@@ -529,7 +529,7 @@ public class Project_parameters {
 			LinkedHashSet<String> tmp_for = new LinkedHashSet<String>();
 			LinkedHashSet<String> tmp_dw = new LinkedHashSet<String>();
 			LinkedHashSet<String> tmp_stop = new LinkedHashSet<String>();
-			Connection connX = Tools.spawn_connection();
+			Connection connX = Tools.spawn_connection_from_pool();
 			Statement stmtX = connX.createStatement();
 			
 			//Load the application special words
@@ -759,7 +759,7 @@ public class Project_parameters {
 	//loads all the available translators in <String,String> variable
 	private LinkedHashMap<String, String> load_translators() throws ClassNotFoundException, SQLException {
 		//Create a connection
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		//Select all the available pairs (translator_id,translator_name)
 		//#
@@ -783,7 +783,7 @@ public class Project_parameters {
 	private LinkedHashMap<String, String> load_languages() throws ClassNotFoundException, SQLException {
 		//Create a connection
 		//#
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		//Select all the available pairs (language_id,language_name)
 		//#
@@ -977,7 +977,7 @@ public class Project_parameters {
 	private void add_public_special(String special_term, String type) {
 		
 		try {
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			PreparedStatement ps = conn.prepareStatement("insert into public_ressources.terms values (?,?,?,?,?,?)");
 			ps.setString(1, Tools.generate_uuid());
 			ps.setString(2, special_term.toUpperCase());
@@ -1460,10 +1460,10 @@ public class Project_parameters {
 			    	ruleLoadingIndicator.setVisible(true);
 					System.out.println("Refreshing rule set "+String.valueOf(knownTaxoChosen));
 					Connection conn;
-					conn = Tools.spawn_connection();
+					conn = Tools.spawn_connection_from_pool();
 					Statement ps = conn.createStatement();
 					ResultSet rs = ps.executeQuery("select * from administration.projects where classification_system_name = '"+taxoName.getValue()+"' and (not suppression_status or suppression_status is null) and project_id is not null and project_id !='"+prj.getPid()+"'");
-					Connection conn2 = Tools.spawn_connection();
+					Connection conn2 = Tools.spawn_connection_from_pool();
 					Statement ps2 = conn2.createStatement();
 					//For every known projects
 					while(rs.next()) {
@@ -2409,7 +2409,7 @@ public class Project_parameters {
 		try {
 			
 			
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 
 			if(column==1) {
@@ -2471,7 +2471,7 @@ public class Project_parameters {
 		 tmp.put("DW",temp);
 		 
 		 
-		 Connection conn = Tools.spawn_connection();
+		 Connection conn = Tools.spawn_connection_from_pool();
 			try {
 				Tools toolbox = new Tools();
 				toolbox.create_project_schema(this.prj.getPid());
@@ -2581,7 +2581,7 @@ public class Project_parameters {
 		//Creates a connection
 		Connection conn = null;
 		try {
-			conn = Tools.spawn_connection();
+			conn = Tools.spawn_connection_from_pool();
 		} catch (ClassNotFoundException | SQLException e) {
 			ExceptionDialog.show("PG000 db_error", "PG000 db_error", "PG000 db_error");
 			return;
@@ -2866,7 +2866,7 @@ public class Project_parameters {
 
 		Connection connX;
 		try {
-			connX = Tools.spawn_connection();
+			connX = Tools.spawn_connection_from_pool();
 			Statement stmt = connX.createStatement();
 			//#
 			//Set the LOGINS variable with the appropriate available user logins

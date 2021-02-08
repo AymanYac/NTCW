@@ -95,7 +95,7 @@ public class ItemFetcher {
 		
 		
 		
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs;
 		
@@ -546,7 +546,7 @@ public class ItemFetcher {
 			classifiedItems = QueryFormater.FETCH_ITEM_CLASSES_NO_UPLOAD_PRIORITY(joinStatement,this.projectGranularity,this.active_project);
 		}
 		
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement st = conn.createStatement();
 		ResultSet rs;
 		

@@ -1,6 +1,5 @@
 package model;
 
-import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import service.CharValuesLoader;
 import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
@@ -250,7 +249,7 @@ public class UserAccount {
 		new Thread (()->{
 			Connection conn = null;
 			try {
-				conn = Tools.spawn_connection();
+				conn = Tools.spawn_connection_from_pool();
 				PreparedStatement stmt = conn.prepareStatement("update users_x_projects set search_preferences = ? where project_id = ? and user_id = ?");
 				stmt.setString(1, ComplexMap2JdbcObject.serialize(searchPreferences));
 				stmt.setString(2,getActive_project());

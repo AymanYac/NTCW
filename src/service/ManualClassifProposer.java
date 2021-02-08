@@ -41,7 +41,7 @@ public class ManualClassifProposer {
 
 		try {
 			Integer gran = Tools.get_project_granularity(active_project);
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			segments = new HashMap<String,String>();
 			ResultSet rs = stmt.executeQuery("select segment_id,level_"+gran+"_name,level_"+gran+"_name_translated from "+active_project+".project_segments");

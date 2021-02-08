@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class WordUtils {
-	
+
 	private static String ruleString;
 	private static int textIdx;
 	private static Unidecode unidecode;
@@ -90,7 +90,7 @@ public class WordUtils {
 	//Useful function to load all the known languages mapping
 		public static HashMap<String, String> load_languages() throws ClassNotFoundException, SQLException {
 			//For every known mapping language_id<-> language store in temporary variable
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery("select * from administration.languages where language_id in (select distinct data_language from administration.projects)");
 			HashMap<String, String> ret = new HashMap<String,String>();
@@ -917,7 +917,7 @@ public class WordUtils {
 //    While char <= Len(transformed(row))
 		while(charIdx<transformed.length()) {
 //        If Mid(transformed(row), char, 1) = """" Then
-			if(transformed.charAt(charIdx)=='"') {
+			if(transformed.charAt(charIdx)=='"' && transformed.charAt(charIdx-1)!='~') {
 
 //            in_quotes = in_quotes * (-1)
 				inQuotes=!inQuotes;
@@ -953,7 +953,7 @@ public class WordUtils {
 //    While char <= Len(transformed(row))
 		while(charIdx<transformed.length()) {
 //        If Mid(transformed(row), char, 1) = """" Then
-			if(transformed.charAt(charIdx)=='"') {
+			if(transformed.charAt(charIdx)=='"' && transformed.charAt(charIdx-1)!='~') {
 //            in_quotes = in_quotes * -1
 				inQuotes=!inQuotes;
 //        End If
@@ -1052,7 +1052,7 @@ public class WordUtils {
 //        is_previous_special = is_special
 			isPreviousSpecial=isSpecial;
 //        If Mid(transformed(row), char, 1) = """" Then
-			if(transformed.charAt(charIdx)=='"') {
+			if(transformed.charAt(charIdx)=='"' && transformed.charAt(charIdx-1)!='~') {
 //            in_quotes = in_quotes * -1
 				inQuotes=!inQuotes;
 //        End If

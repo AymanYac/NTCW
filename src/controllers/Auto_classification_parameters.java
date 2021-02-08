@@ -539,7 +539,7 @@ public class Auto_classification_parameters {
 		
 		
 		try {
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			Statement ps = conn.createStatement();
 			ResultSet rs;
 			rs = ps.executeQuery("select base_sample_size, class_accuracy,  rule_baseline_threshold, rule_accuracy_threshold,coverage from public_ressources.abacus_values");
@@ -1030,7 +1030,7 @@ public class Auto_classification_parameters {
 		}
 		
 		try {
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			PreparedStatement stmt = conn.prepareStatement("select class_accuracy,coverage from public_ressources.abacus_values where base_sample_size = ? and rule_accuracy_threshold = ? and rule_baseline_threshold = ?");
 			stmt.setInt(1, closest_bs);
 			stmt.setDouble(2, Math.min(Math.ceil(ta_slider.getValue()), GlobalConstants.MAX_TA));
@@ -1094,7 +1094,7 @@ public class Auto_classification_parameters {
 			closest_bs = GlobalConstants.MAX_BS;
 		}
 		try {
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			PreparedStatement stmt = conn.prepareStatement("select class_accuracy,coverage from public_ressources.abacus_values where base_sample_size = ? and rule_accuracy_threshold = ? and rule_baseline_threshold = ?");
 			stmt.setInt(1, closest_bs);
 			stmt.setDouble(2, Math.min(Math.ceil(preclass_ta_slider.getValue()), GlobalConstants.MAX_TA));

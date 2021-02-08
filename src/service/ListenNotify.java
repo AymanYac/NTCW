@@ -31,7 +31,7 @@ PGConnection connection;
 public ListenNotify()
 {
 // Get database info from environment variables
-String DBHost = Tools.load_ip();
+String DBHost = Tools.getDatabaseHost();
 String DBName = Tools.getDatabaseName();
 String DBUserName = Tools.getUserName();
 String DBPassword = Tools.getUserPassword();
@@ -52,7 +52,7 @@ try
 // Create a data source for logging into the db
 PGDataSource dataSource = new PGDataSource();
 dataSource.setHost(DBHost);
-dataSource.setPort(Integer.valueOf(Tools.load_port() ));
+dataSource.setPort(Integer.valueOf(Tools.getDatabasePort() ));
 dataSource.setDatabaseName(DBName);
 dataSource.setUser(DBUserName);
 dataSource.setPassword(DBPassword);

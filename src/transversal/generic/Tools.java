@@ -1,5 +1,7 @@
 package transversal.generic;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -46,6 +48,7 @@ public class Tools {
 
 	private static Integer active_project_granularity;
 	private static HashMap<String,ClassSegment> sid2Segment;
+	private static HikariDataSource dbPool = null;
 
 	public static String RunVBS(File file) throws IOException {
 		
@@ -72,7 +75,7 @@ public class Tools {
 	
 	
 	public static String get_project_user_language_code(String active_project) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select google_language_code from administration.languages where language_id in (select classifier_language from projects where project_id ='"+active_project+"')");
 		rs.next();
@@ -85,7 +88,7 @@ public class Tools {
 	}
 
 	public static String get_project_data_language_code(String active_project) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select google_language_code from administration.languages where language_id in (select data_language from projects where project_id ='"+active_project+"')");
 		rs.next();
@@ -104,7 +107,7 @@ public class Tools {
 		//#
 		
 		//Creates a connection
-		Connection conn = spawn_connection();
+		Connection conn = spawn_connection_from_pool();
 		
 		//LOGIC
 		//Get the password and profile associated to the login
@@ -133,7 +136,7 @@ public class Tools {
 		    	account.setUser_name(rs.getString("user_name"));
 		    	account.setUser_password(rs.getString("user_password"));
 		    	account.setUser_profil("user_profile");
-		    	Connection conn2 = Tools.spawn_connection();
+		    	Connection conn2 = Tools.spawn_connection_from_pool();
 		    	PreparedStatement st2 = conn.prepareStatement("select * from administration.users_x_projects where user_id = ?");
 		    	st2.setString(1, account.getUser_id());
 		    	//#
@@ -166,14 +169,38 @@ public class Tools {
 		return account;
 		
 	}
-	
+
+	public static void createConnectionPool(){
+		Properties props = new Properties();
+
+		props.setProperty("dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource");
+		props.setProperty("dataSource.serverName", getDatabaseHost());
+		props.setProperty("dataSource.portNumber", getDatabasePort());
+		props.setProperty("dataSource.user", getUserName());
+		props.setProperty("dataSource.password", getUserPassword());
+		props.setProperty("dataSource.databaseName", getDatabaseName());
+		props.put("dataSource.logWriter", new PrintWriter(System.out));
+
+		HikariConfig config = new HikariConfig(props);
+		dbPool = new HikariDataSource(config);
+	}
+	//Get a pool connection session to the database
+	public static Connection spawn_connection_from_pool() throws ClassNotFoundException, SQLException {
+		if(dbPool !=null){
+			return dbPool.getConnection();
+		}else{
+			createConnectionPool();
+			return dbPool.getConnection();
+		}
+	}
+
 	//Creates an independent connection session to the database
 
 	public static Connection spawn_connection() throws ClassNotFoundException, SQLException {
 		 //load postgresql driver
 		 Class.forName("org.postgresql.Driver");
 		 //load database address, port and database name
-	     String url = "jdbc:postgresql://" + load_ip() + ":"+load_port()+"/" + getDatabaseName();
+	     String url = "jdbc:postgresql://" + getDatabaseHost() + ":"+ getDatabasePort()+"/" + getDatabaseName();
 	     //set connection user, password, login timeout, connection timeout, socket timeout
 	     Properties props = new Properties();
 	     props.setProperty("user", getUserName());
@@ -189,10 +216,10 @@ public class Tools {
 	     return conn;
 	}
 
-	public static String load_ip() {
+	public static String getDatabaseHost() {
 		return GlobalConstants.HOST_ADDRESS;
 	}
-	public static String load_port() {
+	public static String getDatabasePort() {
 		return "5432";
 	}
 	
@@ -294,7 +321,7 @@ public class Tools {
     		return sid2Segment;
 		}
     	sid2Segment = new HashMap<String,ClassSegment>();
-    	Connection conn = Tools.spawn_connection();
+    	Connection conn = Tools.spawn_connection_from_pool();
     	Statement stmt = conn.createStatement();
     	ResultSet rs = stmt.executeQuery("select * from "+account.getActive_project()+".project_segments");
     	while(rs.next()){
@@ -320,7 +347,7 @@ public class Tools {
 	public void create_project_schema(String pid) {
 		try {
 			String schema_creation_query = readStringFile("/scripts/project_schema_creation.sql",Charset.defaultCharset());
-			Connection conn = spawn_connection();
+			Connection conn = spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			//#
 			stmt.execute(schema_creation_query);
@@ -494,7 +521,7 @@ public class Tools {
 					if(activated_pid!=null) {
 						
 					    try {
-					    	Connection conn = Tools.spawn_connection();
+					    	Connection conn = Tools.spawn_connection_from_pool();
 					    	Statement stmt = conn.createStatement();
 					    	ResultSet rs = stmt.executeQuery("select target_quality from administration.projects where project_id='"+activated_pid+"'");
 					    	rs.next();
@@ -674,7 +701,7 @@ public class Tools {
 
 	public static Integer count_project_cardinality(String project_id) throws ClassNotFoundException, SQLException {
 
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery("select count(*) from "+project_id+".project_items");
 		rs.next();
@@ -691,7 +718,7 @@ public class Tools {
     	if(active_project_granularity!=null){
     		return active_project_granularity;
 		}
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery("select number_of_levels from administration.projects where project_id = '"+active_project+"'");
 		rs.next();
@@ -721,7 +748,7 @@ public class Tools {
 
 	public static HashMap<String,String> get_user_names() throws ClassNotFoundException, SQLException {
 		HashMap<String, String> tmp = new HashMap<String,String>();
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select * from administration.users");
 		while(rs.next()) {
@@ -750,7 +777,7 @@ public class Tools {
 	}
 
 	public static HashMap<String, String> UUID2CID(String PID) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 	    Statement stmt = conn.createStatement();
 	    ResultSet rs = stmt.executeQuery("select segment_id,level_"+Tools.get_project_granularity(PID)+"_number from "+PID+".project_segments");
 	    HashMap<String, String> UUID2CID = new HashMap<String,String>();
@@ -777,7 +804,7 @@ public class Tools {
 		    
 		@Override
 	    protected Void call() throws Exception {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		//Connection conn2 = Tools.spawn_connection();
 		HashSet<String> visitedRows = new HashSet<String>();
 		PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_classification_event("
@@ -874,7 +901,7 @@ public class Tools {
 
 
 	public static List<String> get_project_dw_words(String active_project) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select distinct term_name from "+active_project+".project_terms where drawing_term_status ");
 		ArrayList<String> tmp = new ArrayList<String>();
@@ -890,7 +917,7 @@ public class Tools {
 
 
 	public static List<String> get_project_for_words(String active_project) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select distinct term_name from "+active_project+".project_terms where application_term_status");
 		ArrayList<String> tmp = new ArrayList<String>();
@@ -908,7 +935,7 @@ public class Tools {
 	public static String get_project_last_classified_item_id(String active_project) throws ClassNotFoundException, SQLException {
 		
 		try{
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery("select item_id from "+active_project+".project_classification_event where classification_method = 'MANUAL' and classification_time =  (select max (classification_time) from "+active_project+".project_classification_event where classification_method = 'MANUAL')");
 			rs.next();
@@ -924,7 +951,7 @@ public class Tools {
 	}
 	
 	public static String get_project_name(String active_project) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select project_name from administration.projects where project_id = '"+active_project+"'");
 		rs.next();
@@ -943,7 +970,7 @@ public class Tools {
 			@Override
 		    protected Void call() throws Exception {
 				
-				Connection conn = Tools.spawn_connection();
+				Connection conn = Tools.spawn_connection_from_pool();
 				final PreparedStatement ps = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_rules(" + 
 						"            rule_id, main, application, complement, material_group," + 
 						"            pre_classification, drawing, class_id, rule_source, rule_type," + 
@@ -1050,7 +1077,7 @@ public class Tools {
 			@Override
 		    protected Void call() throws Exception {
 				
-				Connection conn = Tools.spawn_connection();
+				Connection conn = Tools.spawn_connection_from_pool();
 				PreparedStatement ps = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_rules(" + 
 						"            rule_id, main, application, complement, material_group," + 
 						"            pre_classification, drawing, class_id, rule_source, rule_type," + 
@@ -1140,7 +1167,7 @@ public class Tools {
 			@Override
 		    protected Void call() throws Exception {
 				
-				Connection conn = Tools.spawn_connection();
+				Connection conn = Tools.spawn_connection_from_pool();
 				PreparedStatement ps = conn.prepareStatement("INSERT INTO "+account.getActive_project()+".project_rules(" + 
 						"            rule_id, main, application, complement, material_group," + 
 						"            pre_classification, drawing, class_id, rule_source, rule_type," + 
@@ -1228,7 +1255,7 @@ public class Tools {
 		}
 
 	public static String[] get_desc_classes(UserAccount account, MenuBar menubar) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		PreparedStatement stmt = conn.prepareStatement("select user_description_classes from administration.users_x_projects where project_id = ? and user_id = ?");
 		stmt.setString(1, account.getActive_project());
 		stmt.setString(2, account.getUser_id());
@@ -1264,7 +1291,7 @@ public class Tools {
 
 	public static void set_desc_class(UserAccount account) throws SQLException, ClassNotFoundException {
     	if(account.getUser_desc_class()!=null){
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			stmt.execute("update administration.users_x_projects set user_description_class = '"+account.getUser_desc_class()+"' where project_id = '"+account.getActive_project()+"' and user_id = '"+account.getUser_id()+"'");
 			stmt.close();
@@ -1274,7 +1301,7 @@ public class Tools {
 	}
 
 	public static String get_desc_class(UserAccount account) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		PreparedStatement stmt = conn.prepareStatement("select user_description_class from administration.users_x_projects where project_id = ? and user_id = ?");
 		stmt.setString(1, account.getActive_project());
 		stmt.setString(2, account.getUser_id());
@@ -1292,7 +1319,7 @@ public class Tools {
 
 	public static ArrayList<String> SET_PROJECT_CLASSES_ARRAY( UserAccount account) throws ClassNotFoundException, SQLException {
 		ArrayList<String> CNAME_CID = new ArrayList<String>();
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement st = conn.createStatement();
 		ResultSet rs;
 		int granularity = Tools.get_project_granularity(account.getActive_project());
@@ -1315,7 +1342,7 @@ public class Tools {
 		    
 			@Override
 		    protected Void call() throws Exception {
-			Connection conn = Tools.spawn_connection();
+			Connection conn = Tools.spawn_connection_from_pool();
 			//Connection conn2 = Tools.spawn_connection();
 			
 			PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_classification_event("
@@ -1387,7 +1414,7 @@ public class Tools {
 
 	
 	public static String get_project_data_language(String active_project) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select data_language from projects where project_id ='"+active_project+"'");
 		rs.next();
@@ -1401,7 +1428,7 @@ public class Tools {
 
 
 	public static String get_project_user_language(String active_project) throws ClassNotFoundException, SQLException {
-		Connection conn = Tools.spawn_connection();
+		Connection conn = Tools.spawn_connection_from_pool();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select classifier_language from projects where project_id ='"+active_project+"'");
 		rs.next();

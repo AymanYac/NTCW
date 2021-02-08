@@ -458,7 +458,7 @@ public class RulePane_CharClassif {
         if(newRule.parseSuccess()) {
             newRule.storeGenericCharRule();
             try{
-                CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),newRule.getCharRuleId(),false);
+                CharPatternServices.suppressGenericRuleInDB(parent.account.getActive_project(),newRule.getCharRuleId(),false);
             }catch (Exception V){
                 ExceptionDialog.show("Connection Error","Could not reach server","Rule could not be saved. Please restart");
             }
@@ -483,7 +483,7 @@ public class RulePane_CharClassif {
             }).start();
             try{
                 oldRule.dropGenericCharRule();
-                CharPatternServices.suppressGenericRuleInDB(null,parent.account.getActive_project(),oldRule.getCharRuleId(),true);
+                CharPatternServices.suppressGenericRuleInDB(parent.account.getActive_project(),oldRule.getCharRuleId(),true);
             }catch (Exception V){
 
             }
@@ -500,7 +500,7 @@ public class RulePane_CharClassif {
                 items2Reevaluate.addAll(CharPatternServices.unApplyRule(oldRule, caracCombo.getValue(), parent.account));
                 oldRule.dropGenericCharRule();
                 try {
-                    CharPatternServices.suppressGenericRuleInDB(null, parent.account.getActive_project(), oldRule.getCharRuleId(), true);
+                    CharPatternServices.suppressGenericRuleInDB( parent.account.getActive_project(), oldRule.getCharRuleId(), true);
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 } catch (ClassNotFoundException e) {
@@ -512,7 +512,7 @@ public class RulePane_CharClassif {
             if (newRule.parseSuccess()) {
                 newRule.storeGenericCharRule();
                 try {
-                    CharPatternServices.suppressGenericRuleInDB(null, parent.account.getActive_project(), newRule.getCharRuleId(), false);
+                    CharPatternServices.suppressGenericRuleInDB(parent.account.getActive_project(), newRule.getCharRuleId(), false);
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 } catch (ClassNotFoundException e) {
