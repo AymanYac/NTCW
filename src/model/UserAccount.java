@@ -248,18 +248,27 @@ public class UserAccount {
 		searchPreferences = concatElems;
 		new Thread (()->{
 			Connection conn = null;
+			PreparedStatement stmt=null;
 			try {
 				conn = Tools.spawn_connection_from_pool();
-				PreparedStatement stmt = conn.prepareStatement("update users_x_projects set search_preferences = ? where project_id = ? and user_id = ?");
+				stmt = conn.prepareStatement("update users_x_projects set search_preferences = ? where project_id = ? and user_id = ?");
 				stmt.setString(1, ComplexMap2JdbcObject.serialize(searchPreferences));
 				stmt.setString(2,getActive_project());
 				stmt.setString(3,getUser_id());
 				stmt.execute();
 				//System.out.println(stmt.toString());
-				stmt.close();
-				conn.close();
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
+			}
+			try {
+				stmt.close();
+			} catch (SQLException throwables) {
+				throwables.printStackTrace();
+			}
+			try {
+				conn.close();
+			} catch (SQLException throwables) {
+				throwables.printStackTrace();
 			}
 		}).start();
 	}

@@ -453,10 +453,14 @@ public class CaracDeclarationDialog {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				if(!newValue && uom1.incompleteProperty.getValue() && uom1.isVisible() && uom1.getText().replace(" ","").length()>0){
-					if(charName.incompleteProperty.getValue()){
-						UoMDeclarationDialog.GenericUomDeclarationPopUp(uom1.getText(),uom1);
-					}else{
-						UoMDeclarationDialog.GenericUomDeclarationPopUpRestrictedConvertibility(uom1.getText(),uom1,charName.selectedEntry.getValue());
+					try{
+						if (charName.incompleteProperty.getValue()) {
+							UoMDeclarationDialog.GenericUomDeclarationPopUp(uom1.getText(), uom1);
+						} else {
+							UoMDeclarationDialog.GenericUomDeclarationPopUpRestrictedConvertibility(uom1.getText(), uom1, charName.selectedEntry.getValue());
+						}
+					} catch (SQLException throwables) {
+						throwables.printStackTrace();
 					}
 				}
 			}
@@ -465,10 +469,14 @@ public class CaracDeclarationDialog {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				if(!newValue && uom2.incompleteProperty.getValue() &&  uom2.isVisible() && uom2.getText().replace(" ","").length()>0){
-					if(charName.incompleteProperty.getValue()){
-						UoMDeclarationDialog.GenericUomDeclarationPopUp(uom2.getText(),uom2);
-					}else{
-						UoMDeclarationDialog.GenericUomDeclarationPopUpRestrictedConvertibility(uom2.getText(),uom2,charName.selectedEntry.getValue());
+					try{
+						if (charName.incompleteProperty.getValue()) {
+							UoMDeclarationDialog.GenericUomDeclarationPopUp(uom2.getText(), uom2);
+						} else {
+							UoMDeclarationDialog.GenericUomDeclarationPopUpRestrictedConvertibility(uom2.getText(), uom2, charName.selectedEntry.getValue());
+						}
+					} catch (SQLException throwables) {
+						throwables.printStackTrace();
 					}
 				}
 			}

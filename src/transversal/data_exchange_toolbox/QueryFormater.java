@@ -182,6 +182,9 @@ public class QueryFormater {
 					}
 					
 			}
+			rs.close();
+			st.close();
+			conn.close();
 		}
 		
 		

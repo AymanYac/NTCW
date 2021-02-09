@@ -355,8 +355,12 @@ public class Char_description {
 	        {
 	            public void handle(final KeyEvent keyEvent) 
 	            {
-	            	handleDataKeyBoardEvent(keyEvent,true);
-	            }
+					try {
+						handleDataKeyBoardEvent(keyEvent,true);
+					} catch (SQLException throwables) {
+						throwables.printStackTrace();
+					}
+				}
 	        });
 		});
 		
@@ -383,7 +387,7 @@ public class Char_description {
 		});
 	}
 
-	protected void handleDataKeyBoardEvent(KeyEvent keyEvent, boolean pressed) {
+	protected void handleDataKeyBoardEvent(KeyEvent keyEvent, boolean pressed) throws SQLException {
 		
 		if(keyEvent.getCode().equals(KeyCode.CONTROL)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.CONTROL, pressed);
@@ -522,7 +526,7 @@ public class Char_description {
 		}
 	}
 
-	public void validateFieldsThenSkipToNext(Boolean TranslationProcessResult) {
+	public void validateFieldsThenSkipToNext(Boolean TranslationProcessResult) throws SQLException {
 		Node pbNode = validateDataFields();
 		if(pbNode!=null) {
 			//The item is not valid, focus on problem
@@ -811,7 +815,7 @@ public class Char_description {
 
 		
 
-	private Node validateDataFields() {
+	private Node validateDataFields() throws SQLException {
 		CharDescriptionRow row = tableController.tableGrid.getSelectionModel().getSelectedItem();
 		String selectedRowClass = row.getClass_segment_string().split("&&&")[0];
 		ClassCaracteristic active_char;
@@ -874,7 +878,7 @@ public class Char_description {
 		}
 		return uom_field.isVisible();
 	}
-	private boolean validateValueField(ClassCaracteristic active_char,TextField target_field) {
+	private boolean validateValueField(ClassCaracteristic active_char,TextField target_field) throws SQLException {
 		String originalValue = target_field.getText();
 		if(!(originalValue!=null) || originalValue.length()==0) {
 			return false;

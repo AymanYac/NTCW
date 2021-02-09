@@ -40,6 +40,7 @@ import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 
@@ -182,6 +183,9 @@ public class Tools {
 		props.put("dataSource.logWriter", new PrintWriter(System.out));
 
 		HikariConfig config = new HikariConfig(props);
+		config.setLeakDetectionThreshold(TimeUnit.MINUTES.toMillis(5L));
+		config.setMaximumPoolSize(30);
+		config.setConnectionTimeout(TimeUnit.MINUTES.toMillis(2L));
 		dbPool = new HikariDataSource(config);
 	}
 	//Get a pool connection session to the database
@@ -519,9 +523,9 @@ public class Tools {
 			String activated_pid = account.getActive_project();
 			Stage stage = (Stage) menubar.getScene().getWindow();
 					if(activated_pid!=null) {
-						
-					    try {
-					    	Connection conn = Tools.spawn_connection_from_pool();
+						Connection conn = null;
+						try {
+							conn = Tools.spawn_connection_from_pool();
 					    	Statement stmt = conn.createStatement();
 					    	ResultSet rs = stmt.executeQuery("select target_quality from administration.projects where project_id='"+activated_pid+"'");
 					    	rs.next();
@@ -564,6 +568,11 @@ public class Tools {
 						} catch(Exception e) {
 							ExceptionDialog.show("FX001 auto_classification_launch", "FX001 auto_classification_launch", "FX001 auto_classification_launch");
 							e.printStackTrace(System.err);
+						}
+						try {
+							conn.close();
+						} catch (SQLException throwables) {
+							throwables.printStackTrace();
 						}
 					}else {
 						//Else raise an alert message dialog
@@ -933,9 +942,8 @@ public class Tools {
 
 
 	public static String get_project_last_classified_item_id(String active_project) throws ClassNotFoundException, SQLException {
-		
+		Connection conn = Tools.spawn_connection_from_pool();
 		try{
-			Connection conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery("select item_id from "+active_project+".project_classification_event where classification_method = 'MANUAL' and classification_time =  (select max (classification_time) from "+active_project+".project_classification_event where classification_method = 'MANUAL')");
 			rs.next();
@@ -945,9 +953,9 @@ public class Tools {
 			conn.close();
 			return ret;
 		}catch(Exception V) {
+			conn.close();
 			return null;
 		}
-		
 	}
 	
 	public static String get_project_name(String active_project) throws ClassNotFoundException, SQLException {

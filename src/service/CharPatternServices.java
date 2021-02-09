@@ -21,7 +21,7 @@ public class CharPatternServices {
 	private static HashMap<String, List<String>> charIdArrays;
 	public static HashMap<String,GenericCharRule> descriptionRules = new HashMap<String,GenericCharRule>();
 
-	public static void scanSelectionForPatternDetection(Char_description parent, ClassCaracteristic active_char,String selectedText) {
+	public static void scanSelectionForPatternDetection(Char_description parent, ClassCaracteristic active_char,String selectedText) throws SQLException {
 		parent.refresh_ui_display();
 		Unidecode unidecode = Unidecode.toAscii();
 		System.out.println("Processing selected text ::: "+selectedText);
@@ -2583,16 +2583,17 @@ public class CharPatternServices {
 		}
 	}
 
-	private static String beginsWithStopWords(String processedText,UserAccount account, ClassCaracteristic active_char) {
+	private static String beginsWithStopWords(String processedText,UserAccount account, ClassCaracteristic active_char) throws SQLException {
 		if(specialwords!=null) {
 
 		}else {
+			Connection connX = null;
 			try {
 				specialwords = new HashMap<String,LinkedHashSet<String>> ();
 				LinkedHashSet<String> tmp_for = new LinkedHashSet<String>();
 				LinkedHashSet<String> tmp_dw = new LinkedHashSet<String>();
 				LinkedHashSet<String> tmp_stop = new LinkedHashSet<String>();
-				Connection connX = Tools.spawn_connection_from_pool();
+				connX = Tools.spawn_connection_from_pool();
 				Statement stmtX = connX.createStatement();
 
 				//Load the application special words
@@ -2623,11 +2624,11 @@ public class CharPatternServices {
 
 				rsX.close();
 				stmtX.close();
-				connX.close();
 			} catch (ClassNotFoundException | SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			connX.close();
 		}
 
 		if(WordUtils.CORRECT(processedText).toUpperCase().startsWith(active_char.getCharacteristic_name().toUpperCase())){
@@ -2798,6 +2799,9 @@ public class CharPatternServices {
 		while (rs.next()){
 			descriptionRules.put(rs.getString("generic_char_rule_id"), (GenericCharRule) ComplexMap2JdbcObject.deserialize(rs.getString("generic_char_rule_json"),new TypeToken<GenericCharRule>(){}.getType()));
 		}
+		rs.close();
+		stmt.close();
+		conn.close();
 
 	}
 }

@@ -16,6 +16,7 @@ import service.CharClassifProposer;
 import transversal.generic.Tools;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 public class UoMDeclarationDialog {
@@ -33,7 +34,7 @@ public class UoMDeclarationDialog {
 	private static HashSet<String> uomCompBases;
 
 	public static void GenericUomDeclarationPopUp(String proposedUomSymbol,
-																	 AutoCompleteBox_UnitOfMeasure uom_field) {
+																	 AutoCompleteBox_UnitOfMeasure uom_field) throws SQLException {
 
 		proposedUomSymbol  = proposedUomSymbol.trim();
 
@@ -89,13 +90,13 @@ public class UoMDeclarationDialog {
 	}
 
 	public static void UomDeclarationPopUpAfterFailedFieldValidation(String proposedUomSymbol,
-																	 AutoCompleteBox_UnitOfMeasure uom_field, ClassCaracteristic active_char) {
+																	 AutoCompleteBox_UnitOfMeasure uom_field, ClassCaracteristic active_char) throws SQLException {
 		GenericUomDeclarationPopUpRestrictedConvertibility(proposedUomSymbol,uom_field,active_char);
 
 	}
 
 	public static void GenericUomDeclarationPopUpRestrictedConvertibility(String proposedUomSymbol,
-																	 AutoCompleteBox_UnitOfMeasure uom_field, ClassCaracteristic active_char) {
+																	 AutoCompleteBox_UnitOfMeasure uom_field, ClassCaracteristic active_char) throws SQLException {
 		
 		proposedUomSymbol  = proposedUomSymbol.trim();
 		CharUomFamily = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0)).getUom_base_id();
@@ -199,10 +200,14 @@ public class UoMDeclarationDialog {
 		Optional<UnitOfMeasure> result = dialog.showAndWait();
 
 		result.ifPresent(newUom -> {
-			UnitOfMeasure.storeNewUom(newUom);
-			
-		    
-		    preparedValue.setUom_id(newUom.getUom_id());
+			try {
+				UnitOfMeasure.storeNewUom(newUom);
+			} catch (SQLException throwables) {
+				throwables.printStackTrace();
+			}
+
+
+			preparedValue.setUom_id(newUom.getUom_id());
 		    parent.sendSemiAutoPattern(preparedValue, preparedRule.replace("$$$UOM_SYMBOL$$$", newUom.getUom_symbol()), null);
 		});
 		

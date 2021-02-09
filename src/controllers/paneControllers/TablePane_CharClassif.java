@@ -470,10 +470,10 @@ public class TablePane_CharClassif {
 		scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 	}
 
-	public void setUserAccount(UserAccount account) {
-		this.account=account;
+	public void setUserAccount(UserAccount account) throws SQLException {
+		TablePane_CharClassif.account =account;
 		this.advancement = new CharAdvancementUpdater();
-		advancement.setParentScene(this.Parent);
+		advancement.setParentScene(Parent);
 		advancement.account=account;
 		advancement.refresh();
     	

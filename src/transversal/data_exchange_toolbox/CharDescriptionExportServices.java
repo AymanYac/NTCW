@@ -940,7 +940,6 @@ public class CharDescriptionExportServices {
 
 					conn = Tools.spawn_connection_from_pool();
 					stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_items_x_pattern_results values(?,?,?,?) on conflict(item_id,characteristic_id) do update set char_rule_results_json = excluded.char_rule_results_json");
-					Connection finalConn = conn;
 					PreparedStatement finalStmt = stmt;
 					CharDescriptionExportServices.itemRuleBuffer = CharDescriptionExportServices.itemRuleBuffer.stream().collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
 					int initRuleBufferSize = CharDescriptionExportServices.itemRuleBuffer.size();

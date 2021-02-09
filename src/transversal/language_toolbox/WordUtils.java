@@ -917,7 +917,7 @@ public class WordUtils {
 //    While char <= Len(transformed(row))
 		while(charIdx<transformed.length()) {
 //        If Mid(transformed(row), char, 1) = """" Then
-			if(transformed.charAt(charIdx)=='"' && transformed.charAt(charIdx-1)!='~') {
+			if(transformed.charAt(charIdx)=='"' && (charIdx==0 || transformed.charAt(charIdx-1)!='~')) {
 
 //            in_quotes = in_quotes * (-1)
 				inQuotes=!inQuotes;
@@ -953,7 +953,7 @@ public class WordUtils {
 //    While char <= Len(transformed(row))
 		while(charIdx<transformed.length()) {
 //        If Mid(transformed(row), char, 1) = """" Then
-			if(transformed.charAt(charIdx)=='"' && transformed.charAt(charIdx-1)!='~') {
+			if(transformed.charAt(charIdx)=='"' && (charIdx==0 || transformed.charAt(charIdx-1)!='~')) {
 //            in_quotes = in_quotes * -1
 				inQuotes=!inQuotes;
 //        End If
@@ -1052,7 +1052,7 @@ public class WordUtils {
 //        is_previous_special = is_special
 			isPreviousSpecial=isSpecial;
 //        If Mid(transformed(row), char, 1) = """" Then
-			if(transformed.charAt(charIdx)=='"' && transformed.charAt(charIdx-1)!='~') {
+			if(transformed.charAt(charIdx)=='"' && (charIdx==0 || transformed.charAt(charIdx-1)!='~')) {
 //            in_quotes = in_quotes * -1
 				inQuotes=!inQuotes;
 //        End If

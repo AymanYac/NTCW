@@ -30,7 +30,7 @@ public class ItemDispatcher {
 		load_next_batch();
 		rs.close();
 		stmt.close();
-		
+		conn.close();
 		
 	}
 

@@ -329,11 +329,13 @@ public class UnitOfMeasure {
 	public int hashCode() {
 		return getUom_id().hashCode();
 	}
-	public static void storeNewUom(UnitOfMeasure newUom) {
+	public static void storeNewUom(UnitOfMeasure newUom) throws SQLException {
 		RunTimeUOMS.put(newUom.getUom_id(), newUom);
+		Connection conn=null;
+		PreparedStatement stmt = null;
 		try{
-			Connection conn = Tools.spawn_connection_from_pool();
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO public_ressources.units_of_measure(\n" +
+			conn = Tools.spawn_connection_from_pool();
+			stmt = conn.prepareStatement("INSERT INTO public_ressources.units_of_measure(\n" +
 					"\tuom_id, uom_multiplier, uom_base_id, uom_name_en, uom_symbols)\n" +
 					"\tVALUES (?, ?, ?, ?, ?);");
 			stmt.setString(1,newUom.getUom_id());
@@ -342,10 +344,10 @@ public class UnitOfMeasure {
 			stmt.setString(4,newUom.getUom_name());
 			stmt.setArray(5,conn.createArrayOf("VARCHAR", newUom.getUom_symbols().toArray(new String [0])));
 			stmt.execute();
-			stmt.close();
-			conn.close();
 		}catch (Exception V){
 
 		}
+		stmt.close();
+		conn.close();
 	}
 }

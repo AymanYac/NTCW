@@ -318,7 +318,6 @@ public class CharDescriptionImportServices {
 		stmt.clearBatch();
 		stmt.close();
 		conn.close();
-		conn.close();
 	}
 
 	private static void storeTaxo() throws SQLException, ClassNotFoundException {

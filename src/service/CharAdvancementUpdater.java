@@ -21,10 +21,10 @@ public class CharAdvancementUpdater {
 		this.parentScene=parent;
 	}
 
-	public void refresh() {
-		
+	public void refresh() throws SQLException {
+		Connection conn=null;
 		try {
-			Connection conn = Tools.spawn_connection_from_pool();
+			conn = Tools.spawn_connection_from_pool();
 			
 			String SUMquery = "select sum(count) from ("
 					+QueryFormater.FetchClassifProgresionByDateByUser(account.getActive_project())
@@ -61,7 +61,6 @@ public class CharAdvancementUpdater {
 			}
 			rs.close();
 			stmt.close();
-			conn.close();
 			
 			final int finalsum = sum;
 			final int finaldailyPersonal = dailyPersonal;
@@ -88,7 +87,7 @@ public class CharAdvancementUpdater {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		conn.close();
 		
 	}
 

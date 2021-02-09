@@ -37,11 +37,11 @@ public class ManualClassifProposer {
 	public List<String> for_words;
 	public List<String> dw_words;
 	
-	public ManualClassifProposer(String active_project) {
-
+	public ManualClassifProposer(String active_project) throws SQLException {
+		Connection conn=null;
 		try {
 			Integer gran = Tools.get_project_granularity(active_project);
-			Connection conn = Tools.spawn_connection_from_pool();
+			conn = Tools.spawn_connection_from_pool();
 			Statement stmt = conn.createStatement();
 			segments = new HashMap<String,String>();
 			ResultSet rs = stmt.executeQuery("select segment_id,level_"+gran+"_name,level_"+gran+"_name_translated from "+active_project+".project_segments");
@@ -50,12 +50,11 @@ public class ManualClassifProposer {
 			}
 			rs.close();
 			stmt.close();
-			conn.close();
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		conn.close();
 		
 		
 	}

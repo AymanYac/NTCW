@@ -16,6 +16,7 @@ import service.TranslationServices;
 import transversal.dialog_toolbox.ValueTranslationDisambiguation;
 import transversal.language_toolbox.Unidecode;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -88,9 +89,13 @@ public class AutoCompleteBox_CharValue {
 		            	entriesPopup.getSkin().getNode().lookup(".menu-item").requestFocus();
 		            	entriesPopup.getSkin().getNode().lookup(".menu-item").setOnKeyPressed(ke ->{
 		            		if(ke.getCode().equals(KeyCode.ENTER) && !account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)) {
-		            			parent.validateFieldsThenSkipToNext(setValuesOnParent(RESULTMAP.get(0), parent));
-		            			
-		            		}
+								try {
+									parent.validateFieldsThenSkipToNext(setValuesOnParent(RESULTMAP.get(0), parent));
+								} catch (SQLException throwables) {
+									throwables.printStackTrace();
+								}
+
+							}
 		            	});
 		            	blockFocusLostProcessing = false;
 		            	
@@ -229,8 +234,12 @@ public void refresh_entries(boolean isDataField) {
       {
         @Override
         public void handle(ActionEvent actionEvent) {
-        	parent.validateFieldsThenSkipToNext(setValuesOnParent(result,parent));
-        }
+			try {
+				parent.validateFieldsThenSkipToNext(setValuesOnParent(result,parent));
+			} catch (SQLException throwables) {
+				throwables.printStackTrace();
+			}
+		}
       });
       RESULTMAP.put(i,result);
       menuItems.add(item);
