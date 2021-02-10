@@ -460,6 +460,7 @@ public class RulePane_CharClassif {
             try{
                 CharPatternServices.suppressGenericRuleInDB(parent.account.getActive_project(),newRule.getCharRuleId(),false);
             }catch (Exception V){
+                V.printStackTrace(System.err);
                 ExceptionDialog.show("Connection Error","Could not reach server","Rule could not be saved. Please restart");
             }
             CharPatternServices.quickApplyRule(newRule,caracCombo.getValue(),parent);

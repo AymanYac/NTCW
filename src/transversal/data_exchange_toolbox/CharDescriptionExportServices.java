@@ -923,7 +923,8 @@ public class CharDescriptionExportServices {
 						stmt2.executeBatch();
 						stmt3.executeBatch();
 					}catch (Exception V){
-					ExceptionDialog.show("Connection Error","Could not reach server","Item values could not be saved. Please restart");
+						V.printStackTrace(System.err);
+						ExceptionDialog.show("Connection Error","Could not reach server","Item values could not be saved. Please restart");
 					}
 
 					
@@ -956,6 +957,7 @@ public class CharDescriptionExportServices {
 								finalStmt.executeBatch();
 								finalStmt.clearBatch();
 							}catch (Exception V){
+								V.printStackTrace(System.err);
 								ExceptionDialog.show("Connection Error","Could not reach server","Rule results could not be saved. Please restart");
 							}
 						});

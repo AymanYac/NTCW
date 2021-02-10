@@ -183,15 +183,19 @@ public class Tools {
 		props.put("dataSource.logWriter", new PrintWriter(System.out));
 
 		HikariConfig config = new HikariConfig(props);
-		config.setLeakDetectionThreshold(TimeUnit.MINUTES.toMillis(5L));
-		config.setMaximumPoolSize(30);
+		config.setLeakDetectionThreshold(TimeUnit.MINUTES.toMillis(25L));
+		config.setMaximumPoolSize(50);
 		config.setConnectionTimeout(TimeUnit.MINUTES.toMillis(2L));
 		dbPool = new HikariDataSource(config);
 	}
 	//Get a pool connection session to the database
 	public static Connection spawn_connection_from_pool() throws ClassNotFoundException, SQLException {
 		if(dbPool !=null){
-			return dbPool.getConnection();
+			try{
+				return dbPool.getConnection();
+			}catch (Exception V){
+				return spawn_connection();
+			}
 		}else{
 			createConnectionPool();
 			return dbPool.getConnection();
@@ -209,9 +213,9 @@ public class Tools {
 	     Properties props = new Properties();
 	     props.setProperty("user", getUserName());
 	     props.setProperty("password", getUserPassword());
-	     props.setProperty("loginTimeout", "20");
-	     props.setProperty("connectTimeout", "0");
-	     props.setProperty("socketTimeout", "0");
+	     props.setProperty("loginTimeout", "5");
+	     props.setProperty("connectTimeout", "5");
+	     props.setProperty("socketTimeout", "5");
 	     
 	     //create connection to the dabase server
 	     Connection conn = DriverManager.getConnection(url, props);

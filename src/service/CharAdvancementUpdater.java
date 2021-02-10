@@ -24,7 +24,7 @@ public class CharAdvancementUpdater {
 	public void refresh() throws SQLException {
 		Connection conn=null;
 		try {
-			conn = Tools.spawn_connection_from_pool();
+			conn = Tools.spawn_connection();
 			
 			String SUMquery = "select sum(count) from ("
 					+QueryFormater.FetchClassifProgresionByDateByUser(account.getActive_project())
