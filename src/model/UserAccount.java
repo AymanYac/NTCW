@@ -24,8 +24,10 @@ public class UserAccount {
 	String user_desc_class;
 	String[] user_desc_classes;
 	static ArrayList<ArrayList<String>> searchPreferences = new ArrayList<ArrayList<String>>();
-	
-	
+	private String activeCharItemID;
+	private String activeCharID;
+
+
 	public String getUser_desc_class(String defaultSegment) {
 		if(user_desc_class!=null) {
 			return user_desc_class;
@@ -63,7 +65,6 @@ public class UserAccount {
 	private ArrayList<String> ManualSortDirs = new ArrayList<String>();
 	private ArrayList<String> DescriptionSortDirs = new ArrayList<String>();
 	private ArrayList<String> ManualPropositions = new ArrayList<String>();
-	private Integer DescriptionActiveIdx;
 	
 	
 	public UserAccount(){
@@ -179,15 +180,6 @@ public class UserAccount {
 		this.ManualPropositions = new ArrayList<> ( Arrays.asList( ( (String[])array.getArray() )) );
 
 	}
-	public void setDescriptionActiveIdx(Integer intIndx) {
-		// TODO Auto-generated method stub
-		this.DescriptionActiveIdx = intIndx;
-
-	}
-	public Integer getDescriptionActiveIdx() {
-		return this.DescriptionActiveIdx;
-
-	}
 
 	public void setManualSortColumns(Array array) throws SQLException {
 		this.ManualSortColumns =  new ArrayList<> ( Arrays.asList( ( (String[])array.getArray() )) );
@@ -275,5 +267,19 @@ public class UserAccount {
 
 	public void setSearchSettings(Object search_preferences) {
 		searchPreferences = (ArrayList<ArrayList<String>>) search_preferences;
+	}
+
+    public void setActiveItem(String activeItemID) {
+		this.activeCharItemID =activeItemID;
+    }
+	public String getActiveItem() {
+		return this.activeCharItemID;
+	}
+
+	public void setActiveChar(String activeCharID) {
+		this.activeCharID = activeCharID;
+	}
+	public String getActiveChar() {
+		return this.activeCharID;
 	}
 }

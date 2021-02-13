@@ -19,6 +19,7 @@ import java.util.Base64;
 
 public class PdfCapableBrowser {
 
+    public String latestPDFLink;
     private boolean pdfJsLoaded;
 
     private ProcessListener processListener;
@@ -27,6 +28,7 @@ public class PdfCapableBrowser {
     private String loadScript;
     private String toExecuteWhenPDFJSLoaded = "";
     private Browser_CharClassif parent;
+    public boolean FORCE_PDF_IN_VIEWER=false;
 
 
     public PdfCapableBrowser() {
@@ -275,7 +277,13 @@ public class PdfCapableBrowser {
                     if ((address.toURL() + "").indexOf(".pdf") > -1)
                     {
 
-                        parent.icePdfBench(address.toURL());
+                        if(FORCE_PDF_IN_VIEWER){
+                            parent.icePdfBench(address.toURL());
+                        }else{
+                            parent.parent.urlLink.setText(address.toURL().toString());
+                            latestPDFLink=address.toURL().toString();
+                            d.browse(address);
+                        }
                         //displayPdf(address.toURL());
                         // wv.getEngine().load(oldValue); // 1
                         // wv.getEngine().getLoadWorker().cancel(); // 2

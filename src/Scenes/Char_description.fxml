@@ -170,14 +170,19 @@
                   <Button fx:id="classDDButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#classDD" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_apply_class_down.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
                   <Separator disable="true" maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
                   <Button fx:id="exportButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#export" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_export.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
-                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
-                  <TextField fx:id="search_text" maxHeight="20.0" maxWidth="800.0" minHeight="20.0" minWidth="800.0" prefHeight="20.0" prefWidth="800.0">
+                  <Separator disable="true" maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                  <TextField fx:id="search_text" maxHeight="20.0" maxWidth="400.0" minHeight="20.0" minWidth="400.0" prefHeight="20.0" prefWidth="400.0">
                      <font>
                         <Font name="System Bold" size="9.0" />
                      </font></TextField>
                   <Button fx:id="searchSettingButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#editSearchSettings" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true;" />
                   <ToggleButton fx:id="googleButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#search_google_inplace" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_google_search.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
                   <ToggleButton fx:id="tableButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#show_table" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_table_view.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
+                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                  <TextField fx:id="urlLink" maxHeight="20.0" maxWidth="400.0" minHeight="20.0" minWidth="400.0" prefHeight="20.0" prefWidth="400.0">
+                     <font>
+                        <Font name="System Bold" size="9.0" />
+                     </font></TextField>
                   <Separator maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" orientation="VERTICAL" prefHeight="15.0" prefWidth="15.0" />
                   <ToggleButton fx:id="ruleButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_rules.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
                   <ToggleButton fx:id="imageButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#search_image" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_image_search2.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />

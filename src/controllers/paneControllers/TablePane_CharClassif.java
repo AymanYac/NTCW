@@ -132,7 +132,12 @@ public class TablePane_CharClassif {
 			}
 
 			try{
-				selected_col = account.getDescriptionActiveIdx()-1;
+				selected_col = CharValuesLoader.active_characteristics.get(
+						FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())
+						.stream().map(c->c.getCharacteristic_id())
+						.collect(Collectors.toCollection(ArrayList::new))
+						.indexOf(account.getActiveChar())-1;
+				selected_col=selected_col==-2?-1:selected_col;
 			}catch (Exception V){
 				selected_col = -1;
 			}
@@ -146,17 +151,18 @@ public class TablePane_CharClassif {
 
 		Connection conn = Tools.spawn_connection_from_pool();
 		PreparedStatement stmt = conn.prepareStatement("select "
-				+ "user_description_sorting_columns, user_description_sorting_order, user_description_active_index,search_preferences"
+				+ "user_description_sorting_columns, user_description_sorting_order,search_preferences, activeCharID, activeItemID"
 				+ " from administration.users_x_projects where project_id = ? and user_id = ?");
 		stmt.setString(1, account.getActive_project());
 		stmt.setString(2, account.getUser_id());
 		ResultSet rs = stmt.executeQuery();
 		rs.next();
 		try {
-			account.setDescriptionSortColumns(rs.getArray(1));
-			account.setDescriptionSortDirs(rs.getArray(2));
-			account.setDescriptionActiveIdx(rs.getInt(3));
+			account.setDescriptionSortColumns(rs.getArray("user_description_sorting_columns"));
+			account.setDescriptionSortDirs(rs.getArray("user_description_sorting_order"));
 			account.setSearchSettings(ComplexMap2JdbcObject.deserialize(rs.getString("search_preferences"),new TypeToken<ArrayList<ArrayList<String>>>(){}.getType()));
+			account.setActiveItem(rs.getString("activeItemID"));
+			account.setActiveChar(rs.getString("activeCharID"));
 		}catch(Exception V) {
 			V.printStackTrace(System.err);
 		}
@@ -270,7 +276,7 @@ public class TablePane_CharClassif {
 				}
 				
 				stop_translation = false;
-		    	advancement.refresh();
+		    	advancement.refresh(Parent);
 		    	
 		    	
 		    	return null;
@@ -475,7 +481,7 @@ public class TablePane_CharClassif {
 		this.advancement = new CharAdvancementUpdater();
 		advancement.setParentScene(Parent);
 		advancement.account=account;
-		advancement.refresh();
+		advancement.refresh(Parent);
     	
 		
 	}
@@ -540,25 +546,39 @@ public class TablePane_CharClassif {
 	}
 
 	private void selectLastDescribedItem() {
-		Optional<LocalDateTime> latestDescriptionTimeInClass = tableGrid.getItems().stream().map(
-				r -> r.getData().values().stream().flatMap(a -> a.values().stream()).filter(v->v!=null && v.getDisplayValue(Parent).length()>0).map(v -> v.getDescriptionTime()).filter(t->t!=null).max(new Comparator<LocalDateTime>() {
-					@Override
-					public int compare(LocalDateTime o1, LocalDateTime o2) {
-						return o1.compareTo(o2);
-					}
-				})
-		).filter(m -> m.isPresent()).map(m -> m.get()).findAny();
-		if(latestDescriptionTimeInClass.isPresent()){
-			Optional<CharDescriptionRow> latestEditedItem = tableGrid.getItems().stream().filter(
-					r -> r.getData().values().stream().flatMap(a-> a.values().stream())
-							.filter(v -> v != null && v.getDescriptionTime().isEqual(latestDescriptionTimeInClass.get())).findAny().isPresent()).findAny();
-			if(latestEditedItem.isPresent()){
-				tableGrid.getSelectionModel().clearSelection();
-				tableGrid.getSelectionModel().select(latestEditedItem.get());
-				tableGrid.scrollTo(tableGrid.getSelectionModel().getSelectedIndex());
+		if(GlobalConstants.DESCRIPTION_RESTORE_PERSISTED_ITEM) {
+			try{
+				Optional<CharDescriptionRow> toSelect = tableGrid.getItems().parallelStream().filter(i -> i.getItem_id().equals(account.getActiveItem())).findAny();
+				if (toSelect.isPresent()) {
+					tableGrid.getSelectionModel().clearSelection();
+					tableGrid.getSelectionModel().select(toSelect.get());
+				} else {
+					tableGrid.getSelectionModel().clearAndSelect(0);
+				}
+			}catch (Exception V){
+				tableGrid.getSelectionModel().clearAndSelect(0);
 			}
 		}else{
-			tableGrid.getSelectionModel().clearAndSelect(0);
+			Optional<LocalDateTime> latestDescriptionTimeInClass = tableGrid.getItems().stream().map(
+					r -> r.getData().values().stream().flatMap(a -> a.values().stream()).filter(v -> v != null && v.getDisplayValue(Parent).length() > 0).map(v -> v.getDescriptionTime()).filter(t -> t != null).max(new Comparator<LocalDateTime>() {
+						@Override
+						public int compare(LocalDateTime o1, LocalDateTime o2) {
+							return o1.compareTo(o2);
+						}
+					})
+			).filter(m -> m.isPresent()).map(m -> m.get()).findAny();
+			if (latestDescriptionTimeInClass.isPresent()) {
+				Optional<CharDescriptionRow> latestEditedItem = tableGrid.getItems().stream().filter(
+						r -> r.getData().values().stream().flatMap(a -> a.values().stream())
+								.filter(v -> v != null && v.getDescriptionTime().isEqual(latestDescriptionTimeInClass.get())).findAny().isPresent()).findAny();
+				if (latestEditedItem.isPresent()) {
+					tableGrid.getSelectionModel().clearSelection();
+					tableGrid.getSelectionModel().select(latestEditedItem.get());
+					tableGrid.scrollTo(tableGrid.getSelectionModel().getSelectedIndex());
+				}
+			} else {
+				tableGrid.getSelectionModel().clearAndSelect(0);
+			}
 		}
 
 	}
@@ -846,7 +866,7 @@ public class TablePane_CharClassif {
 				col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 					public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
 						try{
-							return new ReadOnlyObjectWrapper(r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(characteristic.getCharacteristic_id()).getDisplayValue(Parent));
+							return new ReadOnlyObjectWrapper(r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(characteristic.getCharacteristic_id()).getColumnDisplayValue(Parent,r.getValue().getRulePropositions(characteristic.getCharacteristic_id())));
 						}catch(Exception V) {
 							//Object has null data at daataIndex
 							return new ReadOnlyObjectWrapper("");
@@ -865,7 +885,11 @@ public class TablePane_CharClassif {
                 public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
                     try{
 						String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
-                    	return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getUrl());
+                    	return new ReadOnlyObjectWrapper(
+                    			WordUtils.shortUrlDisplay(
+                    			r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getUrl()
+								)
+						);
                     }catch(Exception V) {
                    	 return new ReadOnlyObjectWrapper("");
                     }
@@ -1166,7 +1190,6 @@ public class TablePane_CharClassif {
 			account.getDescriptionSortColumns().add(c.getText());
 			account.getDescriptionSortDirs().add(c.getSortType().toString());
 		}
-		account.setDescriptionActiveIdx(selected_col);
 		int SI = tableGrid.getSelectionModel().getSelectedIndex();
 
 		refresh_table_with_segment(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment());
@@ -1199,7 +1222,6 @@ public class TablePane_CharClassif {
 			Parent.DescriptionSortDirs.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).add(c.getSortType().toString());
 		}
 
-		account.setDescriptionActiveIdx(selected_col);
 
 		try {
 			transversal.data_exchange_toolbox.ComplexMap2JdbcObject.saveAccountProjectPreferenceForDescription(account);

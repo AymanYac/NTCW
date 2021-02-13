@@ -50,16 +50,14 @@ public class ComplexMap2JdbcObject {
 	public static void saveAccountProjectPreferenceForDescription(UserAccount account) throws ClassNotFoundException, SQLException {
 		Connection conn = Tools.spawn_connection_from_pool();
 		PreparedStatement stmt = conn.prepareStatement("update administration.users_x_projects set "
-				+ "user_description_active_index=?,"
 				+ "user_description_sorting_columns=?,"
 				+ "user_description_sorting_order=? where user_id = ? and project_id = ?");
 
-		stmt.setInt(1,account.getDescriptionActiveIdx());
-		stmt.setArray(2, conn.createArrayOf("text", account.getDescriptionSortColumnsForJDBC()) );
-		stmt.setArray(3, conn.createArrayOf("text", account.getDescriptionSortDirsForJDBC()) );
+		stmt.setArray(1, conn.createArrayOf("text", account.getDescriptionSortColumnsForJDBC()) );
+		stmt.setArray(2, conn.createArrayOf("text", account.getDescriptionSortDirsForJDBC()) );
 
-		stmt.setString(4, account.getUser_id());
-		stmt.setString(5, account.getActive_project());
+		stmt.setString(3, account.getUser_id());
+		stmt.setString(4, account.getActive_project());
 
 
 		stmt.execute();

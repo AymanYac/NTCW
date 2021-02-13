@@ -57,9 +57,9 @@ import java.util.Vector;
 
 
 public class Browser_CharClassif {
-	Char_description parent;
+	public Char_description parent;
 	//private WebView browser;
-	private PdfCapableBrowser browser;
+	public PdfCapableBrowser browser;
 	public SimpleBooleanProperty showingPdf = new SimpleBooleanProperty();
 	public SimpleBooleanProperty nextPageIsPdf = new SimpleBooleanProperty();
 	public JPanel iceFrame;
@@ -194,7 +194,7 @@ public class Browser_CharClassif {
 
 	}
 
-	private void setContainerWindow() {
+	public void setContainerWindow() {
 		if(!(iceController!=null)) {
 			//iceFrame = new JFrame();
 			//iceFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

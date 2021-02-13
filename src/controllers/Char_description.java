@@ -41,10 +41,7 @@ import transversal.language_toolbox.WordUtils;
 import java.awt.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.*;
@@ -53,10 +50,10 @@ import java.util.stream.Collectors;
 public class Char_description {
 
 	public boolean CHANGING_CLASS = false;
-	
-	
-	
-	@FXML MenuBar menubar;
+    public TextField urlLink;
+
+
+    @FXML MenuBar menubar;
 	@FXML MenuBar secondaryMenuBar;
 	@FXML public Menu counterTotal;
 	@FXML public Menu counterRemaining;
@@ -131,8 +128,7 @@ public class Char_description {
 	
 	public TablePane_CharClassif tableController;
 
-	
-	
+
 	public Browser_CharClassif browserController;
 	public StringProperty externalBrowserUrlProperty = new SimpleStringProperty();;
 	
@@ -319,7 +315,7 @@ public class Char_description {
             {
                 try {
 					handleKeyBoardEvent(keyEvent,true);
-				} catch (IOException | ParseException | ClassNotFoundException | SQLException e) {
+				} catch (IOException | ParseException | ClassNotFoundException | SQLException | URISyntaxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -332,7 +328,7 @@ public class Char_description {
             {
                 try {
 					handleKeyBoardEvent(keyEvent,false);
-				} catch (IOException | ParseException | ClassNotFoundException | SQLException e) {
+				} catch (IOException | ParseException | ClassNotFoundException | SQLException | URISyntaxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -428,6 +424,12 @@ public class Char_description {
 		}
 		if(keyEvent.getCode().equals(KeyCode.M)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.M, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.L)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.L, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.O)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.O, pressed);
 		}
 		if(keyEvent.getCode().equals(KeyCode.TAB)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.TAB, pressed);
@@ -590,7 +592,7 @@ public class Char_description {
 		}
 		return true;
 	}
-	protected void handleKeyBoardEvent(KeyEvent keyEvent, boolean pressed) throws IOException, ParseException, ClassNotFoundException, SQLException {
+	protected void handleKeyBoardEvent(KeyEvent keyEvent, boolean pressed) throws IOException, ParseException, ClassNotFoundException, SQLException, URISyntaxException {
 		
 		
 		
@@ -636,6 +638,12 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.M)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.M, pressed);
 		}
+		if(keyEvent.getCode().equals(KeyCode.L)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.L, pressed);
+		}
+		if(keyEvent.getCode().equals(KeyCode.O)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.O, pressed);
+		}
 		if(keyEvent.getCode().equals(KeyCode.TAB)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.TAB, pressed);
 		}
@@ -657,8 +665,10 @@ public class Char_description {
 			}catch(Exception V) {
 				
 			}
-			
-			imageButton.setSelected(true);
+
+			if(!GlobalConstants.TURN_OFF_IMAGE_SEARCH_FOR_DESCRIPTION){
+				imageButton.setSelected(true);
+			}
 			launch_search(true);
 		}
 		
@@ -776,14 +786,45 @@ public class Char_description {
 				load_image_pane(true);
 			}
 		}
-		
+
+		if(account.PRESSED_KEYBOARD.get(KeyCode.O) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
+			if(GlobalConstants.OPEN_LINKS_IN_EXTERNAL){
+				Desktop.getDesktop().browse(new URL(urlLink.getText()).toURI());
+			}else{
+				try {
+					browserController.browser.FORCE_PDF_IN_VIEWER = true;
+					browserController.setContainerWindow();
+					browserController.browser.loadPage(urlLink.getText());
+				} catch (Exception V) {
+					try {
+						load_browser_pane();
+						browserController.browser.FORCE_PDF_IN_VIEWER = true;
+						browserController.setContainerWindow();
+						browserController.icePdfBench(new URL(urlLink.getText()));
+					} catch (Exception L) {
+						L.printStackTrace(System.err);
+					}
+				}
+				browserController.browser.FORCE_PDF_IN_VIEWER = false;
+			}
+		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.K) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
 			tableController.previousChar();
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.M) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
 			tableController.nextChar();
 		}
-		
+		if(account.PRESSED_KEYBOARD.get(KeyCode.L) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
+			if(!FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+				CharDescriptionRow row = tableController.tableGrid.getSelectionModel().getSelectedItem();
+				String itemClass = row.getClass_segment_string().split("&&&")[0];
+				int	selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(itemClass).size());
+				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col);
+				CaracteristicValue val = row.getData(itemClass).get(active_char.getCharacteristic_id()).shallowCopy(account);
+				val.setUrl(urlLink.getText());
+				AssignValueOnSelectedItems(val);
+			}
+		}
 		
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && pressed && keyEvent.getCode().equals(KeyCode.getKeyCode(GlobalConstants.MANUAL_PROPS_1))) {
 			firePropositionButton(1);
@@ -1046,7 +1087,9 @@ public class Char_description {
 	}
 	
 	private void launch_search(boolean checkMethodSelect) throws IOException, ParseException {
-		load_image_pane(checkMethodSelect);
+		if(!GlobalConstants.TURN_OFF_IMAGE_SEARCH_FOR_DESCRIPTION){
+			load_image_pane(checkMethodSelect);
+		}
 		search_google_inplace(checkMethodSelect);
 	}
 	
@@ -1575,7 +1618,20 @@ public class Char_description {
 			}
 			String itemClass = row.getClass_segment_string().split("&&&")[0];
 			//deleteValueLabel.setTranslateX(custom_label_22.localToScene(custom_label_22.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX());
+			try{
+				String valueLink = row.getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getUrl();
+				if(valueLink.length()>0){
+					urlLink.setText(valueLink);
+				}else{
+					urlLink.setText(browserController.browser.latestPDFLink);
+				}
+			}catch (Exception V){
+				try{
+					urlLink.setText(browserController.browser.latestPDFLink);
+				}catch (Exception L){
 
+				}
+			}
 			if(active_char.getIsNumeric()) {
 				if( (active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0)) {
 

@@ -7,6 +7,8 @@ import model.*;
 import org.apache.commons.lang3.StringUtils;
 import transversal.generic.Tools;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -1165,8 +1167,26 @@ public class WordUtils {
 		}
 	}
 
+    public static String shortUrlDisplay(String url) {
+		try {
+			URL aURL = new URL(url);
+			String protocol = aURL.getProtocol(); //http
+			String authority = aURL.getAuthority(); //example.com:80
+			String host = aURL.getHost(); //example.com
+			int port = aURL.getPort(); //80
+			String path = aURL.getPath(); //  /docs/books/tutorial/index.html
+			String query = aURL.getQuery(); //name=networking
+			String filename = aURL.getFile(); ///docs/books/tutorial/index.html?name=networking
+			String ref = aURL.getRef(); //DOWNLOADING
 
-	public abstract static class Rewriter {
+			return host+path;
+		} catch (MalformedURLException e) {
+			return null;
+		}
+	}
+
+
+    public abstract static class Rewriter {
 		private Pattern pattern;
 		private Matcher matcher;
 
