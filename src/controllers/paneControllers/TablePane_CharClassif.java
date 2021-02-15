@@ -866,7 +866,14 @@ public class TablePane_CharClassif {
 				col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 					public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
 						try{
-							return new ReadOnlyObjectWrapper(r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(characteristic.getCharacteristic_id()).getColumnDisplayValue(Parent,r.getValue().getRulePropositions(characteristic.getCharacteristic_id())));
+							CaracteristicValue val = r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(characteristic.getCharacteristic_id());
+							String dsp = val.getDisplayValue(Parent);
+							if(dsp!=null && dsp.length()>0){
+								return new ReadOnlyObjectWrapper(dsp);
+							}else if (r.getValue().getRulePropositions(characteristic.getCharacteristic_id()).size()>0){
+								return new ReadOnlyObjectWrapper<>("*PENDING*");
+							}
+							return new ReadOnlyObjectWrapper("");
 						}catch(Exception V) {
 							//Object has null data at daataIndex
 							return new ReadOnlyObjectWrapper("");

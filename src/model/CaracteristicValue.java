@@ -538,15 +538,4 @@ public class CaracteristicValue implements Serializable {
 		return parentChar;
 	}
 
-    public String getColumnDisplayValue(Char_description parent, ArrayList<CharRuleResult> rulePropositions) {
-		String displayValue = getDisplayValue(parent);
-		if(displayValue!=null && displayValue.length()>0){
-			return displayValue;
-		}else{
-			if(rulePropositions.size()>0){
-				return "*PENDING*";
-			}
-			return null;
-		}
-    }
 }
