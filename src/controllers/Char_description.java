@@ -45,6 +45,7 @@ import java.net.*;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Char_description {
@@ -1168,7 +1169,26 @@ public class Char_description {
 		//load_image_pane();
 		//load_rule_pane();
 		//load_taxo_pane();
-		
+		aidLabel.getScene().getWindow().setOnCloseRequest(event -> {
+			ConfirmationDialog.show("Saving latest modifications", "Click (OK) to persist local changes to remote server. This should only take a few seconds", "OK");
+			try{
+				CharDescriptionExportServices.flushItemDataToDB(account, null);
+				while (CharDescriptionExportServices.itemDataBuffer.peek() != null) {
+					try {
+						TimeUnit.MILLISECONDS.sleep(500);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}catch (Exception V){
+				ConfirmationDialog.show("Could not reach server", "Click (OK) to export project data to spreadsheet", "OK");
+				try {
+					CharDescriptionExportServices.ExportItemDataForClass(null,this,true,true,true,true);
+				} catch (ClassNotFoundException | SQLException | IOException classNotFoundException) {
+					classNotFoundException.printStackTrace();
+				}
+			}
+		});
 		
 		
 		

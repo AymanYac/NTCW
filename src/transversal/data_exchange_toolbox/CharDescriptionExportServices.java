@@ -925,6 +925,7 @@ public class CharDescriptionExportServices {
 					}catch (Exception V){
 						V.printStackTrace(System.err);
 						ExceptionDialog.show("Connection Error","Could not reach server","Item values could not be saved. Please restart");
+						throw new RuntimeException(V.getCause());
 					}
 
 					
@@ -986,7 +987,8 @@ public class CharDescriptionExportServices {
 			dbFlushTask.setOnFailed(e -> {
 			    Throwable problem = dbFlushTask.getException();
 			    /* code to execute if task throws exception */
-			    problem.printStackTrace(System.err);
+				problem.printStackTrace(System.err);
+				throw new RuntimeException(dbFlushTask.getException());
 			});
 
 			dbFlushTask.setOnCancelled(e -> {
