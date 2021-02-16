@@ -50,6 +50,7 @@ public class CharDescriptionRow {
 		String class_segment_string;
 		ClassSegment class_segment;
 		private static Unidecode unidecode;
+		private String accentFreeDescriptionNoCR;
 
 	public void allocateDataField(String target_class) {
 			if(this.data.containsKey(target_class)) {
@@ -414,8 +415,13 @@ public class CharDescriptionRow {
 	}
 
 	public String getAccentFreeDescriptionsNoCR() {
+		if(this.accentFreeDescriptionNoCR!=null){
+			return this.accentFreeDescriptionNoCR;
+		}
 		unidecode = unidecode!=null?unidecode: Unidecode.toAscii();
-		return (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
+		//accentFreeDescriptionNoCR =  (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
+		accentFreeDescriptionNoCR =  " "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
+		return accentFreeDescriptionNoCR;
 	}
 
 	public ObservableBooleanValue hasDataInCurrentClassForCurrentCarac(int selected_col) {
