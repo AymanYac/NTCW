@@ -117,7 +117,10 @@ public class CharDescriptionRow {
 		public void setPreclassif(String preclassif) {
 			this.preclassification = preclassif;
 		}
-		
+
+		public String getCompletionStatusString() {
+			return (itemIsComplete()!=null)?(itemIsComplete()?"Completed critical (exc. Unknown)":"Completed critical (inc. Unknown)"):"Missing critical";
+		}
 		public StackPane getCompletionStatus() {
 		Circle tmp = new Circle(8,8,8);
 
@@ -419,8 +422,8 @@ public class CharDescriptionRow {
 			return this.accentFreeDescriptionNoCR;
 		}
 		unidecode = unidecode!=null?unidecode: Unidecode.toAscii();
-		//accentFreeDescriptionNoCR =  (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
 		accentFreeDescriptionNoCR =  " "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
+		//accentFreeDescriptionNoCR =  (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
 		return accentFreeDescriptionNoCR;
 	}
 
@@ -452,4 +455,6 @@ public class CharDescriptionRow {
 		});
 		CharDescriptionExportServices.addItemCharDataToPush(this);
 	}
+
+
 }

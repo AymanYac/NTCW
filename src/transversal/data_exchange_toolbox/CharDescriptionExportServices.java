@@ -144,12 +144,14 @@ public class CharDescriptionExportServices {
 
 	private static void createReviewHeader(Char_description parent, SXSSFWorkbook wb, Sheet reviewSheet) {
 		Row reviewHeader = createHeaderRow(parent,wb,reviewSheet,new String[] {
+				"Completion Status",
 				"Client Item Number",
 				"Short description",
 				"Long description",
 				"Material Group",
 				"Classification number",
 				"Classification name"}, new IndexedColors[] {
+				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
@@ -414,28 +416,31 @@ public class CharDescriptionExportServices {
 		reviewRowIdx+=1;
 		Row row = reviewSheet.createRow(reviewRowIdx);
 		Cell loopCell;
-		
+
 		loopCell = row.createCell(0);
+		loopCell.setCellValue(item.getCompletionStatusString());
+
+		loopCell = row.createCell(1);
 		loopCell.setCellValue(item.getClient_item_number());
 		
-		loopCell = row.createCell(1);
+		loopCell = row.createCell(2);
 		loopCell.setCellValue(item.getShort_desc());
 
-		loopCell = row.createCell(2);
+		loopCell = row.createCell(3);
 		loopCell.setCellValue(item.getLong_desc());
 		
-		loopCell = row.createCell(3);
+		loopCell = row.createCell(4);
 		loopCell.setCellValue(item.getMaterial_group());
 		
-		loopCell = row.createCell(4);
+		loopCell = row.createCell(5);
 		loopCell.setCellValue(item.getClass_segment_string().split("&&&")[2]);
 		
-		loopCell = row.createCell(5);
+		loopCell = row.createCell(6);
 		loopCell.setCellValue(item.getClass_segment_string().split("&&&")[1]);
 
 
 		for(int i=0;i<itemChars.size();i++) {
-			loopCell = row.createCell(6+2*i);
+			loopCell = row.createCell(7+2*i);
 			loopCell.setCellValue(itemChars.get(i).getCharacteristic_name());
 			loopCell = row.createCell(7+2*i);
 			try{
