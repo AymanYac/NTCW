@@ -519,6 +519,7 @@ public class CaracteristicValue implements Serializable {
 		tmp.setMax_value(getMax_value());
 		tmp.setMin_value(getMin_value());
 		tmp.setUom_id(getUom_id());
+		tmp.setUrl(getUrl());
 		tmp.setParentChar(parentChar);
 		if(account!=null){
 			tmp.setAuthor(account.getUser_id());
@@ -537,5 +538,4 @@ public class CaracteristicValue implements Serializable {
 	public ClassCaracteristic getParentChar() {
 		return parentChar;
 	}
-
 }

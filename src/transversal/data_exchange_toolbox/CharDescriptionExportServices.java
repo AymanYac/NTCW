@@ -442,7 +442,7 @@ public class CharDescriptionExportServices {
 		for(int i=0;i<itemChars.size();i++) {
 			loopCell = row.createCell(7+2*i);
 			loopCell.setCellValue(itemChars.get(i).getCharacteristic_name());
-			loopCell = row.createCell(7+2*i);
+			loopCell = row.createCell(8+2*i);
 			try{
 				loopCell.setCellValue(item.getData(item.getClass_segment_string().split("&&&")[0]).get(itemChars.get(i).getCharacteristic_id()).getDisplayValue(parent/*,carac*/));
 			}catch(Exception V) {

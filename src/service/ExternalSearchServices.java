@@ -1,7 +1,8 @@
-package transversal.dialog_toolbox;
+package service;
 
 import controllers.Char_description;
 import javafx.application.Platform;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -10,12 +11,12 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import model.*;
-import service.CharValuesLoader;
+import transversal.dialog_toolbox.CaracDeclarationDialog;
+import transversal.dialog_toolbox.FxUtilTest;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -25,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
-public class SearchBarCustomizerDialog {
+public class ExternalSearchServices {
     private static Dialog<Object> dialog;
     private static GridPane contentGrid;
     private static CharDescriptionRow sourceItem;
@@ -35,6 +36,10 @@ public class SearchBarCustomizerDialog {
     private static String userLanguageCode;
     private static ChangeListener<? super String> concatGenerator;
     private static Label previewLabel;
+
+    private static String lien_ouvert;
+    private static String lien_actif;
+    private static Char_description parent;
 
 
     public static void editSearchPrefrence(Char_description parent) {
@@ -52,7 +57,7 @@ public class SearchBarCustomizerDialog {
             // handle cancel button code here
             event.consume();
             saveSearchPreference(parent.account);
-            ArrayList<ArrayList<String>> concatElems = loadSettingsFromScreen();
+            ArrayList<ArrayList<String>> concatElems = loadSearchSettingsFromScreen();
             String itemSearchSentence = evaluateSearchSentence(concatElems, sourceItem, sourceSegment);
             parent.search_text.setText(itemSearchSentence);
             dialog.close();
@@ -71,23 +76,23 @@ public class SearchBarCustomizerDialog {
         dialog.getDialogPane().setContent(contentGrid);
 
 
-        storeSourceData(parent);
+        storeSearchSourceData(parent);
         //createFieldsLinePerCarac();
-        createFieldsBlocPerElem(parent.account);
-        setFieldsLayout();
+        createSearchFieldsBlocPerElem(parent.account);
+        setSearchFieldsLayout();
 
         dialog.showAndWait();
 
     }
 
     private static void saveSearchPreference(UserAccount account) {
-        ArrayList<ArrayList<String>> concatElems = loadSettingsFromScreen();
+        ArrayList<ArrayList<String>> concatElems = loadSearchSettingsFromScreen();
         account.saveSearchSettings(concatElems);
         dialog.close();
     }
 
 
-    private static void storeSourceData(Char_description parent) {
+    private static void storeSearchSourceData(Char_description parent) {
         sourceItem = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
         sourceSegment = sourceItem.getClass_segment_string().split("&&&")[0];
         dataLanguageCode = parent.data_language_gcode.toUpperCase();
@@ -98,7 +103,7 @@ public class SearchBarCustomizerDialog {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                 }
-                ArrayList<ArrayList<String>> concatElems = loadSettingsFromScreen();
+                ArrayList<ArrayList<String>> concatElems = loadSearchSettingsFromScreen();
                 String itemSearchSentence = evaluateSearchSentence(concatElems, sourceItem, sourceSegment);
                 Platform.runLater(new Runnable() {
                     @Override
@@ -111,7 +116,7 @@ public class SearchBarCustomizerDialog {
         };
     }
 
-    private static ArrayList<ArrayList<String>> loadSettingsFromScreen() {
+    private static ArrayList<ArrayList<String>> loadSearchSettingsFromScreen() {
         ArrayList<ArrayList<String>> concatElems = new ArrayList<ArrayList<String>>();
         Node[][] gridPaneNodes = new Node[4][99] ;
         for (Node child : elemBlocks.getChildren()) {
@@ -130,7 +135,7 @@ public class SearchBarCustomizerDialog {
                 Node first = gridPaneNodes[0][row];
                 Node second = gridPaneNodes[1][row];
                 Node third = gridPaneNodes[2][row];
-                ArrayList<String> lineElem = loadElemFromFields((ComboBox) first, (ComboBox) second, (ComboBox) third);
+                ArrayList<String> lineElem = loadSearchElemFromFields((ComboBox) first, (ComboBox) second, (ComboBox) third);
                 concatElems.add(lineElem);
             }catch (Exception V){
 
@@ -234,7 +239,7 @@ public class SearchBarCustomizerDialog {
         return searchSentence.get();
     }
 
-    private static void createFieldsBlocPerElem(UserAccount account) {
+    private static void createSearchFieldsBlocPerElem(UserAccount account) {
         elemBlocks = new GridPane();
         ScrollPane elemBlocksScroll = new ScrollPane();
         elemBlocksScroll.setContent(elemBlocks);
@@ -245,11 +250,11 @@ public class SearchBarCustomizerDialog {
         contentGrid.add(elemBlocksScroll,0,1);
         GridPane.setColumnSpan(elemBlocksScroll,GridPane.REMAINING);
         GridPane.setHgrow(contentGrid, Priority.ALWAYS);
-        loadElemBlocks(account);
-        insertAddCombo(account);
+        loadSearchElemBlocks(account);
+        insertSearchAddCombo(account);
     }
 
-    private static void insertAddCombo(UserAccount account) {
+    private static void insertSearchAddCombo(UserAccount account) {
         ComboBox<String> addCombo = new ComboBox<String>();
         GridPane.setHgrow(addCombo,Priority.ALWAYS);
         addCombo.setMaxWidth(Double.MAX_VALUE);
@@ -259,7 +264,7 @@ public class SearchBarCustomizerDialog {
         addCombo.getItems().add("Free text");
         addCombo.getItems().addAll(CharValuesLoader.active_characteristics.get(sourceSegment).stream().map(carac ->
                 String.valueOf(carac.getSequence())+"-"+carac.getCharacteristic_name()).collect(Collectors.toCollection(ArrayList::new)));
-        addFirstElemListener(addCombo,null,null,true);
+        addFirstElemListenerSearch(addCombo,null,null,true);
         previewLabel = new Label();
         contentGrid.add(previewLabel,0,2);
         GridPane.setColumnSpan(previewLabel,GridPane.REMAINING);
@@ -267,14 +272,14 @@ public class SearchBarCustomizerDialog {
         contentGrid.add(new Label("Add a new search element:"),0,3);
     }
 
-    private static void loadElemBlocks(UserAccount account) {
+    private static void loadSearchElemBlocks(UserAccount account) {
         ArrayList<ArrayList<String>> preferences = account.getSearchSettings(sourceSegment);
         preferences.forEach(elem->{
-            addElemBlock(elem);
+            addSearchElemBlock(elem);
         });
     }
 
-    private static void addElemBlock(ArrayList<String> elem) {
+    private static void addSearchElemBlock(ArrayList<String> elem) {
         int maxRow = 1;
         for(Node node: elemBlocks.getChildren()){
             maxRow = Math.max(GridPane.getRowIndex(node)+1,maxRow);
@@ -302,8 +307,8 @@ public class SearchBarCustomizerDialog {
         first.getItems().add("Free text");
         first.getItems().addAll(CharValuesLoader.active_characteristics.get(sourceSegment).stream().map(carac ->
                 String.valueOf(carac.getSequence())+"-"+carac.getCharacteristic_name()).collect(Collectors.toCollection(ArrayList::new)));
-        addFirstElemListener(first,second,third, false);
-        addSecondElemListener(first,second,third);
+        addFirstElemListenerSearch(first,second,third, false);
+        addSecondElemListenerSearch(first,second,third);
         if(elem.get(0).equals(CustomSearchElements.DESCRIPTION_OVERVIEW)){
             first.setValue("Description overview");
             if(elem.get(1).equals(CustomSearchElements.SHORT)){
@@ -349,7 +354,7 @@ public class SearchBarCustomizerDialog {
             }
             if(elem.get(1).equals(CustomSearchElements.VALUE)){
                 second.setValue("Value");
-                loadThirdFieldForCaracValue(third,elem);
+                loadThirdFieldForCaracValueSearch(third,elem);
             }else if(elem.get(1).equals(CustomSearchElements.PATTERN)){
                 second.setValue("Identified pattern");
             }else{
@@ -388,8 +393,8 @@ public class SearchBarCustomizerDialog {
     }
 
 
-    private static void loadThirdFieldForCaracValue(ComboBox<String> third, ArrayList<String> elem) {
-        if(thirdFieldShouldBeVisibleForCaracValue(elem)){
+    private static void loadThirdFieldForCaracValueSearch(ComboBox<String> third, ArrayList<String> elem) {
+        if(thirdFieldShouldBeVisibleForCaracValueSearch(elem)){
             third.setVisible(true);
             try{
                 if(elem.get(2).equals(CustomSearchElements.DL)){
@@ -407,7 +412,7 @@ public class SearchBarCustomizerDialog {
         }
     }
 
-    private static boolean thirdFieldShouldBeVisibleForCaracValue(ArrayList<String> elem) {
+    private static boolean thirdFieldShouldBeVisibleForCaracValueSearch(ArrayList<String> elem) {
         try{
             Optional<ClassCaracteristic> caracMatch = CharValuesLoader.active_characteristics.get(sourceSegment).stream().filter(carac ->
                     (String.valueOf(carac.getSequence()) + "-" + carac.getCharacteristic_name()).equals(elem.get(0))).findAny();
@@ -418,7 +423,7 @@ public class SearchBarCustomizerDialog {
 
     }
 
-    private static void addFirstElemListener(ComboBox<String> first, ComboBox<String> second, ComboBox<String> third, boolean createNewElem) {
+    private static void addFirstElemListenerSearch(ComboBox<String> first, ComboBox<String> second, ComboBox<String> third, boolean createNewElem) {
         first.valueProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -427,7 +432,7 @@ public class SearchBarCustomizerDialog {
                 }
                 if (createNewElem){
                     first.getEditor().clear();
-                    addElemBlock(loadElemFromFields(first,second,third));
+                    addSearchElemBlock(loadSearchElemFromFields(first,second,third));
                     return;
                 }
                 try{
@@ -472,7 +477,7 @@ public class SearchBarCustomizerDialog {
                     second.getItems().add("Value");
                     second.getItems().add("Identified pattern");
                     second.getItems().add("Characteristic name + Value");
-                    if(thirdFieldShouldBeVisibleForCaracValue(loadElemFromFields(first, second, third))){
+                    if(thirdFieldShouldBeVisibleForCaracValueSearch(loadSearchElemFromFields(first, second, third))){
                         third.setVisible(true);
                     }
                 }
@@ -485,7 +490,7 @@ public class SearchBarCustomizerDialog {
         });
     }
 
-    private static void addSecondElemListener(ComboBox<String> first, ComboBox<String> second, ComboBox<String> third) {
+    private static void addSecondElemListenerSearch(ComboBox<String> first, ComboBox<String> second, ComboBox<String> third) {
         second.valueProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -499,7 +504,7 @@ public class SearchBarCustomizerDialog {
                 }
                 if(newValue.equals("Value")){
                     third.setVisible(false);
-                    loadThirdFieldForCaracValue(third,loadElemFromFields(first,second,third));
+                    loadThirdFieldForCaracValueSearch(third, loadSearchElemFromFields(first,second,third));
                 }
                 else if(newValue.equals("Identified pattern")){
                     third.setVisible(false);
@@ -511,7 +516,7 @@ public class SearchBarCustomizerDialog {
         });
     }
 
-    private static ArrayList<String> loadElemFromFields(ComboBox<String> first, ComboBox<String> second, ComboBox<String> third) {
+    private static ArrayList<String> loadSearchElemFromFields(ComboBox<String> first, ComboBox<String> second, ComboBox<String> third) {
         try{
             ArrayList<String> ret = new ArrayList<String>();
             ret.add(first.getValue());
@@ -555,7 +560,7 @@ public class SearchBarCustomizerDialog {
     }
 
 
-    private static void setFieldsLayout() {
+    private static void setSearchFieldsLayout() {
 
         ColumnConstraints cc0 = new ColumnConstraints();
         cc0.setPercentWidth(30);
@@ -573,4 +578,105 @@ public class SearchBarCustomizerDialog {
         previewLabel.setStyle("-fx-fill: #8496AE;-fx-font-style: italic");
     }
 
+
+    public static void refreshUrlAfterElemChange(Char_description parent){
+        ExternalSearchServices.parent = parent;
+        if(get_lien_article_carac()!=null){
+            ExternalSearchServices.parent.urlLink.setText(get_lien_article_carac());
+            urlFieldColor("blue");
+        }else{
+            ExternalSearchServices.parent.urlLink.setText(lien_actif);
+            urlFieldColor("red");
+        }
+    }
+
+    private static String get_lien_article_carac() {
+        String segmentID = FxUtilTest.getComboBoxValue(parent.classCombo).getClassSegment();
+        int active_char_index = Math.floorMod(parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(segmentID).size());
+        ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(segmentID).get(active_char_index);
+        CharDescriptionRow item = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+        try {
+            return item.getData(segmentID).get(activeChar.getCharacteristic_id()).getUrl();
+        }catch (Exception V){
+            return null;
+        }
+
+    }
+
+    private static void set_lien_article_carac(String link) {
+        parent.linkUrlToItem(link);
+    }
+
+    public static void refreshUrlAfterCaracChange(Char_description parent){
+        refreshUrlAfterElemChange(parent);
+    }
+
+    public static void launchingSearch(String searchUrl){
+        browsingLink(searchUrl);
+    }
+
+    public static void browsingLink(String locationUrl){
+        lien_ouvert = locationUrl;
+        lien_actif = locationUrl;
+        if(get_lien_article_carac()!=null){
+            parent.urlLink.setText(get_lien_article_carac());
+        }else{
+            parent.urlLink.setText(lien_actif);
+        }
+    }
+
+    public static void externalPdfViewing(String pdfUrl){
+        lien_actif = pdfUrl;
+        if(get_lien_article_carac()!=null){
+            parent.urlLink.setText(get_lien_article_carac());
+        }else{
+            parent.urlLink.setText(lien_actif);
+        }
+    }
+
+    public static void refreshingBrowser(String refreshingUrl){
+        browsingLink(refreshingUrl);
+    }
+
+    public static void closingBrowser(){
+        browsingLink(null);
+    }
+
+    public static void manualValueInput(){
+        System.out.println(lien_actif);
+        set_lien_article_carac(lien_actif);
+        if(get_lien_article_carac()!=null){
+            urlFieldColor("blue");
+        }else{
+            urlFieldColor("red");
+        }
+    }
+
+    public static void parsingValueFromURL(){
+        set_lien_article_carac(lien_actif);
+        if(get_lien_article_carac()!=null){
+            urlFieldColor("blue");
+        }else{
+            urlFieldColor("red");
+        }
+    }
+
+    public static void clearingURL(){
+        set_lien_article_carac(null);
+        lien_actif=null;
+    }
+
+
+    public static void editingURL(String inputURL){
+        lien_actif = inputURL;
+        if(get_lien_article_carac()!=null){
+            urlFieldColor("blue");
+        }else{
+            urlFieldColor("red");
+        }
+    }
+
+    private static void urlFieldColor(String color) {
+        parent.urlLink.setStyle("-fx-text-inner-color: "+color+";");
+    }
 }

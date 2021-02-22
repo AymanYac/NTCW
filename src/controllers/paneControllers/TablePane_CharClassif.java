@@ -24,7 +24,7 @@ import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.dialog_toolbox.FxUtilTest;
-import transversal.dialog_toolbox.SearchBarCustomizerDialog;
+import service.ExternalSearchServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -200,14 +200,15 @@ public class TablePane_CharClassif {
 	
 	@SuppressWarnings("deprecation")
 	private void item_selection_routine(CharDescriptionRow tmp)  {
-		this.Parent.CHANGING_CLASS=true;
-		this.Parent.classification.setText(tmp.getClass_segment_string().split("&&&")[1]);
-		this.Parent.CHANGING_CLASS=false;
+		Parent.CHANGING_CLASS=true;
+		Parent.classification.setText(tmp.getClass_segment_string().split("&&&")[1]);
+		Parent.CHANGING_CLASS=false;
+		ExternalSearchServices.refreshUrlAfterElemChange(Parent);
 		if(GlobalConstants.ALLOW_DESC_SEARCH_BAR_CUSTOMIZATION){
 			CharDescriptionRow sourceItem = tableGrid.getSelectionModel().getSelectedItem();
 			String sourceSegment = sourceItem.getClass_segment_string().split("&&&")[0];
 			ArrayList<ArrayList<String>> settings = account.getSearchSettings(sourceSegment);
-			Parent.search_text.setText(SearchBarCustomizerDialog.evaluateSearchSentence(settings,sourceItem,sourceSegment));
+			Parent.search_text.setText(ExternalSearchServices.evaluateSearchSentence(settings,sourceItem,sourceSegment));
 		}else{
 			if(tmp.getLong_desc()!=null && tmp.getLong_desc().length()>0) {
 				Parent.search_text.setText(WordUtils.getSearchWords(tmp.getLong_desc()));
@@ -498,6 +499,7 @@ public class TablePane_CharClassif {
 		account.setUser_desc_class(active_class);
 		Tools.set_desc_class(account);
 		if(!active_class.equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+			tableGrid.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			Parent.charButton.setDisable(false);
 
 			this.classItems = getActiveItemsID(active_class);
@@ -522,6 +524,7 @@ public class TablePane_CharClassif {
 			tvX = new TableViewExtra(tableGrid);
 			tableGrid.refresh();
 		}else {
+			tableGrid.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 			try {
 				Parent.charPaneController.PaneClose();
 			}catch(Exception V) {
@@ -736,6 +739,7 @@ public class TablePane_CharClassif {
 
 	@SuppressWarnings("rawtypes")
 	private void selectChartAtIndex(int i, boolean collapsedView) {
+		Parent.lastInputValue = null;
 		while(selected_col<0){
 			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
 		}
@@ -805,7 +809,7 @@ public class TablePane_CharClassif {
 		}
 		
 		
-				
+		ExternalSearchServices.refreshUrlAfterCaracChange(Parent);
 		Parent.refresh_ui_display();
 	}
 
@@ -1022,9 +1026,7 @@ public class TablePane_CharClassif {
 		
 		
 		
-		tableGrid.getSelectionModel().setSelectionMode(
-			    SelectionMode.SINGLE
-			);
+
 		
 		
 		tableGrid.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {

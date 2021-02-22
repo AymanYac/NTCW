@@ -7,7 +7,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -17,8 +16,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -26,10 +23,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Pair;
-import model.CircularArrayList;
 import model.GlobalConstants;
-import net.miginfocom.layout.Grid;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.icepdf.core.pobjects.Destination;
 import org.icepdf.core.pobjects.graphics.text.LineText;
 import org.icepdf.core.util.PropertyConstants;
@@ -40,12 +34,12 @@ import org.icepdf.ri.common.SwingViewBuilder;
 import org.icepdf.ri.common.views.DocumentViewControllerImpl;
 import org.icepdf.ri.util.PropertiesManager;
 import org.json.simple.parser.ParseException;
+import service.ExternalSearchServices;
 import service.DocumentSearchTask;
 import transversal.pdf_toolbox.PdfCapableBrowser;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -91,11 +85,14 @@ public class Browser_CharClassif {
 
 	@FXML Button browsePreviousPageButton;
 	@FXML Button browseNextPageButton;
+	@FXML Button refreshPageButton;
+	@FXML Button closeButton;
 
 	public Stage secondaryStage;
 	private DocumentSearchTask.SearchTextTask dtsk;
 	private int searchHitIndex=0;
 	private SwingNode iceContainer;
+	private String lastPaneLayout;
 
 
 	@FXML void initialize() {
@@ -125,6 +122,10 @@ public class Browser_CharClassif {
 		}
 		browser.nodeValue.getEngine().executeScript("history.forward()");
 	}
+	@FXML void refresh_page() {
+		ExternalSearchServices.refreshingBrowser(browser.nodeValue.getEngine().getLocation());
+		browser.nodeValue.getEngine().reload();
+	}
 	
 
 	
@@ -151,6 +152,7 @@ public class Browser_CharClassif {
 		target = (checkMethodSelect && selected_text.length()>0) ?selected_text:target;
 
 		//icePdfBench(new URL("http://www.africau.edu/images/default/sample.pdf"));
+		ExternalSearchServices.launchingSearch("https://www.google.com/search?q="+URLEncoder.encode(target,"UTF-8"));
 		browser.loadPage("https://www.google.com/search?q="+URLEncoder.encode(target,"UTF-8"));
 		//browser.loadPage(getClass().getResource("/scripts/100RV.pdf").toExternalForm());
 		//browser.loadPage("http://www.africau.edu/images/default/sample.pdf");
@@ -356,7 +358,7 @@ public class Browser_CharClassif {
 				public void handle(KeyEvent event) {
 					switch (event.getCode()) {
 						case ESCAPE:   try {
-							parent.show_table();
+							hide_browser();
 						} catch (IOException | ParseException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -380,17 +382,40 @@ public class Browser_CharClassif {
 
 		}
 		switch_pane_hide_browser(false);
+		try {
+			loadLastPaneLayout();
+		} catch (ParseException | IOException | URISyntaxException e) {
+			e.printStackTrace();
+		}
 	}
 
 
 
 	@FXML void hide_browser() throws IOException, ParseException {
-		parent.show_table();
+		ExternalSearchServices.closingBrowser();
+		String copyLastLayout = String.valueOf(lastPaneLayout);
+		paneSmall();
+		lastPaneLayout = String.valueOf(copyLastLayout);
+		switch_pane_hide_browser(true);
 	}
 
 	public void switch_pane_hide_browser(boolean bool) {
 		toolBar.setVisible(!bool);
 		parent.tableController.tableGrid.setVisible(bool);
+	}
+
+	private void loadLastPaneLayout() throws ParseException, IOException, URISyntaxException {
+		if(lastPaneLayout!=null){
+			if(lastPaneLayout.equals("NEW")){
+				paneNew();
+			}else if(lastPaneLayout.equals("SMALL")){
+				paneSmall();
+			}else if(lastPaneLayout.equals("BIG")){
+				paneBig();
+			}else if(lastPaneLayout.equals("EXTERNAL")){
+				externalBrowser();
+			}
+		}
 	}
 
 
@@ -446,6 +471,7 @@ public class Browser_CharClassif {
 	}
 
 	@FXML void paneSmall(){
+		lastPaneLayout="SMALL";
 		if(!parent.leftAnchor.getChildren().stream().anyMatch(e->e.equals(toolBar))){
 			parent.leftAnchor.getChildren().add(toolBar);
 			parent.leftAnchor.setLeftAnchor(toolBar, 0.0);
@@ -462,6 +488,7 @@ public class Browser_CharClassif {
 		parent.setBottomRegionColumnSpans(false);
 	}
 	@FXML void paneBig(){
+		lastPaneLayout="BIG";
 		if(!parent.leftAnchor.getChildren().stream().anyMatch(e->e.equals(toolBar))){
 			parent.leftAnchor.getChildren().add(toolBar);
 			parent.leftAnchor.setLeftAnchor(toolBar, 0.0);
@@ -502,6 +529,7 @@ public class Browser_CharClassif {
 			@Override
 			public void handle(MouseEvent event) {
 				paneSmall();
+				lastPaneLayout="BIG";
 				secondaryStage.close();
 				switch_pane_hide_browser(true);
 			}
@@ -558,7 +586,12 @@ public class Browser_CharClassif {
 			@Override
 			public void handle(KeyEvent event) {
 				if(event.getCode().equals(KeyCode.ESCAPE)){
-					secondaryStage.close();
+					try {
+						System.out.println("Click ESCAPE");
+						hide_browser();
+					} catch (IOException | ParseException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});
@@ -570,6 +603,7 @@ public class Browser_CharClassif {
 	}
 
 	@FXML void externalBrowser() throws IOException, URISyntaxException, ParseException {
+		lastPaneLayout="EXTERNAL";
 		Desktop.getDesktop().browse(new URL(browser.toNode().getEngine().getLocation()+(showingPdf.get()?"#page="+pageField.getText():"")).toURI());
 		parent.externalBrowserUrlProperty.setValue(browser.toNode().getEngine().getLocation()+(showingPdf.get()?"#page="+pageField.getText():""));
 		//hide_browser();

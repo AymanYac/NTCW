@@ -20,6 +20,7 @@ public class CharClassifProposer {
 	
 	private static HashMap<Integer,Pair<CaracteristicValue,String>> buttonToData = new HashMap<Integer,Pair<CaracteristicValue,String>>();
 	private static HashMap<String,ArrayList<CaracteristicValue>> customValues = new HashMap<String,ArrayList<CaracteristicValue>>();
+	public boolean selectionFromBrowser =false;
 
 	public CharClassifProposer(Char_description parent) {
 		CharClassifProposer.parent = parent;
@@ -118,7 +119,7 @@ public class CharClassifProposer {
 					//result.setStatus("Applied");
 					CaracteristicValue sc = result.getActionValue().shallowCopy(parent.account);
 					sc.setSource(DataInputMethods.SEMI_CHAR_DESC);
-					CharValuesLoader.updateRuntimeDataForItem(row,segment,result.getSourceChar().getCharacteristic_id(),sc);
+					CharValuesLoader.updateRuntimeDataForItem(row,segment,result.getSourceChar().getCharacteristic_id(),sc.shallowCopy(parent.account));
 					CharDescriptionExportServices.addItemCharDataToPush(row, segment, charId);
 					CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
 					clearPropButtons();
@@ -155,7 +156,7 @@ public class CharClassifProposer {
 					btn.setOpacity(1.0);
 					btn.setOnAction((event) -> {
 						parent.tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(row->{
-							CharValuesLoader.updateRuntimeDataForItem(row,row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id(),copy);
+							CharValuesLoader.updateRuntimeDataForItem(row,row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id(),copy.shallowCopy(parent.account));
 							CharDescriptionExportServices.addItemCharDataToPush(row, row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id());
 						});
 						CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
@@ -193,6 +194,7 @@ public class CharClassifProposer {
 	}
 
 	public String getUserSelectedText() {
+		selectionFromBrowser = false;
 		String selectedText = "";
 		selectedText = parent.ld.getSelectedText();
 		if(selectedText.length()==0) {
@@ -204,12 +206,21 @@ public class CharClassifProposer {
 				}
 			}
 		}
+		try{
+			String browserSelection = (String) parent.browserController.browser.nodeValue.getEngine().executeScript("window.getSelection().toString()");
+			if (browserSelection != null && browserSelection.length() > 0) {
+				selectedText = browserSelection;
+				selectionFromBrowser = true;
+			}
+		}catch (Exception V){
 
+		}
 		try{
 			if(parent.browserController.showingPdf.getValue()) {
 				String pdfSelection = parent.browserController.iceController.getDocumentViewController().getSelectedText();
 				if (pdfSelection != null && pdfSelection.length() > 0) {
 					selectedText = pdfSelection;
+					selectionFromBrowser = true;
 				}
 			}
 

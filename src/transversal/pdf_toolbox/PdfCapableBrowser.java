@@ -4,10 +4,10 @@ import controllers.paneControllers.Browser_CharClassif;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
-import javafx.scene.Parent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
+import service.ExternalSearchServices;
 
 import java.awt.*;
 import java.io.*;
@@ -276,11 +276,11 @@ public class PdfCapableBrowser {
                 try {
                     if ((address.toURL() + "").indexOf(".pdf") > -1)
                     {
-
+                        ExternalSearchServices.externalPdfViewing(address.toURL().toString());
                         if(FORCE_PDF_IN_VIEWER){
                             parent.icePdfBench(address.toURL());
                         }else{
-                            parent.parent.urlLink.setText(address.toURL().toString());
+                            //parent.parent.urlLink.setText(address.toURL().toString());
                             latestPDFLink=address.toURL().toString();
                             d.browse(address);
                         }
@@ -291,6 +291,7 @@ public class PdfCapableBrowser {
                         //d.browse(address);
                         //parent.browserUrlProperty.setValue(address.toURL().toString());
                     }else{
+                        ExternalSearchServices.browsingLink(address.toURL().toString());
                         parent.showingPdf.setValue(false);
                     }
                 } catch (IOException e) {

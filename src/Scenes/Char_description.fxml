@@ -183,6 +183,7 @@
                      <font>
                         <Font name="System Bold" size="9.0" />
                      </font></TextField>
+                  <Button fx:id="clearLinkButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#clearLink" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_delete.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true;" />
                   <Separator maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" orientation="VERTICAL" prefHeight="15.0" prefWidth="15.0" />
                   <ToggleButton fx:id="ruleButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_rules.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
                   <ToggleButton fx:id="imageButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#search_image" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_image_search2.png&quot;);" stylesheets="@../Styles/ButtonTool.css" text="Button" />
