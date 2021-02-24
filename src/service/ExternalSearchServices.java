@@ -217,7 +217,7 @@ public class ExternalSearchServices {
                                 searchSentence.set(searchSentence + " " + sourceValue.getUserLanguageValue());
                             }
                         } else {
-                            searchSentence.set(searchSentence + " " + sourceValue.getDisplayValue(false, false));
+                            searchSentence.set(searchSentence + " " + sourceValue.getRawDisplay());
                         }
                     }
                     catch (Exception V){
@@ -229,7 +229,7 @@ public class ExternalSearchServices {
                 }
                 else{
                     try{
-                        searchSentence.set(searchSentence +" "+ caracMatch.getCharacteristic_name()+" "+sourceValue.getDisplayValue(false,false));
+                        searchSentence.set(searchSentence +" "+ caracMatch.getCharacteristic_name()+" "+sourceValue.getRawDisplay());
                     }catch (Exception V){
 
                     }
@@ -590,23 +590,6 @@ public class ExternalSearchServices {
         }
     }
 
-    private static String get_lien_article_carac() {
-        String segmentID = FxUtilTest.getComboBoxValue(parent.classCombo).getClassSegment();
-        int active_char_index = Math.floorMod(parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(segmentID).size());
-        ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(segmentID).get(active_char_index);
-        CharDescriptionRow item = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
-        try {
-            return item.getData(segmentID).get(activeChar.getCharacteristic_id()).getUrl();
-        }catch (Exception V){
-            return null;
-        }
-
-    }
-
-    private static void set_lien_article_carac(String link) {
-        parent.linkUrlToItem(link);
-    }
-
     public static void refreshUrlAfterCaracChange(Char_description parent){
         refreshUrlAfterElemChange(parent);
     }
@@ -640,6 +623,7 @@ public class ExternalSearchServices {
 
     public static void closingBrowser(){
         browsingLink(null);
+        refreshUrlAfterElemChange(parent);
     }
 
     public static void manualValueInput(){
@@ -664,6 +648,7 @@ public class ExternalSearchServices {
     public static void clearingURL(){
         set_lien_article_carac(null);
         lien_actif=null;
+        refreshUrlAfterElemChange(parent);
     }
 
 
@@ -678,5 +663,22 @@ public class ExternalSearchServices {
 
     private static void urlFieldColor(String color) {
         parent.urlLink.setStyle("-fx-text-inner-color: "+color+";");
+    }
+
+    private static String get_lien_article_carac() {
+        String segmentID = FxUtilTest.getComboBoxValue(parent.classCombo).getClassSegment();
+        int active_char_index = Math.floorMod(parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(segmentID).size());
+        ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(segmentID).get(active_char_index);
+        CharDescriptionRow item = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+        try {
+            return item.getData(segmentID).get(activeChar.getCharacteristic_id()).getUrl();
+        }catch (Exception V){
+            return null;
+        }
+
+    }
+
+    private static void set_lien_article_carac(String link) {
+        parent.linkUrlToItem(link);
     }
 }

@@ -119,7 +119,7 @@ public class CharClassifProposer {
 					//result.setStatus("Applied");
 					CaracteristicValue sc = result.getActionValue().shallowCopy(parent.account);
 					sc.setSource(DataInputMethods.SEMI_CHAR_DESC);
-					CharValuesLoader.updateRuntimeDataForItem(row,segment,result.getSourceChar().getCharacteristic_id(),sc.shallowCopy(parent.account));
+					CharValuesLoader.updateRuntimeDataForItem(row,segment,result.getSourceChar().getCharacteristic_id(),sc);
 					CharDescriptionExportServices.addItemCharDataToPush(row, segment, charId);
 					CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
 					clearPropButtons();

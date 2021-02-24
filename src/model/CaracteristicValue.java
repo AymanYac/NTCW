@@ -512,6 +512,8 @@ public class CaracteristicValue implements Serializable {
 
     public CaracteristicValue shallowCopy(UserAccount account) {
 		CaracteristicValue tmp = new CaracteristicValue();
+		tmp.setDescriptionTime(Timestamp.valueOf(LocalDateTime.now()));
+		tmp.setManually_Reviewed(getManually_Reviewed());
 		tmp.setValue_id(Tools.generate_uuid());
 		tmp.setDataLanguageValue(getDataLanguageValue());
 		tmp.setUserLanguageValue(getUserLanguageValue());
@@ -519,7 +521,9 @@ public class CaracteristicValue implements Serializable {
 		tmp.setMax_value(getMax_value());
 		tmp.setMin_value(getMin_value());
 		tmp.setUom_id(getUom_id());
-		tmp.setUrl(getUrl());
+		//tmp.setUrl(getUrl());
+		tmp.setSource(getSource());
+		tmp.setRule_id(getRule_id());
 		tmp.setParentChar(parentChar);
 		if(account!=null){
 			tmp.setAuthor(account.getUser_id());
@@ -537,5 +541,13 @@ public class CaracteristicValue implements Serializable {
 
 	public ClassCaracteristic getParentChar() {
 		return parentChar;
+	}
+
+	public String getRawDisplay() {
+		String ret = getDisplayValue(false, false);
+		if(ret.equals("*UNKNOWN*")){
+			return null;
+		}
+		return ret;
 	}
 }

@@ -34,6 +34,8 @@ import org.icepdf.ri.common.SwingViewBuilder;
 import org.icepdf.ri.common.views.DocumentViewControllerImpl;
 import org.icepdf.ri.util.PropertiesManager;
 import org.json.simple.parser.ParseException;
+import service.CharPatternServices;
+import service.CharValuesLoader;
 import service.ExternalSearchServices;
 import service.DocumentSearchTask;
 import transversal.pdf_toolbox.PdfCapableBrowser;
@@ -529,7 +531,7 @@ public class Browser_CharClassif {
 			@Override
 			public void handle(MouseEvent event) {
 				paneSmall();
-				lastPaneLayout="BIG";
+				lastPaneLayout="NEW";
 				secondaryStage.close();
 				switch_pane_hide_browser(true);
 			}
@@ -591,6 +593,22 @@ public class Browser_CharClassif {
 						hide_browser();
 					} catch (IOException | ParseException e) {
 						e.printStackTrace();
+					}
+				}
+				if(event.getCode().equals(KeyCode.ENTER)){
+					if(event.isControlDown()){
+						System.out.println("CTRL+ENTER");
+						((Stage)parent.charButton.getScene().getWindow()).toFront();
+						int active_char_index = Math.floorMod(parent.tableController.selected_col, CharValuesLoader.active_characteristics.get(parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
+						try{
+							parent.proposer.clearPropButtons();
+							String selectedText=parent.proposer.getUserSelectedText();
+							CharPatternServices.scanSelectionForPatternDetection(parent,
+									CharValuesLoader.active_characteristics.get(parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
+											.get(active_char_index),selectedText);
+						}catch (Exception V){
+							V.printStackTrace(System.err);
+						}
 					}
 				}
 			}

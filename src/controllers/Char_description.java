@@ -479,7 +479,11 @@ public class Char_description {
 			}
 			
 			if((!this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) && account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
-				tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()+1);
+				if(this.account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)){
+					tableController.tableGrid.getSelectionModel().select(tableController.tableGrid.getSelectionModel().getSelectedIndex()+1);
+				}else{
+					tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()+1);
+				}
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
@@ -489,7 +493,11 @@ public class Char_description {
 				});
 			}
 			if((!this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) && account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
-				tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()-1);
+				if(this.account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)){
+					tableController.tableGrid.getSelectionModel().select(tableController.tableGrid.getSelectionModel().getSelectedIndex()-1);
+				}else{
+					tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()-1);
+				}
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
@@ -858,7 +866,11 @@ public class Char_description {
 
 	private void reassignPreviousValue() {
 		if(lastInputValue!=null){
-			AssignValueOnSelectedItems(lastInputValue);
+			CaracteristicValue val = lastInputValue.shallowCopy(account);
+			val.setSource(DataInputMethods.MANUAL);
+			val.setRule_id(null);
+			AssignValueOnSelectedItems(val);
+			ExternalSearchServices.manualValueInput();
 			if(!charButton.isSelected()){
 				int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
 				tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
@@ -873,11 +885,28 @@ public class Char_description {
 				String itemClass = row.getClass_segment_string().split("&&&")[0];
 				int	selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(itemClass).size());
 				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col);
-				CaracteristicValue val = row.getData(itemClass).get(active_char.getCharacteristic_id()).shallowCopy(account);
-				val.setUrl(URL);
-				map.put(row.getItem_id(),val);
+				CaracteristicValue val;
+				try{
+					val = row.getData(itemClass).get(active_char.getCharacteristic_id()).shallowCopy(account);
+					val.setSource(DataInputMethods.MANUAL);
+					val.setRule_id(null);
+					val.setUrl(URL);
+					map.put(row.getItem_id(),val);
+				}catch (Exception V){
+					if(URL!=null && URL.length()>0){
+						val = new CaracteristicValue();
+						val.setAuthor(account.getUser_id());
+						val.setSource(DataInputMethods.MANUAL);
+						val.setRule_id(null);
+						val.setUrl(URL);
+						map.put(row.getItem_id(),val);
+					}
+
+				}
+
 			});
 			AssignValueOnSelectedItems(map);
+			ExternalSearchServices.refreshUrlAfterElemChange(this);
 		}
 	}
 
@@ -1218,7 +1247,9 @@ public class Char_description {
 		urlLink.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				ExternalSearchServices.editingURL(newValue);
+				if(urlLink.isFocused()){
+					ExternalSearchServices.editingURL(newValue);
+				}
 			}
 		});
 		
@@ -2042,7 +2073,7 @@ public class Char_description {
 
 						});*/
 		tableController.tableGrid.getSelectionModel().getSelectedItems().parallelStream().forEach(r->{
-			CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getClassSegment(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id(),map.get(r.getItem_id()).shallowCopy(account));
+			CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getClassSegment(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id(),map.get(r.getItem_id()));
 			CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id());
 		});
 		new HashSet<>(map.values()).forEach(value->{
@@ -2121,8 +2152,10 @@ public class Char_description {
 		}else{
 			pattern_value.setRule_id(ruleString);
 			rule_field.setText(ruleString);
-			AssignValueOnSelectedItems(pattern_value);
+			CaracteristicValue tmp = pattern_value.shallowCopy(account);
 			if(!proposer.selectionFromBrowser){
+				tmp.setSource(DataInputMethods.SEMI_CHAR_DESC);
+				AssignValueOnSelectedItems(tmp);
 				new Thread(()->{
 					CharPatternServices.applyItemRule(this);
 					CharDescriptionExportServices.flushItemDataToDB(account,null);
@@ -2133,6 +2166,11 @@ public class Char_description {
 						}
 					});
 				}).start();
+			}else{
+				tmp.setSource(DataInputMethods.MANUAL);
+				tmp.setRule_id(null);
+				AssignValueOnSelectedItems(tmp);
+				ExternalSearchServices.parsingValueFromURL();
 			}
 		}
 

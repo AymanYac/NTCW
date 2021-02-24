@@ -1181,7 +1181,7 @@ public class WordUtils {
 
 			return host+path;
 		} catch (MalformedURLException e) {
-			return null;
+			return url;
 		}
 	}
 
