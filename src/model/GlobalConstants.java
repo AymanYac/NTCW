@@ -65,9 +65,9 @@ public class GlobalConstants {
 	public static final boolean MANUAL_CLASSIF_PERSIST = false;
 	public static final boolean REDIRECT_OUTSTREAM = true;
 	public static final String TOOL_VERSION = "5.0.4";
-	public static final String HOST_ADDRESS = "localhost";
+	//public static final String HOST_ADDRESS = "localhost";
 	//public static final String HOST_ADDRESS = "91.167.182.87";//"82.66.148.154";//"88.190.148.154";
-	//public static final String HOST_ADDRESS = "192.168.0.22";
+	public static final String HOST_ADDRESS = "192.168.0.22";
 
 	
 	public static final Integer RULE_DISPLAY_FONT_SIZE = 12;
