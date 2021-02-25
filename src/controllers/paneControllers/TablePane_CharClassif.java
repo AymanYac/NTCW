@@ -6,16 +6,22 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
 import model.*;
 import org.json.simple.parser.ParseException;
@@ -37,6 +43,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class TablePane_CharClassif {
@@ -823,6 +830,56 @@ public class TablePane_CharClassif {
         	for(String colname : this.collapsedViewColumns) {
             	TableColumn tmp = new TableColumn<>(colname);
             	tmp.setCellValueFactory(new PropertyValueFactory<>(colname.replace(" ", "")));
+            	if(colname.equals("Completion Status")){
+            		tmp.setComparator(new Comparator() {
+						@Override
+						public int compare(Object o1, Object o2) {
+							ObservableList<Node> children1 = ((StackPane) o1).getChildren();
+							AtomicInteger ret1= new AtomicInteger();
+							ret1.set(0);
+							children1.forEach(node->{
+								if(node instanceof Circle){
+									Paint fill = ((Circle) node).getFill();
+									if(fill.toString().contains("bd392")){
+										//empty=
+										ret1.addAndGet(-100);
+									}else{
+										//full
+										ret1.addAndGet(+100);
+									}
+								}else if(node instanceof Text){
+									if(((Text) node).getText().contains("*")){
+										//has unknown
+										System.out.println(((Text) node).getText());
+										ret1.addAndGet(-10);
+									};
+								}
+							});
+							ObservableList<Node> children2 = ((StackPane) o2).getChildren();
+							AtomicInteger ret2= new AtomicInteger();
+							ret2.set(0);
+							children2.forEach(node->{
+								if(node instanceof Circle){
+									Paint fill = ((Circle) node).getFill();
+									if(fill.toString().contains("bd392")){
+										//empty=
+										ret2.addAndGet(-100);
+									}else{
+										//full
+										ret2.addAndGet(+100);
+									}
+								}else if(node instanceof Text){
+									if(((Text) node).getText().contains("*")){
+										//has unknown
+										System.out.println(((Text) node).getText());
+										ret2.addAndGet(-10);
+									};
+								}
+							});
+							return Integer.compare(ret1.get(),ret2.get());
+						}
+					});
+				}
                 tmp.setResizable(false);
                 tmp.setVisible(false);
                 this.tableGrid.getColumns().add(tmp);

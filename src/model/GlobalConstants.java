@@ -47,7 +47,7 @@ public class GlobalConstants {
 	public static final double COLLAPSED_COLOMNS_VISIBLE_WIDTH_MULTIPLIER = 0.2;
 	public static final String OUT_LOG = "ntcw_out.log.log";
 	public static final String ERR_LOG = "ntcw_err.log.log";
-	public static final boolean OPEN_LINKS_IN_EXTERNAL = true;
+	public static final boolean OPEN_LINKS_IN_EXTERNAL = false;
 	public static final boolean TURN_OFF_IMAGE_SEARCH_FOR_DESCRIPTION = true;
 	public static final boolean DESCRIPTION_RESTORE_PERSISTED_ITEM = true;
 
@@ -64,10 +64,10 @@ public class GlobalConstants {
 	public static final int SEARCH_WORD_LARGE = 3;
 	public static final boolean MANUAL_CLASSIF_PERSIST = false;
 	public static final boolean REDIRECT_OUTSTREAM = true;
-	public static final String TOOL_VERSION = "5.0.3";
-	//public static final String HOST_ADDRESS = "localhost";
+	public static final String TOOL_VERSION = "5.0.4";
+	public static final String HOST_ADDRESS = "localhost";
 	//public static final String HOST_ADDRESS = "91.167.182.87";//"82.66.148.154";//"88.190.148.154";
-	public static final String HOST_ADDRESS = "192.168.0.22";
+	//public static final String HOST_ADDRESS = "192.168.0.22";
 
 	
 	public static final Integer RULE_DISPLAY_FONT_SIZE = 12;

@@ -804,7 +804,7 @@ public class Char_description {
 		}
 
 		if(account.PRESSED_KEYBOARD.get(KeyCode.O) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
-			if(GlobalConstants.OPEN_LINKS_IN_EXTERNAL){
+			if(GlobalConstants.OPEN_LINKS_IN_EXTERNAL || account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)){
 				Desktop.getDesktop().browse(new URL(urlLink.getText()).toURI());
 			}else{
 				try {
@@ -816,7 +816,7 @@ public class Char_description {
 						load_browser_pane();
 						browserController.browser.FORCE_PDF_IN_VIEWER = true;
 						browserController.setContainerWindow();
-						browserController.icePdfBench(new URL(urlLink.getText()));
+						browserController.browser.loadPage(urlLink.getText());
 					} catch (Exception L) {
 						L.printStackTrace(System.err);
 					}
