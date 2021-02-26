@@ -599,6 +599,7 @@ public class Browser_CharClassif {
 					if(event.isControlDown()){
 						System.out.println("CTRL+ENTER");
 						((Stage)parent.charButton.getScene().getWindow()).toFront();
+						parent.value_field.requestFocus();
 						int active_char_index = Math.floorMod(parent.tableController.selected_col, CharValuesLoader.active_characteristics.get(parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
 						try{
 							parent.proposer.clearPropButtons();

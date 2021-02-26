@@ -546,7 +546,7 @@ public class CaracteristicValue implements Serializable {
 	public String getRawDisplay() {
 		String ret = getDisplayValue(false, false);
 		if(ret.equals("*UNKNOWN*")){
-			return null;
+			return "";
 		}
 		return ret;
 	}

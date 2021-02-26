@@ -131,7 +131,6 @@ public class TablePane_CharClassif {
 			for (int ix = 0; ix < SortColumns.size(); ix++) {
 				for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getColumns()) {
 					if (c.getText().equals(SortColumns.get(ix))) {
-						System.out.print(SortColumns.get(ix)+" ");
 						tableGrid.getSortOrder().add(c);
 						c.setSortType(TableColumn.SortType.valueOf(SortDirs.get(ix)));
 					}
@@ -850,7 +849,6 @@ public class TablePane_CharClassif {
 								}else if(node instanceof Text){
 									if(((Text) node).getText().contains("*")){
 										//has unknown
-										System.out.println(((Text) node).getText());
 										ret1.addAndGet(-10);
 									};
 								}
@@ -871,7 +869,6 @@ public class TablePane_CharClassif {
 								}else if(node instanceof Text){
 									if(((Text) node).getText().contains("*")){
 										//has unknown
-										System.out.println(((Text) node).getText());
 										ret2.addAndGet(-10);
 									};
 								}
@@ -1141,23 +1138,23 @@ public class TablePane_CharClassif {
 		this.tableGrid.getSelectionModel().select(0);
 	}
 
-	public void fireScrollNBUp() {
+	public void fireScrollNBUp(Boolean shiftDown) {
 		try {
 			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
+			String activeClass = FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment();
+			ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(activeClass).get(active_char_index);
 			int min = (int) Collections.min(tableGrid.getSelectionModel().getSelectedIndices());
 			CharDescriptionRow thisItem = ((CharDescriptionRow) tableGrid.getItems().get(min));
 			CharDescriptionRow previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
 			String data_this = "";
 			String data_previous="";
 			try{
-				data_this = thisItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
+				data_this = thisItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
 			}catch (Exception V){
-
 			}
 			try{
-				data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
+				data_previous = previousItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
 			}catch (Exception V){
-
 			}
 
 			if(data_this.length()>0  && data_previous.length()>0) {
@@ -1166,12 +1163,15 @@ public class TablePane_CharClassif {
 					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
 					data_previous="";
 					try{
-						data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
+						data_previous = previousItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
 					}catch (Exception V){
-
 					}
 				}
-				tableGrid.getSelectionModel().clearAndSelect(Math.max(0,min));
+				if(shiftDown){
+					tableGrid.getSelectionModel().selectRange(Math.max(0,min),(int) Collections.min(tableGrid.getSelectionModel().getSelectedIndices()));
+				}else{
+					tableGrid.getSelectionModel().clearAndSelect(Math.max(0,min));
+				}
 				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 			}else {
 				while(! ( data_previous.length()>0 ) ) {
@@ -1179,39 +1179,40 @@ public class TablePane_CharClassif {
 					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
 					data_previous="";
 					try{
-						data_previous = previousItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
+						data_previous = previousItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
 					}catch (Exception V){
-
 					}
 				}
-				tableGrid.getSelectionModel().clearAndSelect(Integer.max(min-1,0));
+				if(shiftDown){
+					tableGrid.getSelectionModel().selectRange(Math.max(0,min),(int) Collections.min(tableGrid.getSelectionModel().getSelectedIndices()));
+				}else{
+					tableGrid.getSelectionModel().clearAndSelect(Math.max(0,min-1));
+				}
 				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 
 			}
 		}catch(Exception V) {
-
 		}
 	}
 
 
-	public void fireScrollNBDown() {
-
+	public void fireScrollNBDown(Boolean shiftDown) {
 		try {
 			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
+			String activeClass = FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment();
+			ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(activeClass).get(active_char_index);
 			int max = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
 			CharDescriptionRow thisItem = ((CharDescriptionRow) tableGrid.getItems().get(max));
 			CharDescriptionRow nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
 			String data_this = "";
 			String data_next="";
 			try{
-				data_this = thisItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
+				data_this = thisItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
 			}catch (Exception V){
-
 			}
 			try{
-				data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
+				data_next = nextItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
 			}catch (Exception V){
-
 			}
 
 			if(data_this.length()>0  && data_next.length()>0) {
@@ -1220,12 +1221,15 @@ public class TablePane_CharClassif {
 					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
 					data_next="";
 					try{
-						data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
+						data_next = nextItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
 					}catch (Exception V){
-
 					}
 				}
-				tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max));
+				if(shiftDown){
+					tableGrid.getSelectionModel().selectRange((int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices()),Math.min(tableGrid.getItems().size(),max+1));
+				}else{
+					tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max));
+				}
 				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 			}else {
 				while(! ( data_next.length()>0 ) ) {
@@ -1233,17 +1237,19 @@ public class TablePane_CharClassif {
 					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
 					data_next="";
 					try{
-						data_next = nextItem.getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(active_char_index)).getDisplayValue(Parent);
+						data_next = nextItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
 					}catch (Exception V){
-
 					}
 				}
-				tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max+1));
+				if(shiftDown){
+					tableGrid.getSelectionModel().selectRange((int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices()),Math.min(tableGrid.getItems().size(),max+1));
+				}else{
+					tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max+1));
+				}
 				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
 
 			}
 		}catch(Exception V) {
-			
 		}
 	}
 

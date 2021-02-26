@@ -152,7 +152,7 @@ public class CharValuesLoader {
 		tmp.setSource(DataInputMethods.MANUAL);
 		tmp.setAuthor(parent.account.getUser_id());
 		tmp.setManually_Reviewed(true);
-		parent.AssignValueOnSelectedItems(tmp);
+		parent.assignValueOnSelectedItems(tmp);
 		ExternalSearchServices.manualValueInput();
 		parent.lastInputValue = tmp.shallowCopy(parent.account);
 
