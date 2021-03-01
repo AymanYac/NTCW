@@ -900,7 +900,9 @@ public class Char_description {
 				CaracteristicValue val;
 				try{
 					val = row.getData(itemClass).get(active_char.getCharacteristic_id()).shallowCopy(account);
-					val.setSource(DataInputMethods.MANUAL);
+					if( (URL!=null && URL.length()>0) || (val.getRawDisplay()!=null && val.getRawDisplay().length()>0) ){
+						val.setSource(DataInputMethods.MANUAL);
+					}
 					val.setRule_id(null);
 					val.setUrl(URL);
 					map.put(row.getItem_id(),val);

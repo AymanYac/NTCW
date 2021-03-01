@@ -95,6 +95,7 @@ public class Browser_CharClassif {
 	private int searchHitIndex=0;
 	private SwingNode iceContainer;
 	private String lastPaneLayout;
+	private String beforeExternalPaneLayout;
 
 
 	@FXML void initialize() {
@@ -395,9 +396,9 @@ public class Browser_CharClassif {
 
 	@FXML void hide_browser() throws IOException, ParseException {
 		ExternalSearchServices.closingBrowser();
-		String copyLastLayout = String.valueOf(lastPaneLayout);
+		String copyLastLayout = lastPaneLayout;
 		paneSmall();
-		lastPaneLayout = String.valueOf(copyLastLayout);
+		lastPaneLayout = copyLastLayout;
 		switch_pane_hide_browser(true);
 	}
 
@@ -415,6 +416,15 @@ public class Browser_CharClassif {
 			}else if(lastPaneLayout.equals("BIG")){
 				paneBig();
 			}else if(lastPaneLayout.equals("EXTERNAL")){
+				if(beforeExternalPaneLayout !=null){
+					if(beforeExternalPaneLayout.equals("NEW")){
+						paneNew();
+					}else if(beforeExternalPaneLayout.equals("SMALL")){
+						paneSmall();
+					}else if(beforeExternalPaneLayout.equals("BIG")){
+						paneBig();
+					}
+				}
 				externalBrowser();
 			}
 		}
@@ -508,7 +518,7 @@ public class Browser_CharClassif {
 	}
 	@FXML void paneNew(){
 		paneSmall();
-
+		lastPaneLayout="NEW";
 		GridPane secondaryLayout = new GridPane();
 		secondaryLayout.setMinWidth(GridPane.USE_COMPUTED_SIZE);
 		secondaryLayout.setMaxWidth(GridPane.USE_COMPUTED_SIZE);
@@ -530,6 +540,7 @@ public class Browser_CharClassif {
 		close.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
+				ExternalSearchServices.closingBrowser();
 				paneSmall();
 				lastPaneLayout="NEW";
 				secondaryStage.close();
@@ -589,7 +600,6 @@ public class Browser_CharClassif {
 			public void handle(KeyEvent event) {
 				if(event.getCode().equals(KeyCode.ESCAPE)){
 					try {
-						System.out.println("Click ESCAPE");
 						hide_browser();
 					} catch (IOException | ParseException e) {
 						e.printStackTrace();
@@ -622,11 +632,11 @@ public class Browser_CharClassif {
 	}
 
 	@FXML void externalBrowser() throws IOException, URISyntaxException, ParseException {
+		this.beforeExternalPaneLayout =lastPaneLayout;
 		lastPaneLayout="EXTERNAL";
 		Desktop.getDesktop().browse(new URL(browser.toNode().getEngine().getLocation()+(showingPdf.get()?"#page="+pageField.getText():"")).toURI());
 		parent.externalBrowserUrlProperty.setValue(browser.toNode().getEngine().getLocation()+(showingPdf.get()?"#page="+pageField.getText():""));
 		//hide_browser();
-
 	}
 
 }
