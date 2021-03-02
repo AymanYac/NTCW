@@ -434,6 +434,9 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.O)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.O, pressed);
 		}
+		if(keyEvent.getCode().equals(KeyCode.U)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.U, pressed);
+		}
 		if(keyEvent.getCode().equals(KeyCode.W)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.W, pressed);
 		}
@@ -669,6 +672,9 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.O)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.O, pressed);
 		}
+		if(keyEvent.getCode().equals(KeyCode.U)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.U, pressed);
+		}
 		if(keyEvent.getCode().equals(KeyCode.W)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.W, pressed);
 		}
@@ -720,7 +726,7 @@ public class Char_description {
 		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.ESCAPE)) {
 			
-			
+			ExternalSearchServices.clearingURL();
 			try {
 				imagePaneController.imagePaneClose();
 			}catch(Exception V) {
@@ -870,6 +876,13 @@ public class Char_description {
 
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
 			tableController.fireScrollNBUp(keyEvent.isShiftDown());
+		}
+
+		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.U)){
+			tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::switchUnknownValues);
+			refresh_ui_display();
+			tableController.tableGrid.refresh();
+			CharDescriptionExportServices.flushItemDataToDB(account,null);
 		}
 
 		return;
@@ -1178,7 +1191,7 @@ public class Char_description {
 		try {
 			browserController.switch_pane_hide_browser(true);
 		}catch(Exception V) {
-			V.printStackTrace(System.err);
+
 		}
 		
 		try {

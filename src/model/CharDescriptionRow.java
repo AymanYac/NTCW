@@ -437,7 +437,7 @@ public class CharDescriptionRow {
 
 	public void clearUnknownValues(){
 		String itemClass = getClass_segment_string().split("&&&")[0];
-		getData(getClass_segment_string().split("&&&")[0]).entrySet()
+		getData(itemClass).entrySet()
 				.removeIf(e->e.getValue()!=null && e.getValue().getDisplayValue(false,false).equals("*UNKNOWN*"));
 		CharDescriptionExportServices.addItemCharDataToPush(this);
 	}
@@ -454,5 +454,19 @@ public class CharDescriptionRow {
 			}
 		});
 		CharDescriptionExportServices.addItemCharDataToPush(this);
+	}
+
+    public void switchUnknownValues() {
+		if(hasClearValue()){
+			markUnknownClearValues();
+		}else{
+			clearUnknownValues();
+		}
+    }
+
+	private boolean hasClearValue() {
+		String itemClass = getClass_segment_string().split("&&&")[0];
+		return CharValuesLoader.active_characteristics.get(itemClass).stream().anyMatch(
+				c -> !(getData(itemClass).get(c.getCharacteristic_id()) != null && getData(itemClass).get(c.getCharacteristic_id()).getParentChar() != null && getData(itemClass).get(c.getCharacteristic_id()).getDisplayValue(false,false).length() > 0));
 	}
 }
