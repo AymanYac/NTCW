@@ -139,7 +139,7 @@ public class Char_description {
 	
 
 
-	private String lastRightPane="";
+	public String lastRightPane="";
 
 
 	private ImagePane_CharClassif imagePaneController;
@@ -684,20 +684,14 @@ public class Char_description {
 		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.SHIFT) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
 			this.lastRightPane="";
-			try {
-				if(this.charButton.isSelected()) {
-					this.lastRightPane="CHARS";
-				}
-			}catch(Exception V) {
-				
+			if(this.charButton.isSelected()) {
+				this.lastRightPane="CHARS";
 			}
-			
-			try {
-				if(this.imageButton.isSelected()) {
-					this.lastRightPane="IMAGES";
-				}
-			}catch(Exception V) {
-				
+			if(this.imageButton.isSelected()) {
+				this.lastRightPane="IMAGES";
+			}
+			if(this.ruleButton.isSelected()) {
+				this.lastRightPane="RULES";
 			}
 
 			if(!GlobalConstants.TURN_OFF_IMAGE_SEARCH_FOR_DESCRIPTION){
@@ -743,30 +737,58 @@ public class Char_description {
 
 			}
 
-			try {
-					//We clicked escape to close search
-					try {
-						show_table();
-					}catch(Exception V) {
-						
-					}
-					try{
-						browserController.secondaryStage.close();
-					}catch (Exception V){
+			boolean closingBrowser=false;
+			try{
+				closingBrowser=browserController.secondaryStage.isShowing();
 
-					}
-					if(this.lastRightPane.equals("CHARS")) {
-						charButton.setSelected(true);
-						load_char_pane();
-					}
-					if(this.lastRightPane.equals("IMAGES")) {
-						imageButton.setSelected(true);
-						load_image_pane(true);
-					}
-					this.lastRightPane="";
+			}catch (Exception V){
+
+			}
+			try{
+				closingBrowser=closingBrowser || browserController.showingPdf.get();
+
+			}catch (Exception V){
+
+			}
+			try{
+				closingBrowser=closingBrowser || browserController.toolBar.isVisible();
+
+			}catch (Exception V){
+
+			}
+			//We clicked escape to close search
+			try {
+				show_table();
 			}catch(Exception V) {
+
+			}
+
+
+			try{
+				browserController.secondaryStage.close();
+			}catch (Exception V){
+
+			}
+			ruleButton.setSelected(false);
+			charButton.setSelected(false);
+			imageButton.setSelected(false);
+			if(closingBrowser){
+				if(this.lastRightPane.equals("CHARS")) {
+					charButton.setSelected(true);
+					view_chars();
+				}
+				if(this.lastRightPane.equals("IMAGES")) {
+					imageButton.setSelected(true);
+					search_image();
+				}
+				if(this.lastRightPane.equals("RULES")) {
+					ruleButton.setSelected(true);
+					view_rules();
+				}
+			}else{
 				this.lastRightPane="";
 			}
+
 			
 			
 			
@@ -803,7 +825,7 @@ public class Char_description {
 				@Override
 				public void run() {
 					try {
-						load_rule_pane();
+						 load_rule_pane();
 					} catch (IOException | SQLException | ClassNotFoundException e) {
 						e.printStackTrace();
 					}
@@ -879,7 +901,7 @@ public class Char_description {
 		}
 
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.U)){
-			tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::switchUnknownValues);
+			tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.switchUnknownValues(account));
 			refresh_ui_display();
 			tableController.tableGrid.refresh();
 			CharDescriptionExportServices.flushItemDataToDB(account,null);
@@ -1174,13 +1196,65 @@ public class Char_description {
 		}
 		search_google_inplace(checkMethodSelect);
 	}
-	
-	@FXML void search_image() throws IOException, ParseException {
-		load_image_pane(false);
+
+	@FXML public void view_rules() throws IOException, ParseException {
+		if(!this.ruleButton.isSelected()) {
+			this.rulePaneController.PaneClose();
+		}else {
+			imageButton.setSelected(false);
+			charButton.setSelected(false);
+			ruleButton.setSelected(true);
+		}
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					load_rule_pane();
+				} catch (IOException | SQLException | ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	@FXML public void search_image() throws IOException, ParseException {
+		if(!this.imageButton.isSelected()) {
+			this.imagePaneController.imagePaneClose();
+		}else {
+			imageButton.setSelected(true);
+			charButton.setSelected(false);
+			ruleButton.setSelected(false);
+		}
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					load_image_pane(false);
+				} catch (IOException | ParseException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 	
-	@FXML void view_chars() throws IOException, ParseException, ClassNotFoundException, SQLException {
-		load_char_pane();
+	@FXML public void view_chars() throws IOException, ParseException, ClassNotFoundException, SQLException {
+		if(!this.charButton.isSelected()) {
+			this.charPaneController.PaneClose();
+		}else {
+			imageButton.setSelected(false);
+			charButton.setSelected(true);
+			ruleButton.setSelected(false);
+		}
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					load_char_pane();
+				} catch (IOException | SQLException | ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 	
 	
@@ -1365,7 +1439,7 @@ public class Char_description {
 		MenuItem mark_as_known = new MenuItem("Mark clear values on selected items as unknowns");
 		mark_as_known.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::markUnknownClearValues);
+				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
 				CharDescriptionExportServices.flushItemDataToDB(account,null);
@@ -1387,7 +1461,7 @@ public class Char_description {
 				if(!ConfirmationDialog.WarningClearingUnknownValues()){
 					return;
 				}
-				tableController.tableGrid.getItems().forEach(CharDescriptionRow::markUnknownClearValues);
+				tableController.tableGrid.getItems().forEach(r->r.markUnknownClearValues(account));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
 				CharDescriptionExportServices.flushItemDataToDB(account,null);
@@ -1428,10 +1502,10 @@ public class Char_description {
 			public CharDescClassComboRow fromString(String string) {
 				Optional<CharDescClassComboRow> match = classCombo.getItems().stream().filter(e -> e.toString().equals(string)).findAny();
 				if(match.isPresent()){
-					System.out.println("Found match for >"+string+"<");
+
 					return match.get();
 				}
-				System.out.println("No match for >"+string+"< returning first");
+
 				return classCombo.getItems().get(0);
 			}
 		});
@@ -2172,9 +2246,9 @@ public class Char_description {
 				ruleString = loopRule;
 			}
 		}
-		System.out.println("Sortie de l'arbre >"+ruleString);
+
 		ruleString = WordUtils.correctDescriptionRuleSyntax(ruleString);
-		System.out.println("Sortie de la correction >"+ruleString);
+
 		if(draftingRule){
 			CharDescriptionRow activeRow = tableController.tableGrid.getSelectionModel().getSelectedItem();
 			String activeClass = tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];

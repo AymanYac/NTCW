@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
@@ -63,7 +64,7 @@ public class Browser_CharClassif {
 
 
 
-	@FXML GridPane toolBar;
+	@FXML public GridPane toolBar;
 	@FXML ToolBar iconBar;
 
 	@FXML Button zoomInButton;
@@ -355,7 +356,7 @@ public class Browser_CharClassif {
 			parent.leftAnchor.setRightAnchor(toolBar,0.0);
 			parent.leftAnchor.setBottomAnchor(toolBar,0.0);
 
-			toolBar.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			/*toolBar.setOnKeyPressed(new EventHandler<KeyEvent>() {
 				@SuppressWarnings("incomplete-switch")
 				@Override
 				public void handle(KeyEvent event) {
@@ -368,7 +369,7 @@ public class Browser_CharClassif {
 						} break;
 					}
 				}
-			});
+			});*/
 
 		}
 		if(!parent.leftAnchor.getChildren().stream().anyMatch(e->e.equals(toolBar))){
@@ -390,6 +391,37 @@ public class Browser_CharClassif {
 		} catch (ParseException | IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
+		parent.ruleButton.setSelected(false);
+		parent.charButton.setSelected(false);
+		parent.imageButton.setSelected(false);
+		if(lastPaneLayout!=null && lastPaneLayout.equals("BIG")){
+			return;
+		}
+		if(parent.lastRightPane.equals("RULES")){
+			try {
+				parent.view_rules();
+				parent.ruleButton.setSelected(true);
+			} catch (IOException | ParseException e) {
+				e.printStackTrace();
+			}
+		}
+		if(parent.lastRightPane.equals("CHARS")){
+			try {
+				parent.view_chars();
+				parent.charButton.setSelected(true);
+			} catch (IOException | ParseException | ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		if(parent.lastRightPane.equals("IMAGES")){
+			try {
+				parent.search_image();
+				parent.imageButton.setSelected(true);
+			} catch (IOException | ParseException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 
@@ -399,7 +431,44 @@ public class Browser_CharClassif {
 		String copyLastLayout = lastPaneLayout;
 		paneSmall();
 		lastPaneLayout = copyLastLayout;
+		boolean closingBrowser = false;
+		if(toolBar.isVisible()){
+			closingBrowser=true;
+		}
+		System.out.println("hide_browser()");
+		System.out.println("Closing browser >"+String.valueOf(closingBrowser));
 		switch_pane_hide_browser(true);
+		parent.ruleButton.setSelected(false);
+		parent.charButton.setSelected(false);
+		parent.imageButton.setSelected(false);
+		if(closingBrowser){
+			if(parent.lastRightPane.equals("RULES")){
+				try {
+					parent.view_rules();
+					parent.ruleButton.setSelected(true);
+				} catch (IOException | ParseException e) {
+					e.printStackTrace();
+				}
+			}
+			if(parent.lastRightPane.equals("CHARS")){
+				try {
+					parent.view_chars();
+					parent.charButton.setSelected(true);
+				} catch (IOException | ParseException | ClassNotFoundException | SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if(parent.lastRightPane.equals("IMAGES")){
+				try {
+					parent.search_image();
+					parent.imageButton.setSelected(true);
+				} catch (IOException | ParseException e) {
+					e.printStackTrace();
+				}
+			}
+		}else{
+			parent.lastRightPane="";
+		}
 	}
 
 	public void switch_pane_hide_browser(boolean bool) {
