@@ -435,15 +435,17 @@ public class CharDescriptionRow {
 		return simp;
 	}
 
-	public void clearUnknownValues(){
+	public void clearUnknownValues(String targetChar){
 		String itemClass = getClass_segment_string().split("&&&")[0];
 		getData(itemClass).entrySet()
-				.removeIf(e->e.getValue()!=null && e.getValue().getDisplayValue(false,false).equals("*UNKNOWN*"));
+				.removeIf(e-> (!(targetChar!=null) || e.getKey().equals(targetChar)) &&
+						(e.getValue()!=null && e.getValue().getDisplayValue(false,false).equals("*UNKNOWN*"))
+				);
 		CharDescriptionExportServices.addItemCharDataToPush(this);
 	}
-	public void markUnknownClearValues(UserAccount account){
+	public void markUnknownClearValues(UserAccount account, String targetChar){
 		String itemClass = getClass_segment_string().split("&&&")[0];
-		CharValuesLoader.active_characteristics.get(itemClass).forEach(c->{
+		CharValuesLoader.active_characteristics.get(itemClass).stream().filter(c->!(targetChar!=null) || c.getCharacteristic_id().equals(targetChar)).forEach(c->{
 			if(getData(itemClass).get(c.getCharacteristic_id())!=null && getData(itemClass).get(c.getCharacteristic_id()).getParentChar()!=null && getData(itemClass).get(c.getCharacteristic_id()).getDisplayValue(false,false).length()>0){
 
 			}else{
@@ -458,11 +460,11 @@ public class CharDescriptionRow {
 		CharDescriptionExportServices.addItemCharDataToPush(this);
 	}
 
-    public void switchUnknownValues(UserAccount account) {
+    public void switchUnknownValues(UserAccount account,String activeCharID) {
 		if(hasClearValue()){
-			markUnknownClearValues(account);
+			markUnknownClearValues(account, activeCharID);
 		}else{
-			clearUnknownValues();
+			clearUnknownValues(activeCharID);
 		}
     }
 

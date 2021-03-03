@@ -901,7 +901,7 @@ public class Char_description {
 		}
 
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.U)){
-			tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.switchUnknownValues(account));
+			tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.switchUnknownValues(account,null));
 			refresh_ui_display();
 			tableController.tableGrid.refresh();
 			CharDescriptionExportServices.flushItemDataToDB(account,null);
@@ -1417,7 +1417,7 @@ public class Char_description {
 			desc.show();
 		});
 		Char_description parent = this;
-		MenuItem reeval_rules_true = new MenuItem("Refresh rules on all items");
+		MenuItem reeval_rules_true = new MenuItem("Reevaluate item values");
 		reeval_rules_true.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
 				CharItemFetcher.allRowItems.parallelStream().forEach(CharDescriptionRow::reEvaluateCharRules);
@@ -1427,48 +1427,73 @@ public class Char_description {
 			}
 		});
 
-		MenuItem clear_unknowns = new MenuItem("Clear unknown values on selected items");
+		MenuItem clear_unknowns = new MenuItem("Clear UNKNOWN values (selected items)                         Ctrl+U");
 		clear_unknowns.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::clearUnknownValues);
+				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(charDescriptionRow -> charDescriptionRow.clearUnknownValues(null));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
 				CharDescriptionExportServices.flushItemDataToDB(account,null);
 			}
 		});
-		MenuItem mark_as_known = new MenuItem("Mark clear values on selected items as unknowns");
+		MenuItem mark_as_known = new MenuItem("Mark blank values as UNKNOWN (selected items)         Ctrl+U");
 		mark_as_known.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account));
+				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account, null));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
 				CharDescriptionExportServices.flushItemDataToDB(account,null);
 			}
 		});
 
-		MenuItem clear_unknowns_class = new MenuItem("Clear unknown values for current class");
-		clear_unknowns_class.setOnAction(new EventHandler<ActionEvent>() {
+		MenuItem clear_unknowns_active_char = new MenuItem("Clear UNKNOWN values (active characteristic)");
+		clear_unknowns_active_char.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				tableController.tableGrid.getItems().forEach(CharDescriptionRow::clearUnknownValues);
+				String activeClass = FxUtilTest.getComboBoxValue(classCombo).getClassSegment();
+				int selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(activeClass).size());
+				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(activeClass).get(selected_col);
+				CharItemFetcher.allRowItems.forEach(r->r.clearUnknownValues(active_char.getCharacteristic_id()));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
 				CharDescriptionExportServices.flushItemDataToDB(account,null);
 			}
 		});
-		MenuItem mark_as_known_class = new MenuItem("Mark clear values for current class as unknowns");
+		MenuItem mark_as_known_active_char = new MenuItem("Mark blank values as UNKNOWN (active characteristic)");
+		mark_as_known_active_char.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent t) {
+				String activeClass = FxUtilTest.getComboBoxValue(classCombo).getClassSegment();
+				int selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(activeClass).size());
+				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(activeClass).get(selected_col);
+				CharItemFetcher.allRowItems.forEach(r->r.markUnknownClearValues(account,active_char.getCharacteristic_id()));
+				refresh_ui_display();
+				tableController.tableGrid.refresh();
+				CharDescriptionExportServices.flushItemDataToDB(account,null);
+			}
+		});
+
+		MenuItem clear_unknowns_class = new MenuItem("Clear UNKNOWN values (active class)");
+		clear_unknowns_class.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent t) {
+				tableController.tableGrid.getItems().forEach(charDescriptionRow -> charDescriptionRow.clearUnknownValues(null));
+				refresh_ui_display();
+				tableController.tableGrid.refresh();
+				CharDescriptionExportServices.flushItemDataToDB(account,null);
+			}
+		});
+		MenuItem mark_as_known_class = new MenuItem("Mark blank values as UNKNOWN (active class)");
 		mark_as_known_class.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
 				if(!ConfirmationDialog.WarningClearingUnknownValues()){
 					return;
 				}
-				tableController.tableGrid.getItems().forEach(r->r.markUnknownClearValues(account));
+				tableController.tableGrid.getItems().forEach(r->r.markUnknownClearValues(account, null));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
 				CharDescriptionExportServices.flushItemDataToDB(account,null);
 			}
 		});
 
-		desc.getItems().addAll(reeval_rules_true,clear_unknowns,mark_as_known,clear_unknowns_class,mark_as_known_class);
+		desc.getItems().addAll(reeval_rules_true,clear_unknowns,mark_as_known,clear_unknowns_active_char,mark_as_known_active_char,clear_unknowns_class,mark_as_known_class);
 	}
 
 
