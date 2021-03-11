@@ -2,7 +2,6 @@ package service;
 
 import controllers.Char_description;
 import javafx.application.Platform;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -15,11 +14,14 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import model.*;
+import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.CaracDeclarationDialog;
 import transversal.dialog_toolbox.FxUtilTest;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,6 +42,8 @@ public class ExternalSearchServices {
     private static String lien_ouvert;
     private static String lien_actif;
     private static Char_description parent;
+    private static LocalDateTime lastManualInputTime;
+    private static int manualInputCounter=1;
 
 
     public static void editSearchPrefrence(Char_description parent) {
@@ -627,13 +631,22 @@ public class ExternalSearchServices {
     }
 
     public static void manualValueInput(){
-        System.out.println(lien_actif);
         set_lien_article_carac(lien_actif);
         if(get_lien_article_carac()!=null){
             urlFieldColor("blue");
         }else{
             urlFieldColor("red");
         }
+        if(lastManualInputTime!=null && Duration.between(lastManualInputTime,LocalDateTime.now()).getSeconds() > GlobalConstants.ManualValuesBufferFlushTime){
+            CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
+            lastManualInputTime = LocalDateTime.now();
+            System.out.println("Flushing manual values after "+String.valueOf(GlobalConstants.ManualValuesBufferFlushTime)+ " seconds");
+        }else if(manualInputCounter%GlobalConstants.ManualValuesBufferFlushSize ==0){
+            CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
+            lastManualInputTime = LocalDateTime.now();
+            System.out.println("Flushing manual values after "+String.valueOf(GlobalConstants.ManualValuesBufferFlushSize)+ " inputs");
+        }
+        manualInputCounter+=1;
     }
 
     public static void parsingValueFromURL(){
