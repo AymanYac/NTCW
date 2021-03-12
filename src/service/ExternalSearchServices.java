@@ -626,6 +626,7 @@ public class ExternalSearchServices {
     }
 
     public static void closingBrowser(){
+        System.gc();
         browsingLink(null);
         refreshUrlAfterElemChange(parent);
     }
