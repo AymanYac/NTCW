@@ -128,10 +128,8 @@ public class AutoCompleteBox_CharClassification extends TextField
 
 				@Override
 				public int compare(Object o1, Object o2) {
-					int ret = (new Integer(
-							((String)o1).split("&&&")[1].compareTo(
-							((String)o2).split("&&&")[1])
-							));
+					int ret = (((String) o1).split("&&&")[1].compareTo(
+                            ((String) o2).split("&&&")[1]));
 					int av_1 =  unidecode.decodeAndTrim(((String)o1).split("&&&")[1]).toUpperCase().startsWith(unidecode.decodeAndTrim(getText()).toUpperCase())?1000000:0;
         	  		int av_2 =  unidecode.decodeAndTrim(((String)o2).split("&&&")[1]).toUpperCase().startsWith(unidecode.decodeAndTrim(getText()).toUpperCase())?1000000:0;
         	  		

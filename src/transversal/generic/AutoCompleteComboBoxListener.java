@@ -1,6 +1,5 @@
 package transversal.generic;
 
-import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -8,6 +7,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.ListView;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -109,7 +109,7 @@ public class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
         for (int i=0; i<items.size(); i++) {
             if (AutoCompleteComboBoxListener.this.comboBox.getEditor().getText().toLowerCase().equals(items.get(i).toString().toLowerCase())) {
                 try {
-                    ListView lv = ((ComboBoxListViewSkin) AutoCompleteComboBoxListener.this.comboBox.getSkin()).getListView();
+                    ListView lv = (ListView) ((ComboBoxListViewSkin) AutoCompleteComboBoxListener.this.comboBox.getSkin()).getPopupContent();
                     this.comboBox.getSelectionModel().clearAndSelect(i);
                     lv.scrollTo(lv.getSelectionModel().getSelectedIndex());
                     found = true;

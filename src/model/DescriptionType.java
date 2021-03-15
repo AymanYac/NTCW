@@ -1,7 +1,7 @@
 package model;
 
 
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public enum DescriptionType {
 	RAW_PREFERED("short_description, long_description"),
@@ -26,7 +26,7 @@ public enum DescriptionType {
 	}
 	
 	public String toPrintString() {
-		return WordUtils.capitalize(name.replace("_datalanguage_", " ").replace(",", " + ").replace("_", " ").replace("sd", "short description").replace("ld", "long description"));
+		return StringUtils.capitalize(name.replace("_datalanguage_", " ").replace(",", " + ").replace("_", " ").replace("sd", "short description").replace("ld", "long description"));
 		
 	}
 }

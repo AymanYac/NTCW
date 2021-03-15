@@ -81,10 +81,8 @@ public class AutoCompleteBox_UnitOfMeasure extends TextField
 
 				@Override
 				public int compare(Object o1, Object o2) {
-					int ret = (new Integer(
-							((UnitOfMeasure)o1).getUom_symbol().toLowerCase().compareTo(
-							((UnitOfMeasure)o2).getUom_symbol().toLowerCase())
-							));
+					int ret = (((UnitOfMeasure) o1).getUom_symbol().toLowerCase().compareTo(
+                            ((UnitOfMeasure) o2).getUom_symbol().toLowerCase()));
                   int av_1 =  (StringUtils.startsWithIgnoreCase(((UnitOfMeasure) o1).getUom_name(),getText()) || StringUtils.startsWithIgnoreCase(((UnitOfMeasure) o1).getUom_symbol(),getText()))?1000000:0;
                   int av_2 =  (StringUtils.startsWithIgnoreCase(((UnitOfMeasure) o2).getUom_name(),getText()) || StringUtils.startsWithIgnoreCase(((UnitOfMeasure) o2).getUom_symbol(),getText()))?1000000:0;
 

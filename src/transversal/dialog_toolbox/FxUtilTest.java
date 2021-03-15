@@ -1,11 +1,11 @@
 package transversal.dialog_toolbox;
 
-import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -38,7 +38,7 @@ public class FxUtilTest {
                     if (!comboBox.isShowing()) {
                         comboBox.show();
                         comboBox.getSelectionModel().clearAndSelect(Math.max(comboBox.getSelectionModel().getSelectedIndex()-1,0));
-                        ListView<?> lv = ((ComboBoxListViewSkin) comboBox.getSkin()).getListView();
+                        ListView<?> lv = (ListView<?>) ((ComboBoxListViewSkin) comboBox.getSkin()).getPopupContent();
                         lv.getFocusModel().focus(comboBox.getSelectionModel().getSelectedIndex());
                         lv.scrollTo(comboBox.getSelectionModel().getSelectedIndex());
                     }
@@ -57,7 +57,7 @@ public class FxUtilTest {
                         }catch (Exception V){
 
                         }
-                        ListView<?> lv = ((ComboBoxListViewSkin) comboBox.getSkin()).getListView();
+                        ListView<?> lv = (ListView<?>) ((ComboBoxListViewSkin) comboBox.getSkin()).getPopupContent();
                         lv.getFocusModel().focus(comboBox.getSelectionModel().getSelectedIndex());
                         lv.scrollTo(comboBox.getSelectionModel().getSelectedIndex());
                     }
