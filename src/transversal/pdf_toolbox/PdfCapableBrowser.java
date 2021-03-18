@@ -1,21 +1,34 @@
 package transversal.pdf_toolbox;
 
 import controllers.paneControllers.Browser_CharClassif;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
+import javafx.embed.swing.SwingNode;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import model.GlobalConstants;
 import netscape.javascript.JSObject;
+import org.icepdf.core.util.PropertyConstants;
+import org.icepdf.core.views.DocumentViewModel;
+import org.icepdf.ri.common.SwingController;
+import org.icepdf.ri.common.SwingViewBuilder;
+import org.icepdf.ri.common.views.DocumentViewControllerImpl;
+import org.icepdf.ri.util.PropertiesManager;
 import service.ExternalSearchServices;
 
+import javax.swing.*;
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Base64;
+import java.util.ResourceBundle;
 
 public class PdfCapableBrowser {
 
@@ -28,18 +41,36 @@ public class PdfCapableBrowser {
     private String loadScript;
     private String toExecuteWhenPDFJSLoaded = "";
     private Browser_CharClassif parent;
-    public boolean FORCE_PDF_IN_VIEWER=false;
+    public boolean FORCE_PDF_IN_VIEWER=GlobalConstants.FORCE_PDF_IN_VIEWER;
 
 
+    private boolean urlStartsWithPDFBytes(URL url) {
+        try {
+            URLConnection uc = url.openConnection();
+            uc.addRequestProperty("User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2656.18 Safari/537.36");
+            BufferedInputStream bis = new BufferedInputStream(uc.getInputStream());
+            byte[] buffer = new byte[6];
+            bis.read(buffer);
+            String base64 = Base64.getEncoder().encodeToString(buffer);
+            //System.out.println("base64 =>"+base64);
+            bis.close();
+            return base64.startsWith("JVBERi0");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public void displayPdf(URL url) throws IOException {
+        URLConnection uc = url.openConnection();
+        uc.addRequestProperty("User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2656.18 Safari/537.36");
+
+        displayPdf(new BufferedInputStream(uc.getInputStream()));
+    }
     public PdfCapableBrowser() {
     }
 
     public PdfCapableBrowser(File file) throws IOException {
         displayPdf(file);
-    }
-
-    public PdfCapableBrowser(URL url) throws IOException {
-        displayPdf(url);
     }
 
     public PdfCapableBrowser(InputStream inputStream) throws IOException {
@@ -50,15 +81,7 @@ public class PdfCapableBrowser {
     public void displayPdf(File file) throws IOException {
         displayPdf(new BufferedInputStream(new FileInputStream(file)));
     }
-
-    public void displayPdf(URL url) throws IOException {
-        URLConnection uc = url.openConnection();
-        /*uc.addRequestProperty("User-Agent",
-                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)");*/
-        uc.addRequestProperty("User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2656.18 Safari/537.36");
-
-        displayPdf(new BufferedInputStream(uc.getInputStream()));
-    }
+    
 
     public void displayPdf(InputStream inputStream) throws IOException {
 
@@ -68,10 +91,33 @@ public class PdfCapableBrowser {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
             String url = getClass().getResource("/scripts/pdfjs/web/viewer.html").toExternalForm();
-
             nodeValue.getEngine().setJavaScriptEnabled(true);
             nodeValue.getEngine().load(url);
             updateProcessListener(false);
+            nodeValue.getEngine().getLoadWorker().workDoneProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    //System.out.println(newValue.intValue());
+                    if(newValue.intValue()==100){
+                        //System.out.println(loadScript);
+                        //System.out.println(toExecuteWhenPDFJSLoaded);
+                        try {
+                            if (processListener != null) processListener.listen(pdfJsLoaded = true);
+
+                            if (loadScript != null)
+                                nodeValue.getEngine().executeScript(loadScript);
+
+                            nodeValue.getEngine().executeScript(toExecuteWhenPDFJSLoaded);
+                            toExecuteWhenPDFJSLoaded = "";
+                            loadScript=null;
+                            observable.removeListener(this);
+                        } catch (Exception e) {
+                            e.printStackTrace(System.err);
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            });
 
             byte[] buffer = new byte[4096];
 
@@ -88,20 +134,12 @@ public class PdfCapableBrowser {
             updateProcessListener(true);
 
             byte[] data = outputStream.toByteArray();
-            /*String editedString = outputStream.toString();
-            Pattern ptn = Pattern.compile(Pattern.quote("(")+" .+ "+Pattern.quote(")"));
-            Matcher m = ptn.matcher(editedString);
-            while (m.find()){
-                System.out.println(m.group(0));
-                editedString = editedString.replace(m.group(0),"( "+new String(new char[m.group(0).length()-4]).replace("\0", "$")+" )");
-            }
-            data = editedString.getBytes();*/
             String base64 = Base64.getEncoder().encodeToString(data);
             // call JS function from Java code
             String js = "openFileFromBase64('" + base64 + "');";
 
             try {
-                nodeValue.getEngine().executeScript(js);
+                executeScript(js);
             } catch (Exception ex) {
                 if (!pdfJsLoaded) loadScript = js;
             }
@@ -216,57 +254,13 @@ public class PdfCapableBrowser {
 
         if (processListener != null) processListener.listen(false);
 
-        engine.getLoadWorker().workDoneProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if(newValue.intValue()==100){
-                    try {
-                        if (processListener != null) processListener.listen(pdfJsLoaded = true);
-
-                        if (loadScript != null)
-                            engine.executeScript(loadScript);
-
-                        engine.executeScript(toExecuteWhenPDFJSLoaded);
-                        toExecuteWhenPDFJSLoaded = null;
-                        loadScript=null;
-                        observable.removeListener(this);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        });
-        engine.getLoadWorker()
-                .stateProperty()
-                .addListener(
-                        new ChangeListener<Worker.State>() {
-                            @Override
-                            public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
-                                JSObject window = (JSObject) engine.executeScript("window");
-                                window.setMember("java", new JSLogListener());
-                                engine.executeScript("console.log = function(message){ try {java.log(message);} catch(e) {} };");
-
-                                if (newValue == Worker.State.SUCCEEDED) {
-                                    try {
-                                        if (processListener != null) processListener.listen(pdfJsLoaded = true);
-
-                                        if (loadScript != null)
-                                            engine.executeScript(loadScript);
-
-                                        engine.executeScript(toExecuteWhenPDFJSLoaded);
-                                        toExecuteWhenPDFJSLoaded = null;
-                                        loadScript=null;
-                                        observable.removeListener(this);
-                                    } catch (Exception e) {
-                                        //throw new RuntimeException(e);
-                                    }
-                                }
-                            }
-                        });
         engine.locationProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                Desktop d = Desktop.getDesktop();
+                if(parent.showingPdf.getValue()){
+                    return;
+                }
+                System.out.println("Browsing location: "+newValue);
                 URI address = null;
                 try {
                     address = new URI(observable.getValue());
@@ -274,14 +268,18 @@ public class PdfCapableBrowser {
                     e.printStackTrace();
                 }
                 try {
-                    if ((address.toURL() + "").indexOf(".pdf") > -1)
+                    if (urlStartsWithPDFBytes(address.toURL()) )
                     {
+                        parent.showingPdf.setValue(true);
                         ExternalSearchServices.externalPdfViewing(address.toURL().toString());
-                        if(FORCE_PDF_IN_VIEWER){
-                            parent.icePdfBench(address.toURL());
+                        if(FORCE_PDF_IN_VIEWER && !GlobalConstants.JAVASCRIPT_PDF_RENDER) {
+                            icePdfBench(address.toURL(), parent.iceController);
+                        }else if(FORCE_PDF_IN_VIEWER && GlobalConstants.JAVASCRIPT_PDF_RENDER){
+                            displayPdf(address.toURL());
                         }else{
                             //parent.parent.urlLink.setText(address.toURL().toString());
                             latestPDFLink=address.toURL().toString();
+                            Desktop d = Desktop.getDesktop();
                             d.browse(address);
                         }
                         //displayPdf(address.toURL());
@@ -305,6 +303,35 @@ public class PdfCapableBrowser {
     }
 
 
+    public void icePdfBench(URL url, SwingController iceController) {
+        //String filePath = getClass().getResource("/scripts/100RV.pdf").toExternalForm();
+        //filePath = getClass().getResource("/scripts/SSRV.pdf").toExternalForm();
+
+        //iceFrame.getContentPane().removeAll();
+        //iceFrame.getContentPane().add(viewerComponentPanel);
+
+        // Now that the GUI is all in place, we can try opening a PDF
+        iceController.openDocument(url);
+
+        // show the component
+        //iceFrame.pack();
+        parent.iceFrame.setVisible(true);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                parent.pageField.setText(String.valueOf(iceController.getDocumentViewController().getCurrentPageIndex()+1));
+            }
+        });
+        try{
+            parent.pageLabel2.setText("/"+iceController.getDocument().getNumberOfPages());
+        }catch (Exception V){
+
+        }
+        iceController.setDocumentToolMode(DocumentViewModel.DISPLAY_TOOL_TEXT_SELECTION);
+
+
+    }
+
 
     public WebView toNode() {
         if (nodeValue == null)
@@ -319,5 +346,74 @@ public class PdfCapableBrowser {
 
     public void setParent(Browser_CharClassif browser_charClassif) {
         this.parent = browser_charClassif;
+    }
+
+    public SwingController loadIceController(JPanel iceFrame, SwingNode iceContainer) {
+        SwingController iceController = new SwingController();
+        PropertiesManager properties =
+                new PropertiesManager(System.getProperties(),
+                        ResourceBundle.getBundle(PropertiesManager.DEFAULT_MESSAGE_BUNDLE));
+
+        // Change the value of a couple default viewer Properties.
+        // Note: this should be done before the factory is initialized.
+        properties.setBoolean(PropertiesManager.PROPERTY_VIEWPREF_HIDETOOLBAR,Boolean.TRUE);
+        properties.setBoolean(PropertiesManager.PROPERTY_VIEWPREF_HIDEMENUBAR,Boolean.TRUE);
+        //properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_KEYBOARD_SHORTCUTS,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR_STATUSLABEL,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR_VIEWMODE,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_ANNOTATION,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_FIT,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_PAGENAV,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_ROTATE,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_TOOL,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_UTILITY,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_ZOOM,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_OPEN,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_PRINT,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_SAVE,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_SEARCH,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_UPANE,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITYPANE_ANNOTATION,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITYPANE_BOOKMARKS,Boolean.FALSE);
+        properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITYPANE_SEARCH,Boolean.FALSE);
+
+        // add interactive mouse link annotation support via callback
+        iceController.getDocumentViewController().setAnnotationCallback(
+                new org.icepdf.ri.common.MyAnnotationCallback(
+                        iceController.getDocumentViewController()));
+        //Add page change listener handler
+        ((DocumentViewControllerImpl) iceController.getDocumentViewController()).addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (PropertyConstants.DOCUMENT_CURRENT_PAGE.equals(evt.getPropertyName())) {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            parent.pageField.setText(String.valueOf(iceController.getDocumentViewController().getCurrentPageIndex()+1));
+                        }
+                    });
+                }
+            }
+        });
+
+        SwingViewBuilder factory = new SwingViewBuilder(iceController,properties);
+        iceFrame = factory.buildViewerPanel();
+        iceFrame.setVisible(false);
+        iceContainer = new SwingNode();
+        iceContainer.setContent(iceFrame);
+        iceContainer.visibleProperty().bind(parent.showingPdf);
+
+
+        return iceController;
+    }
+
+
+    class Bridge {
+        public void exit() {
+            //Platform.exit();
+            System.out.print("Hello!UPCALL");
+        }
     }
 }

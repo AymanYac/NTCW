@@ -861,7 +861,7 @@ public class Char_description {
 						L.printStackTrace(System.err);
 					}
 				}
-				browserController.browser.FORCE_PDF_IN_VIEWER = false;
+				browserController.browser.FORCE_PDF_IN_VIEWER = GlobalConstants.FORCE_PDF_IN_VIEWER;
 			}
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.K) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {

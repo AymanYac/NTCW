@@ -72,8 +72,8 @@ public class Browser_CharClassif {
 	@FXML Button pageFitButton;
 	@FXML Button pageWidthButton;
 	@FXML Label pageLabel1;
-	@FXML TextField pageField;
-	@FXML Label pageLabel2;
+	@FXML public TextField pageField;
+	@FXML public Label pageLabel2;
 
 	@FXML TextField searchField;
 	@FXML Label searchLabel;
@@ -155,131 +155,118 @@ public class Browser_CharClassif {
 		String target = parent.search_text.getText();
 		target = (checkMethodSelect && selected_text.length()>0) ?selected_text:target;
 
-		//icePdfBench(new URL("http://www.africau.edu/images/default/sample.pdf"));
 		ExternalSearchServices.launchingSearch("https://www.google.com/search?q="+URLEncoder.encode(target,"UTF-8"));
 		browser.loadPage("https://www.google.com/search?q="+URLEncoder.encode(target,"UTF-8"));
-		//browser.loadPage(getClass().getResource("/scripts/100RV.pdf").toExternalForm());
-		//browser.loadPage("http://www.africau.edu/images/default/sample.pdf");
-		//browser.displayPdf(new URL("http://www.africau.edu/images/default/sample.pdf"));
-
-		//browser.displayPdf(new URL("https://www.google.com/search?q="+URLEncoder.encode(target,"UTF-8")));
-
-
-		//icePdfBench(new URL("https://www.nexans.gm/Morocco/family/doc/en/U_1000_R2V.pdf"));
-		//icePdfBench(new URL("https://www.nexans.fr/France/2018/Referentiel_Cables_Liste_Prix.pdf"));
-		//icePdfBench(new URL("https://assets.new.siemens.com/siemens/assets/api/uuid:5644c620-1ca1-4f77-807d-d72aeac5cc23/version:1560766252/produits-d-alimentation.pdf"));
-
-
-
-
 
 	}
 
-	public void icePdfBench(URL url) {
-		//String filePath = getClass().getResource("/scripts/100RV.pdf").toExternalForm();
-		//filePath = getClass().getResource("/scripts/SSRV.pdf").toExternalForm();
 
-		//iceFrame.getContentPane().removeAll();
-		//iceFrame.getContentPane().add(viewerComponentPanel);
+	public void setContainerWindow() {
+		if(!GlobalConstants.JAVASCRIPT_PDF_RENDER && !(iceController!=null)) {
+			iceController = browser.loadIceController(iceFrame,iceContainer);
+			browser.toNode().visibleProperty().bind(showingPdf.not());
+			toolBar.add(iceContainer,0,1,GridPane.REMAINING,GridPane.REMAINING);
 
-		// Now that the GUI is all in place, we can try opening a PDF
-		iceController.openDocument(url);
+		}
+		setSearchFieldListener();
+		toolBar.add(browser.toNode(),0,1,GridPane.REMAINING,GridPane.REMAINING);
+		pageFitButton.disableProperty().bind(showingPdf.not());
+		pageWidthButton.disableProperty().bind(showingPdf.not());
+		zoomInButton.disableProperty().bind(showingPdf.not());
+		zoomOutButton.disableProperty().bind(showingPdf.not());
+		pageLabel1.visibleProperty().bind(showingPdf);
+		pageField.visibleProperty().bind(showingPdf);
+		pageLabel2.visibleProperty().bind(showingPdf);
+		parent.leftAnchor.getChildren().add(toolBar);
+		parent.leftAnchor.setLeftAnchor(toolBar, 0.0);
+		parent.leftAnchor.setTopAnchor(toolBar, 0.0);
+		parent.leftAnchor.setRightAnchor(toolBar,0.0);
+		parent.leftAnchor.setBottomAnchor(toolBar,0.0);
+		searchLabel.visibleProperty().bind(searchField.textProperty().length().greaterThan(0));
+		pageField.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				String numbersOnly = newValue.replaceAll("[^\\d]", "");
+				if(numbersOnly.equals(oldValue)){
+					return;
+				}
+				pageField.setText(numbersOnly);
+			}
+		});
+		showingPdf.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if(newValue){
+					System.out.println("now showing pdf");
+					browsePreviousPageButton.setDisable(false);
+					browseNextPageButton.setDisable(true);
+				}else{
+					System.out.println("closed pdf");
+					browsePreviousPageButton.setDisable( browser.toNode().getEngine().getHistory().currentIndexProperty().getValue() == 0 );
+					browseNextPageButton.setDisable(false);
+				}
+			}
+		});
+		browser.toNode().getEngine().getHistory().currentIndexProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				browseNextPageButton.setDisable(newValue.intValue() == browser.toNode().getEngine().getHistory().getEntries().size()-1 );
+				browsePreviousPageButton.setDisable(!showingPdf.getValue() && newValue.intValue() == 0 );
+			}
+		});
 
-		// show the component
-		//iceFrame.pack();
-		showingPdf.setValue(true);
-		iceFrame.setVisible(true);
-		updateLayoutAfterPageChange();
 		try{
-			pageLabel2.setText("/"+iceController.getDocument().getNumberOfPages());
+			secondaryStage.close();
 		}catch (Exception V){
 
 		}
-		iceController.setDocumentToolMode(DocumentViewModel.DISPLAY_TOOL_TEXT_SELECTION);
-
+		switch_pane_hide_browser(false);
+		try {
+			loadLastPaneLayout();
+		} catch (ParseException | IOException | URISyntaxException e) {
+			e.printStackTrace();
+		}
+		parent.ruleButton.setSelected(false);
+		parent.charButton.setSelected(false);
+		parent.imageButton.setSelected(false);
+		if(lastPaneLayout!=null && lastPaneLayout.equals("BIG")){
+			return;
+		}
+		if(parent.lastRightPane.equals("RULES")){
+			try {
+				parent.view_rules();
+				parent.ruleButton.setSelected(true);
+			} catch (IOException | ParseException e) {
+				e.printStackTrace();
+			}
+		}
+		if(parent.lastRightPane.equals("CHARS")){
+			try {
+				parent.view_chars();
+				parent.charButton.setSelected(true);
+			} catch (IOException | ParseException | ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		if(parent.lastRightPane.equals("IMAGES")){
+			try {
+				parent.search_image();
+				parent.imageButton.setSelected(true);
+			} catch (IOException | ParseException e) {
+				e.printStackTrace();
+			}
+		}
 
 	}
 
-	public void setContainerWindow() {
-		if(!(iceController!=null)) {
-			//iceFrame = new JFrame();
-			//iceFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-			// build a component controller
-			iceController = new SwingController();
-			PropertiesManager properties =
-					new PropertiesManager(System.getProperties(),
-							ResourceBundle.getBundle(PropertiesManager.DEFAULT_MESSAGE_BUNDLE));
-
-			// Change the value of a couple default viewer Properties.
-			// Note: this should be done before the factory is initialized.
-			properties.setBoolean(PropertiesManager.PROPERTY_VIEWPREF_HIDETOOLBAR,Boolean.TRUE);
-			properties.setBoolean(PropertiesManager.PROPERTY_VIEWPREF_HIDEMENUBAR,Boolean.TRUE);
-			//properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_KEYBOARD_SHORTCUTS,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR_STATUSLABEL,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_STATUSBAR_VIEWMODE,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_ANNOTATION,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_FIT,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_PAGENAV,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_ROTATE,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_TOOL,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_UTILITY,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_TOOLBAR_ZOOM,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_OPEN,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_PRINT,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_SAVE,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_SEARCH,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITY_UPANE,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITYPANE_ANNOTATION,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITYPANE_BOOKMARKS,Boolean.FALSE);
-			properties.setBoolean(PropertiesManager.PROPERTY_SHOW_UTILITYPANE_SEARCH,Boolean.FALSE);
-
-			// add interactive mouse link annotation support via callback
-			iceController.getDocumentViewController().setAnnotationCallback(
-					new org.icepdf.ri.common.MyAnnotationCallback(
-							iceController.getDocumentViewController()));
-			//Add page change listener handler
-			((DocumentViewControllerImpl) iceController.getDocumentViewController()).addPropertyChangeListener(new PropertyChangeListener() {
-				@Override
-				public void propertyChange(PropertyChangeEvent evt) {
-					if (PropertyConstants.DOCUMENT_CURRENT_PAGE.equals(evt.getPropertyName())) {
-						updateLayoutAfterPageChange();
-					}
-				}
-			});
-
-			SwingViewBuilder factory = new SwingViewBuilder(iceController,properties);
-
-			iceFrame = factory.buildViewerPanel();
-
-
-
-			iceFrame.setVisible(false);
-			iceContainer = new SwingNode();
-			iceContainer.setContent(iceFrame);
-			iceContainer.visibleProperty().bind(showingPdf);
-			pageFitButton.disableProperty().bind(showingPdf.not());
-			pageWidthButton.disableProperty().bind(showingPdf.not());
-			zoomInButton.disableProperty().bind(showingPdf.not());
-			zoomOutButton.disableProperty().bind(showingPdf.not());
-			pageLabel1.visibleProperty().bind(showingPdf);
-			pageField.visibleProperty().bind(showingPdf);
-			pageLabel2.visibleProperty().bind(showingPdf);
-			browser.toNode().visibleProperty().bind(showingPdf.not());
-			searchLabel.visibleProperty().bind(searchField.textProperty().length().greaterThan(0));
-			pageField.textProperty().addListener(new ChangeListener<String>() {
+	private void setSearchFieldListener() {
+		if(GlobalConstants.JAVASCRIPT_PDF_RENDER){
+			searchField.textProperty().addListener(new ChangeListener<String>() {
 				@Override
 				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-					String numbersOnly = newValue.replaceAll("[^\\d]", "");
-					if(numbersOnly.equals(oldValue)){
-						return;
-					}
-					pageField.setText(numbersOnly);
-				}
-			});
-
+					browser.toNode().getEngine().executeScript("findSentence('" + newValue + "');");
+				}});
+		}else{
 			searchField.textProperty().addListener(new ChangeListener<String>() {
 				@Override
 				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -325,105 +312,8 @@ public class Browser_CharClassif {
 					dtsk.go();
 				}
 			});
-
-			showingPdf.addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-					if(newValue){
-						browsePreviousPageButton.setDisable(false);
-						browseNextPageButton.setDisable(true);
-					}else{
-						browsePreviousPageButton.setDisable( browser.toNode().getEngine().getHistory().currentIndexProperty().getValue() == 0 );
-						browseNextPageButton.setDisable(false);
-					}
-				}
-			});
-			browser.toNode().getEngine().getHistory().currentIndexProperty().addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-					browseNextPageButton.setDisable(newValue.intValue() == browser.toNode().getEngine().getHistory().getEntries().size()-1 );
-					browsePreviousPageButton.setDisable(!showingPdf.getValue() && newValue.intValue() == 0 );
-				}
-			});
-
-			toolBar.add(browser.toNode(),0,1,GridPane.REMAINING,GridPane.REMAINING);
-			toolBar.add(iceContainer,0,1,GridPane.REMAINING,GridPane.REMAINING);
-
-
-			parent.leftAnchor.getChildren().add(toolBar);
-			parent.leftAnchor.setLeftAnchor(toolBar, 0.0);
-			parent.leftAnchor.setTopAnchor(toolBar, 0.0);
-			parent.leftAnchor.setRightAnchor(toolBar,0.0);
-			parent.leftAnchor.setBottomAnchor(toolBar,0.0);
-
-			/*toolBar.setOnKeyPressed(new EventHandler<KeyEvent>() {
-				@SuppressWarnings("incomplete-switch")
-				@Override
-				public void handle(KeyEvent event) {
-					switch (event.getCode()) {
-						case ESCAPE:   try {
-							hide_browser();
-						} catch (IOException | ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} break;
-					}
-				}
-			});*/
-
 		}
-		if(!parent.leftAnchor.getChildren().stream().anyMatch(e->e.equals(toolBar))){
-			parent.leftAnchor.getChildren().add(toolBar);
-			parent.leftAnchor.setLeftAnchor(toolBar, 0.0);
-			parent.leftAnchor.setTopAnchor(toolBar, 0.0);
-			parent.leftAnchor.setRightAnchor(toolBar,0.0);
-			parent.leftAnchor.setBottomAnchor(toolBar,0.0);
-
-		}
-		try{
-			secondaryStage.close();
-		}catch (Exception V){
-
-		}
-		switch_pane_hide_browser(false);
-		try {
-			loadLastPaneLayout();
-		} catch (ParseException | IOException | URISyntaxException e) {
-			e.printStackTrace();
-		}
-		parent.ruleButton.setSelected(false);
-		parent.charButton.setSelected(false);
-		parent.imageButton.setSelected(false);
-		if(lastPaneLayout!=null && lastPaneLayout.equals("BIG")){
-			return;
-		}
-		if(parent.lastRightPane.equals("RULES")){
-			try {
-				parent.view_rules();
-				parent.ruleButton.setSelected(true);
-			} catch (IOException | ParseException e) {
-				e.printStackTrace();
-			}
-		}
-		if(parent.lastRightPane.equals("CHARS")){
-			try {
-				parent.view_chars();
-				parent.charButton.setSelected(true);
-			} catch (IOException | ParseException | ClassNotFoundException | SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		if(parent.lastRightPane.equals("IMAGES")){
-			try {
-				parent.search_image();
-				parent.imageButton.setSelected(true);
-			} catch (IOException | ParseException e) {
-				e.printStackTrace();
-			}
-		}
-
 	}
-
 
 
 	@FXML void hide_browser() throws IOException, ParseException {
@@ -477,6 +367,9 @@ public class Browser_CharClassif {
 	}
 
 	private void loadLastPaneLayout() throws ParseException, IOException, URISyntaxException {
+		if(GlobalConstants.SEARCH_PANE_LAYOUT_FORCE!=null){
+			lastPaneLayout = GlobalConstants.SEARCH_PANE_LAYOUT_FORCE;
+		}
 		if(lastPaneLayout!=null){
 			if(lastPaneLayout.equals("NEW")){
 				paneNew();
@@ -501,31 +394,44 @@ public class Browser_CharClassif {
 
 
 	@FXML void zoomIn(){
-		iceController.getDocumentViewController().setZoom((float) (iceController.getUserZoom()*1.1));
+		if(GlobalConstants.JAVASCRIPT_PDF_RENDER){
+			browser.toNode().getEngine().executeScript("zoomIn()");
+		}else{
+			iceController.getDocumentViewController().setZoom((float) (iceController.getUserZoom()*1.1));
+		}
 	}
 	@FXML void zoomOut(){
-		iceController.getDocumentViewController().setZoom((float) (iceController.getUserZoom()*0.9));
+		if(GlobalConstants.JAVASCRIPT_PDF_RENDER){
+			browser.toNode().getEngine().executeScript("zoomOut()");
+		}else{
+			iceController.getDocumentViewController().setZoom((float) (iceController.getUserZoom()*0.9));
+		}
 
 	}
 	@FXML void pageFit(){
-		iceController.getDocumentViewController().setFitMode(DocumentViewController.PAGE_FIT_WINDOW_HEIGHT);
+		if(GlobalConstants.JAVASCRIPT_PDF_RENDER){
+			browser.toNode().getEngine().executeScript("pageFit()");
+		}else{
+			iceController.getDocumentViewController().setFitMode(DocumentViewController.PAGE_FIT_WINDOW_HEIGHT);
+		}
 	}
 	@FXML void pageWidth(){
-		iceController.getDocumentViewController().setFitMode(DocumentViewController.PAGE_FIT_WINDOW_WIDTH);
+		if(GlobalConstants.JAVASCRIPT_PDF_RENDER){
+			browser.toNode().getEngine().executeScript("pageWidth()");
+		}else{
+			iceController.getDocumentViewController().setFitMode(DocumentViewController.PAGE_FIT_WINDOW_WIDTH);
+		}
 	}
 	@FXML void goToUserPage(KeyEvent event){
 		if(event.getCode().equals(KeyCode.ENTER)){
-			iceController.getDocumentViewController().setCurrentPageIndex(Integer.valueOf(pageField.getText())-1);
+			if(GlobalConstants.JAVASCRIPT_PDF_RENDER){
+				browser.toNode().getEngine().executeScript("goToPage("+Integer.valueOf(pageField.getText())+")");
+			}else{
+				iceController.getDocumentViewController().setCurrentPageIndex(Integer.valueOf(pageField.getText())-1);
+			}
 		}
 	}
-	private void updateLayoutAfterPageChange() {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				pageField.setText(String.valueOf(iceController.getDocumentViewController().getCurrentPageIndex()+1));
-			}
-		});
-	}
+
 
 	private void scrollToSearchHit(Pair<Integer, LineText> integerLineTextPair) {
 		Vector<Object> v = new Vector<Object>();
@@ -543,12 +449,21 @@ public class Browser_CharClassif {
 		if(searchNextButton.isDisabled()){
 			return;
 		}
-		searchHitIndex+=1;
-		scrollToSearchHit(dtsk.hitResults.get(searchHitIndex));
+		if(GlobalConstants.JAVASCRIPT_PDF_RENDER){
+			browser.toNode().getEngine().executeScript("findNext();");
+		}else{
+			searchHitIndex+=1;
+			scrollToSearchHit(dtsk.hitResults.get(searchHitIndex));
+		}
 	}
 	@FXML void searchPrevious(){
-		searchHitIndex-=1;
-		scrollToSearchHit(dtsk.hitResults.get(searchHitIndex));
+		if(GlobalConstants.JAVASCRIPT_PDF_RENDER){
+
+		}else{
+			searchHitIndex-=1;
+			scrollToSearchHit(dtsk.hitResults.get(searchHitIndex));
+		}
+
 	}
 
 	@FXML void paneSmall(){
