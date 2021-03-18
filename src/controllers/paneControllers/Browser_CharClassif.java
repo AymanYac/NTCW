@@ -38,6 +38,7 @@ import service.CharPatternServices;
 import service.CharValuesLoader;
 import service.ExternalSearchServices;
 import service.DocumentSearchTask;
+import transversal.generic.Tools;
 import transversal.pdf_toolbox.PdfCapableBrowser;
 
 import javax.swing.*;
@@ -162,14 +163,22 @@ public class Browser_CharClassif {
 
 
 	public void setContainerWindow() {
-		if(!GlobalConstants.JAVASCRIPT_PDF_RENDER && !(iceController!=null)) {
-			iceController = browser.loadIceController(iceFrame,iceContainer);
-			browser.toNode().visibleProperty().bind(showingPdf.not());
-			toolBar.add(iceContainer,0,1,GridPane.REMAINING,GridPane.REMAINING);
+		try{
+			Tools.deleteRow(toolBar,1);
+		}catch (Exception V){
 
 		}
-		setSearchFieldListener();
-		toolBar.add(browser.toNode(),0,1,GridPane.REMAINING,GridPane.REMAINING);
+		if(!GlobalConstants.JAVASCRIPT_PDF_RENDER) {
+			if(!(iceController!=null)){
+				iceController = browser.loadIceController(iceFrame,iceContainer);
+				browser.toNode().visibleProperty().bind(showingPdf.not());
+			}
+			toolBar.add(iceContainer,0,1,GridPane.REMAINING,GridPane.REMAINING);
+
+		}else{
+			toolBar.add(browser.toNode(),0,1,GridPane.REMAINING,GridPane.REMAINING);
+		}
+
 		pageFitButton.disableProperty().bind(showingPdf.not());
 		pageWidthButton.disableProperty().bind(showingPdf.not());
 		zoomInButton.disableProperty().bind(showingPdf.not());
@@ -183,37 +192,6 @@ public class Browser_CharClassif {
 		parent.leftAnchor.setRightAnchor(toolBar,0.0);
 		parent.leftAnchor.setBottomAnchor(toolBar,0.0);
 		searchLabel.visibleProperty().bind(searchField.textProperty().length().greaterThan(0));
-		pageField.textProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				String numbersOnly = newValue.replaceAll("[^\\d]", "");
-				if(numbersOnly.equals(oldValue)){
-					return;
-				}
-				pageField.setText(numbersOnly);
-			}
-		});
-		showingPdf.addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				if(newValue){
-					System.out.println("now showing pdf");
-					browsePreviousPageButton.setDisable(false);
-					browseNextPageButton.setDisable(true);
-				}else{
-					System.out.println("closed pdf");
-					browsePreviousPageButton.setDisable( browser.toNode().getEngine().getHistory().currentIndexProperty().getValue() == 0 );
-					browseNextPageButton.setDisable(false);
-				}
-			}
-		});
-		browser.toNode().getEngine().getHistory().currentIndexProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				browseNextPageButton.setDisable(newValue.intValue() == browser.toNode().getEngine().getHistory().getEntries().size()-1 );
-				browsePreviousPageButton.setDisable(!showingPdf.getValue() && newValue.intValue() == 0 );
-			}
-		});
 
 		try{
 			secondaryStage.close();
@@ -367,6 +345,7 @@ public class Browser_CharClassif {
 	}
 
 	private void loadLastPaneLayout() throws ParseException, IOException, URISyntaxException {
+
 		if(GlobalConstants.SEARCH_PANE_LAYOUT_FORCE!=null){
 			lastPaneLayout = GlobalConstants.SEARCH_PANE_LAYOUT_FORCE;
 		}
@@ -613,6 +592,39 @@ public class Browser_CharClassif {
 	}
 	public void setParent(Char_description char_description) {
 		this.parent=char_description;
+		setSearchFieldListener();
+		pageField.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				String numbersOnly = newValue.replaceAll("[^\\d]", "");
+				if(numbersOnly.equals(oldValue)){
+					return;
+				}
+				pageField.setText(numbersOnly);
+			}
+		});
+		showingPdf.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if(newValue){
+					System.out.println("now showing pdf");
+					browsePreviousPageButton.setDisable(false);
+					browseNextPageButton.setDisable(true);
+				}else{
+					System.out.println("closed pdf");
+					browsePreviousPageButton.setDisable( browser.toNode().getEngine().getHistory().currentIndexProperty().getValue() == 0 );
+					browseNextPageButton.setDisable(false);
+				}
+			}
+		});
+		browser.toNode().getEngine().getHistory().currentIndexProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				browseNextPageButton.setDisable(newValue.intValue() == browser.toNode().getEngine().getHistory().getEntries().size()-1 );
+				browsePreviousPageButton.setDisable(!showingPdf.getValue() && newValue.intValue() == 0 );
+			}
+		});
+
 	}
 
 	@FXML void externalBrowser() throws IOException, URISyntaxException, ParseException {

@@ -1325,6 +1325,11 @@ public class Char_description {
 		//load_rule_pane();
 		//load_taxo_pane();
 		aidLabel.getScene().getWindow().setOnCloseRequest(event -> {
+			try {
+				browserController.secondaryStage.close();
+			}catch (Exception V){
+
+			}
 			ConfirmationDialog.show("Saving latest modifications", "Click (OK) to persist local changes to remote server. This should only take a few seconds", "OK");
 			try{
 				CharDescriptionExportServices.flushItemDataToDB(account, null);
@@ -1728,6 +1733,7 @@ public class Char_description {
 	}
 	
 	private void load_browser_pane() throws IOException {
+		System.out.println("Loading browser for the first time");
 		googleButton.setSelected(true);
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/Browser_CharClassif.fxml"));
 		loader.load();
@@ -1808,6 +1814,7 @@ public class Char_description {
 		try{
 			browserController.search_google_inplace(checkMethodSelect);
 		}catch(Exception V) {
+			//V.printStackTrace(System.err);
 			load_browser_pane();
 			browserController.search_google_inplace(checkMethodSelect);
 		}
