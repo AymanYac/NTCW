@@ -271,6 +271,7 @@ public class PdfCapableBrowser {
                     if (urlStartsWithPDFBytes(address.toURL()) )
                     {
                         parent.showingPdf.setValue(true);
+                        latestPDFLink=address.toURL().toString();
                         ExternalSearchServices.externalPdfViewing(address.toURL().toString());
                         if(FORCE_PDF_IN_VIEWER && !GlobalConstants.JAVASCRIPT_PDF_RENDER) {
                             icePdfBench(address.toURL(), parent.iceController);
@@ -278,7 +279,6 @@ public class PdfCapableBrowser {
                             displayPdf(address.toURL());
                         }else{
                             //parent.parent.urlLink.setText(address.toURL().toString());
-                            latestPDFLink=address.toURL().toString();
                             Desktop d = Desktop.getDesktop();
                             d.browse(address);
                         }
@@ -290,7 +290,6 @@ public class PdfCapableBrowser {
                         //parent.browserUrlProperty.setValue(address.toURL().toString());
                     }else{
                         ExternalSearchServices.browsingLink(address.toURL().toString());
-                        parent.showingPdf.setValue(false);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

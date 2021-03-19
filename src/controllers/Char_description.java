@@ -130,8 +130,7 @@ public class Char_description {
 
 
 	public Browser_CharClassif browserController;
-	public StringProperty externalBrowserUrlProperty = new SimpleStringProperty();;
-	
+
 	private GridPane rightAnchorImageGrid;
 	private GridPane rightAnchorContentGrid;
 	
@@ -376,14 +375,6 @@ public class Char_description {
 			});
 		});
 
-		sd.getScene().getWindow().focusedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				if(newValue && externalBrowserUrlProperty.get()!=null){
-					//UrlBookMarkDialog.promptBookMarkForItemClass(externalBrowserUrlProperty.get(),tableController.tableGrid.getSelectionModel().getSelectedItem(), externalBrowserUrlProperty);
-				}
-			}
-		});
 	}
 
 	protected void handleDataKeyBoardEvent(KeyEvent keyEvent, boolean pressed) throws SQLException {

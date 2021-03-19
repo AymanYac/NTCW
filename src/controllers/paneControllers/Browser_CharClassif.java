@@ -163,6 +163,10 @@ public class Browser_CharClassif {
 
 
 	public void setContainerWindow() {
+
+		nextPageIsPdf.setValue(false);
+		showingPdf.setValue(false);
+
 		try{
 			Tools.deleteRow(toolBar,1);
 		}catch (Exception V){
@@ -630,8 +634,15 @@ public class Browser_CharClassif {
 	@FXML void externalBrowser() throws IOException, URISyntaxException, ParseException {
 		this.beforeExternalPaneLayout =lastPaneLayout;
 		lastPaneLayout="EXTERNAL";
-		Desktop.getDesktop().browse(new URL(browser.toNode().getEngine().getLocation()+(showingPdf.get()?"#page="+pageField.getText():"")).toURI());
-		parent.externalBrowserUrlProperty.setValue(browser.toNode().getEngine().getLocation()+(showingPdf.get()?"#page="+pageField.getText():""));
+		if(showingPdf.getValue()){
+			if(GlobalConstants.JAVASCRIPT_PDF_RENDER){
+				Desktop.getDesktop().browse(new URL(browser.latestPDFLink).toURI());
+			}else{
+				Desktop.getDesktop().browse(new URL(browser.toNode().getEngine().getLocation()+"#page="+pageField.getText()).toURI());
+			}
+		}else{
+			Desktop.getDesktop().browse(new URL(browser.toNode().getEngine().getLocation()).toURI());
+		}
 		//hide_browser();
 	}
 
