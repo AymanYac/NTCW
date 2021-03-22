@@ -150,14 +150,16 @@ public class CharDescriptionExportServices {
 				"Long description",
 				"Material Group",
 				"Classification number",
-				"Classification name"}, new IndexedColors[] {
+				"Classification name",
+				"Reference URL"}, new IndexedColors[] {
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.SEA_GREEN,
-				IndexedColors.SEA_GREEN
+				IndexedColors.SEA_GREEN,
+				IndexedColors.GREY_80_PERCENT
 		});
 		completeReviewHeaderRow(wb,reviewHeader,
 				CharValuesLoader.active_characteristics.values().parallelStream()
@@ -215,15 +217,17 @@ public class CharDescriptionExportServices {
 
 		if(exportReview){
 			reviewSheet.setColumnWidth(0,256*17);
-			reviewSheet.setColumnWidth(1,256*50);
+			reviewSheet.setColumnWidth(1,256*17);
 			reviewSheet.setColumnWidth(2,256*50);
-			reviewSheet.setColumnWidth(3,256*15);
-			reviewSheet.setColumnWidth(4,256*25);
-			reviewSheet.setColumnWidth(5,256*35);
+			reviewSheet.setColumnWidth(3,256*50);
+			reviewSheet.setColumnWidth(4,256*15);
+			reviewSheet.setColumnWidth(5,256*25);
+			reviewSheet.setColumnWidth(6,256*35);
+			reviewSheet.setColumnWidth(7,256*35);
 			for(int i=0;i<CharValuesLoader.active_characteristics.values().parallelStream()
 					.map(a->a.size()).max(Integer::compare).get();i++) {
-				reviewSheet.setColumnWidth(6+2*i,256*20);
-				reviewSheet.setColumnWidth(7+2*i,256*20);
+				reviewSheet.setColumnWidth(8+2*i,256*20);
+				reviewSheet.setColumnWidth(9+2*i,256*20);
 			}
 			reviewSheet.setZoom(60);
 			reviewSheet.createFreezePane(0, 1);
@@ -438,11 +442,16 @@ public class CharDescriptionExportServices {
 		loopCell = row.createCell(6);
 		loopCell.setCellValue(item.getClass_segment_string().split("&&&")[1]);
 
+		loopCell = row.createCell(7);
+		String urlList = item.getItemURLListForClass(item.getClass_segment_string().split("&&&")[0]);
+		if(urlList.length()>0){
+			loopCell.setCellValue(urlList);
+		}
 
 		for(int i=0;i<itemChars.size();i++) {
-			loopCell = row.createCell(7+2*i);
-			loopCell.setCellValue(itemChars.get(i).getCharacteristic_name());
 			loopCell = row.createCell(8+2*i);
+			loopCell.setCellValue(itemChars.get(i).getCharacteristic_name());
+			loopCell = row.createCell(9+2*i);
 			try{
 				loopCell.setCellValue(item.getData(item.getClass_segment_string().split("&&&")[0]).get(itemChars.get(i).getCharacteristic_id()).getDisplayValue(parent/*,carac*/));
 			}catch(Exception V) {
@@ -497,7 +506,7 @@ public class CharDescriptionExportServices {
 		XSSFColor[] colorArr = new XSSFColor[]{darkBlue,lightBlue};
 		
 		for(int i=0;i<reviewCharCardinality;i++) {
-			Cell cell = headerRow.createCell(6+2*i);
+			Cell cell = headerRow.createCell(8+2*i);
 			cell.setCellValue("Characteristic name "+String.valueOf(i+1));
     		XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
     		 style.setFillForegroundColor(colorArr[Math.floorMod(i, 2)]);
@@ -508,7 +517,7 @@ public class CharDescriptionExportServices {
     		 style.setFont(font);
     		 cell.setCellStyle(style);
     		 
-    		 cell = headerRow.createCell(7+2*i);
+    		 cell = headerRow.createCell(9+2*i);
  			 cell.setCellValue("Characteristic value "+String.valueOf(i+1));
      		 style = (XSSFCellStyle) wb.createCellStyle();
      		 style.setFillForegroundColor(colorArr[Math.floorMod(i, 2)]);
