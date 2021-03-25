@@ -1216,6 +1216,7 @@ public class CaracDeclarationDialog {
 	}
 
 	public static void skipToNextField(Node node) {
+		/*
 		KeyEvent newEvent
 				= new KeyEvent(
 				null,
@@ -1235,6 +1236,6 @@ public class CaracDeclarationDialog {
 		}
 		if(node instanceof ComboBox){
 			((BehaviorSkinBase) ((ComboBox)node).getSkin()).getBehavior().traverseNext();
-		}
+		}*/
 	}
 }

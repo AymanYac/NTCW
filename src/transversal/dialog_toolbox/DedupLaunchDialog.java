@@ -496,7 +496,7 @@ public class DedupLaunchDialog {
     }
 
     private static void skipToNextField(Node node) {
-        KeyEvent newEvent
+        /*KeyEvent newEvent
                 = new KeyEvent(
                 null,
                 null,
@@ -515,6 +515,6 @@ public class DedupLaunchDialog {
         }
         if(node instanceof ComboBox){
             ((BehaviorSkinBase) ((ComboBox)node).getSkin()).getBehavior().traverseNext();
-        }
+        }*/
     }
 }
