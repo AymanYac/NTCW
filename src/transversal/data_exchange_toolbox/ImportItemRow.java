@@ -203,9 +203,9 @@ public class ImportItemRow {
 			}else {
 				
 				//The carac is not declared in this segment (unknown template)
-				rejectedRows.add(new Pair<Row,String>(current_row,"Characteristic: "+charID+" is not declared for the item's category: "+item.getClass_segment().getClassNumber()));
-				valueParseHasFailed = true;
-				return null;
+				rejectedRows.add(new Pair<Row,String>(current_row,"Non blocking Warning: Characteristic: "+charID+" is not declared for the item's category: "+item.getClass_segment().getClassNumber()));
+				//valueParseHasFailed = true;
+				//return null;
 			}
 		}else {
 			
