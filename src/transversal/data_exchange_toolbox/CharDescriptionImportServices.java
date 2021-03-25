@@ -141,7 +141,8 @@ public class CharDescriptionImportServices {
 			CharItemFetcher.fetchAllItems(account.getActive_project(),true);
 			ClassCharacteristicsLoader.loadAllClassCharacteristic(account.getActive_project(),true);
 			CharItemFetcher.initClassDataFields();
-			ClassCharacteristicsLoader.loadKnownValuesAssociated2Items(account.getActive_project(),true);
+			//ClassCharacteristicsLoader.loadKnownValuesAssociated2Items(account.getActive_project(),true);
+			CharValuesLoader.fetchAllKnownValuesAssociated2Items(active_project,true);
 			HashSet<String> items2Update = new HashSet<String>();
 			Patterns2Apply.forEach(p->{
 				items2Update.addAll(CharPatternServices.applyRule(p.getKey(),p.getValue(),account));
@@ -152,7 +153,6 @@ public class CharDescriptionImportServices {
 			ConfirmationDialog.show("Description rules application failed", "Unable to apply pattern description rules", "OK", null);
 			V.printStackTrace(System.err);
 		}
-
 
 
 	}
