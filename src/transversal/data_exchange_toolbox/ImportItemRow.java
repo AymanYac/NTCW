@@ -62,14 +62,6 @@ public class ImportItemRow {
 			
 			ClassCaracteristic knownTemplate = CharDescriptionImportServices.classSpecificFields.get(charID).get(item.getClass_segment().getClassNumber());
 			if(knownTemplate!=null) {
-				try{
-					String url = current_row.getCell(columnMap.get("value_url"), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
-					if(url!=null && url.replace(" ","").length()>0){
-						current_value.setUrl(url);
-					}
-				}catch (Exception V){
-
-				}
 				if(knownCarac.getIsNumeric()) {
 					//The carac is numeric
 					
@@ -155,9 +147,19 @@ public class ImportItemRow {
 							}else {
 								
 								//The uom symbol is not known
-								rejectedRows.add(new Pair<Row,String>(current_row,"Uom symbol: "+tmpUomSymbol+" can not be matched to any known unit of measure"));
-								valueParseHasFailed=true;
-								return null;
+								if(
+										(current_value.getNominal_value()!=null && current_value.getNominal_value().length()>0)||
+										(current_value.getMin_value()!=null && current_value.getMin_value().length()>0)||
+										(current_value.getMax_value()!=null && current_value.getMax_value().length()>0)
+								){
+									//At least a num field is filled and yet no uom has been declared
+									rejectedRows.add(new Pair<Row,String>(current_row,"Uom symbol: "+tmpUomSymbol+" can not be matched to any known unit of measure"));
+									valueParseHasFailed=true;
+									return null;
+								}else{
+									current_value.setUom_id(knownTemplate.getAllowedUoms().get(0));
+								}
+
 							}
 						}else {
 							
@@ -214,6 +216,15 @@ public class ImportItemRow {
 		}
 		current_value.setSource(DataInputMethods.PROJECT_SETUP_UPLOAD);
 		current_value.setManually_Reviewed(true);
+		try{
+			String url = current_row.getCell(columnMap.get("value_url"), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+			if(url!=null && url.replace(" ","").length()>0){
+				current_value.setUrl(url);
+			}
+		}catch (Exception V){
+
+		}
+
 		return current_value;
 	}
 
