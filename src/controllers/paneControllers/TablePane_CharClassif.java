@@ -170,7 +170,7 @@ public class TablePane_CharClassif {
 			account.setActiveItem(rs.getString("activeItemID"));
 			account.setActiveChar(rs.getString("activeCharID"));
 		}catch(Exception V) {
-			V.printStackTrace(System.err);
+			//V.printStackTrace(System.err);
 		}
 		rs.close();
 		stmt.close();

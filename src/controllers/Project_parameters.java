@@ -2748,7 +2748,6 @@ public class Project_parameters {
 			try {
 				CharDescriptionImportServices.upsertTaxoAndChar(taxoFile.getText(),"TAXO","ITEMS",this.prj.getPid(),Integer.parseInt(classificationLevels.getValue()),account);
 			} catch (ClassNotFoundException | IOException | InvalidFormatException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return this.prj.getPid()+".project_segments";

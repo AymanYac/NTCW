@@ -147,26 +147,30 @@ public class ImportItemRow {
 							}else {
 								
 								//The uom symbol is not known
-								if(
-										(current_value.getNominal_value()!=null && current_value.getNominal_value().length()>0)||
-										(current_value.getMin_value()!=null && current_value.getMin_value().length()>0)||
-										(current_value.getMax_value()!=null && current_value.getMax_value().length()>0)
-								){
-									//At least a num field is filled and yet no uom has been declared
-									rejectedRows.add(new Pair<Row,String>(current_row,"Uom symbol: "+tmpUomSymbol+" can not be matched to any known unit of measure"));
-									valueParseHasFailed=true;
-									return null;
-								}else{
-									current_value.setUom_id(knownTemplate.getAllowedUoms().get(0));
-								}
-
+								rejectedRows.add(new Pair<Row,String>(current_row,"Uom symbol: "+tmpUomSymbol+" can not be matched to any known unit of measure"));
+								valueParseHasFailed=true;
+								return null;
 							}
 						}else {
 							
 							//The row has no uom symbol
-							rejectedRows.add(new Pair<Row,String>(current_row,"Uom is required for characteristic: "+charID));
-							valueParseHasFailed=true;
-							return null;
+							if(
+								(current_value.getNominal_value()!=null && current_value.getNominal_value().length()>0)||
+								(current_value.getMin_value()!=null && current_value.getMin_value().length()>0)||
+								(current_value.getMax_value()!=null && current_value.getMax_value().length()>0)
+							) {
+								//And yet there's a nominal, min or max value in the row, reject
+								rejectedRows.add(new Pair<Row, String>(current_row, "Uom is required for characteristic: " + charID));
+								valueParseHasFailed = true;
+								return null;
+							}else{
+								//No num field in the row, allow *UNKNOWN*
+								try{
+									current_value.setUom_id(knownTemplate.getAllowedUoms().get(0));
+								}catch (Exception V){
+
+								}
+							}
 						}
 					}
 				}else {
@@ -319,7 +323,7 @@ public class ImportItemRow {
 		columnMap.put("value_max", 13);
 		columnMap.put("value_uom", 14);
 		columnMap.put("value_note", 15);
-		columnMap.put("value_rule", 16);
+		columnMap.put("valute_rule", 16);
 		columnMap.put("value_url",17);
 		
 	}

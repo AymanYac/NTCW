@@ -53,6 +53,7 @@ public class CharItemFetcher {
 
 
 			stmt = conn.prepareStatement("select item_id, client_item_number, short_description,short_description_translated, long_description,long_description_translated,material_group,pre_classification from "+active_project+".project_items");
+			//System.out.println(stmt.toString());
 			rs = stmt.executeQuery();
 			
 			int i=-1;
@@ -63,8 +64,6 @@ public class CharItemFetcher {
 					//CharDescriptionRow tmp = new CharDescriptionRow(loop_class_id,tablePane_CharClassif.active_characteristics.get(loop_class_id).size());
 					CharDescriptionRow tmp = new CharDescriptionRow();
 					tmp.setItem_id(rs.getString("item_id"));
-					i+=1;
-					indexedRowItems.put(tmp.getItem_id(), i);
 					tmp.setClient_item_number(rs.getString("client_item_number"));
 					tmp.setShort_desc(rs.getString("short_description"));
 					tmp.setShort_desc_translated(rs.getString("short_description_translated"));
@@ -80,10 +79,11 @@ public class CharItemFetcher {
 					tmp.setClass_segment_string(loop_class_id+"&&&"+loop_class_name+"&&&"+loop_class_number);
 
 					tmp.setRuleResults(Item2RuleResults.get(tmp.getItem_id()));
-
+					i+=1;
+					indexedRowItems.put(tmp.getItem_id(), i);
 					allRowItems.add(tmp);
 				}catch(Exception V) {
-					V.printStackTrace(System.err);
+					//V.printStackTrace(System.err);
 				}
 				
 			}

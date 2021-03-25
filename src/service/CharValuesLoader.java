@@ -31,7 +31,6 @@ public class CharValuesLoader {
 					+ "(select * from "+active_project+".project_items_x_values"
 					+ ") data left join "+active_project+".project_values "
 					+ "on data.value_id = project_values.value_id");
-
 			rs = stmt.executeQuery();
 			HashMap<String, List<String>> charIdArrays = new HashMap<String,List<String>>();
 			CharValuesLoader.active_characteristics.forEach((k,v)->{
@@ -39,12 +38,18 @@ public class CharValuesLoader {
 			});
 			int i=-1;
 			while(rs.next()) {
-				String loop_class_id = CharItemFetcher.classifiedItems.get(rs.getString("item_id")).split("&&&")[4];
+				if(!CharItemFetcher.classifiedItems.containsKey(rs.getString("item_id"))){
+					continue;
+				}
+				String loop_class_id = CharItemFetcher.classifiedItems.get(rs.getString("item_id")).split("&&&")[4];;
 				String item_id = rs.getString("item_id");
 				String characteristic_id = rs.getString("characteristic_id");
 				String user_id = rs.getString("user_id");
 				String description_method = rs.getString("description_method");
 				String description_rule_id = rs.getString("description_rule_id");
+				if(!charIdArrays.containsKey(loop_class_id)){
+					continue;
+				}
 				if(charIdArrays.get(loop_class_id).indexOf(characteristic_id)==-1){
 					continue;
 				}

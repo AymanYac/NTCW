@@ -337,6 +337,29 @@ public class DedupLaunchDialog {
         caracWeightTable.setEditable(true);
         caracWeightTable.getSelectionModel().setCellSelectionEnabled(true);
         caracWeightTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        caracWeightTable.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if(event.getCode().equals(KeyCode.D) && event.isControlDown()){
+                    Pair<ClassCaracteristic, ArrayList<String>> firstRow = caracWeightTable.getItems().get(caracWeightTable.getSelectionModel().getSelectedIndices().stream().min(Comparator.naturalOrder()).get());
+                    caracWeightTable.getSelectionModel().getSelectedCells().forEach(c->{
+                        int itemIdx = c.getRow();
+                        int weightIdx = c.getColumn()-2;
+                        caracWeightTable.getItems().get(itemIdx).getValue().set(weightIdx,firstRow.getValue().get(weightIdx));
+                    });
+                    caracWeightTable.refresh();
+                }
+            }
+        });
+
+        TableColumn col0 = new TableColumn("Sequence");
+        col0.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String> r) {
+                return new ReadOnlyObjectWrapper(r.getValue().getKey().getSequence().toString());
+            }
+        });
+        col0.setResizable(false);
+        col0.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(10 / 100.0));
 
         TableColumn col1 = new TableColumn("Characteristic name");
         col1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String>, ObservableValue<String>>() {
@@ -345,7 +368,7 @@ public class DedupLaunchDialog {
             }
         });
         col1.setResizable(false);
-        col1.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(40 / 100.0));
+        col1.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(30 / 100.0));
 
         TableColumn col2 = new TableColumn("Strong match weight");
         col2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String>, ObservableValue<String>>() {
@@ -431,6 +454,7 @@ public class DedupLaunchDialog {
         col4.setResizable(false);
         col4.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(20 / 100.0));
 
+        caracWeightTable.getColumns().add(col0);
         caracWeightTable.getColumns().add(col1);
         caracWeightTable.getColumns().add(col2);
         caracWeightTable.getColumns().add(col3);

@@ -200,7 +200,7 @@ public class ImportTaxoRow {
 							
 					}else {
 						//The row lacks declared uoms
-						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+" with undeclared uom(s), excpected: "+
+						Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Duplicate characteristic "+row_char_id+" with undeclared uom(s), expected: "+
 						String.join(",",knownTemplate.getAllowedUoms().stream().map(id->UnitOfMeasure.RunTimeUOMS.get(id).toString()).collect(Collectors.toList())));
 						rejectedRows.add(rejectedRow);
 						caracParseFail();
