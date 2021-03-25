@@ -62,6 +62,14 @@ public class ImportItemRow {
 			
 			ClassCaracteristic knownTemplate = CharDescriptionImportServices.classSpecificFields.get(charID).get(item.getClass_segment().getClassNumber());
 			if(knownTemplate!=null) {
+				try{
+					String url = current_row.getCell(columnMap.get("value_url"), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+					if(url!=null && url.replace(" ","").length()>0){
+						current_value.setUrl(url);
+					}
+				}catch (Exception V){
+
+				}
 				if(knownCarac.getIsNumeric()) {
 					//The carac is numeric
 					
@@ -300,7 +308,8 @@ public class ImportItemRow {
 		columnMap.put("value_max", 13);
 		columnMap.put("value_uom", 14);
 		columnMap.put("value_note", 15);
-		columnMap.put("valute_rule", 16);
+		columnMap.put("value_rule", 16);
+		columnMap.put("value_url",17);
 		
 	}
 
