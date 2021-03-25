@@ -422,8 +422,8 @@ public class CharDescriptionRow {
 			return this.accentFreeDescriptionNoCR;
 		}
 		unidecode = unidecode!=null?unidecode: Unidecode.toAscii();
-		//accentFreeDescriptionNoCR =  (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
-		accentFreeDescriptionNoCR =  (getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
+		accentFreeDescriptionNoCR =  (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
+		//accentFreeDescriptionNoCR =  (getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
 		return accentFreeDescriptionNoCR;
 	}
 

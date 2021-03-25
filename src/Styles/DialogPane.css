@@ -49,7 +49,7 @@
 	-fx-text-fill:#8496AE;
 }
 
-.table-view:row-selection:constrained-resize .column-header-background{
+.table-view .column-header-background{
 	-fx-background-color:#445469,
 	linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%),
     linear-gradient(#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
@@ -73,26 +73,26 @@
 
 }
 
-.table-view:row-selection .column-header-background .nested-column-header .table-column .label{
+.table-view .column-header-background .nested-column-header .table-column .label{
 		-fx-background-color:transparent;
 		-fx-border-color:transparent;
 }
 
-.table-view:row-selection .column-header-background .filler{
+.table-view .column-header-background .filler{
 	-fx-background-color:#445469,
 	linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%),
     linear-gradient(#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
 }
 
-.table-view:row-selection:constrained-resize .column-resize-line{
+.table-view .column-resize-line{
 	-fx-background-color:red;
 }
 
-.table-view:row-selection .column-header-background .nested-column-header{
+.table-view .column-header-background .nested-column-header{
 	-fx-background-color:red;
 }
 
-.table-view:row-selection .column-header-background .nested-column-header .table-column{
+.table-view .column-header-background .nested-column-header .table-column{
 	-fx-background-color:#445469,
 	linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%),
     linear-gradient(#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);

@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -87,7 +88,7 @@ public class CaracDeclarationDialog {
 		grid.setPadding(new Insets(10, 10, 10, 10));
 		TableView<Pair<ClassSegment,SimpleBooleanProperty>> tableview = new TableView<Pair<ClassSegment, SimpleBooleanProperty>>();
 
-		TableColumn col1 = new TableColumn("Cateogry ID");
+		TableColumn col1 = new TableColumn("Class ID");
 		col1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassSegment,SimpleBooleanProperty>, String>, ObservableValue<String>>() {
 			public ObservableValue<String> call(TableColumn.CellDataFeatures<Pair<ClassSegment,SimpleBooleanProperty>, String> r) {
 				return new ReadOnlyObjectWrapper(r.getValue().getKey().getClassNumber());
@@ -523,7 +524,7 @@ public class CaracDeclarationDialog {
 		grid.setPadding(new Insets(10, 10, 10, 10));
 		TableView<ClassSegment> tableview = new TableView<ClassSegment>();
 
-		TableColumn col1 = new TableColumn("Cateogry ID");
+		TableColumn col1 = new TableColumn("Class ID");
 		col1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ClassSegment, String>, ObservableValue<String>>() {
 			public ObservableValue<String> call(TableColumn.CellDataFeatures<ClassSegment, String> r) {
 				return new ReadOnlyObjectWrapper(r.getValue().getClassNumber());
@@ -1215,7 +1216,7 @@ public class CaracDeclarationDialog {
 	}
 
 	public static void skipToNextField(Node node) {
-		/*KeyEvent newEvent
+		KeyEvent newEvent
 				= new KeyEvent(
 				null,
 				null,
@@ -1228,12 +1229,12 @@ public class CaracDeclarationDialog {
 				false,
 				false
 		);
-		Event.fireEvent( node, newEvent );*/
-		/*if(node instanceof TextField){
+		Event.fireEvent( node, newEvent );
+		if(node instanceof TextField){
 			((BehaviorSkinBase) ((TextField)node).getSkin()).getBehavior().traverseNext();
 		}
 		if(node instanceof ComboBox){
 			((BehaviorSkinBase) ((ComboBox)node).getSkin()).getBehavior().traverseNext();
-		}*/
+		}
 	}
 }

@@ -1488,8 +1488,18 @@ public class Char_description {
 				CharDescriptionExportServices.flushItemDataToDB(account,null);
 			}
 		});
+		MenuItem launchDedup = new MenuItem("Launch Deduplication settings");
+		launchDedup.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent t) {
+				try {
+					DedupLaunchDialog.Settings(Tools.get_project_segments(parent.account).get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()),tableController.Parent);
+				} catch (SQLException | ClassNotFoundException throwables) {
+					throwables.printStackTrace();
+				}
+			}
+		});
 
-		desc.getItems().addAll(reeval_rules_true,clear_unknowns,mark_as_known,clear_unknowns_active_char,mark_as_known_active_char,clear_unknowns_class,mark_as_known_class);
+		desc.getItems().addAll(reeval_rules_true,clear_unknowns,mark_as_known,clear_unknowns_active_char,mark_as_known_active_char,clear_unknowns_class,mark_as_known_class,launchDedup);
 	}
 
 
