@@ -48,7 +48,10 @@ public class PdfCapableBrowser {
         try {
             URLConnection uc = url.openConnection();
             uc.addRequestProperty("User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2656.18 Safari/537.36");
-            BufferedInputStream bis = new BufferedInputStream(uc.getInputStream());
+            uc.setConnectTimeout(2000); // 2 sec
+            uc.setReadTimeout(4000); // 4 sec
+            InputStream is = uc.getInputStream();
+            BufferedInputStream bis = new BufferedInputStream(is);
             byte[] buffer = new byte[6];
             bis.read(buffer);
             String base64 = Base64.getEncoder().encodeToString(buffer);

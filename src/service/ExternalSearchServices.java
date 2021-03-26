@@ -216,9 +216,9 @@ public class ExternalSearchServices {
                                     ||
                                     (elem.get(2).equals(userLanguageCode + " or " + dataLanguageCode) && !(sourceValue.getUserLanguageValue() != null && sourceValue.getUserLanguageValue().length() > 0))
                             ) {
-                                searchSentence.set(searchSentence + " " + sourceValue.getDataLanguageValue());
+                                searchSentence.set(searchSentence + " " + sourceValue.getDataLanguageValueRAW());
                             } else {
-                                searchSentence.set(searchSentence + " " + sourceValue.getUserLanguageValue());
+                                searchSentence.set(searchSentence + " " + sourceValue.getUserLanguageValueRAW());
                             }
                         } else {
                             searchSentence.set(searchSentence + " " + sourceValue.getRawDisplay());

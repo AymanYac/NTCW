@@ -313,6 +313,13 @@ public class CaracteristicValue implements Serializable {
 				
 		return concatDataLength>0;
 	}
+	public String getUserLanguageValueRAW() {
+		String ret = getUserLanguageValue();
+		if(ret!=null){
+			return ret;
+		}
+		return "";
+	}
 	public String getUserLanguageValue() {
 		return userLanguageValue;
 		/*
@@ -332,7 +339,13 @@ public class CaracteristicValue implements Serializable {
 		}
 		return null;*/
 	}
-	
+	public String getDataLanguageValueRAW() {
+		String ret = getDataLanguageValue();
+		if(ret!=null){
+			return ret;
+		}
+		return "";
+	}
 	public String getDataLanguageValue() {
 		return dataLanguageValue;
 		/*if(text_values!=null) {
