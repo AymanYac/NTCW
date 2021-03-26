@@ -11,6 +11,7 @@ import transversal.language_toolbox.WordUtils;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -2723,13 +2724,13 @@ public class CharPatternServices {
 
 	public static HashSet<String> applyRule(GenericCharRule newRule, ClassCaracteristic activeChar,UserAccount account) {
 		//System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
-		HashSet<String> items2Reevaluate = new HashSet<String>();
+		ConcurrentHashMap.KeySetView<String, Boolean> items2Reevaluate = ConcurrentHashMap.newKeySet();
 		Pattern regexPattern;
 		try {
 			regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 		}catch (Exception V){
 			V.printStackTrace(System.err);
-			return items2Reevaluate;
+			return new HashSet<>(items2Reevaluate);
 		}
 		ArrayList<String> targetClasses = CharValuesLoader.active_characteristics.entrySet().stream()
 				.filter(e -> e.getValue().stream().map(car -> car.getCharacteristic_id())
@@ -2753,7 +2754,7 @@ public class CharPatternServices {
 						items2Reevaluate.add(r.getItem_id());
 					}
 				});
-		return items2Reevaluate;
+		return new HashSet<>(items2Reevaluate);
 	}
 
 

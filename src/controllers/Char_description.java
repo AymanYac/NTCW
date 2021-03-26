@@ -2,8 +2,6 @@ package controllers;
 
 import controllers.paneControllers.*;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -305,7 +303,7 @@ public class Char_description {
 				assignValueOnSelectedItems(val);
 				ExternalSearchServices.refreshUrlAfterElemChange(parent);
 				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::reEvaluateCharRules);
-				CharDescriptionExportServices.flushItemDataToDB(account,null);
+				CharDescriptionExportServices.flushItemDataToDB(account);
 			}
 		});
 		
@@ -895,7 +893,7 @@ public class Char_description {
 			tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.switchUnknownValues(account,null));
 			refresh_ui_display();
 			tableController.tableGrid.refresh();
-			CharDescriptionExportServices.flushItemDataToDB(account,null);
+			CharDescriptionExportServices.flushItemDataToDB(account);
 		}
 
 		return;
@@ -1323,7 +1321,7 @@ public class Char_description {
 			}
 			ConfirmationDialog.show("Saving latest modifications", "Click (OK) to persist local changes to remote server. This should only take a few seconds", "OK");
 			try{
-				CharDescriptionExportServices.flushItemDataToDB(account, null);
+				CharDescriptionExportServices.flushItemDataToDB(account);
 				while (CharDescriptionExportServices.itemDataBuffer.peek() != null) {
 					try {
 						TimeUnit.MILLISECONDS.sleep(500);
@@ -1419,7 +1417,7 @@ public class Char_description {
 				CharItemFetcher.allRowItems.parallelStream().forEach(CharDescriptionRow::reEvaluateCharRules);
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account,null);
+				CharDescriptionExportServices.flushItemDataToDB(account);
 			}
 		});
 
@@ -1429,7 +1427,7 @@ public class Char_description {
 				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(charDescriptionRow -> charDescriptionRow.clearUnknownValues(null));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account,null);
+				CharDescriptionExportServices.flushItemDataToDB(account);
 			}
 		});
 		MenuItem mark_as_known = new MenuItem("Mark blank values as UNKNOWN (selected items)         Ctrl+U");
@@ -1438,7 +1436,7 @@ public class Char_description {
 				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account, null));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account,null);
+				CharDescriptionExportServices.flushItemDataToDB(account);
 			}
 		});
 
@@ -1451,7 +1449,7 @@ public class Char_description {
 				CharItemFetcher.allRowItems.forEach(r->r.clearUnknownValues(active_char.getCharacteristic_id()));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account,null);
+				CharDescriptionExportServices.flushItemDataToDB(account);
 			}
 		});
 		MenuItem mark_as_known_active_char = new MenuItem("Mark blank values as UNKNOWN (active characteristic)");
@@ -1463,7 +1461,7 @@ public class Char_description {
 				CharItemFetcher.allRowItems.forEach(r->r.markUnknownClearValues(account,active_char.getCharacteristic_id()));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account,null);
+				CharDescriptionExportServices.flushItemDataToDB(account);
 			}
 		});
 
@@ -1473,7 +1471,7 @@ public class Char_description {
 				tableController.tableGrid.getItems().forEach(charDescriptionRow -> charDescriptionRow.clearUnknownValues(null));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account,null);
+				CharDescriptionExportServices.flushItemDataToDB(account);
 			}
 		});
 		MenuItem mark_as_known_class = new MenuItem("Mark blank values as UNKNOWN (active class)");
@@ -1485,7 +1483,7 @@ public class Char_description {
 				tableController.tableGrid.getItems().forEach(r->r.markUnknownClearValues(account, null));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account,null);
+				CharDescriptionExportServices.flushItemDataToDB(account);
 			}
 		});
 		MenuItem launchDedup = new MenuItem("Launch Deduplication settings");
@@ -2307,7 +2305,7 @@ public class Char_description {
 				assignValueOnSelectedItems(tmp);
 				new Thread(()->{
 					CharPatternServices.applyItemRule(this);
-					CharDescriptionExportServices.flushItemDataToDB(account,null);
+					CharDescriptionExportServices.flushItemDataToDB(account);
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {

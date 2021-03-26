@@ -879,124 +879,122 @@ public class CharDescriptionExportServices {
 		return;
 	}
 
-	public static void flushItemDataToDB(UserAccount account, Integer itemRuleBufferSize) {
+	public static void flushItemDataToDBNoThread(UserAccount account) throws SQLException, ClassNotFoundException {
+		Connection conn = Tools.spawn_connection_from_pool();
+		Connection conn2 = Tools.spawn_connection_from_pool();
+		Connection conn3 = Tools.spawn_connection_from_pool();
+		PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_values values(?,?,?,?,?,?,?,?,?) on conflict(value_id) do update set manually_reviewed = excluded.manually_reviewed");
+		PreparedStatement stmt2 = conn2.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values values (?,?,?,?,clock_timestamp(),?,?,?) on conflict (item_id,characteristic_id) do update set user_id = excluded.user_id, description_method = excluded.description_method, description_time=excluded.description_time, value_id = excluded.value_id, description_rule_id=excluded.description_rule_id,url_link = excluded.url_link");
+		PreparedStatement stmt3 = conn3.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values_history values (?,?,?,?,clock_timestamp(),?,?,?)");
+		while(itemDataBuffer.peek()!=null) {
+			try {
+				Pair<String, Pair<CaracteristicValue, ClassCaracteristic>> elem = itemDataBuffer.poll();
+				String item_id = elem.getKey();
+				CaracteristicValue val = elem.getValue().getKey();
+				ClassCaracteristic carac = elem.getValue().getValue();
+
+				stmt.setString(1, val.getValue_id());
+				stmt.setString(2, val.getDataLanguageValue());
+				stmt.setString(3, val.getUserLanguageValue());
+				stmt.setString(4, val.getNominal_value());
+				stmt.setString(5, val.getMin_value());
+				stmt.setString(6, val.getMax_value());
+				stmt.setString(7, val.getNote());
+				stmt.setString(8, val.getUom_id());
+				stmt.setBoolean(9,val.getManually_Reviewed());
+				stmt.addBatch();
+
+				stmt2.setString(1, item_id);
+				stmt2.setString(2, carac.getCharacteristic_id());
+				stmt2.setString(3, account.getUser_id());
+				stmt2.setString(4, val.getSource());
+				stmt2.setString(5, val.getValue_id());
+				stmt2.setString(6, val.getRule_id());
+				stmt2.setString(7, val.getUrl());
+
+				stmt2.addBatch();
+
+				stmt3.setString(1, item_id);
+				stmt3.setString(2, carac.getCharacteristic_id());
+				stmt3.setString(3, account.getUser_id());
+				stmt3.setString(4, val.getSource());
+				stmt3.setString(5, val.getValue_id());
+				stmt3.setString(6, val.getRule_id());
+				stmt3.setString(7, val.getUrl());
+				stmt3.addBatch();
+
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
+			}
+		}
+		try{
+			stmt.executeBatch();
+			stmt2.executeBatch();
+			stmt3.executeBatch();
+		}catch (Exception V){
+			V.printStackTrace(System.err);
+			ExceptionDialog.show("Connection Error","Could not reach server","Item values could not be saved. Please restart");
+			throw new RuntimeException(V.getCause());
+		}
+
+
+		stmt.clearBatch();
+		stmt.close();
+		stmt2.clearBatch();
+		stmt2.close();
+		stmt3.clearBatch();
+		stmt3.close();
+
+		conn.close();
+		conn2.close();
+		conn3.close();
+
+		conn = Tools.spawn_connection_from_pool();
+		stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_items_x_pattern_results values(?,?,?,?) on conflict(item_id,characteristic_id) do update set char_rule_results_json = excluded.char_rule_results_json");
+		PreparedStatement finalStmt = stmt;
+		CharDescriptionExportServices.itemRuleBuffer = CharDescriptionExportServices.itemRuleBuffer.stream().collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
+		int initRuleBufferSize = CharDescriptionExportServices.itemRuleBuffer.size();
+		if(GlobalConstants.PUSH_RULE_BUFFER_BY_BLOCK){
+			IntStream.range(0,20).forEach(loop->{
+				System.out.println("\t Buffer Block "+String.valueOf(loop+1)+"/20");
+				int bufferBlockIdx =0;
+				while (CharDescriptionExportServices.itemRuleBuffer.peek()!=null && bufferBlockIdx<(1.0*initRuleBufferSize)/20.0){
+					CharDescriptionRow row = CharDescriptionExportServices.itemRuleBuffer.poll();
+					bufferBlockIdx +=1;
+					addItemRuleBufferElement2StatementBatch(row,finalStmt);
+				}
+				try {
+					finalStmt.executeBatch();
+					finalStmt.clearBatch();
+				}catch (Exception V){
+					V.printStackTrace(System.err);
+					ExceptionDialog.show("Connection Error","Could not reach server","Rule results could not be saved. Please restart");
+				}
+			});
+		}
+		while (CharDescriptionExportServices.itemRuleBuffer.peek()!=null){
+			CharDescriptionRow row = CharDescriptionExportServices.itemRuleBuffer.poll();
+			addItemRuleBufferElement2StatementBatch(row,stmt);
+		}
+
+		stmt.executeBatch();
+		stmt.clearBatch();
+		stmt.close();
+		conn.close();
+	}
+
+	public static void flushItemDataToDB(UserAccount account) {
 		if(itemDataBuffer.peek()!=null) {
 			Task<Void> dbFlushTask = new Task<Void>() {
 			    
 				@Override
 			    protected Void call() throws Exception {
-					Connection conn = Tools.spawn_connection_from_pool();
-					Connection conn2 = Tools.spawn_connection_from_pool();
-					Connection conn3 = Tools.spawn_connection_from_pool();
-					PreparedStatement stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_values values(?,?,?,?,?,?,?,?,?) on conflict(value_id) do update set manually_reviewed = excluded.manually_reviewed");
-					PreparedStatement stmt2 = conn2.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values values (?,?,?,?,clock_timestamp(),?,?,?) on conflict (item_id,characteristic_id) do update set user_id = excluded.user_id, description_method = excluded.description_method, description_time=excluded.description_time, value_id = excluded.value_id, description_rule_id=excluded.description_rule_id,url_link = excluded.url_link");
-					PreparedStatement stmt3 = conn3.prepareStatement("insert into "+account.getActive_project()+".project_items_x_values_history values (?,?,?,?,clock_timestamp(),?,?,?)");
-					while(itemDataBuffer.peek()!=null) {
-						try {
-							Pair<String, Pair<CaracteristicValue, ClassCaracteristic>> elem = itemDataBuffer.poll();
-							String item_id = elem.getKey();
-							CaracteristicValue val = elem.getValue().getKey();
-							ClassCaracteristic carac = elem.getValue().getValue();
-
-							stmt.setString(1, val.getValue_id());
-							stmt.setString(2, val.getDataLanguageValue());
-							stmt.setString(3, val.getUserLanguageValue());
-							stmt.setString(4, val.getNominal_value());
-							stmt.setString(5, val.getMin_value());
-							stmt.setString(6, val.getMax_value());
-							stmt.setString(7, val.getNote());
-							stmt.setString(8, val.getUom_id());
-							stmt.setBoolean(9,val.getManually_Reviewed());
-							stmt.addBatch();
-							
-							stmt2.setString(1, item_id);
-							stmt2.setString(2, carac.getCharacteristic_id());
-							stmt2.setString(3, account.getUser_id());
-							stmt2.setString(4, val.getSource());
-							stmt2.setString(5, val.getValue_id());
-							stmt2.setString(6, val.getRule_id());
-							stmt2.setString(7, val.getUrl());
-							
-							stmt2.addBatch();
-							
-							stmt3.setString(1, item_id);
-							stmt3.setString(2, carac.getCharacteristic_id());
-							stmt3.setString(3, account.getUser_id());
-							stmt3.setString(4, val.getSource());
-							stmt3.setString(5, val.getValue_id());
-							stmt3.setString(6, val.getRule_id());
-							stmt3.setString(7, val.getUrl());
-							stmt3.addBatch();
-							
-						}catch(Exception V) {
-							V.printStackTrace(System.err);
-						}
-					}
-					try{
-						stmt.executeBatch();
-						stmt2.executeBatch();
-						stmt3.executeBatch();
-					}catch (Exception V){
-						V.printStackTrace(System.err);
-						ExceptionDialog.show("Connection Error","Could not reach server","Item values could not be saved. Please restart");
-						throw new RuntimeException(V.getCause());
-					}
-
-					
-					stmt.clearBatch();
-					stmt.close();
-					stmt2.clearBatch();
-					stmt2.close();
-					stmt3.clearBatch();
-					stmt3.close();
-					
-					conn.close();
-					conn2.close();
-					conn3.close();
-
-					conn = Tools.spawn_connection_from_pool();
-					stmt = conn.prepareStatement("insert into "+account.getActive_project()+".project_items_x_pattern_results values(?,?,?,?) on conflict(item_id,characteristic_id) do update set char_rule_results_json = excluded.char_rule_results_json");
-					PreparedStatement finalStmt = stmt;
-					CharDescriptionExportServices.itemRuleBuffer = CharDescriptionExportServices.itemRuleBuffer.stream().collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
-					int initRuleBufferSize = CharDescriptionExportServices.itemRuleBuffer.size();
-					if(GlobalConstants.PUSH_RULE_BUFFER_BY_BLOCK){
-						IntStream.range(0,20).forEach(loop->{
-							System.out.println("\t Buffer Block "+String.valueOf(loop+1)+"/20");
-							int bufferBlockIdx =0;
-							while (CharDescriptionExportServices.itemRuleBuffer.peek()!=null && bufferBlockIdx<(1.0*initRuleBufferSize)/20.0){
-								CharDescriptionRow row = CharDescriptionExportServices.itemRuleBuffer.poll();
-								bufferBlockIdx +=1;
-								addItemRuleBufferElement2StatementBatch(row,finalStmt);
-							}
-							try {
-								finalStmt.executeBatch();
-								finalStmt.clearBatch();
-							}catch (Exception V){
-								V.printStackTrace(System.err);
-								ExceptionDialog.show("Connection Error","Could not reach server","Rule results could not be saved. Please restart");
-							}
-						});
-					}
-					while (CharDescriptionExportServices.itemRuleBuffer.peek()!=null){
-						CharDescriptionRow row = CharDescriptionExportServices.itemRuleBuffer.poll();
-						addItemRuleBufferElement2StatementBatch(row,stmt);
-					}
-
-					stmt.executeBatch();
-					stmt.clearBatch();
-					stmt.close();
-					conn.close();
-
+					flushItemDataToDBNoThread(account);
 			    	return null;
 			    }
 			};
 			dbFlushTask.setOnSucceeded(e -> {
-				if(itemRuleBufferSize!=null){
-					if(itemRuleBufferSize>0){
-						ConfirmationDialog.show("Description rules applied", String.valueOf(itemRuleBufferSize)+" rule(s) have been applied", "OK", null);
-					}
-				}
-				
+
 				});
 			dbFlushTask.setOnFailed(e -> {
 			    Throwable problem = dbFlushTask.getException();

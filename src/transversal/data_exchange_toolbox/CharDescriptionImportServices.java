@@ -160,7 +160,16 @@ public class CharDescriptionImportServices {
 
 
 	private static void storeItemsData(UserAccount account, Integer size) {
-		CharDescriptionExportServices.flushItemDataToDB(account,size);
+		try {
+			CharDescriptionExportServices.flushItemDataToDBNoThread(account);
+			if(size!=null){
+				if(size>0){
+					ConfirmationDialog.show("Description rules applied", String.valueOf(size)+" rule(s) have been applied", "OK", null);
+				}
+			}
+		} catch (SQLException | ClassNotFoundException throwables) {
+			throwables.printStackTrace();
+		}
 	}
 
 

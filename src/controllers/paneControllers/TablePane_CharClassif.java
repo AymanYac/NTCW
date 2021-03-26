@@ -473,7 +473,7 @@ public class TablePane_CharClassif {
 					}
 				});
 			}
-			CharDescriptionExportServices.flushItemDataToDB(account, null);
+			CharDescriptionExportServices.flushItemDataToDB(account);
 		}
 	}
 	private void jumpNext() {
@@ -1307,6 +1307,6 @@ public class TablePane_CharClassif {
 
     public void ReevaluateItems(HashSet<String> items2Update) {
 		 CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(CharDescriptionRow::reEvaluateCharRules);
-		 CharDescriptionExportServices.flushItemDataToDB(account, null);
+		 CharDescriptionExportServices.flushItemDataToDB(account);
 	}
 }

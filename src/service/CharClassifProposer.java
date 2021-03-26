@@ -121,7 +121,7 @@ public class CharClassifProposer {
 					sc.setSource(DataInputMethods.SEMI_CHAR_DESC);
 					CharValuesLoader.updateRuntimeDataForItem(row,segment,result.getSourceChar().getCharacteristic_id(),sc);
 					CharDescriptionExportServices.addItemCharDataToPush(row, segment, charId);
-					CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
+					CharDescriptionExportServices.flushItemDataToDB(parent.account);
 					clearPropButtons();
 					if(!parent.charButton.isSelected()){
 						try {
@@ -159,7 +159,7 @@ public class CharClassifProposer {
 							CharValuesLoader.updateRuntimeDataForItem(row,row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id(),copy.shallowCopy(parent.account));
 							CharDescriptionExportServices.addItemCharDataToPush(row, row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id());
 						});
-						CharDescriptionExportServices.flushItemDataToDB(parent.account, null);
+						CharDescriptionExportServices.flushItemDataToDB(parent.account);
 						clearPropButtons();
 						parent.refresh_ui_display();
 						parent.tableController.tableGrid.refresh();
