@@ -925,7 +925,12 @@ public class TablePane_CharClassif {
 					public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
 						try{
 							CaracteristicValue val = r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(characteristic.getCharacteristic_id());
-							String dsp = val.getDisplayValue(Parent);
+							String dsp = null;
+							try{
+								dsp = val.getDisplayValue(Parent);
+							}catch (Exception V){
+
+							}
 							if(dsp!=null && dsp.length()>0){
 								return new ReadOnlyObjectWrapper(dsp);
 							}else if (r.getValue().getRulePropositions(characteristic.getCharacteristic_id()).size()>0){

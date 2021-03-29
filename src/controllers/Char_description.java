@@ -793,8 +793,8 @@ public class Char_description {
 			}
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.R)) {
+			
 			String selectedText = proposer.getUserSelectedText();
-			//SearchBarCustomizerDialog.editSearchPrefrence(this);
 			if(selectedText.length()>0){
 				draftingRule=true;
 				int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());

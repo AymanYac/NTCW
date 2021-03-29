@@ -28,8 +28,8 @@ public class CharValuesLoader {
 			ResultSet rs;
 
 			stmt = conn.prepareStatement("select item_id,characteristic_id,user_id,description_method,description_rule_id,url_link,project_values.value_id,text_value_data_language, text_value_user_language,nominal_value,min_value,max_value,note,uom_id,description_time,manually_reviewed from "
-					+ "(select * from "+active_project+".project_items_x_values"
-					+ ") data left join "+active_project+".project_values "
+					+ "(select * from "+active_project+".project_items_x_values where description_method is not null)"
+					+ " data left join "+active_project+".project_values "
 					+ "on data.value_id = project_values.value_id");
 			rs = stmt.executeQuery();
 			HashMap<String, List<String>> charIdArrays = new HashMap<String,List<String>>();
