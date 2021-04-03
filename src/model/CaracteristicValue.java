@@ -563,4 +563,21 @@ public class CaracteristicValue implements Serializable {
 		}
 		return ret;
 	}
+
+	public String getField(String FIELD) {
+		if(FIELD.equals("NOMINAL")){
+			return getNominal_value();
+		}else if(FIELD.equals("MIN")){
+			return getMin_value();
+		}else if(FIELD.equals("MAX")){
+			return getMax_value();
+		}else if(FIELD.equals("UOM_ID")){
+			return getUom_id();
+		}else if(FIELD.equals("DL")){
+			return getDataLanguageValue();
+		}else if(FIELD.equals("UL")){
+			return getUserLanguageValue();
+		}
+		throw new RuntimeException();
+	}
 }

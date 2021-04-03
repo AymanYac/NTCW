@@ -5,6 +5,7 @@ import javafx.util.Pair;
 import model.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.generic.Tools;
+import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
 import java.sql.*;
@@ -280,4 +281,20 @@ public class CharValuesLoader {
 
 	}
 
+    public static HashMap<String, ArrayList<String>> getNameSakeCarIDs() {
+		Unidecode unidec = Unidecode.toAscii();
+		HashMap<String, ArrayList<String>> nameSakeCarIDs = new HashMap<String, ArrayList<String>>();
+		CharValuesLoader.active_characteristics.values().forEach(a->{
+			a.stream().forEach(car->{
+				try{
+					nameSakeCarIDs.get(unidec.decodeAndTrim(car.getCharacteristic_name().toLowerCase())).add(car.getCharacteristic_id());
+				}catch (Exception V){
+					nameSakeCarIDs.put(unidec.decodeAndTrim(car.getCharacteristic_name().toLowerCase()),new ArrayList<>());
+					nameSakeCarIDs.get(unidec.decodeAndTrim(car.getCharacteristic_name().toLowerCase())).add(car.getCharacteristic_id());
+				}
+			});
+		});
+		nameSakeCarIDs.replaceAll((k,v)->new ArrayList<>(new HashSet<>(v)));
+		return nameSakeCarIDs;
+    }
 }

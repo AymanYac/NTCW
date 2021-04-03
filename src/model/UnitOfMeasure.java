@@ -1,6 +1,7 @@
 package model;
 
 
+import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.generic.Tools;
@@ -24,9 +25,34 @@ public class UnitOfMeasure {
 	public static HashMap<String, UnitOfMeasure> RunTimeUOMS;
 	private static int uom_lookup_max_found_length;
 	private static UnitOfMeasure uom_lookup_best_candidate;
-	
-	
-	public String getUom_id() {
+
+	public static Pair<String, String> convertToUOM(Pair<String, String> currentValUomPair, Pair<String, String> targetValue) {
+		String targetuomID = null;
+		if(targetValue!=null && (targetuomID=targetValue.getValue())!=null){
+			if(currentValUomPair!=null){
+				try{
+					UnitOfMeasure current_uom = UnitOfMeasure.RunTimeUOMS.get(currentValUomPair.getValue());
+					//Converting to base uom
+					UnitOfMeasure base_uom = UnitOfMeasure.RunTimeUOMS.get(current_uom.getUom_base_id());
+					String baseValue = String.valueOf(new BigDecimal(currentValUomPair.getKey().replace(",", ".").replace(" ", "")).multiply(current_uom.getUom_multiplier())).replace(".", ",");
+					//Converting to target uom
+					UnitOfMeasure targetUom = UnitOfMeasure.RunTimeUOMS.get(targetuomID);
+					if (targetUom.getUom_base_id().equals(base_uom.getUom_id())) {
+						String convertedValue = String.valueOf(new BigDecimal(baseValue.replace(",", ".").replace(" ", "")).divide(targetUom.getUom_multiplier())).replace(".", ",");
+						return new Pair<>(convertedValue, targetuomID);
+					}
+					return currentValUomPair;
+				}catch (Exception V){
+					return currentValUomPair;
+				}
+			}
+			return null;
+		}
+		return currentValUomPair;
+	}
+
+
+    public String getUom_id() {
 		return uom_id;
 	}
 	public void setUom_id(String uom_id) {
