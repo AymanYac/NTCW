@@ -19,6 +19,9 @@ import transversal.language_toolbox.Unidecode;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CharDescriptionRow {
@@ -47,6 +50,7 @@ public class CharDescriptionRow {
 		String item_id;
 		private HashMap<String,HashMap<String,CaracteristicValue>> data = new HashMap<String,HashMap<String,CaracteristicValue>>();
 		private HashMap<String,ArrayList<CharRuleResult>> ruleResults = new HashMap<String,ArrayList<CharRuleResult>>();
+		private ConcurrentHashMap<String,ArrayList<CharRuleResult>> dedupResults = new ConcurrentHashMap<String,ArrayList<CharRuleResult>>();
 		String class_segment_string;
 		ClassSegment class_segment;
 		private static Unidecode unidecode;
@@ -354,6 +358,12 @@ public class CharDescriptionRow {
 		return !unknownCritical;
 	}
 
+	private void addDedupResult2Row(CharRuleResult newMatch) {
+		if(!newMatch.action2ValueSuccess){
+			return;
+		}
+		this.dedupResults.get(newMatch.getSourceChar().getCharacteristic_id()).add(newMatch);
+	}
 	public void addRuleResult2Row(CharRuleResult newMatch) {
 		if(!newMatch.action2ValueSuccess){
 			return;
@@ -417,13 +427,16 @@ public class CharDescriptionRow {
 		return false;
 	}
 
-	public String getAccentFreeDescriptionsNoCR() {
+	public String getAccentFreeDescriptionsNoCR(boolean longDescOnly) {
 		if(this.accentFreeDescriptionNoCR!=null){
 			return this.accentFreeDescriptionNoCR;
 		}
 		unidecode = unidecode!=null?unidecode: Unidecode.toAscii();
-		accentFreeDescriptionNoCR =  (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
-		//accentFreeDescriptionNoCR =  (getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
+		if(!longDescOnly){
+			accentFreeDescriptionNoCR =  (getShort_desc()!=null?unidecode.decode(getShort_desc()):"")+" "+(getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
+		}else{
+			accentFreeDescriptionNoCR =  (getLong_desc()!=null?unidecode.decode(getLong_desc()):"").replaceAll("(?:\\n|\\r)", " ").replace("_"," ");
+		}
 		return accentFreeDescriptionNoCR;
 	}
 
@@ -478,4 +491,53 @@ public class CharDescriptionRow {
 		HashSet<String> ret = getData(segment).values().stream().filter(v->v!=null && v.getUrl()!=null && v.getUrl().length()>0).map(v->v.getUrl()).collect(Collectors.toCollection(HashSet<String>::new));
 		return StringUtils.join(ret,"\n");
     }
+
+	public void addDedupRulesForCar(ClassCaracteristic targetCar) {
+		if(targetCar.getIsNumeric() && !hasDedupRulesForCar(targetCar)){
+			dedupResults.put(targetCar.getCharacteristic_id(), new ArrayList<CharRuleResult>());
+			ArrayList<GenericCharRule> dedupRules = new ArrayList<>();
+			if(targetCar.getAllowedUoms()!=null){
+				dedupRules = targetCar.getAllowedUoms().stream().map(uomid -> "%1<NOM %1><UOM '" + UnitOfMeasure.RunTimeUOMS.get(uomid).getUom_symbol() + "'").map(loopRuleString -> new GenericCharRule(loopRuleString)).collect(Collectors.toCollection(ArrayList::new));
+			}else{
+				dedupRules.add(new GenericCharRule("%1<NOM %1>"));
+			}
+			dedupRules.forEach(newRule->{
+				newRule.storeGenericCharRule();
+				newRule.setRegexMarker(targetCar);
+				if(newRule.parseSuccess()) {
+					Matcher m;
+					Pattern regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+					m = regexPattern.matcher(" "+getAccentFreeDescriptionsNoCR(false)+" ");
+					while (m.find()){
+						String identifiedPattern="";
+						for(int j=1;j<=newRule.ruleCompositionRank();j++){
+							identifiedPattern=identifiedPattern+m.group((newRule.ruleCompositionRank()>1?2:1)*j)+"+";
+						}
+						identifiedPattern = identifiedPattern.substring(0,identifiedPattern.length()-1);
+						UserAccount tmpaccount = new UserAccount();
+						tmpaccount.setUser_id("VIRTUAL_DEDUP_RULE");
+						addDedupResult2Row(new CharRuleResult(newRule,targetCar,identifiedPattern,tmpaccount));
+					}
+				}});
+		}
+	}
+
+	private boolean hasDedupRulesForCar(ClassCaracteristic targetCar) {
+		return dedupResults.get(targetCar.getCharacteristic_id())!=null;
+	}
+
+	public ArrayList<CaracteristicValue> addDedupCandidateForCar(ClassCaracteristic targetCar) {
+		ArrayList<CharRuleResult> candidates = new ArrayList<>();
+		try{
+			candidates.addAll(getRuleResults().get(targetCar.getCharacteristic_id()));
+		}catch (Exception V){
+
+		}
+		try{
+			candidates.addAll(dedupResults.get(targetCar.getCharacteristic_id()));
+		}catch (Exception V){
+
+		}
+		return candidates.stream().filter(cand->cand!=null).map(cand->cand.getActionValue()).collect(Collectors.toCollection(ArrayList::new));
+	}
 }

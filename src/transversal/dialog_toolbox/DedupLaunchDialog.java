@@ -38,8 +38,6 @@ import transversal.generic.Tools;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -227,6 +225,10 @@ public class DedupLaunchDialog {
             @Override
             public void changed(ObservableValue<? extends ClassSegmentClusterComboRow> observable, ClassSegmentClusterComboRow oldValue, ClassSegmentClusterComboRow newValue) {
                 caracWeightTable.getItems().clear();
+                ClassCaracteristic tmp = new ClassCaracteristic();
+                tmp.setSequence(0);
+                tmp.setCharacteristic_name("Item Class");
+                caracWeightTable.getItems().add(new Pair<ClassCaracteristic,ArrayList<String>>(tmp,new ArrayList<>(Arrays.asList(new String("1.0"),new String("1.0"),new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))));
                 caracWeightTable.getItems().addAll(GenerateWeightList(newValue));
             }
         });
@@ -258,7 +260,11 @@ public class DedupLaunchDialog {
                         weightTable.put(r.getKey().getCharacteristic_id(),tmp);
                     }
                 });
-                DeduplicationServices.scoreDuplicatesForClasses(targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()));
+                if(GlobalConstants.DEDUP_CARAC_WISE){
+                    DeduplicationServices.scoreDuplicatesForClassesPairWise(targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()));
+                }else{
+                    DeduplicationServices.scoreDuplicatesForClassesFull(targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()));
+                }
                 showReport();
             }
         });
@@ -269,6 +275,18 @@ public class DedupLaunchDialog {
     private static ArrayList<Pair<ClassCaracteristic,ArrayList<String>>> GenerateWeightList(ClassSegmentClusterComboRow newValue) {
         if(newValue==null){
             return new ArrayList<Pair<ClassCaracteristic,ArrayList<String>>>();
+        }
+        if(!GlobalConstants.DEDUP_CARAC_WISE){
+            if(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID){
+                HashSet<String> uniqueNameCarac = new HashSet<String>();
+                return newValue.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).flatMap(ac -> ac.stream()).filter(c->uniqueNameCarac.add(c.getCharacteristic_name()))
+                        .map(car->new Pair<ClassCaracteristic,ArrayList<String>>(car,new ArrayList<>(Arrays.asList(new String("1.0"),new String("1.0"),new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))))
+                        .collect(Collectors.toCollection(ArrayList::new));
+            }
+            HashSet<ClassCaracteristic> uniqueIDCarac = newValue.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).flatMap(ac -> ac.stream()).collect(Collectors.toCollection(HashSet<ClassCaracteristic>::new));
+            return uniqueIDCarac.stream()
+                    .map(car->new Pair<ClassCaracteristic,ArrayList<String>>(car,new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))))
+                    .collect(Collectors.toCollection(ArrayList::new));
         }
         HashSet<String> retainedCars = null;
         for (Pair<ClassSegment, SimpleBooleanProperty> classSegmentSimpleBooleanPropertyPair : newValue.getRowSegments()) {
@@ -466,7 +484,7 @@ public class DedupLaunchDialog {
                 }
         );
         col2.setResizable(false);
-        col2.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(15 / 100.0));
+        col2.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(10.0/100.0));
 
         TableColumn col3 = new TableColumn("Weak match weight");
         col3.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String>, ObservableValue<String>>() {
@@ -494,7 +512,7 @@ public class DedupLaunchDialog {
                 }
         );
         col3.setResizable(false);
-        col3.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(15 / 100.0));
+        col3.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(10.0/100.0));
 
         TableColumn col4 = new TableColumn("Included weight");
         col4.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String>, ObservableValue<String>>() {
@@ -522,9 +540,9 @@ public class DedupLaunchDialog {
                 }
         );
         col4.setResizable(false);
-        col4.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(15 / 100.0));
+        col4.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(10.0/100.0));
 
-        TableColumn col5 = new TableColumn("Mismatch weight");
+        TableColumn col5 = new TableColumn("Alternative weight");
         col5.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String> r) {
                 return new ReadOnlyObjectWrapper(r.getValue().getValue().get(3));
@@ -550,7 +568,63 @@ public class DedupLaunchDialog {
                 }
         );
         col5.setResizable(false);
-        col5.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(15 / 100.0));
+        col5.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(10.0/100.0));
+
+        TableColumn col6 = new TableColumn("Unknown weight");
+        col6.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String> r) {
+                return new ReadOnlyObjectWrapper(r.getValue().getValue().get(3));
+            }
+        });
+        col6.setCellFactory(TextFieldTableCell.<Pair<ClassCaracteristic,ArrayList<String>>>forTableColumn());
+        col6.setOnEditCommit(
+                new EventHandler<TableColumn.CellEditEvent<Pair<ClassCaracteristic,ArrayList<String>>, String>>() {
+                    @Override
+                    public void handle(TableColumn.CellEditEvent<Pair<ClassCaracteristic, ArrayList<String>>, String> t) {
+                        String newVal;
+                        try{
+                            newVal = String.valueOf(Double.valueOf(t.getNewValue()));
+                        }catch (Exception V){
+                            t.getTableView().refresh();
+                            return;
+                        }
+                        ((Pair<ClassCaracteristic,ArrayList<String>>) t.getTableView().getItems().get(
+                                t.getTablePosition().getRow())
+                        ).getValue().set(3,newVal);
+                        t.getTableView().refresh();
+                    }
+                }
+        );
+        col6.setResizable(false);
+        col6.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(10.0/100.0));
+
+        TableColumn col7 = new TableColumn("Mismatch weight");
+        col7.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Pair<ClassCaracteristic,ArrayList<String>>, String> r) {
+                return new ReadOnlyObjectWrapper(r.getValue().getValue().get(3));
+            }
+        });
+        col7.setCellFactory(TextFieldTableCell.<Pair<ClassCaracteristic,ArrayList<String>>>forTableColumn());
+        col7.setOnEditCommit(
+                new EventHandler<TableColumn.CellEditEvent<Pair<ClassCaracteristic,ArrayList<String>>, String>>() {
+                    @Override
+                    public void handle(TableColumn.CellEditEvent<Pair<ClassCaracteristic, ArrayList<String>>, String> t) {
+                        String newVal;
+                        try{
+                            newVal = String.valueOf(Double.valueOf(t.getNewValue()));
+                        }catch (Exception V){
+                            t.getTableView().refresh();
+                            return;
+                        }
+                        ((Pair<ClassCaracteristic,ArrayList<String>>) t.getTableView().getItems().get(
+                                t.getTablePosition().getRow())
+                        ).getValue().set(3,newVal);
+                        t.getTableView().refresh();
+                    }
+                }
+        );
+        col7.setResizable(false);
+        col7.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(10.0/100.0));
 
         caracWeightTable.getColumns().add(col0);
         caracWeightTable.getColumns().add(col1);
@@ -558,6 +632,8 @@ public class DedupLaunchDialog {
         caracWeightTable.getColumns().add(col3);
         caracWeightTable.getColumns().add(col4);
         caracWeightTable.getColumns().add(col5);
+        caracWeightTable.getColumns().add(col6);
+        caracWeightTable.getColumns().add(col7);
 
 
     }

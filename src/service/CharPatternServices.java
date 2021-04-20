@@ -20,7 +20,7 @@ public class CharPatternServices {
 
 	private static HashMap<String,LinkedHashSet<String>> specialwords;
 	private static HashMap<String, List<String>> charIdArrays;
-	public static HashMap<String,GenericCharRule> descriptionRules = new HashMap<String,GenericCharRule>();
+	public static ConcurrentHashMap<String,GenericCharRule> descriptionRules = new ConcurrentHashMap<String,GenericCharRule>();
 
 	public static void scanSelectionForPatternDetection(Char_description parent, ClassCaracteristic active_char,String selectedText) throws SQLException {
 		parent.refresh_ui_display();
@@ -2694,9 +2694,9 @@ public class CharPatternServices {
 					.forEach(r->{
 				if(targetClasses.contains(r.getClass_segment_string().split("&&&")[0])){
 					Matcher m;
-					m = regexPattern.matcher(" "+r.getAccentFreeDescriptionsNoCR()+" ");
+					m = regexPattern.matcher(" "+r.getAccentFreeDescriptionsNoCR(GlobalConstants.TEMP_APPLY_RULES_ON_LONG_DESC_ONLY)+" ");
 					while (m.find()){
-						System.out.println("matches desc> "+r.getAccentFreeDescriptionsNoCR()+" ");
+						System.out.println("matches desc> "+r.getAccentFreeDescriptionsNoCR(GlobalConstants.TEMP_APPLY_RULES_ON_LONG_DESC_ONLY)+" ");
 						String identifiedPattern="";
 						for(int j=1;j<=newRule.ruleCompositionRank();j++){
 							System.out.println("\tfor identified pattern in group("+String.valueOf(j)+"): "+m.group((newRule.ruleCompositionRank()>1?2:1)*j));
@@ -2740,7 +2740,7 @@ public class CharPatternServices {
 				.filter(r->targetClasses.contains(r.getClass_segment_string().split("&&&")[0]))
 				.forEach(r->{
 					Matcher m;
-					m = regexPattern.matcher(" "+r.getAccentFreeDescriptionsNoCR()+" ");
+					m = regexPattern.matcher(" "+r.getAccentFreeDescriptionsNoCR(GlobalConstants.TEMP_APPLY_RULES_ON_LONG_DESC_ONLY)+" ");
 					while (m.find()){
 						//System.out.println("matches desc> "+r.getAccentFreeDescriptionsNoCR()+" ");
 						String identifiedPattern="";

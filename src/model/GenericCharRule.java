@@ -124,7 +124,9 @@ public class GenericCharRule {
 
 
 	public void storeGenericCharRule() {
-		setCharRuleId(Tools.generate_uuid());
+		if(getCharRuleId()==null){
+			setCharRuleId(Tools.generate_uuid());
+		}
 		CharPatternServices.descriptionRules.put(getCharRuleId(),this);
 	}
 
