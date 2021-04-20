@@ -60,20 +60,20 @@ public class DeduplicationServices {
                                 if(data_A == null && data_B == null){
                                     ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"UNKNOWN_MATCH");
                                     hardStore(item_A,item_B,car_A,result);
-                                    System.out.println(" took "+ ChronoUnit.MILLIS.between(then,Instant.now()));
+                                    System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
                                     return;
                                 }else{
                                     if(valCompare.equals("STRONG_MATCH") || valCompare.equals("WEAK_MATCH")){
                                         ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,valCompare);
                                         hardStore(item_A,item_B,car_A,result);
-                                        System.out.println(" took "+ ChronoUnit.MILLIS.between(then,Instant.now()));
+                                        System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
                                         return;
                                     }
                                 }
                             }else{
                                 if(valCompare.equals("WEAK_MATCH") || valCompare.equals("STRONG_MATCH")){
                                     ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"ALTERNATIVE_MATCH");
-                                    System.out.println(" took "+ ChronoUnit.MILLIS.between(then,Instant.now()));
+                                    System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
                                     softStore(item_A,item_B,car_A,result);
                                 }
                             }
@@ -81,7 +81,7 @@ public class DeduplicationServices {
                                 item_B.addDedupRulesForCar(car_A);
                                 if(checkDescContainsVal(item_B,car_A,data_A,item_A)){
                                     ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,null,data_A,null,"DESCRIPTION_MATCH");
-                                    System.out.println(" took "+ ChronoUnit.MILLIS.between(then,Instant.now()));
+                                    System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
                                     softStore(item_A,item_B,car_A,result);
                                 }
                                 }
@@ -90,7 +90,7 @@ public class DeduplicationServices {
                                     item_A.addDedupRulesForCar(car_B);
                                     if(checkDescContainsVal(item_A,car_B,data_B,item_B)){
                                         ComparaisonResult result = new ComparaisonResult(item_A,item_B,null,car_B,null,data_B,"DESCRIPTION_MATCH");
-                                        System.out.println(" took "+ ChronoUnit.MILLIS.between(then,Instant.now()));
+                                        System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
                                         softStore(item_A,item_B,car_B,result);
                                     }
                                 }
@@ -98,15 +98,15 @@ public class DeduplicationServices {
                             if(isSameCar(car_A,car_B) && !hasStored(item_A,item_B,car_A) && !hasStored(item_A,item_B,car_B)){
                                 if(data_A!=null && data_B!=null && data_A.getRawDisplay().length()>0 && data_B.getRawDisplay().length()>0){
                                     ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"MISMATCH");
-                                    System.out.println(" took "+ ChronoUnit.MILLIS.between(then,Instant.now()));
+                                    System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
                                     softStore(item_A,item_B,car_B,result);
                                 }else{
                                     ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"UNKNOWN_MATCH");
-                                    System.out.println(" took "+ ChronoUnit.MILLIS.between(then,Instant.now()));
+                                    System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
                                     softStore(item_A,item_B,car_B,result);
                                 }
                             }
-                            System.out.println(" took "+ ChronoUnit.MILLIS.between(then,Instant.now()));
+                            System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
                         });
                     });
                     if(Math.random()<0){
