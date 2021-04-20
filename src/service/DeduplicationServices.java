@@ -2,6 +2,7 @@ package service;
 
 import javafx.util.Pair;
 import model.*;
+import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.language_toolbox.Unidecode;
 
 import java.time.Instant;
@@ -17,6 +18,7 @@ public class DeduplicationServices {
     private static ArrayList<String> targetSegmentIDS;
     private static HashMap<String, ArrayList<Object>> weightTable;
     private static ArrayList<CharDescriptionRow> targetItems;
+    private static ArrayList<Pair<CharDescriptionRow,CharDescriptionRow>> targetItemPairs = new ArrayList<>();
     private static HashMap<String, ArrayList<String>> nameSakeCarIDs;
     private static Unidecode unidec;
     private static double lastprogess;
@@ -30,151 +32,163 @@ public class DeduplicationServices {
         DeduplicationServices.weightTable = weightTable;
         DeduplicationServices.nameSakeCarIDs = CharValuesLoader.getNameSakeCarIDs();
         DeduplicationServices.fullCompResults = new HashMap<String, ConcurrentHashMap<String, HashMap<String, ComparaisonResult>>>();
-        IntStream.range(0, CharItemFetcher.allRowItems.size()).forEach(idx_A -> {
-            CharDescriptionRow item_A = CharItemFetcher.allRowItems.get(idx_A);
-            fullCompResults.put(item_A.getItem_id(),new ConcurrentHashMap<String,HashMap<String,ComparaisonResult>>());
-            IntStream.range(idx_A + 1, CharItemFetcher.allRowItems.size())/*.parallel()*/.forEach(idx_B -> {
-                CharDescriptionRow item_B = CharItemFetcher.allRowItems.get(idx_B);
-                fullCompResults.get(item_A.getItem_id()).put(item_B.getItem_id(),new HashMap<String,ComparaisonResult>());
-                HashSet<ClassCaracteristic> checkedCarBInDescA = new HashSet<ClassCaracteristic>();
-                if(isInTargetClass(item_A) || isInTargetClass(item_B)){
-                    System.out.println("XXXXXXXX");
-                    System.out.println(item_A.getClient_item_number()+">"+item_A.getAccentFreeDescriptionsNoCR(false));
-                    System.out.println(item_B.getClient_item_number()+">"+item_B.getAccentFreeDescriptionsNoCR(false));
-
-                    String class_A = item_A.getClass_segment_string().split("&&&")[0];
-                    String class_B = item_B.getClass_segment_string().split("&&&")[0];
-                    ArrayList<ClassCaracteristic> cars_A = CharValuesLoader.active_characteristics.get(class_A);
-                    ArrayList<ClassCaracteristic> cars_B = CharValuesLoader.active_characteristics.get(class_B);
-                    cars_A.forEach(car_A->{
-                        cars_B.forEach(car_B->{
-                            if(!car_B.getIsNumeric().equals(car_A.getIsNumeric())){
-                                return;
-                            }
-                            System.out.print("Comparing "+car_A.getCharacteristic_name()+ "<=>"+car_B.getCharacteristic_name());
-                            Instant then = Instant.now();
-                            CaracteristicValue data_A = item_A.getData(class_A).get(car_A.getCharacteristic_id());
-                            CaracteristicValue data_B = item_B.getData(class_B).get(car_B.getCharacteristic_id());
-                            String valCompare = compareValues(item_A, item_B, car_A, car_B,false);
-                            if(isSameCar(car_A,car_B)){
-                                if(data_A == null && data_B == null){
-                                    ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"UNKNOWN_MATCH");
-                                    hardStore(item_A,item_B,car_A,result);
-                                    System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
-                                    return;
-                                }else{
-                                    if(valCompare.equals("STRONG_MATCH") || valCompare.equals("WEAK_MATCH")){
-                                        ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,valCompare);
-                                        hardStore(item_A,item_B,car_A,result);
-                                        System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
-                                        return;
-                                    }
-                                }
-                            }else{
-                                if(valCompare.equals("WEAK_MATCH") || valCompare.equals("STRONG_MATCH")){
-                                    ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"ALTERNATIVE_MATCH");
-                                    System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
-                                    softStore(item_A,item_B,car_A,result);
-                                }
-                            }
-                            if(!hasStored(item_A,item_B,car_A)){
-                                item_B.addDedupRulesForCar(car_A);
-                                if(checkDescContainsVal(item_B,car_A,data_A,item_A)){
-                                    ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,null,data_A,null,"DESCRIPTION_MATCH");
-                                    System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
-                                    softStore(item_A,item_B,car_A,result);
-                                }
-                                }
-                            if(!hasStored(item_A,item_B,car_B)){
-                                if(checkedCarBInDescA.add(car_B)){
-                                    item_A.addDedupRulesForCar(car_B);
-                                    if(checkDescContainsVal(item_A,car_B,data_B,item_B)){
-                                        ComparaisonResult result = new ComparaisonResult(item_A,item_B,null,car_B,null,data_B,"DESCRIPTION_MATCH");
-                                        System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
-                                        softStore(item_A,item_B,car_B,result);
-                                    }
-                                }
-                            }
-                            if(isSameCar(car_A,car_B) && !hasStored(item_A,item_B,car_A) && !hasStored(item_A,item_B,car_B)){
-                                if(data_A!=null && data_B!=null && data_A.getRawDisplay().length()>0 && data_B.getRawDisplay().length()>0){
-                                    ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"MISMATCH");
-                                    System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
-                                    softStore(item_A,item_B,car_B,result);
-                                }else{
-                                    ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"UNKNOWN_MATCH");
-                                    System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
-                                    softStore(item_A,item_B,car_B,result);
-                                }
-                            }
-                            System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
-                        });
-                    });
-                    if(Math.random()<0){
-                        System.out.println("XXXXXXXX");
-                        System.out.println(item_A.getClient_item_number());
-                        System.out.println(item_A.getAccentFreeDescriptionsNoCR(false));
-                        System.out.println(item_B.getClient_item_number());
-                        System.out.println(item_B.getAccentFreeDescriptionsNoCR(false));
-                        fullCompResults.get(item_A.getItem_id()).get(item_B.getItem_id()).values().forEach(comparaisonResult -> {
-                            String ret = "";
-                            try{
-                                ret+=comparaisonResult.getCar_A().getCharacteristic_name();
-                            }catch (Exception V){
-
-                            }
-                            try{
-                                ret+="<=>"+comparaisonResult.getCar_B().getCharacteristic_name();
-                            }catch (Exception V){
-
-                            }
-                            ret+=":";
-                            try{
-                                ret+=comparaisonResult.getVal_A().getRawDisplay();
-                            }catch (Exception V){
-
-                            }
-                            try{
-                                ret+="<=>"+comparaisonResult.getVal_B().getRawDisplay();
-                            }catch (Exception V){
-
-                            }
-                            ret+=":";
-                            ret+=comparaisonResult.getResultType();
-                            System.out.println("\t>"+ret);
-                        });
-                    }
-                    fullCompResults.get(item_A.getItem_id()).get(item_B.getItem_id()).values().forEach(comparaisonResult -> {
-                        String ret = "";
-                        try{
-                            ret+=comparaisonResult.getCar_A().getCharacteristic_name();
-                        }catch (Exception V){
-
-                        }
-                        try{
-                            ret+="<=>"+comparaisonResult.getCar_B().getCharacteristic_name();
-                        }catch (Exception V){
-
-                        }
-                        ret+=":";
-                        try{
-                            ret+=comparaisonResult.getVal_A().getRawDisplay();
-                        }catch (Exception V){
-
-                        }
-                        try{
-                            ret+="<=>"+comparaisonResult.getVal_B().getRawDisplay();
-                        }catch (Exception V){
-
-                        }
-                        ret+=":";
-                        ret+=comparaisonResult.getResultType();
-                        System.out.println("\t>"+ret);
-                    });
-                    //System.out.println(fullCompResults.get(item_A.getItem_id()));
-                    //System.out.println(item_A.getClient_item_number());
-                }
+        ArrayList<CharDescriptionRow> inClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> isInTargetClass(item)).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<CharDescriptionRow> outClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> !isInTargetClass(item)).collect(Collectors.toCollection(ArrayList::new));
+        IntStream.range(0, inClass.size()).forEach(idx_A -> {
+            CharDescriptionRow item_A = inClass.get(idx_A);
+            IntStream.range(idx_A+1,inClass.size()).forEach(idx_B->{
+                targetItemPairs.add(new Pair<>(item_A,inClass.get(idx_B)));
+            });
+            outClass.forEach(item_B->{
+                targetItemPairs.add(new Pair<>(item_A,item_B));
             });
         });
+        System.out.println("::::::::::::::::::::::::::::: COMPARISONS TO BE MADE : "+targetItemPairs.size()+" :::::::::::::::::::::::::::::");
+        targetItemPairs.forEach(e -> {
+            CharDescriptionRow item_A = e.getKey();
+            CharDescriptionRow item_B = e.getValue();
+            fullCompResults.put(item_A.getItem_id(),new ConcurrentHashMap<String,HashMap<String,ComparaisonResult>>());
+            fullCompResults.get(item_A.getItem_id()).put(item_B.getItem_id(),new HashMap<String,ComparaisonResult>());
+            HashSet<ClassCaracteristic> checkedCarBInDescA = new HashSet<ClassCaracteristic>();
+            System.out.println("XXXXXXXX");
+            System.out.println(item_A.getClient_item_number()+">"+item_A.getAccentFreeDescriptionsNoCR(false));
+            System.out.println(item_B.getClient_item_number()+">"+item_B.getAccentFreeDescriptionsNoCR(false));
+
+            String class_A = item_A.getClass_segment_string().split("&&&")[0];
+            String class_B = item_B.getClass_segment_string().split("&&&")[0];
+            ArrayList<ClassCaracteristic> cars_A = CharValuesLoader.active_characteristics.get(class_A);
+            ArrayList<ClassCaracteristic> cars_B = CharValuesLoader.active_characteristics.get(class_B);
+            cars_A.forEach(car_A->{
+                cars_B.forEach(car_B->{
+                    if(!car_B.getIsNumeric().equals(car_A.getIsNumeric())){
+                        return;
+                    }
+                    System.out.print("Comparing "+car_A.getCharacteristic_name()+ "<=>"+car_B.getCharacteristic_name());
+                    Instant then = Instant.now();
+                    CaracteristicValue data_A = item_A.getData(class_A).get(car_A.getCharacteristic_id());
+                    CaracteristicValue data_B = item_B.getData(class_B).get(car_B.getCharacteristic_id());
+                    String valCompare = compareValues(item_A, item_B, car_A, car_B,false);
+                    if(isSameCar(car_A,car_B)){
+                        if(data_A == null && data_B == null){
+                            ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"UNKNOWN_MATCH");
+                            hardStore(item_A,item_B,car_A,result);
+                            System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
+                            return;
+                        }else{
+                            if(valCompare.equals("STRONG_MATCH") || valCompare.equals("WEAK_MATCH")){
+                                ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,valCompare);
+                                hardStore(item_A,item_B,car_A,result);
+                                System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
+                                return;
+                            }
+                        }
+                    }else{
+                        if(valCompare.equals("WEAK_MATCH") || valCompare.equals("STRONG_MATCH")){
+                            ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"ALTERNATIVE_MATCH");
+                            System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
+                            softStore(item_A,item_B,car_A,result);
+                        }
+                    }
+                    if(!hasStored(item_A,item_B,car_A)){
+                        item_B.addDedupRulesForCar(car_A);
+                        if(checkDescContainsVal(item_B,car_A,data_A,item_A)){
+                            ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,null,data_A,null,"DESCRIPTION_MATCH");
+                            System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
+                            softStore(item_A,item_B,car_A,result);
+                        }
+                    }
+                    if(!hasStored(item_A,item_B,car_B)){
+                        if(checkedCarBInDescA.add(car_B)){
+                            item_A.addDedupRulesForCar(car_B);
+                            if(checkDescContainsVal(item_A,car_B,data_B,item_B)){
+                                ComparaisonResult result = new ComparaisonResult(item_A,item_B,null,car_B,null,data_B,"DESCRIPTION_MATCH");
+                                System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
+                                softStore(item_A,item_B,car_B,result);
+                            }
+                        }
+                    }
+                    if(isSameCar(car_A,car_B) && !hasStored(item_A,item_B,car_A) && !hasStored(item_A,item_B,car_B)){
+                        if(data_A!=null && data_B!=null && data_A.getRawDisplay().length()>0 && data_B.getRawDisplay().length()>0){
+                            ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"MISMATCH");
+                            System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
+                            softStore(item_A,item_B,car_B,result);
+                        }else{
+                            ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"UNKNOWN_MATCH");
+                            System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
+                            softStore(item_A,item_B,car_B,result);
+                        }
+                    }
+                    System.out.println(" took "+ ChronoUnit.NANOS.between(then,Instant.now()));
+                });
+            });
+            if(Math.random()<0){
+                System.out.println("XXXXXXXX");
+                System.out.println(item_A.getClient_item_number());
+                System.out.println(item_A.getAccentFreeDescriptionsNoCR(false));
+                System.out.println(item_B.getClient_item_number());
+                System.out.println(item_B.getAccentFreeDescriptionsNoCR(false));
+                fullCompResults.get(item_A.getItem_id()).get(item_B.getItem_id()).values().forEach(comparaisonResult -> {
+                    String ret = "";
+                    try{
+                        ret+=comparaisonResult.getCar_A().getCharacteristic_name();
+                    }catch (Exception V){
+
+                    }
+                    try{
+                        ret+="<=>"+comparaisonResult.getCar_B().getCharacteristic_name();
+                    }catch (Exception V){
+
+                    }
+                    ret+=":";
+                    try{
+                        ret+=comparaisonResult.getVal_A().getRawDisplay();
+                    }catch (Exception V){
+
+                    }
+                    try{
+                        ret+="<=>"+comparaisonResult.getVal_B().getRawDisplay();
+                    }catch (Exception V){
+
+                    }
+                    ret+=":";
+                    ret+=comparaisonResult.getResultType();
+                    System.out.println("\t>"+ret);
+                });
+            }
+            fullCompResults.get(item_A.getItem_id()).get(item_B.getItem_id()).values().forEach(comparaisonResult -> {
+                String ret = "";
+                try{
+                    ret+=comparaisonResult.getCar_A().getCharacteristic_name();
+                }catch (Exception V){
+
+                }
+                try{
+                    ret+="<=>"+comparaisonResult.getCar_B().getCharacteristic_name();
+                }catch (Exception V){
+
+                }
+                ret+=":";
+                try{
+                    ret+=comparaisonResult.getVal_A().getRawDisplay();
+                }catch (Exception V){
+
+                }
+                try{
+                    ret+="<=>"+comparaisonResult.getVal_B().getRawDisplay();
+                }catch (Exception V){
+
+                }
+                ret+=":";
+                ret+=comparaisonResult.getResultType();
+                System.out.println("\t>"+ret);
+            });
+            //System.out.println(fullCompResults.get(item_A.getItem_id()));
+            //System.out.println(item_A.getClient_item_number());
+        });
+        System.out.println("::::::::::::::::::::::::::::: DONE COMPARING : "+targetItemPairs.size()+" :::::::::::::::::::::::::::::");
+        ConfirmationDialog.show("Done", "DONE COMPARING : "+targetItemPairs.size(), "OK");
+
+
     }
 
     private static boolean checkDescContainsVal(CharDescriptionRow targetItem, ClassCaracteristic sourceCarac, CaracteristicValue sourceValue, CharDescriptionRow sourceItem) {
@@ -308,7 +322,7 @@ public class DeduplicationServices {
         DeduplicationServices.unidec = Unidecode.toAscii();
         DeduplicationServices.targetSegmentIDS = targetSegmentIDS;
         DeduplicationServices.weightTable = weightTable;
-        DeduplicationServices.targetItems = CharItemFetcher.allRowItems.parallelStream().filter(r->targetSegmentIDS.contains(r.getClass_segment_string().split("&&&")[0])).collect(Collectors.toCollection(ArrayList::new));
+        DeduplicationServices.targetItems = CharItemFetcher.allRowItems.parallelStream().filter(DeduplicationServices::isInTargetClass).collect(Collectors.toCollection(ArrayList::new));
         DeduplicationServices.nameSakeCarIDs = CharValuesLoader.getNameSakeCarIDs();
         IntStream.range(0,targetItems.size()).forEach(idx_A->{
             IntStream.range(idx_A+1,targetItems.size()).parallel().forEach(idx_B->{
