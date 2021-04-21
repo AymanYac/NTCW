@@ -6,7 +6,6 @@ import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.language_toolbox.Unidecode;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,7 +21,7 @@ public class DeduplicationServices {
     private static HashMap<String, ArrayList<String>> nameSakeCarIDs;
     private static Unidecode unidec;
     private static double lastprogess;
-    private static HashMap<String, ConcurrentHashMap<String, HashMap<String, ComparaisonResult>>> fullCompResults;
+    private static ConcurrentHashMap<String, HashMap<String, HashMap<String, ComparaisonResult>>> fullCompResults;
     private static int compteur;
 
     public static void scoreDuplicatesForClassesFull(ArrayList<String> targetSegmentIDS, HashMap<String, ArrayList<Object>> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, Double GLOBAL_MISMATCH_RATIO) {
@@ -31,7 +30,7 @@ public class DeduplicationServices {
         DeduplicationServices.targetSegmentIDS = targetSegmentIDS;
         DeduplicationServices.weightTable = weightTable;
         DeduplicationServices.nameSakeCarIDs = CharValuesLoader.getNameSakeCarIDs();
-        DeduplicationServices.fullCompResults = new HashMap<String, ConcurrentHashMap<String, HashMap<String, ComparaisonResult>>>();
+        DeduplicationServices.fullCompResults = new ConcurrentHashMap<String, HashMap<String, HashMap<String, ComparaisonResult>>>();
         ArrayList<CharDescriptionRow> inClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> isInTargetClass(item)).collect(Collectors.toCollection(ArrayList::new));
         ArrayList<CharDescriptionRow> outClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> !isInTargetClass(item)).collect(Collectors.toCollection(ArrayList::new));
         IntStream.range(0, inClass.size()).forEach(idx_A -> {
@@ -47,10 +46,10 @@ public class DeduplicationServices {
         System.out.println("::::::::::::::::::::::::::::: ITEMS IN PROJECT : "+CharItemFetcher.allRowItems.size()+" :::::::::::::::::::::::::::::");
         System.out.println("::::::::::::::::::::::::::::: COMPARISONS TO BE MADE : "+targetItemPairs.size()+" :::::::::::::::::::::::::::::");
         targetItemPairs.parallelStream().forEach(e -> {
+            HashMap<String, ComparaisonResult> localCompStorage = new HashMap<String, ComparaisonResult>();
             CharDescriptionRow item_A = e.getKey();
             CharDescriptionRow item_B = e.getValue();
-            fullCompResults.put(item_A.getItem_id(),new ConcurrentHashMap<String,HashMap<String,ComparaisonResult>>());
-            fullCompResults.get(item_A.getItem_id()).put(item_B.getItem_id(),new HashMap<String,ComparaisonResult>());
+            localCompStorage.put("CLASS_ID",new ComparaisonResult(item_A,item_B,null,null,null,null,item_A.getClass_segment_string().equals(item_B.getClass_segment_string())?"STRONG_MATCH":"WEAK_MATCH"));
             HashSet<ClassCaracteristic> checkedCarBInDescA = new HashSet<ClassCaracteristic>();
             String class_A = item_A.getClass_segment_string().split("&&&")[0];
             String class_B = item_B.getClass_segment_string().split("&&&")[0];
@@ -60,7 +59,7 @@ public class DeduplicationServices {
                 ClassCaracteristic car_A = cars_A.get(car_idx_A);
                 IntStream.range(0, cars_B.size()).forEach(car_idx_B->{
                     ClassCaracteristic car_B = cars_B.get(car_idx_B);
-                    if(!itemPairIsViable(fullCompResults.get(item_A.getItem_id()).get(item_B.getItem_id()),GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,(cars_A.size()-car_idx_A-1)*cars_B.size() - (cars_B.size()-car_idx_B))){
+                    if(!itemPairIsViable(localCompStorage.values(),GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,(cars_A.size()-car_idx_A-1)*cars_B.size() + (cars_B.size()-car_idx_B))){
                         return;
                     }
                     if(!car_B.getIsNumeric().equals(car_A.getIsNumeric())){
@@ -73,87 +72,107 @@ public class DeduplicationServices {
                     if(isSameCar(car_A,car_B)){
                         if(data_A == null && data_B == null){
                             ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"UNKNOWN_MATCH");
-                            hardStore(item_A,item_B,car_A,result);
+                            hardStore(localCompStorage, car_A,result);
                             return;
                         }else{
                             if(valCompare.equals("STRONG_MATCH") || valCompare.equals("WEAK_MATCH")){
                                 ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,valCompare);
-                                hardStore(item_A,item_B,car_A,result);
+                                hardStore(localCompStorage, car_A,result);
                                 return;
                             }
                         }
                     }else{
                         if(valCompare.equals("WEAK_MATCH") || valCompare.equals("STRONG_MATCH")){
                             ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"ALTERNATIVE_MATCH");
-                            softStore(item_A,item_B,car_A,result);
+                            softStore(localCompStorage, car_A,result);
                         }
                     }
-                    if(!hasStored(item_A,item_B,car_A)){
+                    if(!hasStored(localCompStorage, car_A)){
                         item_B.addDedupRulesForCar(car_A);
                         if(checkDescContainsVal(item_B,car_A,data_A,item_A)){
                             ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,null,data_A,null,"DESCRIPTION_MATCH");
-                            softStore(item_A,item_B,car_A,result);
+                            softStore(localCompStorage, car_A,result);
                         }
                     }
-                    if(!hasStored(item_A,item_B,car_B)){
+                    if(!hasStored(localCompStorage, car_B)){
                         if(checkedCarBInDescA.add(car_B)){
                             item_A.addDedupRulesForCar(car_B);
                             if(checkDescContainsVal(item_A,car_B,data_B,item_B)){
                                 ComparaisonResult result = new ComparaisonResult(item_A,item_B,null,car_B,null,data_B,"DESCRIPTION_MATCH");
-                                softStore(item_A,item_B,car_B,result);
+                                softStore(localCompStorage, car_B,result);
                             }
                         }
                     }
-                    if(isSameCar(car_A,car_B) && !hasStored(item_A,item_B,car_A) && !hasStored(item_A,item_B,car_B)){
+                    if(isSameCar(car_A,car_B) && !hasStored(localCompStorage, car_A) && !hasStored(localCompStorage, car_B)){
                         if(data_A!=null && data_B!=null && data_A.getRawDisplay().length()>0 && data_B.getRawDisplay().length()>0){
                             ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"MISMATCH");
-                            softStore(item_A,item_B,car_B,result);
+                            softStore(localCompStorage, car_B,result);
                         }else{
                             ComparaisonResult result = new ComparaisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"UNKNOWN_MATCH");
-                            softStore(item_A,item_B,car_B,result);
+                            softStore(localCompStorage, car_B,result);
                         }
                     }
                 });
             });
-            if(itemPairIsViable(fullCompResults.get(item_A.getItem_id()).get(item_B.getItem_id()),GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,0) && Math.random()<1.0){
-                System.out.println("XXXXXXXX");
-                System.out.println(item_A.getClient_item_number());
-                System.out.println(item_A.getAccentFreeDescriptionsNoCR(false));
-                System.out.println(item_B.getClient_item_number());
-                System.out.println(item_B.getAccentFreeDescriptionsNoCR(false));
-                fullCompResults.get(item_A.getItem_id()).get(item_B.getItem_id()).values().forEach(comparaisonResult -> {
-                    String ret = "";
-                    try{
-                        ret+=comparaisonResult.getCar_A().getCharacteristic_name();
-                    }catch (Exception V){
-
-                    }
-                    try{
-                        ret+="<=>"+comparaisonResult.getCar_B().getCharacteristic_name();
-                    }catch (Exception V){
-
-                    }
-                    ret+=":";
-                    try{
-                        ret+=comparaisonResult.getVal_A().getRawDisplay();
-                    }catch (Exception V){
-
-                    }
-                    try{
-                        ret+="<=>"+comparaisonResult.getVal_B().getRawDisplay();
-                    }catch (Exception V){
-
-                    }
-                    ret+=":";
-                    ret+=comparaisonResult.getResultType();
-                    System.out.println("\t>"+ret);
-                });
+            if(itemPairIsViable(localCompStorage.values(),GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,0) && Math.random()<1.0){
+                if(Math.random()<1.0){
+                    printConsoleSummary(item_A,item_B, localCompStorage);
+                }
+                try{
+                    fullCompResults.get(item_A.getItem_id()).put(item_B.getItem_id(),localCompStorage);
+                }catch (Exception V){
+                    fullCompResults.put(item_A.getItem_id(),new HashMap<String,HashMap<String,ComparaisonResult>>());
+                    fullCompResults.get(item_A.getItem_id()).put(item_B.getItem_id(),localCompStorage);
+                }
             }
         });
         System.out.println("::::::::::::::::::::::::::::: DONE COMPARING : "+targetItemPairs.size()+" :::::::::::::::::::::::::::::");
         ConfirmationDialog.show("Done", "DONE COMPARING : "+targetItemPairs.size(), "OK");
 
 
+    }
+
+    private static void printConsoleSummary(CharDescriptionRow item_A, CharDescriptionRow item_B, HashMap<String, ComparaisonResult> localCompStorage) {
+        AtomicReference<String> pairComparison = new AtomicReference<>("XXXXXXXX\n"
+                + item_A.getClient_item_number() + "\n"
+                + item_A.getAccentFreeDescriptionsNoCR(false) + "\n"
+                + item_B.getClient_item_number() + "\n"
+                + item_B.getAccentFreeDescriptionsNoCR(false));
+        AtomicReference<String> carComparison = new AtomicReference<>();
+        localCompStorage.entrySet().forEach(e -> {
+            String carID = e.getKey();
+            ComparaisonResult comparaisonResult = e.getValue();
+            if(e.getKey().equals("CLASS_ID")){
+                pairComparison.getAndSet(pairComparison.get() + "\n\t>" + "ITEM_CLASS<=>ITEM_CLASS:"+comparaisonResult.getItem_A().getClass_segment().getClassNumber()+"-"+comparaisonResult.getItem_A().getClass_segment().getClassName()+"<=>"+comparaisonResult.getItem_B().getClass_segment().getClassNumber()+"-"+comparaisonResult.getItem_B().getClass_segment().getClassName()+":"+comparaisonResult.getResultType());
+                return;
+            }
+            carComparison.set("");
+            try {
+                carComparison.getAndSet(carComparison.get()+ comparaisonResult.getCar_A().getCharacteristic_name());
+            } catch (Exception V) {
+
+            }
+            try {
+                carComparison.getAndSet(carComparison.get()+ "<=>" + comparaisonResult.getCar_B().getCharacteristic_name());
+            } catch (Exception V) {
+
+            }
+            carComparison.getAndSet(carComparison.get()+ ":");
+            try {
+                carComparison.getAndSet(carComparison.get()+ comparaisonResult.getVal_A().getRawDisplay());
+            } catch (Exception V) {
+
+            }
+            try {
+                carComparison.getAndSet(carComparison.get()+ "<=>" + comparaisonResult.getVal_B().getRawDisplay());
+            } catch (Exception V) {
+
+            }
+            carComparison.getAndSet(carComparison.get()+ ":");
+            carComparison.getAndSet(carComparison.get()+ comparaisonResult.getResultType());
+            pairComparison.getAndSet(pairComparison.get() + "\n\t>" + carComparison.get());
+        });
+        System.out.println(pairComparison.get());
     }
 
 
@@ -174,23 +193,23 @@ public class DeduplicationServices {
     }
 
 
-    private static boolean hasStored(CharDescriptionRow item_a, CharDescriptionRow item_b, ClassCaracteristic car_a) {
+    private static boolean hasStored(HashMap<String, ComparaisonResult> localComp, ClassCaracteristic car_a) {
         try {
-            fullCompResults.get(item_a.getItem_id()).get(item_b.getItem_id()).get(car_a.getCharacteristic_id()).getResultType();
+            localComp.get(car_a.getCharacteristic_id()).getResultType();
             return true;
         }catch (Exception V){
             return false;
         }
     }
 
-    private static void hardStore(CharDescriptionRow item_a, CharDescriptionRow item_b, ClassCaracteristic car_a, ComparaisonResult result) {
-        fullCompResults.get(item_a.getItem_id()).get(item_b.getItem_id()).put(car_a.getCharacteristic_id(),result);
+    private static void hardStore(HashMap<String, ComparaisonResult> localComp, ClassCaracteristic car_a, ComparaisonResult result) {
+        localComp.put(car_a.getCharacteristic_id(),result);
     }
-    private static void softStore(CharDescriptionRow item_a, CharDescriptionRow item_b, ClassCaracteristic car_a, ComparaisonResult result) {
+    private static void softStore(HashMap<String, ComparaisonResult> localComp, ClassCaracteristic car_a, ComparaisonResult result) {
         try {
-            fullCompResults.get(item_a.getItem_id()).get(item_b.getItem_id()).get(car_a.getCharacteristic_id()).getResultType();
+            localComp.get(car_a.getCharacteristic_id()).getResultType();
         }catch (Exception V){
-            hardStore(item_a,item_b,car_a,result);
+            hardStore(localComp, car_a,result);
         }
     }
 
@@ -580,17 +599,21 @@ public class DeduplicationServices {
     }
 
 
-    private static boolean itemPairIsViable(HashMap<String, ComparaisonResult> stringComparaisonResultHashMap, Integer global_min_matches, Integer global_max_mismatches, Double global_max_ratio, int remainingUncheckedCars) {
+    private static boolean itemPairIsViable(Collection<ComparaisonResult> stringComparaisonResultHashMap, Integer global_min_matches, Integer global_max_mismatches, Double global_max_ratio, int remainingUncheckedCars) {
         List<String> matchResultWordings = Arrays.asList("STRONG_MATCH", "WEAK_MATCH", "ALTERNATIVE_MATCH", "DESCRIPTION_MATCH");
-        int totalMatches = stringComparaisonResultHashMap.values().stream().filter(r->r.getResultType()!=null && matchResultWordings.contains(r.ResultType)).collect(Collectors.toList()).size();
+        int totalMatches = stringComparaisonResultHashMap.stream().filter(r->r.getResultType()!=null && matchResultWordings.contains(r.getResultType())).collect(Collectors.toList()).size();
         List<String> NomatchResultWordings = Arrays.asList("MISMATCH");
-        int totalMismatches = stringComparaisonResultHashMap.values().stream().filter(r->r.getResultType()!=null && NomatchResultWordings.contains(r.ResultType)).collect(Collectors.toList()).size();
-        return itemPairIsViable(totalMatches,totalMismatches,global_min_matches,global_min_matches,global_max_ratio,remainingUncheckedCars);
+        int totalMismatches = stringComparaisonResultHashMap.stream().filter(r->r.getResultType()!=null && NomatchResultWordings.contains(r.getResultType())).collect(Collectors.toList()).size();
+        boolean ret = itemPairIsViable(totalMatches,totalMismatches,global_min_matches,global_max_mismatches,global_max_ratio,remainingUncheckedCars);
+        if(remainingUncheckedCars==0 && !ret){
+            System.out.println();
+        }
+        return ret;
     }
     private static boolean itemPairIsViable(AtomicReference<Integer> strongMatches, AtomicReference<Integer> weakMatches, AtomicReference<Integer> descMatches, AtomicReference<Integer> mismatches, Integer global_min_matches, Integer global_max_mismatches, Double global_max_ratio, int remainingUncheckedCars) {
         int totalMatches = strongMatches.get() + weakMatches.get() + descMatches.get();
         int totalMismatches = mismatches.get();
-        return itemPairIsViable(totalMatches,totalMismatches,global_min_matches,global_min_matches,global_max_ratio,remainingUncheckedCars);
+        return itemPairIsViable(totalMatches,totalMismatches,global_min_matches,global_max_mismatches,global_max_ratio,remainingUncheckedCars);
     }
 
     private static boolean itemPairIsViable(int totalMatches, int totalMismatches, Integer global_min_matches, Integer global_max_mismatches, Double global_max_ratio, int remainingUncheckedCars) {
