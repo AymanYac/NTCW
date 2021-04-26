@@ -12,6 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import service.CharItemFetcher;
 import service.CharValuesLoader;
+import service.DeduplicationServices;
 import service.TranslationServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.ExceptionDialog;
@@ -24,7 +25,10 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -61,12 +65,12 @@ public class CharDescriptionExportServices {
         Sheet reviewSheet = null;
         if(exportReview){
         	reviewSheet = wb.createSheet("Review format");
-			createReviewHeader(parent,wb,reviewSheet);
+			createReviewHeader(wb,reviewSheet);
 		}
         Sheet baseSheet = null;
         if(exportBase) {
         	baseSheet = wb.createSheet("Database format");
-        	createBaseHeader(parent,wb,baseSheet);
+        	createBaseHeader(wb,baseSheet);
 
 		}
 
@@ -84,7 +88,7 @@ public class CharDescriptionExportServices {
         		reviewCharCardinality = itemChars.size();
         	}
         	if(exportReview) appendReviewItem(item,reviewSheet,itemChars,parent);
-        	if(exportBase) appendBaseItem(item,baseSheet,itemChars,parent);
+        	if(exportBase) appendBaseItem(item,baseSheet,itemChars);
         }
 
 		HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(parent.account);
@@ -98,7 +102,7 @@ public class CharDescriptionExportServices {
 
 		if(exportTaxo) {
 			Sheet taxoSheet = wb.createSheet("Taxonomy");
-			createTaxoHeader(taxoSheet,wb,parent);
+			createTaxoHeader(taxoSheet,wb);
 			taxoRowIdx=0;
 			ks.stream().forEach(kse->{
 				CharValuesLoader.returnSortedCopyOfClassCharacteristic(kse.getKey()).forEach(carac->{
@@ -109,7 +113,7 @@ public class CharDescriptionExportServices {
 
 		if(exportKV){
 			Sheet knownValueSheet = wb.createSheet("Known values");
-			createKnownValuesHeader(knownValueSheet,wb,parent);
+			createKnownValuesHeader(knownValueSheet,wb);
 			knownValueRowIdx=0;
 			HashSet<ClassCaracteristic> caracSet = new HashSet<ClassCaracteristic>();
 			CharValuesLoader.active_characteristics.values().stream().flatMap(a->a.stream()).forEach(c->caracSet.add(c));
@@ -133,7 +137,7 @@ public class CharDescriptionExportServices {
 
 
         
-        setColumnWidths(reviewSheet,baseSheet,parent,exportBase,exportReview,exportTaxo,exportKV);
+        setColumnWidths(reviewSheet,baseSheet, exportBase,exportReview,exportTaxo,exportKV);
         
         closeExportFile(file,wb);
 		
@@ -142,8 +146,8 @@ public class CharDescriptionExportServices {
 		
 	}
 
-	private static void createReviewHeader(Char_description parent, SXSSFWorkbook wb, Sheet reviewSheet) {
-		Row reviewHeader = createHeaderRow(parent,wb,reviewSheet,new String[] {
+	private static void createReviewHeader(SXSSFWorkbook wb, Sheet reviewSheet) {
+		Row reviewHeader = createHeaderRow(wb,reviewSheet,new String[] {
 				"Completion Status",
 				"Client Item Number",
 				"Short description",
@@ -160,15 +164,15 @@ public class CharDescriptionExportServices {
 				IndexedColors.SEA_GREEN,
 				IndexedColors.SEA_GREEN,
 				IndexedColors.GREY_80_PERCENT
-		});
+		}, 0);
 		completeReviewHeaderRow(wb,reviewHeader,
 				CharValuesLoader.active_characteristics.values().parallelStream()
 						.map(a->a.size()).max(Integer::compare).get());
 	}
 
 
-	private static void createBaseHeader(Char_description parent, SXSSFWorkbook wb, Sheet baseSheet) {
-		createHeaderRow(parent,wb,baseSheet,new String[] {
+	private static void createBaseHeader(SXSSFWorkbook wb, Sheet baseSheet) {
+		createHeaderRow(wb,baseSheet,new String[] {
 				"Client Item Number",
 				"Characteristic Sequence",
 				"Characteristic ID",
@@ -199,7 +203,7 @@ public class CharDescriptionExportServices {
 				null,
 				null,
 				null,
-		});
+		}, 0);
 	}
 
 
@@ -213,7 +217,7 @@ public class CharDescriptionExportServices {
         wb.close();
 	}
 
-	private static void setColumnWidths(Sheet reviewSheet, Sheet baseSheet, Char_description parent, boolean exportBase, boolean exportReview, boolean exportTaxo, boolean exportKV) {
+	private static void setColumnWidths(Sheet reviewSheet, Sheet baseSheet, boolean exportBase, boolean exportReview, boolean exportTaxo, boolean exportKV) {
 
 		if(exportReview){
 			reviewSheet.setColumnWidth(0,256*17);
@@ -315,7 +319,7 @@ public class CharDescriptionExportServices {
 
 	}
 
-	private static void appendBaseItem(CharDescriptionRow item, Sheet baseSheet, ArrayList<ClassCaracteristic> itemChars, Char_description parent) {
+	private static void appendBaseItem(CharDescriptionRow item, Sheet baseSheet, ArrayList<ClassCaracteristic> itemChars) {
 		String itemClass = item.getClass_segment_string().split("&&&")[0];
 		itemChars.forEach(carac->{
 
@@ -463,8 +467,8 @@ public class CharDescriptionExportServices {
 
 	}
 
-	private static void createKnownValuesHeader(Sheet knownValueSheet, SXSSFWorkbook wb, Char_description parent) {
-		createHeaderRow(parent,wb,knownValueSheet,new String[] {
+	private static void createKnownValuesHeader(Sheet knownValueSheet, SXSSFWorkbook wb) {
+		createHeaderRow(wb,knownValueSheet,new String[] {
 				"Characteristic ID",
 				"Characteristic Name",
 				"Known value in DL",
@@ -472,10 +476,10 @@ public class CharDescriptionExportServices {
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
-				IndexedColors.GREY_80_PERCENT});
+				IndexedColors.GREY_80_PERCENT}, 0);
 	}
-	private static void createTaxoHeader(Sheet taxoSheet, SXSSFWorkbook wb, Char_description parent){
-		createHeaderRow(parent,wb,taxoSheet,new String[] {
+	private static void createTaxoHeader(Sheet taxoSheet, SXSSFWorkbook wb){
+		createHeaderRow(wb,taxoSheet,new String[] {
 				"Class Number",
 				"Characteristic Sequence",
 				"Characteristic ID",
@@ -489,7 +493,7 @@ public class CharDescriptionExportServices {
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
-				IndexedColors.GREY_80_PERCENT});
+				IndexedColors.GREY_80_PERCENT}, 0);
 	}
 
 	
@@ -558,8 +562,8 @@ public class CharDescriptionExportServices {
 		
 	}
 
-	private static Row createHeaderRow(Char_description parent, SXSSFWorkbook wb, Sheet targetSheet, String[] columnTitles, IndexedColors[] columnColors) {
-		Row headerRow = targetSheet.createRow(0);
+	private static Row createHeaderRow(SXSSFWorkbook wb, Sheet targetSheet, String[] columnTitles, IndexedColors[] columnColors, Integer headerRowOffset) {
+		Row headerRow = targetSheet.createRow(headerRowOffset);
 		for(int i=0;i<columnTitles.length;i++) {
 			Cell cell = headerRow.createCell(i);
 			cell.setCellValue(columnTitles[i]);
@@ -1034,5 +1038,279 @@ public class CharDescriptionExportServices {
 	}
 
 
+	public static void exportDedupReport(ConcurrentHashMap<String, HashMap<String, HashMap<String, DeduplicationServices.ComparisonResult>>> fullCompResults, HashMap<String, ArrayList<Object>> weightTable, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
+		File file = openExportFile(parent);
+		if(file==null){
+			return;
+		}
 
+		SXSSFWorkbook wb = new SXSSFWorkbook(5000); // keep 5000 rows in memory, exceeding rows will be flushed to disk
+		Sheet paramSheet = null;
+		paramSheet = wb.createSheet("Matching parameters");
+		createDudupParamHeader(wb,paramSheet,global_min_matches,global_max_mismatches,global_mismatch_ratio);
+		Sheet couplesSheet = null;
+		couplesSheet = wb.createSheet("Matching couples");
+		createDedupCoupleHeader(wb,couplesSheet);
+		Sheet dedupDetailSheet = null;
+		dedupDetailSheet = wb.createSheet("Detailed matching results");
+		createDedupDetailsHeader(wb,dedupDetailSheet);
+
+		fillDedupParamSheet(wb,paramSheet,weightTable.values());
+		AtomicInteger couplesIndx = new AtomicInteger(0);
+		Sheet finalCouplesSheet = couplesSheet;
+		fullCompResults.values().forEach(e->{
+			e.values().forEach(v->{
+				AtomicReference<CharDescriptionRow> itemA = new AtomicReference<CharDescriptionRow>();
+				AtomicReference<CharDescriptionRow> itemB = new AtomicReference<CharDescriptionRow>();
+				AtomicInteger strongMatches = new AtomicInteger();
+				AtomicInteger weakMatches = new AtomicInteger();
+				AtomicInteger includedMatches = new AtomicInteger();
+				AtomicInteger alternativeMatches = new AtomicInteger();
+				AtomicInteger unknownMatches = new AtomicInteger();
+				AtomicInteger mismatches = new AtomicInteger();
+
+				v.values().forEach(r->{
+					itemA.set(r.getItem_A());
+					itemB.set(r.getItem_B());
+					switch (r.getResultType()){
+						case "STRONG_MATCH":
+							strongMatches.addAndGet(1);
+							break;
+						case "WEAK_MATCH":
+							weakMatches.addAndGet(1);
+							break;
+						case "DESCRIPTION_MATCH":
+							includedMatches.addAndGet(1);
+							break;
+						case "ALTERNATIVE_MATCH":
+							alternativeMatches.addAndGet(1);
+							break;
+						case "UNKNOWN_MATCH":
+							unknownMatches.addAndGet(1);
+							break;
+						case "MISMATCH":
+							mismatches.addAndGet(1);
+							break;
+					}
+				});
+				appendDedupCouple(finalCouplesSheet, couplesIndx.addAndGet(1),itemA.get(),itemB.get(),strongMatches.get(),weakMatches.get(),includedMatches.get(),alternativeMatches.get(),unknownMatches.get(),mismatches.get());
+			});
+		});
+		closeExportFile(file,wb);
+	}
+
+	private static void appendDedupCouple(Sheet couplesSheet, int couplesIndx, CharDescriptionRow itemA, CharDescriptionRow itemB, int strongMatches, int weakMatches, int includedMatches, int alternativeMatches, int unknownMatches, int mismatches) {
+		Row row = couplesSheet.createRow(couplesIndx);
+		Cell cell = row.createCell(0);
+		cell.setCellValue(itemA.getClient_item_number());
+		cell = row.createCell(1);
+		cell.setCellValue(itemB.getClient_item_number());
+		cell = row.createCell(2);
+		cell.setCellValue(strongMatches);
+		cell = row.createCell(3);
+		cell.setCellValue(weakMatches);
+		cell = row.createCell(4);
+		cell.setCellValue(includedMatches);
+		cell = row.createCell(5);
+		cell.setCellValue(alternativeMatches);
+		cell = row.createCell(6);
+		cell.setCellValue(unknownMatches);
+		cell = row.createCell(7);
+		cell.setCellValue(mismatches);
+	}
+
+	private static void fillDedupParamSheet(SXSSFWorkbook wb, Sheet paramSheet, Collection<ArrayList<Object>> values) {
+		AtomicInteger rowIndex = new AtomicInteger(7);
+		values.forEach(p->{
+			rowIndex.addAndGet(1);
+			Row row = paramSheet.createRow(rowIndex.get());
+			Cell cell = row.createCell(0);
+			cell.setCellValue(DeduplicationServices.getCarFromWeightTableRowValue(p).getCharacteristic_id());
+			cell = row.createCell(1);
+			cell.setCellValue(DeduplicationServices.getCarFromWeightTableRowValue(p).getCharacteristic_name());
+			cell = row.createCell(2);
+			try{
+				cell.setCellValue(DeduplicationServices.getCarFromWeightTableRowValue(p).getIsNumeric()?"NUM":"TXT");
+			}catch (Exception V){
+
+			}
+			cell = row.createCell(3);
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("STRONG",p));
+			cell = row.createCell(4);
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("WEAK",p));
+			cell = row.createCell(5);
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("DESCRIPTION_MATCH",p));
+			cell = row.createCell(6);
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("ALTERNATIVE",p));
+			cell = row.createCell(7);
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("UNKNOWN",p));
+			cell = row.createCell(8);
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("MISMATCH",p));
+		});
+	}
+
+	private static void createDedupDetailsHeader(SXSSFWorkbook wb, Sheet dedupDetailSheet) {
+		Row row = dedupDetailSheet.createRow(0);
+		Cell cell = row.createCell(0);
+		cell.setCellValue("Item 1");
+		XSSFCellStyle item1Style = (XSSFCellStyle) wb.createCellStyle();
+		item1Style.setAlignment(HorizontalAlignment.LEFT);
+		Font item1Font = wb.createFont();
+		item1Font.setColor(HSSFColor.HSSFColorPredefined.SEA_GREEN.getIndex());
+		item1Font.setBold(true);
+		item1Style.setFont(item1Font);
+		cell.setCellStyle(item1Style);
+
+		cell = row.createCell(13);
+		cell.setCellValue("Item 2");
+		XSSFCellStyle item2Style = (XSSFCellStyle) wb.createCellStyle();
+		item2Style.setAlignment(HorizontalAlignment.LEFT);
+		Font item2Font = wb.createFont();
+		item2Font.setColor(HSSFColor.HSSFColorPredefined.DARK_BLUE.getIndex());
+		item2Font.setBold(true);
+		item2Style.setFont(item2Font);
+		cell.setCellStyle(item2Style);
+
+		createHeaderRow(wb,dedupDetailSheet,new String[] {
+				"Client Item Number",
+				"Characteristic Sequence",
+				"Characteristic ID",
+				"Characteristic Name",
+				"Characteristic Type",
+				"Value",
+				"Unit of Measure",
+				"Value (translation)",
+				"Value (Min)",
+				"Value (Max)",
+				"Source",
+				"Rule",
+				"Value status",
+				"Client Item Number",
+				"Characteristic Sequence",
+				"Characteristic ID",
+				"Characteristic Name",
+				"Characteristic Type",
+				"Value",
+				"Unit of Measure",
+				"Value (translation)",
+				"Value (Min)",
+				"Value (Max)",
+				"Source",
+				"Rule",
+				"Value status",
+				"Characteristic matching result"}, new IndexedColors[] {
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.RED
+		}, 1);
+
+	}
+
+	private static void createDedupCoupleHeader(SXSSFWorkbook wb, Sheet couplesSheet) {
+		createHeaderRow(wb,couplesSheet,new String[] {
+				"Client Item Number 1",
+				"Client Item Number 2",
+				"# of strong matches",
+				"# of weak matches",
+				"# of included matches",
+				"# of alternative matches",
+				"# of unknown matches",
+				"# of mismatches",
+				"Matching score"}, new IndexedColors[] {
+				IndexedColors.SEA_GREEN,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.RED,
+				IndexedColors.RED,
+				IndexedColors.RED,
+				IndexedColors.RED,
+				IndexedColors.GREY_80_PERCENT
+		}, 0);
+	}
+
+	private static void createDudupParamHeader(SXSSFWorkbook wb, Sheet paramSheet, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio) {
+
+		XSSFCellStyle paramNameStyle = (XSSFCellStyle) wb.createCellStyle();
+		paramNameStyle.setAlignment(HorizontalAlignment.RIGHT);
+		Font parameNameFont = wb.createFont();
+		parameNameFont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+		parameNameFont.setBold(true);
+		paramNameStyle.setFont(parameNameFont);
+
+		XSSFCellStyle paramValueStyle = (XSSFCellStyle) wb.createCellStyle();
+		paramValueStyle.setAlignment(HorizontalAlignment.CENTER);
+		Font paramValuefont = wb.createFont();
+		paramValuefont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+		paramValuefont.setBold(true);
+		paramValueStyle.setFont(paramValuefont);
+
+
+		Row row = paramSheet.createRow(1);
+		Cell cell = row.createCell(1);
+		cell.setCellValue("Minimum number of matches");
+		cell.setCellStyle(paramNameStyle);
+		cell = row.createCell(2);
+		cell.setCellValue(global_min_matches);
+		cell.setCellStyle(paramValueStyle);
+
+		row = paramSheet.createRow(2);
+		cell = row.createCell(1);
+		cell.setCellValue("Maximum number of mismatches");
+		cell.setCellStyle(paramNameStyle);
+		cell = row.createCell(2);
+		cell.setCellValue(global_max_mismatches);
+		cell.setCellStyle(paramValueStyle);
+
+		row = paramSheet.createRow(3);
+		cell = row.createCell(1);
+		cell.setCellValue("Maximum mismatch/match ratio");
+		cell.setCellStyle(paramNameStyle);
+		cell = row.createCell(2);
+		cell.setCellValue(global_mismatch_ratio);
+		cell.setCellStyle(paramValueStyle);
+
+		createHeaderRow(wb,paramSheet,new String[] {
+				"Characteristic ID",
+				"Characteristic name",
+				"Characteristic type",
+				"Strong match weight",
+				"Weak match weight",
+				"Included weight",
+				"Alternative weight",
+				"Unknown weight",
+				"Mismatch weight"}, new IndexedColors[] {
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+		}, 6);
+	}
 }

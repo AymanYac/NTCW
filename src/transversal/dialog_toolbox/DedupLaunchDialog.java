@@ -36,6 +36,7 @@ import service.CharValuesLoader;
 import service.DeduplicationServices;
 import transversal.generic.Tools;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -249,11 +250,14 @@ public class DedupLaunchDialog {
                 HashMap<String, ArrayList<Object>> weightTable = new HashMap<>();
                 caracWeightTable.getItems().forEach(r->{
                     ArrayList<Object> tmp = new ArrayList<Object>();
-                    tmp.add(r.getKey());
-                    tmp.add(r.getValue().get(0));
-                    tmp.add(r.getValue().get(1));
-                    tmp.add(r.getValue().get(2));
-                    tmp.add(r.getValue().get(3));
+                    tmp.add(r.getKey());//Carac
+                    tmp.add(r.getValue().get(0));//Strong
+                    tmp.add(r.getValue().get(1));//Weak
+                    tmp.add(r.getValue().get(2));//Included
+                    tmp.add(r.getValue().get(3));//Alternative
+                    tmp.add(r.getValue().get(4));//Unknown
+                    tmp.add(r.getValue().get(5));//Mismatch
+
                     if(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID){
                         weightTable.put(r.getKey().getCharacteristic_name(),tmp);
                     }else{
@@ -263,7 +267,11 @@ public class DedupLaunchDialog {
                 if(GlobalConstants.DEDUP_CARAC_WISE){
                     DeduplicationServices.scoreDuplicatesForClassesPairWise(targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()));
                 }else{
-                    DeduplicationServices.scoreDuplicatesForClassesFull(targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()));
+                    try {
+                        DeduplicationServices.scoreDuplicatesForClassesFull(targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()), parent);
+                    } catch (SQLException | ClassNotFoundException | IOException throwables) {
+                        throwables.printStackTrace();
+                    }
                 }
                 showReport();
             }
@@ -285,7 +293,7 @@ public class DedupLaunchDialog {
             }
             HashSet<ClassCaracteristic> uniqueIDCarac = newValue.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).flatMap(ac -> ac.stream()).collect(Collectors.toCollection(HashSet<ClassCaracteristic>::new));
             return uniqueIDCarac.stream()
-                    .map(car->new Pair<ClassCaracteristic,ArrayList<String>>(car,new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))))
+                    .map(car->new Pair<ClassCaracteristic,ArrayList<String>>(car,new ArrayList<>(Arrays.asList(new String("1.0"),new String("1.0"),new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
         HashSet<String> retainedCars = null;

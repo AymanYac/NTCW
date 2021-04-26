@@ -733,8 +733,10 @@ public class Auto_classification_progress {
 				switch(i) {
 				case 1:
 					tmp.setPercentHeight(4);
+					break;
 				case 2:
 					tmp.setPercentHeight(2);
+					break;
 				}
 			}
 			rc.add(tmp);
@@ -748,45 +750,59 @@ public class Auto_classification_progress {
 			case 0:
 				tmp.setPercentWidth(4);
 				cc.add(tmp);
+				break;
 			case 1:
 				tmp.setPercentWidth(26);
 				cc.add(tmp);
+				break;
 			case 2:
 				tmp.setPercentWidth(7);
 				cc.add(tmp);
+				break;
 			case 3:
 				tmp.setPercentWidth(12);
 				cc.add(tmp);
+				break;
 			case 4:
 				tmp.setPercentWidth(7);
 				cc.add(tmp);
+				break;
 			case 5:
 				tmp.setPercentWidth(8);
 				cc.add(tmp);
+				break;
 			case 6:
 				tmp.setPercentWidth(8);
 				cc.add(tmp);
+				break;
 			case 7:
 				tmp.setPercentWidth(0);
 				cc.add(tmp);
+				break;
 			case 8:
 				tmp.setPercentWidth(0);
 				cc.add(tmp);
+				break;
 			case 9:
 				tmp.setPercentWidth(15);
 				cc.add(tmp);
+				break;
 			case 10:
 				tmp.setPercentWidth(0);
 				cc.add(tmp);
+				break;
 			case 11:
 				tmp.setPercentWidth(15);
 				cc.add(tmp);
+				break;
 			case 12:
 				tmp.setPercentWidth(0);
 				cc.add(tmp);
+				break;
 			case 13:
 				tmp.setPercentWidth(0);
 				cc.add(tmp);
+				break;
 			}
 		}
 		
