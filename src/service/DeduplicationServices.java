@@ -21,7 +21,7 @@ public class DeduplicationServices {
     private static ArrayList<String> targetSegmentIDS;
     private static HashMap<String, ArrayList<Object>> weightTable;
     private static ArrayList<CharDescriptionRow> targetItems;
-    private static ArrayList<Pair<CharDescriptionRow,CharDescriptionRow>> targetItemPairs = new ArrayList<>();
+    private static ArrayList<Pair<CharDescriptionRow,CharDescriptionRow>> targetItemPairs;
     private static HashMap<String, ArrayList<String>> nameSakeCarIDs;
     private static Unidecode unidec;
     private static double lastprogess;
@@ -35,6 +35,7 @@ public class DeduplicationServices {
         DeduplicationServices.weightTable = weightTable;
         DeduplicationServices.nameSakeCarIDs = CharValuesLoader.getNameSakeCarIDs();
         DeduplicationServices.fullCompResults = new ConcurrentHashMap<String, HashMap<String, HashMap<String, ComparisonResult>>>();
+        DeduplicationServices.targetItemPairs = new ArrayList<>();
         ArrayList<CharDescriptionRow> inClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> isInTargetClass(item)).collect(Collectors.toCollection(ArrayList::new));
         ArrayList<CharDescriptionRow> outClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> !isInTargetClass(item)).collect(Collectors.toCollection(ArrayList::new));
         IntStream.range(0, inClass.size()).forEach(idx_A -> {
