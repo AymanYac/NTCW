@@ -6,10 +6,13 @@ import model.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.language_toolbox.Unidecode;
+import transversal.language_toolbox.WordUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,43 +21,47 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class DeduplicationServices {
+    private static ArrayList<String> sourceSegmentIDS;
     private static ArrayList<String> targetSegmentIDS;
     private static HashMap<String, ArrayList<Object>> weightTable;
-    private static ArrayList<CharDescriptionRow> targetItems;
-    private static ArrayList<Pair<CharDescriptionRow,CharDescriptionRow>> targetItemPairs;
+    private static ArrayList<CharDescriptionRow> computeItems;
+    private static ArrayList<Pair<CharDescriptionRow,CharDescriptionRow>> computeItemPairs;
     private static HashMap<String, ArrayList<String>> nameSakeCarIDs;
     private static Unidecode unidec;
     private static double lastprogess;
-    private static ConcurrentHashMap<String, HashMap<String, HashMap<String, ComparisonResult>>> fullCompResults;
-    private static int compteur;
+    private static ConcurrentHashMap<String, HashMap<String, ComparisonResult>> fullCompResults;
 
-    public static void scoreDuplicatesForClassesFull(ArrayList<String> targetSegmentIDS, HashMap<String, ArrayList<Object>> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, Double GLOBAL_MISMATCH_RATIO, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
+    public static void scoreDuplicatesForClassesFull(ArrayList<String> sourceSegmentIDs, ArrayList<String> targetSegmentIDs, HashMap<String, ArrayList<Object>> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, Double GLOBAL_MISMATCH_RATIO, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
         lastprogess = 0;
         DeduplicationServices.unidec = Unidecode.toAscii();
-        DeduplicationServices.targetSegmentIDS = targetSegmentIDS;
+        DeduplicationServices.sourceSegmentIDS = sourceSegmentIDs;
+        DeduplicationServices.targetSegmentIDS = targetSegmentIDs;
         DeduplicationServices.weightTable = weightTable;
         DeduplicationServices.nameSakeCarIDs = CharValuesLoader.getNameSakeCarIDs();
-        DeduplicationServices.fullCompResults = new ConcurrentHashMap<String, HashMap<String, HashMap<String, ComparisonResult>>>();
-        DeduplicationServices.targetItemPairs = new ArrayList<>();
-        ArrayList<CharDescriptionRow> inClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> isInTargetClass(item)).collect(Collectors.toCollection(ArrayList::new));
-        ArrayList<CharDescriptionRow> outClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> !isInTargetClass(item)).collect(Collectors.toCollection(ArrayList::new));
+        DeduplicationServices.fullCompResults = new ConcurrentHashMap<String, HashMap<String, ComparisonResult>>();
+        DeduplicationServices.computeItemPairs = new ArrayList<>();
+        ArrayList<CharDescriptionRow> inClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> isInSourceClass(item)).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<CharDescriptionRow> outClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> !isInSourceClass(item) && isInTargetClass(item)).collect(Collectors.toCollection(ArrayList::new));
         IntStream.range(0, inClass.size()).forEach(idx_A -> {
             CharDescriptionRow item_A = inClass.get(idx_A);
             IntStream.range(idx_A+1,inClass.size()).forEach(idx_B->{
-                targetItemPairs.add(new Pair<>(item_A,inClass.get(idx_B)));
+                computeItemPairs.add(new Pair<>(item_A,inClass.get(idx_B)));
             });
             outClass.forEach(item_B->{
-                targetItemPairs.add(new Pair<>(item_A,item_B));
+                computeItemPairs.add(new Pair<>(item_A,item_B));
             });
         });
+        Collections.shuffle(computeItemPairs);
         System.out.println("::::::::::::::::::::::::::::: TARGET ITEMS : "+inClass.size()+" :::::::::::::::::::::::::::::");
         System.out.println("::::::::::::::::::::::::::::: ITEMS IN PROJECT : "+CharItemFetcher.allRowItems.size()+" :::::::::::::::::::::::::::::");
-        System.out.println("::::::::::::::::::::::::::::: COMPARISONS TO BE MADE : "+targetItemPairs.size()+" :::::::::::::::::::::::::::::");
-        targetItemPairs.parallelStream().forEach(e -> {
+        System.out.println("::::::::::::::::::::::::::::: COMPARISONS TO BE MADE : "+ computeItemPairs.size()+" :::::::::::::::::::::::::::::");
+        Instant start = Instant.now();
+        AtomicInteger doneComparisons = new AtomicInteger(0);
+        computeItemPairs.parallelStream().forEach(e -> {
             HashMap<String, ComparisonResult> localCompStorage = new HashMap<String, ComparisonResult>();
             CharDescriptionRow item_A = e.getKey();
             CharDescriptionRow item_B = e.getValue();
-            localCompStorage.put("CLASS_ID",new ComparisonResult(item_A,item_B,null,null,null,null,item_A.getClass_segment_string().equals(item_B.getClass_segment_string())?"STRONG_MATCH":"WEAK_MATCH"));
+            localCompStorage.put("CLASS_ID",new ComparisonResult(item_A,item_B,null,null,null,null,item_A.getClass_segment_string().equals(item_B.getClass_segment_string())?"STRONG_MATCH":"MISMATCH"));
             HashSet<ClassCaracteristic> checkedCarBInDescA = new HashSet<ClassCaracteristic>();
             String class_A = item_A.getClass_segment_string().split("&&&")[0];
             String class_B = item_B.getClass_segment_string().split("&&&")[0];
@@ -62,17 +69,26 @@ public class DeduplicationServices {
             ArrayList<ClassCaracteristic> cars_B = CharValuesLoader.active_characteristics.get(class_B);
             IntStream.range(0,cars_A.size()).forEach(car_idx_A->{
                 ClassCaracteristic car_A = cars_A.get(car_idx_A);
+                CaracteristicValue data_A = item_A.getData(class_A).get(car_A.getCharacteristic_id());
+                if(!hasCounterPart(car_A,cars_B) && (data_A==null || data_A.getRawDisplay().length()==0)){
+                    ComparisonResult result = new ComparisonResult(item_A,item_B,car_A,null,data_A,null,"UNKNOWN_MATCH");
+                    hardStore(localCompStorage, car_A,result);
+                    return;
+                }
                 IntStream.range(0, cars_B.size()).forEach(car_idx_B->{
                     ClassCaracteristic car_B = cars_B.get(car_idx_B);
+                    CaracteristicValue data_B = item_B.getData(class_B).get(car_B.getCharacteristic_id());
+                    if(!hasCounterPart(car_B,cars_A) && (data_B==null || data_B.getRawDisplay().length()==0)){
+                        ComparisonResult result = new ComparisonResult(item_A,item_B,null,car_B,null,data_B,"UNKNOWN_MATCH");
+                        hardStore(localCompStorage, car_B,result);
+                        return;
+                    }
                     if(!itemPairIsViable(localCompStorage.values(),GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,(cars_A.size()-car_idx_A-1)*cars_B.size() + (cars_B.size()-car_idx_B))){
                         return;
                     }
                     if(!car_B.getIsNumeric().equals(car_A.getIsNumeric())){
                         return;
                     }
-                    Instant then = Instant.now();
-                    CaracteristicValue data_A = item_A.getData(class_A).get(car_A.getCharacteristic_id());
-                    CaracteristicValue data_B = item_B.getData(class_B).get(car_B.getCharacteristic_id());
                     String valCompare = compareValues(item_A, item_B, car_A, car_B,false);
                     if(isSameCar(car_A,car_B)){
                         if(data_A == null && data_B == null){
@@ -119,23 +135,31 @@ public class DeduplicationServices {
                     }
                 });
             });
-            if(itemPairIsViable(localCompStorage.values(),GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,0) && Math.random()<1.0){
-                if(Math.random()<1.0){
-                    printConsoleSummary(item_A,item_B, localCompStorage);
+            doneComparisons.addAndGet(1);
+            if(Math.random()<0.001){
+                double progress = (doneComparisons.get() * 100.0) / computeItemPairs.size();
+                if(progress-lastprogess>2){
+                    lastprogess = progress;
+                    System.out.println(LocalDateTime.now().getHour()+":"+LocalDateTime.now().getMinute()+" > "+ WordUtils.Rewriter.DecimalUtils.round(progress)+"%");
                 }
-                try{
-                    fullCompResults.get(item_A.getItem_id()).put(item_B.getItem_id(),localCompStorage);
-                }catch (Exception V){
-                    fullCompResults.put(item_A.getItem_id(),new HashMap<String,HashMap<String, ComparisonResult>>());
-                    fullCompResults.get(item_A.getItem_id()).put(item_B.getItem_id(),localCompStorage);
-                }
+                //printConsoleSummary(item_A,item_B, localCompStorage);
+            }
+            if(itemPairIsViable(localCompStorage.values(),GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,0)){
+                fullCompResults.put(item_A.getItem_id()+"<=>"+item_B.getItem_id(),localCompStorage);
             }
         });
-        System.out.println("::::::::::::::::::::::::::::: DONE COMPARING : "+targetItemPairs.size()+" :::::::::::::::::::::::::::::");
-        ConfirmationDialog.show("Done", "DONE COMPARING : "+targetItemPairs.size(), "OK");
+        System.out.println("::::::::::::::::::::::::::::: RETAINED ITEMS : "+fullCompResults.size()+" ::::::::::::::::::::::::::::: in "+Duration.between(start,Instant.now()).getSeconds() +" seconds");
+        ConfirmationDialog.show("Done", "RETAINED ITEMS : "+fullCompResults.size(), "OK");
         CharDescriptionExportServices.exportDedupReport(fullCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO, parent);
         ConfirmationDialog.show("Done", "Results saved", "OK");
 
+    }
+
+    private static boolean hasCounterPart(ClassCaracteristic car_a, ArrayList<ClassCaracteristic> cars_b) {
+        return cars_b.stream().map(car->
+                    GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID?car.getCharacteristic_name():car.getCharacteristic_id())
+                .collect(Collectors.toList())
+                .contains(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID?car_a.getCharacteristic_name():car_a.getCharacteristic_id());
     }
 
     private static void printConsoleSummary(CharDescriptionRow item_A, CharDescriptionRow item_B, HashMap<String, ComparisonResult> localCompStorage) {
@@ -304,21 +328,24 @@ public class DeduplicationServices {
     }
 
 
+    private static boolean isInSourceClass(CharDescriptionRow item) {
+        return DeduplicationServices.sourceSegmentIDS.contains(item.getClass_segment_string().split("&&&")[0]);
+    }
     private static boolean isInTargetClass(CharDescriptionRow item) {
         return DeduplicationServices.targetSegmentIDS.contains(item.getClass_segment_string().split("&&&")[0]);
     }
 
-    public static void scoreDuplicatesForClassesPairWise(ArrayList<String> targetSegmentIDS, HashMap<String, ArrayList<Object>> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, Double GLOBAL_MISMATCH_RATIO) {
+    public static void scoreDuplicatesForClassesPairWise(ArrayList<String> sourceSegmentIDS, HashMap<String, ArrayList<Object>> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, Double GLOBAL_MISMATCH_RATIO) {
         lastprogess = 0;
         DeduplicationServices.unidec = Unidecode.toAscii();
-        DeduplicationServices.targetSegmentIDS = targetSegmentIDS;
+        DeduplicationServices.sourceSegmentIDS = sourceSegmentIDS;
         DeduplicationServices.weightTable = weightTable;
-        DeduplicationServices.targetItems = CharItemFetcher.allRowItems.parallelStream().filter(DeduplicationServices::isInTargetClass).collect(Collectors.toCollection(ArrayList::new));
+        DeduplicationServices.computeItems = CharItemFetcher.allRowItems.parallelStream().filter(DeduplicationServices::isInSourceClass).collect(Collectors.toCollection(ArrayList::new));
         DeduplicationServices.nameSakeCarIDs = CharValuesLoader.getNameSakeCarIDs();
-        IntStream.range(0,targetItems.size()).forEach(idx_A->{
-            IntStream.range(idx_A+1,targetItems.size()).parallel().forEach(idx_B->{
-                CharDescriptionRow item_A = targetItems.get(idx_A);
-                CharDescriptionRow item_B = targetItems.get(idx_B);
+        IntStream.range(0, computeItems.size()).forEach(idx_A->{
+            IntStream.range(idx_A+1, computeItems.size()).parallel().forEach(idx_B->{
+                CharDescriptionRow item_A = computeItems.get(idx_A);
+                CharDescriptionRow item_B = computeItems.get(idx_B);
                 AtomicReference<Double> score = new AtomicReference<>(0.0);
                 AtomicReference<Integer> strongMatches = new AtomicReference<>(0);
                 AtomicReference<Integer> weakMatches = new AtomicReference<>(0);
@@ -376,11 +403,11 @@ public class DeduplicationServices {
                 }
             });
             if(Math.random()<0.01){
-                double progress = (idx_A * 100.0) / targetItems.size();
+                double progress = (idx_A * 100.0) / computeItems.size();
                 if(progress-lastprogess>2){
-                    System.out.println(progress+"%");
+                    lastprogess = progress;
+                    System.out.println(LocalDateTime.now().getHour()+":"+LocalDateTime.now().getMinute()+" > "+WordUtils.Rewriter.DecimalUtils.round(progress)+"%");
                 }
-                lastprogess = progress;
             }
         });
     }

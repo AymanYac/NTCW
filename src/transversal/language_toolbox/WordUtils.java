@@ -7,6 +7,7 @@ import model.*;
 import org.apache.commons.lang3.StringUtils;
 import transversal.generic.Tools;
 
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -1226,6 +1227,22 @@ public class WordUtils {
 			}
 			matcher.appendTail(result);
 			return result.toString();
+		}
+
+		public static class DecimalUtils {
+
+			public static double round(double value, int numberOfDigitsAfterDecimalPoint) {
+				BigDecimal bigDecimal = new BigDecimal(value);
+				bigDecimal = bigDecimal.setScale(numberOfDigitsAfterDecimalPoint,
+						BigDecimal.ROUND_HALF_UP);
+				return bigDecimal.doubleValue();
+			}
+			public static double round(double value) {
+				BigDecimal bigDecimal = new BigDecimal(value);
+				bigDecimal = bigDecimal.setScale(2,
+						BigDecimal.ROUND_HALF_UP);
+				return bigDecimal.doubleValue();
+			}
 		}
 	}
 }

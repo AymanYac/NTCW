@@ -51,13 +51,15 @@ public class DedupLaunchDialog {
     private static TextField maxMismatches;
     private static TextField maxMismatchRatio;
 
-    private static ComboBox<ClassSegmentClusterComboRow> charClassLink;
-    private static Label detailsLabel;
+    private static ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink;
+    private static ComboBox<ClassSegmentClusterComboRow> targetCharClassLink;
+    private static Label sourceDetailsLabel;
+    private static Label targetDetailsLabel;
     private static TableView<Pair<ClassCaracteristic,ArrayList<String>>> caracWeightTable;
     private static ButtonType validateButtonType;
 
 
-    private static void showDetailedClassClusters(ClassSegment itemSegment) {
+    private static void showDetailedClassClusters(ClassSegment itemSegment,ComboBox<ClassSegmentClusterComboRow> ClassLink) {
         Dialog dialog = new Dialog<>();
         dialog.setTitle("Listing all impacted classes");
         dialog.setHeaderText(null);
@@ -99,27 +101,27 @@ public class DedupLaunchDialog {
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                        int activeCount = (int) charClassLink.getValue().getRowSegments().stream().filter(p->p.getValue().getValue()).count();
-                        if(activeCount==charClassLink.getValue().getRowSegments().size()){
+                        int activeCount = (int) ClassLink.getValue().getRowSegments().stream().filter(p->p.getValue().getValue()).count();
+                        if(activeCount== ClassLink.getValue().getRowSegments().size()){
                             //All cluster classes are active
-                            Optional<ClassSegmentClusterComboRow> fullCluster = charClassLink.getItems().stream().filter(r -> r.getRowSegments().stream().map(p -> p.getKey()).collect(Collectors.toCollection(ArrayList::new)).equals(charClassLink.getValue().getRowSegments().stream().map(p -> p.getKey()).collect(Collectors.toCollection(ArrayList::new)))).findAny();
-                            ArrayList<ClassSegmentClusterComboRow> pureClusters = charClassLink.getItems().stream().filter(r -> !r.toString().endsWith("(ies)")).collect(Collectors.toCollection(ArrayList::new));
-                            charClassLink.getItems().clear();
-                            charClassLink.getItems().addAll(pureClusters);
-                            fullCluster.ifPresent(classSegmentClusterComboRow -> charClassLink.getSelectionModel().select(classSegmentClusterComboRow));
+                            Optional<ClassSegmentClusterComboRow> fullCluster = ClassLink.getItems().stream().filter(r -> r.getRowSegments().stream().map(p -> p.getKey()).collect(Collectors.toCollection(ArrayList::new)).equals(ClassLink.getValue().getRowSegments().stream().map(p -> p.getKey()).collect(Collectors.toCollection(ArrayList::new)))).findAny();
+                            ArrayList<ClassSegmentClusterComboRow> pureClusters = ClassLink.getItems().stream().filter(r -> !r.toString().endsWith("(ies)")).collect(Collectors.toCollection(ArrayList::new));
+                            ClassLink.getItems().clear();
+                            ClassLink.getItems().addAll(pureClusters);
+                            fullCluster.ifPresent(classSegmentClusterComboRow -> ClassLink.getSelectionModel().select(classSegmentClusterComboRow));
                         }else if(activeCount>1){
                             //Cluster has been edited and at least one other class is active
-                            ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow("This and "+String.valueOf(activeCount-1)+" other category(ies)",charClassLink.getValue().getRowSegments());
-                            charClassLink.getItems().add(cc);
-                            charClassLink.getSelectionModel().select(cc);
+                            ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow("This and "+String.valueOf(activeCount-1)+" other category(ies)", ClassLink.getValue().getRowSegments());
+                            ClassLink.getItems().add(cc);
+                            ClassLink.getSelectionModel().select(cc);
                         }else{
                             //Only the current class is active
-                            ArrayList<ClassSegmentClusterComboRow> pureClusters = charClassLink.getItems().stream().filter(r -> !r.toString().endsWith("(ies)")).collect(Collectors.toCollection(ArrayList::new));
-                            charClassLink.getItems().clear();
-                            charClassLink.getItems().addAll(pureClusters);
-                            Optional<ClassSegmentClusterComboRow> classOnlyRow = charClassLink.getItems().stream().filter(r -> r.toString().equals("This category only")).findAny();
+                            ArrayList<ClassSegmentClusterComboRow> pureClusters = ClassLink.getItems().stream().filter(r -> !r.toString().endsWith("(ies)")).collect(Collectors.toCollection(ArrayList::new));
+                            ClassLink.getItems().clear();
+                            ClassLink.getItems().addAll(pureClusters);
+                            Optional<ClassSegmentClusterComboRow> classOnlyRow = ClassLink.getItems().stream().filter(r -> r.toString().equals("This category only")).findAny();
                             if(classOnlyRow.isPresent()){
-                                charClassLink.getSelectionModel().select(classOnlyRow.get());
+                                ClassLink.getSelectionModel().select(classOnlyRow.get());
                             }
                         }
                     }
@@ -135,7 +137,7 @@ public class DedupLaunchDialog {
         tableview.getColumns().add(col3);
 
         //IntStream.range(0,20).forEach(idx->tableview.getItems().addAll(charClassLink.getValue().getRowSegments()));
-        tableview.getItems().addAll(charClassLink.getValue().getRowSegments());
+        tableview.getItems().addAll(ClassLink.getValue().getRowSegments());
 
         grid.add(tableview,0,0);
         tableview.setMinWidth(800);
@@ -189,7 +191,8 @@ public class DedupLaunchDialog {
         // Request focus on the char name by default.
         Platform.runLater(() -> {
             minMatches.requestFocus();
-            charClassLink.getSelectionModel().select(0);
+            sourceCharClassLink.getSelectionModel().select(0);
+            //targetCharClassLink.getSelectionModel().select(targetCharClassLink.getItems().size()-1);
         });
         dialog.showAndWait();
     }
@@ -214,30 +217,63 @@ public class DedupLaunchDialog {
         maxMismatches.textProperty().addListener(paramListner);
         maxMismatchRatio.textProperty().addListener(paramListner);
 
-        charClassLink.getItems().clear();
+        sourceCharClassLink.getItems().clear();
+        targetCharClassLink.getItems().clear();
         IntStream.range(0,currentItemSegment.getSegmentGranularity()).forEach(lvl->{
             ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(lvl, currentItemSegment,sid2Segment);
-            charClassLink.getItems().add(cc);
+            sourceCharClassLink.getItems().add(cc);
+            targetCharClassLink.getItems().add(cc);
         });
-        Collections.reverse(charClassLink.getItems());
+        Collections.reverse(sourceCharClassLink.getItems());
+        Collections.reverse(targetCharClassLink.getItems());
         ClassSegmentClusterComboRow cc = new ClassSegmentClusterComboRow(sid2Segment);
-        charClassLink.getItems().add(cc);
-        charClassLink.valueProperty().addListener(new ChangeListener<ClassSegmentClusterComboRow>() {
-            @Override
-            public void changed(ObservableValue<? extends ClassSegmentClusterComboRow> observable, ClassSegmentClusterComboRow oldValue, ClassSegmentClusterComboRow newValue) {
-                caracWeightTable.getItems().clear();
-                ClassCaracteristic tmp = new ClassCaracteristic();
-                tmp.setSequence(0);
-                tmp.setCharacteristic_name("Item Class");
-                caracWeightTable.getItems().add(new Pair<ClassCaracteristic,ArrayList<String>>(tmp,new ArrayList<>(Arrays.asList(new String("1.0"),new String("1.0"),new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))));
-                caracWeightTable.getItems().addAll(GenerateWeightList(newValue));
-            }
-        });
+        sourceCharClassLink.getItems().add(cc);
+        targetCharClassLink.getItems().add(cc);
+        if(!GlobalConstants.DEDUP_CARAC_WISE) {
+            sourceCharClassLink.valueProperty().addListener(new ChangeListener<ClassSegmentClusterComboRow>() {
+                @Override
+                public void changed(ObservableValue<? extends ClassSegmentClusterComboRow> observable, ClassSegmentClusterComboRow oldValue, ClassSegmentClusterComboRow newValue) {
+                    targetCharClassLink.setValue(newValue);
+                }
+            });
+            targetCharClassLink.valueProperty().addListener(new ChangeListener<ClassSegmentClusterComboRow>() {
+                @Override
+                public void changed(ObservableValue<? extends ClassSegmentClusterComboRow> observable, ClassSegmentClusterComboRow oldValue, ClassSegmentClusterComboRow newValue) {
+                    caracWeightTable.getItems().clear();
+                    ClassCaracteristic tmp = new ClassCaracteristic();
+                    tmp.setSequence(0);
+                    tmp.setCharacteristic_name("Item Class");
+                    tmp.setCharacteristic_id("CLASS_ID");
+                    caracWeightTable.getItems().add(new Pair<ClassCaracteristic, ArrayList<String>>(tmp, new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))));
+                    caracWeightTable.getItems().addAll(GenerateWeightList(sourceCharClassLink.getValue(), newValue));
+                }
+            });
+        }else{
+            sourceCharClassLink.valueProperty().bindBidirectional(targetCharClassLink.valueProperty());
+            targetCharClassLink.valueProperty().addListener(new ChangeListener<ClassSegmentClusterComboRow>() {
+                @Override
+                public void changed(ObservableValue<? extends ClassSegmentClusterComboRow> observable, ClassSegmentClusterComboRow oldValue, ClassSegmentClusterComboRow newValue) {
+                    caracWeightTable.getItems().clear();
+                    ClassCaracteristic tmp = new ClassCaracteristic();
+                    tmp.setSequence(0);
+                    tmp.setCharacteristic_name("Item Class");
+                    tmp.setCharacteristic_id("CLASS_ID");
+                    caracWeightTable.getItems().add(new Pair<ClassCaracteristic, ArrayList<String>>(tmp, new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))));
+                    caracWeightTable.getItems().addAll(GenerateWeightList(newValue, newValue));
+                }
+            });
+        }
 
-        detailsLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        sourceDetailsLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                showDetailedClassClusters(currentItemSegment);
+                showDetailedClassClusters(currentItemSegment,sourceCharClassLink);
+            }
+        });
+        targetDetailsLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                showDetailedClassClusters(currentItemSegment,targetCharClassLink);
             }
         });
         Button validationButton = (Button) dialog.getDialogPane().lookupButton(validateButtonType);
@@ -246,7 +282,8 @@ public class DedupLaunchDialog {
             @Override
             public void handle(ActionEvent event) {
                 dialog.close();
-                ArrayList<String> targetSegmentIDS = charClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
+                ArrayList<String> sourceSegmentIDS = sourceCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
+                ArrayList<String> targetSegmentIDS = targetCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
                 HashMap<String, ArrayList<Object>> weightTable = new HashMap<>();
                 caracWeightTable.getItems().forEach(r->{
                     ArrayList<Object> tmp = new ArrayList<Object>();
@@ -265,12 +302,12 @@ public class DedupLaunchDialog {
                     }
                 });
                 if(GlobalConstants.DEDUP_CARAC_WISE){
-                    DeduplicationServices.scoreDuplicatesForClassesPairWise(targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()));
+                    DeduplicationServices.scoreDuplicatesForClassesPairWise(sourceSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()));
                 }else{
                     try {
-                        DeduplicationServices.scoreDuplicatesForClassesFull(targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()), parent);
+                        DeduplicationServices.scoreDuplicatesForClassesFull(sourceSegmentIDS,targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()), parent);
                     } catch (SQLException | ClassNotFoundException | IOException throwables) {
-                        throwables.printStackTrace();
+                        throwables.printStackTrace(System.err);
                     }
                 }
                 showReport();
@@ -280,24 +317,31 @@ public class DedupLaunchDialog {
 
     }
 
-    private static ArrayList<Pair<ClassCaracteristic,ArrayList<String>>> GenerateWeightList(ClassSegmentClusterComboRow newValue) {
-        if(newValue==null){
+    private static ArrayList<Pair<ClassCaracteristic,ArrayList<String>>> GenerateWeightList(ClassSegmentClusterComboRow source, ClassSegmentClusterComboRow target) {
+        if(source==null || target == null){
             return new ArrayList<Pair<ClassCaracteristic,ArrayList<String>>>();
         }
         if(!GlobalConstants.DEDUP_CARAC_WISE){
             if(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID){
                 HashSet<String> uniqueNameCarac = new HashSet<String>();
-                return newValue.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).flatMap(ac -> ac.stream()).filter(c->uniqueNameCarac.add(c.getCharacteristic_name()))
-                        .map(car->new Pair<ClassCaracteristic,ArrayList<String>>(car,new ArrayList<>(Arrays.asList(new String("1.0"),new String("1.0"),new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))))
+                ArrayList<Pair<ClassCaracteristic, ArrayList<String>>> sourceCars = source.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).filter(c -> uniqueNameCarac.add(c.getCharacteristic_name()))
+                        .map(car -> new Pair<ClassCaracteristic, ArrayList<String>>(car, new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))))
                         .collect(Collectors.toCollection(ArrayList::new));
+                ArrayList<Pair<ClassCaracteristic, ArrayList<String>>> targetCars = target.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).filter(c -> uniqueNameCarac.add(c.getCharacteristic_name()))
+                        .map(car -> new Pair<ClassCaracteristic, ArrayList<String>>(car, new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))))
+                        .collect(Collectors.toCollection(ArrayList::new));
+                sourceCars.addAll(targetCars);
+                return sourceCars;
+
             }
-            HashSet<ClassCaracteristic> uniqueIDCarac = newValue.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).flatMap(ac -> ac.stream()).collect(Collectors.toCollection(HashSet<ClassCaracteristic>::new));
-            return uniqueIDCarac.stream()
+            HashSet<ClassCaracteristic> uniqueIDCars = source.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toCollection(HashSet<ClassCaracteristic>::new));
+                                    uniqueIDCars.addAll(target.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toCollection(HashSet<ClassCaracteristic>::new)));
+            return uniqueIDCars.stream()
                     .map(car->new Pair<ClassCaracteristic,ArrayList<String>>(car,new ArrayList<>(Arrays.asList(new String("1.0"),new String("1.0"),new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
         HashSet<String> retainedCars = null;
-        for (Pair<ClassSegment, SimpleBooleanProperty> classSegmentSimpleBooleanPropertyPair : newValue.getRowSegments()) {
+        for (Pair<ClassSegment, SimpleBooleanProperty> classSegmentSimpleBooleanPropertyPair : source.getRowSegments()) {
             if (classSegmentSimpleBooleanPropertyPair.getValue().getValue()) {
                 try {
                     ArrayList<String> loopChars = CharValuesLoader.active_characteristics.get(classSegmentSimpleBooleanPropertyPair.getKey().getSegmentId()).stream().map(a -> GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID ? a.getCharacteristic_name() : a.getCharacteristic_id()).collect(Collectors.toCollection(ArrayList::new));
@@ -313,7 +357,7 @@ public class DedupLaunchDialog {
             }
         }
         HashSet<String> finalRetainedCars = retainedCars;
-        ArrayList<ClassCaracteristic> uniqueIDCarac = newValue.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(ac -> ac != null).flatMap(ac -> ac.stream()).filter(car -> finalRetainedCars.remove(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID ? car.getCharacteristic_name() : car.getCharacteristic_id())).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<ClassCaracteristic> uniqueIDCarac = source.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).filter(car -> finalRetainedCars.remove(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID ? car.getCharacteristic_name() : car.getCharacteristic_id())).collect(Collectors.toCollection(ArrayList::new));
         return uniqueIDCarac.stream()
                 .map(car->new Pair<ClassCaracteristic,ArrayList<String>>(car,new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -410,9 +454,21 @@ public class DedupLaunchDialog {
             }
         });
 
-        charClassLink = new ComboBox<ClassSegmentClusterComboRow>();
-        charClassLink.setMaxWidth(Integer.MAX_VALUE);
-        charClassLink.setOnKeyReleased(new EventHandler<KeyEvent>() {
+        sourceCharClassLink = new ComboBox<ClassSegmentClusterComboRow>();
+        sourceCharClassLink.setMaxWidth(Integer.MAX_VALUE);
+        sourceCharClassLink.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if(event.getCode().equals(KeyCode.ENTER)){
+                    event.consume();
+                    //skipToNextField(charClassLink);
+
+                }
+            }
+        });
+        targetCharClassLink = new ComboBox<ClassSegmentClusterComboRow>();
+        targetCharClassLink.setMaxWidth(Integer.MAX_VALUE);
+        targetCharClassLink.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 if(event.getCode().equals(KeyCode.ENTER)){
@@ -423,11 +479,16 @@ public class DedupLaunchDialog {
             }
         });
 
-        detailsLabel = new Label("View details...");
-        detailsLabel.setUnderline(true);
-        detailsLabel.setTextAlignment(TextAlignment.CENTER);
-        detailsLabel.setFont(Font.font(detailsLabel.getFont().getName(), FontWeight.LIGHT, FontPosture.ITALIC, detailsLabel.getFont().getSize()));
-        grid.setHalignment(detailsLabel, HPos.CENTER);
+        sourceDetailsLabel = new Label("View details...");
+        sourceDetailsLabel.setUnderline(true);
+        sourceDetailsLabel.setTextAlignment(TextAlignment.CENTER);
+        sourceDetailsLabel.setFont(Font.font(sourceDetailsLabel.getFont().getName(), FontWeight.LIGHT, FontPosture.ITALIC, sourceDetailsLabel.getFont().getSize()));
+        grid.setHalignment(sourceDetailsLabel, HPos.CENTER);
+        targetDetailsLabel = new Label("View details...");
+        targetDetailsLabel.setUnderline(true);
+        targetDetailsLabel.setTextAlignment(TextAlignment.CENTER);
+        targetDetailsLabel.setFont(Font.font(targetDetailsLabel.getFont().getName(), FontWeight.LIGHT, FontPosture.ITALIC, targetDetailsLabel.getFont().getSize()));
+        grid.setHalignment(targetDetailsLabel, HPos.CENTER);
 
         caracWeightTable = new TableView<Pair<ClassCaracteristic,ArrayList<String>>>();
         caracWeightTable.setEditable(true);
@@ -690,15 +751,19 @@ public class DedupLaunchDialog {
         grid.add(new Label("Maximum mismatch/match ratio"), 1, 4);
         grid.add(maxMismatchRatio,3,4);
         grid.add(new Label("Run deduplication on"), 1, 5);
-        grid.add(charClassLink, 3, 5);
-        grid.setHgrow(charClassLink, Priority.ALWAYS);
-        grid.add(detailsLabel, 5, 5);
+        grid.add(sourceCharClassLink, 3, 5);
+        grid.setHgrow(sourceCharClassLink, Priority.ALWAYS);
+        grid.add(sourceDetailsLabel, 5, 5);
+        grid.add(new Label("Run deduplication against"), 1, 6);
+        grid.add(targetCharClassLink, 3, 6);
+        grid.setHgrow(targetCharClassLink, Priority.ALWAYS);
+        grid.add(targetDetailsLabel, 5, 6);
 
         Label headerLabel2 = new Label("Deduplication settings at characteristic level");
         headerLabel2.setUnderline(true);
-        grid.add(headerLabel2, 1, 6);
+        grid.add(headerLabel2, 1, 7);
 
-        grid.add(caracWeightTable,1,7);
+        grid.add(caracWeightTable,1,8);
         GridPane.setColumnSpan(caracWeightTable,GridPane.REMAINING);
     }
 

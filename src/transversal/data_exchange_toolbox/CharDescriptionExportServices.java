@@ -1038,7 +1038,7 @@ public class CharDescriptionExportServices {
 	}
 
 
-	public static void exportDedupReport(ConcurrentHashMap<String, HashMap<String, HashMap<String, DeduplicationServices.ComparisonResult>>> fullCompResults, HashMap<String, ArrayList<Object>> weightTable, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
+	public static void exportDedupReport(ConcurrentHashMap<String, HashMap<String, DeduplicationServices.ComparisonResult>> fullCompResults, HashMap<String, ArrayList<Object>> weightTable, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
 		File file = openExportFile(parent);
 		if(file==null){
 			return;
@@ -1059,42 +1059,39 @@ public class CharDescriptionExportServices {
 		AtomicInteger couplesIndx = new AtomicInteger(0);
 		Sheet finalCouplesSheet = couplesSheet;
 		fullCompResults.values().forEach(e->{
-			e.values().forEach(v->{
-				AtomicReference<CharDescriptionRow> itemA = new AtomicReference<CharDescriptionRow>();
-				AtomicReference<CharDescriptionRow> itemB = new AtomicReference<CharDescriptionRow>();
-				AtomicInteger strongMatches = new AtomicInteger();
-				AtomicInteger weakMatches = new AtomicInteger();
-				AtomicInteger includedMatches = new AtomicInteger();
-				AtomicInteger alternativeMatches = new AtomicInteger();
-				AtomicInteger unknownMatches = new AtomicInteger();
-				AtomicInteger mismatches = new AtomicInteger();
-
-				v.values().forEach(r->{
-					itemA.set(r.getItem_A());
-					itemB.set(r.getItem_B());
-					switch (r.getResultType()){
-						case "STRONG_MATCH":
-							strongMatches.addAndGet(1);
-							break;
-						case "WEAK_MATCH":
-							weakMatches.addAndGet(1);
-							break;
-						case "DESCRIPTION_MATCH":
-							includedMatches.addAndGet(1);
-							break;
-						case "ALTERNATIVE_MATCH":
-							alternativeMatches.addAndGet(1);
-							break;
-						case "UNKNOWN_MATCH":
-							unknownMatches.addAndGet(1);
-							break;
-						case "MISMATCH":
-							mismatches.addAndGet(1);
-							break;
-					}
-				});
-				appendDedupCouple(finalCouplesSheet, couplesIndx.addAndGet(1),itemA.get(),itemB.get(),strongMatches.get(),weakMatches.get(),includedMatches.get(),alternativeMatches.get(),unknownMatches.get(),mismatches.get());
+			AtomicReference<CharDescriptionRow> itemA = new AtomicReference<CharDescriptionRow>();
+			AtomicReference<CharDescriptionRow> itemB = new AtomicReference<CharDescriptionRow>();
+			AtomicInteger strongMatches = new AtomicInteger();
+			AtomicInteger weakMatches = new AtomicInteger();
+			AtomicInteger includedMatches = new AtomicInteger();
+			AtomicInteger alternativeMatches = new AtomicInteger();
+			AtomicInteger unknownMatches = new AtomicInteger();
+			AtomicInteger mismatches = new AtomicInteger();
+			e.values().forEach(r->{
+				itemA.set(r.getItem_A());
+				itemB.set(r.getItem_B());
+				switch (r.getResultType()){
+					case "STRONG_MATCH":
+						strongMatches.addAndGet(1);
+						break;
+					case "WEAK_MATCH":
+						weakMatches.addAndGet(1);
+						break;
+					case "DESCRIPTION_MATCH":
+						includedMatches.addAndGet(1);
+						break;
+					case "ALTERNATIVE_MATCH":
+						alternativeMatches.addAndGet(1);
+						break;
+					case "UNKNOWN_MATCH":
+						unknownMatches.addAndGet(1);
+						break;
+					case "MISMATCH":
+						mismatches.addAndGet(1);
+						break;
+				}
 			});
+			appendDedupCouple(finalCouplesSheet, couplesIndx.addAndGet(1),itemA.get(),itemB.get(),strongMatches.get(),weakMatches.get(),includedMatches.get(),alternativeMatches.get(),unknownMatches.get(),mismatches.get());
 		});
 		closeExportFile(file,wb);
 	}
