@@ -246,3 +246,9 @@
 	-fx-text-fill:#445469;
 	-fx-font-weight:bold;
 }
+
+.table-row-cell.highlightedRow {
+    -fx-background-color: #9BBB5C;
+    -fx-border-color:transparent;
+    -fx-text-fill: black;
+}

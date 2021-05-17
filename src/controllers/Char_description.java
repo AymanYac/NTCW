@@ -793,7 +793,6 @@ public class Char_description {
 			}
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.R)) {
-			
 			String selectedText = proposer.getUserSelectedText();
 			if(selectedText.length()>0){
 				draftingRule=true;
