@@ -53,7 +53,7 @@ public class GlobalConstants {
     public static final boolean JAVASCRIPT_PDF_RENDER = true;
     public static final boolean FORCE_PDF_IN_VIEWER = true;
 	public static final String SEARCH_PANE_LAYOUT_FORCE = "NEW";
-    public static final boolean DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID = false;
+    public static final boolean DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID = true;
 	public static final double DEDUP_NUM_APPROACHING_THRESH = 0.05;
 	public static final boolean DEDUP_CARAC_WISE = false;
 	public static final boolean TEMP_APPLY_RULES_ON_LONG_DESC_ONLY = true;
