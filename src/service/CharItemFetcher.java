@@ -128,15 +128,17 @@ public class CharItemFetcher {
 
 		try {
 			tablePane_CharClassif.itemArray.clear();
-			indexedRowItems.entrySet().parallelStream().filter(e->classItemIDs.contains(e.getKey()))
-			.forEach(e->tablePane_CharClassif.itemArray.add(allRowItems.get(e.getValue())));
-			System.gc();
 		}catch(Exception V) {
 			tablePane_CharClassif.itemArray = new ArrayList<CharDescriptionRow>();
-			indexedRowItems.entrySet().parallelStream().filter(e->classItemIDs.contains(e.getKey()))
-			.forEach(e->tablePane_CharClassif.itemArray.add(allRowItems.get(e.getValue())));
-			System.gc();
 		}
+		indexedRowItems.entrySet().parallelStream().filter(e->classItemIDs.contains(e.getKey()))
+				.forEach(e->{
+					if(allRowItems.get(e.getValue())==null){
+						System.out.println("**** NULL ROW LOADED FROM DB *****");
+					}
+					tablePane_CharClassif.itemArray.add(allRowItems.get(e.getValue()));
+				});
+		System.gc();
 		
 	}
 

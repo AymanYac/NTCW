@@ -914,6 +914,22 @@ public class TablePane_CharClassif {
 							 return new ReadOnlyObjectWrapper("");
 						 }
 					 }catch (Exception V){
+					 	System.out.println("row is null : "+r==null);
+					 	try{
+					 		System.out.println(r.getValue().getClient_item_number());
+						}catch (Exception E){
+
+						}
+						 try{
+							 System.out.println(r.getValue().getShort_desc());
+						 }catch (Exception E){
+
+						 }
+						 try{
+							 System.out.println(r.getValue().getLong_desc());
+						 }catch (Exception E){
+
+						 }
 					 	return new ReadOnlyObjectWrapper<>("**** BUG ****");
 					 }
                  }
