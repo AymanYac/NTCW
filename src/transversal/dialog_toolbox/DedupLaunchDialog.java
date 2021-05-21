@@ -224,6 +224,29 @@ public class DedupLaunchDialog {
         minMatches.textProperty().addListener(paramListner);
         maxMismatches.textProperty().addListener(paramListner);
         maxMismatchRatio.textProperty().addListener(paramListner);
+        allCarsPropertySelected.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                caracWeightTable.getItems().stream().filter(DedupLaunchDialogRow::isNotSpecialRow).forEach(r->r.setAllCarac(newValue));
+                if(newValue){
+                    caracWeightTable.getItems().stream().filter(DedupLaunchDialogRow::isNotSpecialRow).forEach(r->r.setSameCarac(true));
+                    refreshSameCarsProperty();
+                }
+                DedupLaunchDialog.caracWeightTable.refresh();
+            }
+        });
+        sameCarsPropertySelected.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                caracWeightTable.getItems().stream().filter(Objects::nonNull).forEach(r->r.setSameCarac(newValue));
+                if(!newValue){
+                    caracWeightTable.getItems().stream().filter(Objects::nonNull).forEach(r->r.setAllCarac(false));
+                    refreshSameCarsProperty();
+                }
+                DedupLaunchDialog.caracWeightTable.refresh();
+            }
+        });
+
 
         sourceCharClassLink.getItems().clear();
         targetCharClassLink.getItems().clear();
@@ -565,9 +588,9 @@ public class DedupLaunchDialog {
         caracWeightTable.sortPolicyProperty().set(t -> {
             Comparator<DedupLaunchDialogRow> comparator = (r1, r2)
                     //-> r1.getCarac().getSequence()==0 ? -1 //this row on top
-                    -> !r1.isNotSpecialRow()? -1 //this row on top
+                    -> r1==null ? -1 //this row on top
                     //: r2.getCarac().getSequence()==0 ? 1 //this row on top
-                    : !r2.isNotSpecialRow()? 1 //this row on top
+                    : r2==null ? 1 //this row on top
                     : t.getComparator() == null ? 0 //no column sorted: don't change order
                     : t.getComparator().compare(r1, r2); //columns are sorted: sort accordingly
             FXCollections.sort(caracWeightTable.getItems(), comparator);
@@ -617,17 +640,6 @@ public class DedupLaunchDialog {
                     return new ReadOnlyObjectWrapper(tmp);
                 }else{
                     CheckBox tmp = new CheckBox();
-                    tmp.selectedProperty().addListener(new ChangeListener<Boolean>() {
-                        @Override
-                        public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                            caracWeightTable.getItems().stream().filter(r->r.getCarac()!=null).forEach(r->r.sameCaracProperty().setValue(newValue));
-                            if(!newValue){
-                                caracWeightTable.getItems().stream().filter(r->r.getCarac()!=null).forEach(r->r.allCaracProperty().setValue(false));
-                                refreshAllCarsProperty();
-                            }
-                            DedupLaunchDialog.caracWeightTable.refresh();
-                        }
-                    });
                     tmp.selectedProperty().bindBidirectional(sameCarsPropertySelected);
                     tmp.indeterminateProperty().bindBidirectional(sameCarsPropertyUndetermined);
                     return new ReadOnlyObjectWrapper(tmp);
@@ -655,17 +667,6 @@ public class DedupLaunchDialog {
                     return new ReadOnlyObjectWrapper(tmp);
                 }else {
                     CheckBox tmp = new CheckBox();
-                    tmp.selectedProperty().addListener(new ChangeListener<Boolean>() {
-                        @Override
-                        public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                            caracWeightTable.getItems().stream().filter(r->r.getCarac()!=null).forEach(r->r.allCaracProperty().setValue(newValue));
-                            if(newValue){
-                                caracWeightTable.getItems().stream().filter(r->r.getCarac()!=null).forEach(r->r.sameCaracProperty().setValue(true));
-                                refreshSameCarsProperty();
-                            }
-                            DedupLaunchDialog.caracWeightTable.refresh();
-                        }
-                    });
                     tmp.selectedProperty().bindBidirectional(allCarsPropertySelected);
                     tmp.indeterminateProperty().bindBidirectional(allCarsPropertyUndetermined);
                     return new ReadOnlyObjectWrapper(tmp);
@@ -681,7 +682,7 @@ public class DedupLaunchDialog {
                 if(r.getValue().isNotSpecialRow()){
                     return new ReadOnlyObjectWrapper(r.getValue().getStrongWeight());
                 }else{
-                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.getCarac()!=null).map(row -> row.getStrongWeight()).collect(Collectors.toCollection(HashSet::new));
+                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.isNotSpecialRow()).map(row -> row.getStrongWeight()).collect(Collectors.toCollection(HashSet::new));
                     if(distinctValues.size()==1){
                         return new ReadOnlyObjectWrapper<>(distinctValues.iterator().next());
                     }
@@ -706,7 +707,7 @@ public class DedupLaunchDialog {
                                     t.getTablePosition().getRow())
                             ).getWeights().set(0, newVal);
                         }else{
-                            t.getTableView().getItems().stream().filter(r->r.getCarac()!=null).forEach(r->r.getWeights().set(0,newVal));
+                            t.getTableView().getItems().stream().filter(r->r.isNotSpecialRow()).forEach(r->r.getWeights().set(0,newVal));
                         }
                         t.getTableView().refresh();
                     }
@@ -721,7 +722,7 @@ public class DedupLaunchDialog {
                 if(r.getValue().isNotSpecialRow()){
                     return new ReadOnlyObjectWrapper(r.getValue().getWeakWeight());
                 }else{
-                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.getCarac()!=null).map(row -> row.getWeakWeight()).collect(Collectors.toCollection(HashSet::new));
+                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.isNotSpecialRow()).map(row -> row.getWeakWeight()).collect(Collectors.toCollection(HashSet::new));
                     if(distinctValues.size()==1){
                         return new ReadOnlyObjectWrapper<>(distinctValues.iterator().next());
                     }
@@ -757,7 +758,7 @@ public class DedupLaunchDialog {
                 if(r.getValue().isNotSpecialRow()){
                     return new ReadOnlyObjectWrapper(r.getValue().getIncludedWeight());
                 }else {
-                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.getCarac()!=null).map(row -> row.getIncludedWeight()).collect(Collectors.toCollection(HashSet::new));
+                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.isNotSpecialRow()).map(row -> row.getIncludedWeight()).collect(Collectors.toCollection(HashSet::new));
                     if(distinctValues.size()==1){
                         return new ReadOnlyObjectWrapper<>(distinctValues.iterator().next());
                     }
@@ -793,7 +794,7 @@ public class DedupLaunchDialog {
                 if(r.getValue().isNotSpecialRow()){
                     return new ReadOnlyObjectWrapper(r.getValue().getAlternativeWeight());
                 }else {
-                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.getCarac()!=null).map(row -> row.getAlternativeWeight()).collect(Collectors.toCollection(HashSet::new));
+                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.isNotSpecialRow()).map(row -> row.getAlternativeWeight()).collect(Collectors.toCollection(HashSet::new));
                     if(distinctValues.size()==1){
                         return new ReadOnlyObjectWrapper<>(distinctValues.iterator().next());
                     }
@@ -829,7 +830,7 @@ public class DedupLaunchDialog {
                 if(r.getValue().isNotSpecialRow()){
                     return new ReadOnlyObjectWrapper(r.getValue().getUnknownWeight());
                 }else {
-                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.getCarac()!=null).map(row -> row.getUnknownWeight()).collect(Collectors.toCollection(HashSet::new));
+                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.isNotSpecialRow()).map(row -> row.getUnknownWeight()).collect(Collectors.toCollection(HashSet::new));
                     if(distinctValues.size()==1){
                         return new ReadOnlyObjectWrapper<>(distinctValues.iterator().next());
                     }
@@ -865,7 +866,7 @@ public class DedupLaunchDialog {
                 if(r.getValue().isNotSpecialRow()){
                     return new ReadOnlyObjectWrapper(r.getValue().getMismatchWeight());
                 }else {
-                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.getCarac()!=null).map(row -> row.getMismatchWeight()).collect(Collectors.toCollection(HashSet::new));
+                    HashSet<String> distinctValues = DedupLaunchDialog.caracWeightTable.getItems().stream().filter(row->row.isNotSpecialRow()).map(row -> row.getMismatchWeight()).collect(Collectors.toCollection(HashSet::new));
                     if(distinctValues.size()==1){
                         return new ReadOnlyObjectWrapper<>(distinctValues.iterator().next());
                     }
@@ -910,7 +911,7 @@ public class DedupLaunchDialog {
     }
 
     private static void refreshAllCarsProperty() {
-        long selected = caracWeightTable.getItems().stream().filter(r -> r.getCarac()!=null && r.allCaracProperty().getValue()).count();
+        long selected = caracWeightTable.getItems().stream().filter(r -> r.isNotSpecialRow() && r.allCaracProperty().getValue()).count();
         if(selected == caracWeightTable.getItems().size()-1){
             allCarsPropertySelected.setValue(true);
             allCarsPropertyUndetermined.setValue(false);
@@ -922,7 +923,7 @@ public class DedupLaunchDialog {
         }
     }
     private static void refreshSameCarsProperty() {
-        long selected = caracWeightTable.getItems().stream().filter(r -> r.getCarac()!=null && r.sameCaracProperty().getValue()).count();
+        long selected = caracWeightTable.getItems().stream().filter(r -> r.isNotSpecialRow() && r.sameCaracProperty().getValue()).count();
         if(selected == caracWeightTable.getItems().size()-1){
             sameCarsPropertySelected.setValue(true);
             sameCarsPropertyUndetermined.setValue(false);

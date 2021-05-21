@@ -904,14 +904,18 @@ public class TablePane_CharClassif {
             TableColumn descriptionColumn = new TableColumn<>("Description");
             descriptionColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
                  public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                     if(r.getValue().getLong_desc()!=null && r.getValue().getLong_desc().length()>0) {
-                         return new ReadOnlyObjectWrapper(r.getValue().getLong_desc());
-                     }
-                     try{
-                    	 return new ReadOnlyObjectWrapper(r.getValue().getShort_desc());
-                     }catch(Exception V) {
-                    	 return new ReadOnlyObjectWrapper("");
-                     }
+					 try{
+						 if (r.getValue().getLong_desc() != null && r.getValue().getLong_desc().length() > 0) {
+							 return new ReadOnlyObjectWrapper(r.getValue().getLong_desc());
+						 }
+						 try {
+							 return new ReadOnlyObjectWrapper(r.getValue().getShort_desc());
+						 } catch (Exception V) {
+							 return new ReadOnlyObjectWrapper("");
+						 }
+					 }catch (Exception V){
+					 	return new ReadOnlyObjectWrapper<>("**** BUG ****");
+					 }
                  }
               });
             this.tableGrid.getColumns().add(descriptionColumn);
