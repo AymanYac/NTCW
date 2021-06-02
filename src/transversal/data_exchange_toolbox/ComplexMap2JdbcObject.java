@@ -2,7 +2,9 @@ package transversal.data_exchange_toolbox;
 
 import com.google.gson.Gson;
 import model.UserAccount;
+import org.hildan.fxgson.FxGson;
 import org.postgresql.util.PGobject;
+import transversal.dialog_toolbox.DedupLaunchDialog;
 import transversal.generic.Tools;
 
 import java.lang.reflect.Type;
@@ -70,7 +72,21 @@ public class ComplexMap2JdbcObject {
 		return gson.toJson(obj);
 	}
 
+	public static String serializeFX(Object obj) {
+		// to handle only Properties and Observable collections
+		Gson fxGson = FxGson.coreBuilder().setPrettyPrinting().create();
+		return fxGson.toJson(obj);
+	}
+
 	public static Object deserialize(String string, Type type) {
 		return gson.fromJson(string,type);
 	}
+
+	public static Object deserializeFX(String string, Type type) {
+		// to handle only Properties and Observable collections
+		Gson fxGson = FxGson.create();
+		return fxGson.fromJson(string,type);
+	}
+
+
 }

@@ -1874,10 +1874,18 @@ public class Char_description {
 			int selected_col = 0;
 			if(!FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 				selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
-				active_char = CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col);
-				proposer.loadCustomValues(CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col));
-				proposer.loadCharRuleProps(row,row.getClass_segment_string().split("&&&")[0],CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col).getCharacteristic_id());
-				
+				String itemSegementID = row.getClass_segment_string().split("&&&")[0];
+				active_char = CharValuesLoader.active_characteristics.get(itemSegementID).get(selected_col);
+				proposer.loadCharRuleProps(row,itemSegementID,active_char.getCharacteristic_id());
+				try{
+					if (row.getRulePropositions(active_char.getCharacteristic_id()).size() == 0) {
+						proposer.loadCustomValues(CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col));
+					}
+				}catch (Exception V){
+					//Null rule props
+					proposer.loadCustomValues(CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col));
+				}
+
 			}else {
 				active_char = CharItemFetcher.defaultCharValues.get(tableController.tableGrid.getSelectionModel().getSelectedIndex()).getKey();
 				

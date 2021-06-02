@@ -1,6 +1,7 @@
 package transversal.dialog_toolbox;
 
 
+import com.google.gson.reflect.TypeToken;
 import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -17,7 +18,11 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -29,6 +34,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Screen;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import model.ClassCaracteristic;
@@ -37,9 +43,14 @@ import model.ClassSegmentClusterComboRow;
 import model.GlobalConstants;
 import service.CharValuesLoader;
 import service.DeduplicationServices;
+import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.generic.Tools;
 
+import java.awt.*;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,7 +63,7 @@ public class DedupLaunchDialog {
     private static GridPane grid;
     private static TextField minMatches;
     private static TextField maxMismatches;
-    private static TextField maxMismatchRatio;
+    private static TextField minMatchMismatchRatio;
 
     private static ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink;
     private static ComboBox<ClassSegmentClusterComboRow> targetCharClassLink;
@@ -60,11 +71,17 @@ public class DedupLaunchDialog {
     private static Label targetDetailsLabel;
     private static TableView<DedupLaunchDialogRow> caracWeightTable;
     private static ButtonType validateButtonType;
+    private static ButtonType resetButtonType;
+    private static ButtonType saveButtonType;
     private static final ObservableList<Integer>  highlightRows = FXCollections.observableArrayList();
     private static SimpleBooleanProperty allCarsPropertySelected = new SimpleBooleanProperty();
     private static SimpleBooleanProperty allCarsPropertyUndetermined = new SimpleBooleanProperty(false);
     private static SimpleBooleanProperty sameCarsPropertySelected = new SimpleBooleanProperty();
     private static SimpleBooleanProperty sameCarsPropertyUndetermined = new SimpleBooleanProperty(false);
+    private static Char_description parent;
+    private static ClassSegment currentItemSegment;
+    private static HashMap<String,HashMap<String,DedupLaunchDialogRow>> savedWeights;
+    private static HashMap<Integer, TableColumn> columnBase = new HashMap<Integer, TableColumn>();
 
 
     private static void showDetailedClassClusters(ClassSegment itemSegment,ComboBox<ClassSegmentClusterComboRow> ClassLink) {
@@ -181,6 +198,9 @@ public class DedupLaunchDialog {
 
     public static void Settings(ClassSegment currentItemSegment, Char_description parent) throws SQLException, ClassNotFoundException {
 
+        DedupLaunchDialog.parent = parent;
+        DedupLaunchDialog.currentItemSegment = currentItemSegment;
+        loadLastSessionWeights();
 
         // Create the custom dialog.
         create_dialog();
@@ -192,7 +212,7 @@ public class DedupLaunchDialog {
         set_fields_layout();
 
         //Set fields behavior
-        set_fields_behavior(dialog,validateButtonType,currentItemSegment,parent);
+        set_fields_behavior();
 
         dialog.getDialogPane().setContent(grid);
 
@@ -205,8 +225,35 @@ public class DedupLaunchDialog {
         dialog.showAndWait();
     }
 
+    private static void loadSavedWeights() {
+    }
+    public static void loadLastSessionWeights() throws SQLException, ClassNotFoundException {
 
-    private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType, ClassSegment currentItemSegment, Char_description parent) throws SQLException, ClassNotFoundException {
+        Connection conn = Tools.spawn_connection_from_pool();
+        PreparedStatement stmt = conn.prepareStatement("select "
+                + "deduplication_weights"
+                + " from administration.users_x_projects where project_id = ? and user_id = ?");
+        stmt.setString(1, parent.account.getActive_project());
+        stmt.setString(2, parent.account.getUser_id());
+        ResultSet rs = stmt.executeQuery();
+        rs.next();
+        try {
+            DedupLaunchDialog.savedWeights = (HashMap<String, HashMap<String, DedupLaunchDialogRow>>) ComplexMap2JdbcObject.deserializeFX(rs.getString("deduplication_weights"),new TypeToken<HashMap<String,HashMap<String,DedupLaunchDialogRow>>>(){}.getType());
+        }catch(Exception V) {
+            V.printStackTrace(System.err);
+            DedupLaunchDialog.savedWeights = new HashMap<String, HashMap<String, DedupLaunchDialogRow>>();
+        }
+        if(DedupLaunchDialog.savedWeights == null){
+            DedupLaunchDialog.savedWeights = new HashMap<String, HashMap<String, DedupLaunchDialogRow>>();
+        }
+        rs.close();
+        stmt.close();
+        conn.close();
+
+
+    }
+
+    private static void set_fields_behavior() throws SQLException, ClassNotFoundException {
         HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(parent.account);
         ChangeListener<String> paramListner = new ChangeListener<String>() {
             @Override
@@ -214,7 +261,7 @@ public class DedupLaunchDialog {
                 try {
                     Integer.parseInt(minMatches.getText());
                     Integer.parseInt(maxMismatches.getText());
-                    Double.parseDouble(maxMismatchRatio.getText());
+                    double minMatchMismatchRatio = 1.0 / (Double.parseDouble(DedupLaunchDialog.minMatchMismatchRatio.getText()));
                     ((Button) dialog.getDialogPane().lookupButton(validateButtonType)).setDisable(false);
                 } catch (Exception V) {
                     ((Button) dialog.getDialogPane().lookupButton(validateButtonType)).setDisable(true);
@@ -223,7 +270,7 @@ public class DedupLaunchDialog {
         };
         minMatches.textProperty().addListener(paramListner);
         maxMismatches.textProperty().addListener(paramListner);
-        maxMismatchRatio.textProperty().addListener(paramListner);
+        minMatchMismatchRatio.textProperty().addListener(paramListner);
         allCarsPropertySelected.addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -269,21 +316,8 @@ public class DedupLaunchDialog {
             });
             targetCharClassLink.valueProperty().addListener(new ChangeListener<ClassSegmentClusterComboRow>() {
                 @Override
-                public void changed(ObservableValue<? extends ClassSegmentClusterComboRow> observable, ClassSegmentClusterComboRow oldValue, ClassSegmentClusterComboRow newValue) {
-                    caracWeightTable.getItems().clear();
-                    highlightRows.clear();
-                    //caracWeightTable.getItems().add(null);
-                    caracWeightTable.getItems().add(new DedupLaunchDialogRow());
-                    ClassCaracteristic tmp = new ClassCaracteristic();
-                    tmp.setSequence(0);
-                    tmp.setCharacteristic_name("Item Class");
-                    tmp.setCharacteristic_id("CLASS_ID");
-                    caracWeightTable.getItems().add(new DedupLaunchDialogRow(tmp));
-                    caracWeightTable.getItems().addAll(GenerateWeightList(sourceCharClassLink.getValue(), newValue));
-                    highlightRows.setAll(Collections.singleton(0));
-                    refreshAllCarsProperty();
-                    refreshSameCarsProperty();
-                    caracWeightTable.refresh();
+                public void changed(ObservableValue<? extends ClassSegmentClusterComboRow> observable, ClassSegmentClusterComboRow oldValue, ClassSegmentClusterComboRow targetValue) {
+                    fillWeightTable(false);
                 }
             });
         }else{
@@ -291,17 +325,7 @@ public class DedupLaunchDialog {
             targetCharClassLink.valueProperty().addListener(new ChangeListener<ClassSegmentClusterComboRow>() {
                 @Override
                 public void changed(ObservableValue<? extends ClassSegmentClusterComboRow> observable, ClassSegmentClusterComboRow oldValue, ClassSegmentClusterComboRow newValue) {
-                    caracWeightTable.getItems().clear();
-                    //caracWeightTable.getItems().add(null);
-                    caracWeightTable.getItems().add(new DedupLaunchDialogRow());
-                    ClassCaracteristic tmp = new ClassCaracteristic();
-                    tmp.setSequence(0);
-                    tmp.setCharacteristic_name("Item Class");
-                    tmp.setCharacteristic_id("CLASS_ID");
-                    caracWeightTable.getItems().add(new DedupLaunchDialogRow(tmp));
-                    caracWeightTable.getItems().addAll(GenerateWeightList(newValue, newValue));
-                    refreshAllCarsProperty();
-                    refreshSameCarsProperty();
+                    fillWeightTablePairWise(oldValue,oldValue,false);
                 }
             });
         }
@@ -344,10 +368,10 @@ public class DedupLaunchDialog {
                     }
                 });
                 if(GlobalConstants.DEDUP_CARAC_WISE){
-                    DeduplicationServices.scoreDuplicatesForClassesPairWise(sourceSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()));
+                    DeduplicationServices.scoreDuplicatesForClassesPairWise(sourceSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()),  1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())));
                 }else{
                     try {
-                        DeduplicationServices.scoreDuplicatesForClassesFull(sourceSegmentIDS,targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), Double.parseDouble(maxMismatchRatio.getText()), parent);
+                        DeduplicationServices.scoreDuplicatesForClassesFull(sourceSegmentIDS,targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), 1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())), parent);
                     } catch (SQLException | ClassNotFoundException | IOException throwables) {
                         throwables.printStackTrace(System.err);
                     }
@@ -356,10 +380,59 @@ public class DedupLaunchDialog {
             }
         });
 
+        Button saveBT = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
+        saveBT.addEventFilter(ActionEvent.ACTION, event -> {
+            HashMap<String, DedupLaunchDialogRow> tmp = new HashMap<String, DedupLaunchDialogRow>();
+            caracWeightTable.getItems().stream().filter(r->r!=null && r.isNotSpecialRow()).forEach(r->{
+                if(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID){
+                    tmp.put(r.getCarac().getCharacteristic_name(),r);
+                }else{
+                    tmp.put(r.getCarac().getCharacteristic_id(),r);
+                }
+            });
+            DedupLaunchDialogRow.saveWeights(currentItemSegment.getSegmentId(),tmp);
+            event.consume();
+        });
+        Button resetBT = (Button) dialog.getDialogPane().lookupButton(resetButtonType);
+        resetBT.addEventFilter(ActionEvent.ACTION, event -> {
+            fillWeightTable(true);
+            event.consume();
+        });
 
     }
 
-    private static ArrayList<DedupLaunchDialogRow> GenerateWeightList(ClassSegmentClusterComboRow source, ClassSegmentClusterComboRow target) {
+    private static void fillWeightTablePairWise(ClassSegmentClusterComboRow value, ClassSegmentClusterComboRow valueCopy, boolean resetWeights) {
+        caracWeightTable.getItems().clear();
+        //caracWeightTable.getItems().add(null);
+        caracWeightTable.getItems().add(new DedupLaunchDialogRow());
+        ClassCaracteristic tmp = new ClassCaracteristic();
+        tmp.setSequence(0);
+        tmp.setCharacteristic_name("Item Class");
+        tmp.setCharacteristic_id("CLASS_ID");
+        caracWeightTable.getItems().add(new DedupLaunchDialogRow(tmp,resetWeights));
+        caracWeightTable.getItems().addAll(GenerateWeightList(value, valueCopy, resetWeights));
+        refreshAllCarsProperty();
+        refreshSameCarsProperty();
+    }
+
+    private static void fillWeightTable(boolean resetWeights) {
+        caracWeightTable.getItems().clear();
+        highlightRows.clear();
+        //caracWeightTable.getItems().add(null);
+        caracWeightTable.getItems().add(new DedupLaunchDialogRow());
+        ClassCaracteristic tmp = new ClassCaracteristic();
+        tmp.setSequence(0);
+        tmp.setCharacteristic_name("Item Class");
+        tmp.setCharacteristic_id("CLASS_ID");
+        caracWeightTable.getItems().add(new DedupLaunchDialogRow(tmp,resetWeights));
+        caracWeightTable.getItems().addAll(GenerateWeightList(sourceCharClassLink.getValue(), targetCharClassLink.getValue(),resetWeights));
+        highlightRows.setAll(Collections.singleton(0));
+        refreshAllCarsProperty();
+        refreshSameCarsProperty();
+        caracWeightTable.refresh();
+    }
+
+    private static ArrayList<DedupLaunchDialogRow> GenerateWeightList(ClassSegmentClusterComboRow source, ClassSegmentClusterComboRow target, boolean resetWeights) {
         if(source==null || target == null){
             return new ArrayList<DedupLaunchDialogRow>();
         }
@@ -368,21 +441,21 @@ public class DedupLaunchDialog {
                 HashSet<String> uniqueNameCarac = new HashSet<String>();
                 ArrayList<DedupLaunchDialogRow> sourceCars = source.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).filter(c -> uniqueNameCarac.add(c.getCharacteristic_name()))
                         //.map(car -> new Pair<ClassCaracteristic, Pair<BooleanProperty[],ArrayList<String>>>(car, new Pair<BooleanProperty[],ArrayList<String>>(new BooleanProperty[]{new SimpleBooleanProperty(true),new SimpleBooleanProperty(true)},new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"))))))
-                        .map(car -> new DedupLaunchDialogRow(car))
+                        .map(car -> new DedupLaunchDialogRow(car,resetWeights))
                         .collect(Collectors.toCollection(ArrayList::new));
                 ArrayList<DedupLaunchDialogRow> targetCars = target.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).filter(c -> uniqueNameCarac.add(c.getCharacteristic_name()))
                         //.map(car -> new Pair<ClassCaracteristic, Pair<BooleanProperty[],ArrayList<String>>>(car, new Pair<BooleanProperty[],ArrayList<String>>(new BooleanProperty[]{new SimpleBooleanProperty(true),new SimpleBooleanProperty(true)},new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"))))))
-                        .map(car -> new DedupLaunchDialogRow(car))
+                        .map(car -> new DedupLaunchDialogRow(car,resetWeights))
                         .collect(Collectors.toCollection(ArrayList::new));
                 sourceCars.addAll(targetCars);
                 return sourceCars;
 
             }
             HashSet<ClassCaracteristic> uniqueIDCars = source.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toCollection(HashSet<ClassCaracteristic>::new));
-                                    uniqueIDCars.addAll(target.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toCollection(HashSet<ClassCaracteristic>::new)));
+            uniqueIDCars.addAll(target.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toCollection(HashSet<ClassCaracteristic>::new)));
             return uniqueIDCars.stream()
                     //.map(car -> new Pair<ClassCaracteristic, Pair<BooleanProperty[],ArrayList<String>>>(car, new Pair<BooleanProperty[],ArrayList<String>>(new BooleanProperty[]{new SimpleBooleanProperty(true),new SimpleBooleanProperty(true)},new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"))))))
-                    .map(car -> new DedupLaunchDialogRow(car))
+                    .map(car -> new DedupLaunchDialogRow(car,resetWeights))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
         HashSet<String> retainedCars = null;
@@ -405,7 +478,7 @@ public class DedupLaunchDialog {
         ArrayList<ClassCaracteristic> uniqueIDCarac = source.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).filter(car -> finalRetainedCars.remove(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID ? car.getCharacteristic_name() : car.getCharacteristic_id())).collect(Collectors.toCollection(ArrayList::new));
         return uniqueIDCarac.stream()
                 //.map(car -> new Pair<ClassCaracteristic, Pair<BooleanProperty[],ArrayList<String>>>(car, new Pair<BooleanProperty[],ArrayList<String>>(new BooleanProperty[]{new SimpleBooleanProperty(true),new SimpleBooleanProperty(true)},new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"))))))
-                .map(car -> new DedupLaunchDialogRow(car))
+                .map(car -> new DedupLaunchDialogRow(car,resetWeights))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -459,13 +532,16 @@ public class DedupLaunchDialog {
 
         // Set the button types.
         validateButtonType = new ButtonType("Launch", ButtonData.OK_DONE);
+        saveButtonType = new ButtonType("Save weights", ButtonData.LEFT);
+        resetButtonType = new ButtonType("Reset weights", ButtonBar.ButtonData.LEFT);
         ButtonType cancelButtonType = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-        dialog.getDialogPane().getButtonTypes().addAll(validateButtonType, cancelButtonType);
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType,resetButtonType,validateButtonType, cancelButtonType);
 
     }
     @SuppressWarnings("static-access")
     private static void create_dialog_fields() {
         grid = new GridPane();
+        grid.setMinWidth(Math.floor(Screen.getPrimary().getBounds().getWidth() * 0.85));
         minMatches = new TextField();
         minMatches.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
@@ -488,13 +564,13 @@ public class DedupLaunchDialog {
                 }
             }
         });
-        maxMismatchRatio = new TextField();
-        maxMismatchRatio.setOnKeyReleased(new EventHandler<KeyEvent>() {
+        minMatchMismatchRatio = new TextField();
+        minMatchMismatchRatio.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 if(event.getCode().equals(KeyCode.ENTER)){
                     event.consume();
-                    skipToNextField(maxMismatchRatio);
+                    skipToNextField(minMatchMismatchRatio);
 
                 }
             }
@@ -540,6 +616,47 @@ public class DedupLaunchDialog {
         caracWeightTable.setEditable(true);
         caracWeightTable.getSelectionModel().setCellSelectionEnabled(true);
         caracWeightTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        caracWeightTable.getSelectionModel().getSelectedCells().addListener(new ListChangeListener<TablePosition>() {
+            @Override
+            public void onChanged(Change<? extends TablePosition> p) {
+                p.next();
+                if(p.getAddedSubList().stream().filter(c->c.getColumn()<4).findAny().isPresent()){
+                    ArrayList<Pair<Integer,Integer>> validSelection = caracWeightTable.getSelectionModel().getSelectedCells().stream().filter(c -> c.getColumn() > 3).map(c -> new Pair<Integer,Integer>(c.getRow(), c.getColumn())).collect(Collectors.toCollection(ArrayList::new));
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            caracWeightTable.getSelectionModel().clearSelection();
+                            validSelection.forEach(pair->{
+                                caracWeightTable.getSelectionModel().selectRange(pair.getKey(),columnBase.get(pair.getValue()),pair.getKey(),columnBase.get(pair.getValue()));
+                            });
+                        }
+                    });
+                }
+            }
+        });
+        // switch to edit mode on keypress
+        // this must be KeyEvent.KEY_PRESSED so that the key gets forwarded to the editing cell; it wouldn't be forwarded on KEY_RELEASED
+        caracWeightTable.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+
+                if( event.getCode() == KeyCode.ENTER) {
+//                  event.consume(); // don't consume the event or else the values won't be updated;
+                    return;
+                }
+
+                // switch to edit mode on keypress, but only if we aren't already in edit mode
+                if( caracWeightTable.getEditingCell() == null) {
+                    if( event.getCode().isLetterKey() || event.getCode().isDigitKey()) {
+
+                        TablePosition focusedCellPosition = caracWeightTable.getFocusModel().getFocusedCell();
+                        caracWeightTable.edit(focusedCellPosition.getRow(), focusedCellPosition.getTableColumn());
+
+                    }
+                }
+
+            }
+        });
         caracWeightTable.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -620,9 +737,9 @@ public class DedupLaunchDialog {
             }
         });
         col1.setResizable(false);
-        col1.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(28.0 / 100.0));
+        col1.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(26.0 / 100.0));
 
-        TableColumn sameCarCol = new TableColumn("Same carac.");
+        TableColumn sameCarCol = new TableColumn("Same charac.");
         sameCarCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<DedupLaunchDialogRow, String> r) {
                 if(r.getValue().isNotSpecialRow()){
@@ -676,7 +793,34 @@ public class DedupLaunchDialog {
         allDataCol.setResizable(false);
         allDataCol.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0 / 100.0));
 
-        TableColumn col2 = new TableColumn("Strong match weight");
+        EventHandler<TableColumn.CellEditEvent<DedupLaunchDialogRow, String>> editCommitHandler = new EventHandler<TableColumn.CellEditEvent<DedupLaunchDialogRow, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<DedupLaunchDialogRow, String> t) {
+                String newVal;
+                try {
+                    newVal = String.valueOf(Double.valueOf(t.getNewValue()));
+                } catch (Exception V) {
+                    t.getTableView().refresh();
+                    return;
+                }
+                t.getTableView().getSelectionModel().getSelectedCells().forEach(c->{
+                    if(c.getColumn()<4){
+                        return;
+                    }
+                    if (t.getTableView().getItems().get(c.getRow()).isNotSpecialRow()) {
+                        ((DedupLaunchDialogRow) t.getTableView().getItems().get(
+                                c.getRow())
+                        ).getWeights().set(c.getColumn()-4, newVal);
+                    } else {
+                        t.getTableView().getItems().stream().filter(r -> r.isNotSpecialRow()).forEach(r -> r.getWeights().set(c.getColumn()-4, newVal));
+                    }
+
+                });
+                t.getTableView().refresh();
+            }
+        };
+
+        TableColumn col2 = new TableColumn("Strong");
         col2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<DedupLaunchDialogRow, String> r) {
                 if(r.getValue().isNotSpecialRow()){
@@ -691,32 +835,11 @@ public class DedupLaunchDialog {
             }
         });
         col2.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
-        col2.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<DedupLaunchDialogRow, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<DedupLaunchDialogRow, String> t) {
-                        String newVal;
-                        try{
-                            newVal = String.valueOf(Double.valueOf(t.getNewValue()));
-                        }catch (Exception V){
-                            t.getTableView().refresh();
-                            return;
-                        }
-                        if(t.getTableView().getItems().get(t.getTablePosition().getRow()).isNotSpecialRow()){
-                            ((DedupLaunchDialogRow) t.getTableView().getItems().get(
-                                    t.getTablePosition().getRow())
-                            ).getWeights().set(0, newVal);
-                        }else{
-                            t.getTableView().getItems().stream().filter(r->r.isNotSpecialRow()).forEach(r->r.getWeights().set(0,newVal));
-                        }
-                        t.getTableView().refresh();
-                    }
-                }
-        );
+        col2.setOnEditCommit(editCommitHandler);
         col2.setResizable(false);
         col2.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
 
-        TableColumn col3 = new TableColumn("Weak match weight");
+        TableColumn col3 = new TableColumn("Weak");
         col3.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<DedupLaunchDialogRow, String> r) {
                 if(r.getValue().isNotSpecialRow()){
@@ -731,28 +854,11 @@ public class DedupLaunchDialog {
             }
         });
         col3.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
-        col3.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<DedupLaunchDialogRow, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<DedupLaunchDialogRow, String> t) {
-                        String newVal;
-                        try{
-                            newVal = String.valueOf(Double.valueOf(t.getNewValue()));
-                        }catch (Exception V){
-                            t.getTableView().refresh();
-                            return;
-                        }
-                        ((DedupLaunchDialogRow) t.getTableView().getItems().get(
-                                t.getTablePosition().getRow())
-                        ).getWeights().set(1,newVal);
-                        t.getTableView().refresh();
-                    }
-                }
-        );
+        col3.setOnEditCommit(editCommitHandler);
         col3.setResizable(false);
         col3.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
 
-        TableColumn col4 = new TableColumn("Included weight");
+        TableColumn col4 = new TableColumn("Description");
         col4.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<DedupLaunchDialogRow, String> r) {
                 if(r.getValue().isNotSpecialRow()){
@@ -767,28 +873,11 @@ public class DedupLaunchDialog {
             }
         });
         col4.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
-        col4.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<DedupLaunchDialogRow, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<DedupLaunchDialogRow, String> t) {
-                        String newVal;
-                        try{
-                            newVal = String.valueOf(Double.valueOf(t.getNewValue()));
-                        }catch (Exception V){
-                            t.getTableView().refresh();
-                            return;
-                        }
-                        ((DedupLaunchDialogRow) t.getTableView().getItems().get(
-                                t.getTablePosition().getRow())
-                        ).getWeights().set(2,newVal);
-                        t.getTableView().refresh();
-                    }
-                }
-        );
+        col4.setOnEditCommit(editCommitHandler);
         col4.setResizable(false);
         col4.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
 
-        TableColumn col5 = new TableColumn("Alternative weight");
+        TableColumn col5 = new TableColumn("Alternative");
         col5.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<DedupLaunchDialogRow, String> r) {
                 if(r.getValue().isNotSpecialRow()){
@@ -803,28 +892,11 @@ public class DedupLaunchDialog {
             }
         });
         col5.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
-        col5.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<DedupLaunchDialogRow, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<DedupLaunchDialogRow, String> t) {
-                        String newVal;
-                        try{
-                            newVal = String.valueOf(Double.valueOf(t.getNewValue()));
-                        }catch (Exception V){
-                            t.getTableView().refresh();
-                            return;
-                        }
-                        ((DedupLaunchDialogRow) t.getTableView().getItems().get(
-                                t.getTablePosition().getRow())
-                        ).getWeights().set(3,newVal);
-                        t.getTableView().refresh();
-                    }
-                }
-        );
+        col5.setOnEditCommit(editCommitHandler);
         col5.setResizable(false);
         col5.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
 
-        TableColumn col6 = new TableColumn("Unknown weight");
+        TableColumn col6 = new TableColumn("Unknown");
         col6.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<DedupLaunchDialogRow, String> r) {
                 if(r.getValue().isNotSpecialRow()){
@@ -839,28 +911,11 @@ public class DedupLaunchDialog {
             }
         });
         col6.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
-        col6.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<DedupLaunchDialogRow, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<DedupLaunchDialogRow, String> t) {
-                        String newVal;
-                        try{
-                            newVal = String.valueOf(Double.valueOf(t.getNewValue()));
-                        }catch (Exception V){
-                            t.getTableView().refresh();
-                            return;
-                        }
-                        ((DedupLaunchDialogRow) t.getTableView().getItems().get(
-                                t.getTablePosition().getRow())
-                        ).getWeights().set(4,newVal);
-                        t.getTableView().refresh();
-                    }
-                }
-        );
+        col6.setOnEditCommit(editCommitHandler);
         col6.setResizable(false);
         col6.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
 
-        TableColumn col7 = new TableColumn("Mismatch weight");
+        TableColumn col7 = new TableColumn("Mismatch");
         col7.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<DedupLaunchDialogRow, String> r) {
                 if(r.getValue().isNotSpecialRow()){
@@ -875,37 +930,30 @@ public class DedupLaunchDialog {
             }
         });
         col7.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
-        col7.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<DedupLaunchDialogRow, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<DedupLaunchDialogRow, String> t) {
-                        String newVal;
-                        try{
-                            newVal = String.valueOf(Double.valueOf(t.getNewValue()));
-                        }catch (Exception V){
-                            t.getTableView().refresh();
-                            return;
-                        }
-                        ((DedupLaunchDialogRow) t.getTableView().getItems().get(
-                                t.getTablePosition().getRow())
-                        ).getWeights().set(5,newVal);
-                        t.getTableView().refresh();
-                    }
-                }
-        );
+        col7.setOnEditCommit(editCommitHandler);
         col7.setResizable(false);
         col7.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
 
         caracWeightTable.getColumns().add(col0);
+        columnBase.put(0,col0);
         caracWeightTable.getColumns().add(col1);
+        columnBase.put(1,col1);
         caracWeightTable.getColumns().add(sameCarCol);
+        columnBase.put(2,sameCarCol);
         caracWeightTable.getColumns().add(allDataCol);
+        columnBase.put(3,allDataCol);
         caracWeightTable.getColumns().add(col2);
+        columnBase.put(4,col2);
         caracWeightTable.getColumns().add(col3);
+        columnBase.put(5,col3);
         caracWeightTable.getColumns().add(col4);
+        columnBase.put(6,col4);
         caracWeightTable.getColumns().add(col5);
+        columnBase.put(7,col5);
         caracWeightTable.getColumns().add(col6);
+        columnBase.put(8,col6);
         caracWeightTable.getColumns().add(col7);
+        columnBase.put(9,col7);
 
 
     }
@@ -967,7 +1015,7 @@ public class DedupLaunchDialog {
         grid.getColumnConstraints().addAll(col0,col1,col2,col3,col4,col5,col6);
 
         grid.getChildren().clear();
-        Label headerLabel1 = new Label("General deduplication settings");
+        Label headerLabel1 = new Label("General settings");
         headerLabel1.setUnderline(true);
         grid.add(headerLabel1, 1, 0);
 
@@ -975,22 +1023,30 @@ public class DedupLaunchDialog {
         grid.add(minMatches,3,2);
         grid.add(new Label("Maximum mismatches"), 1, 3);
         grid.add(maxMismatches,3,3);
-        grid.add(new Label("Maximum mismatch/match ratio"), 1, 4);
-        grid.add(maxMismatchRatio,3,4);
-        grid.add(new Label("Run deduplication on"), 1, 5);
+        grid.add(new Label("Minimum match/mismatch ratio"), 1, 4);
+        grid.add(minMatchMismatchRatio,3,4);
+        grid.add(new Label("Compare items of:"), 1, 5);
         grid.add(sourceCharClassLink, 3, 5);
         grid.setHgrow(sourceCharClassLink, Priority.ALWAYS);
         grid.add(sourceDetailsLabel, 5, 5);
-        grid.add(new Label("Run deduplication against"), 1, 6);
+        grid.add(new Label("Compare with items of:"), 1, 6);
         grid.add(targetCharClassLink, 3, 6);
         grid.setHgrow(targetCharClassLink, Priority.ALWAYS);
         grid.add(targetDetailsLabel, 5, 6);
 
-        Label headerLabel2 = new Label("Deduplication settings at characteristic level");
+        Label headerLabel2 = new Label("Characteristic settings");
         headerLabel2.setUnderline(true);
         grid.add(headerLabel2, 1, 7);
 
-        grid.add(caracWeightTable,1,8);
+        Label transLabel1 = new Label("Compare values with:");
+        grid.add(transLabel1,1,8);
+        transLabel1.translateXProperty().bind(caracWeightTable.widthProperty().multiply(0.36));
+        Label transLabel2 = new Label("Scoring weight by comparison result type");
+        grid.add(transLabel2,1,8);
+        transLabel2.translateXProperty().bind(caracWeightTable.widthProperty().multiply(0.52));
+
+
+        grid.add(caracWeightTable,1,9);
         GridPane.setColumnSpan(caracWeightTable,GridPane.REMAINING);
     }
 
@@ -1024,11 +1080,23 @@ public class DedupLaunchDialog {
         private final ArrayList<String> weights;
         private final boolean specialRow;
 
-        public DedupLaunchDialogRow(ClassCaracteristic tmp) {
+        public DedupLaunchDialogRow(ClassCaracteristic tmp,boolean resetWeights) {
             this.carac = tmp;
-            this.sameCarac = new SimpleBooleanProperty(true);
-            this.allCarac = new SimpleBooleanProperty(true);
-            this.weights = new ArrayList<>(Arrays.asList(new String("1.0"), new String("2.0"), new String("3.0"), new String("4.0"), new String("5.0"), new String("6.0")));
+            DedupLaunchDialogRow previousWeight = null;
+            try{
+                previousWeight = DedupLaunchDialog.savedWeights.get(currentItemSegment.getSegmentId()).get(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID ? tmp.getCharacteristic_name() : tmp.getCharacteristic_id());
+            }catch (Exception V){
+
+            }
+            if(!resetWeights && previousWeight!=null){
+                this.sameCarac = previousWeight.sameCaracProperty();
+                this.allCarac = previousWeight.allCaracProperty();
+                this.weights = previousWeight.weights;
+            }else{
+                this.sameCarac = new SimpleBooleanProperty(true);
+                this.allCarac = new SimpleBooleanProperty(true);
+                this.weights = new ArrayList<>(Arrays.asList(new String("2.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("0.0"), new String("-2.0")));
+            }
             this.specialRow = false;
             //new Pair<ClassCaracteristic, Pair<BooleanProperty[],ArrayList<String>>>(tmp, new Pair<BooleanProperty[],ArrayList<String>>(new BooleanProperty[]{new SimpleBooleanProperty(true),new SimpleBooleanProperty(true)},new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0")))))
         }
@@ -1041,8 +1109,36 @@ public class DedupLaunchDialog {
             this.carac = tmp;
             this.sameCarac = new SimpleBooleanProperty(true);
             this.allCarac = new SimpleBooleanProperty(true);
-            this.weights = new ArrayList<>(Arrays.asList(new String("1.0"), new String("2.0"), new String("3.0"), new String("4.0"), new String("5.0"), new String("6.0")));
+            this.weights = new ArrayList<>(Arrays.asList(new String("2.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("0.0"), new String("-2.0")));
             this.specialRow = true;
+        }
+
+        public static void saveWeights(String segmentId, HashMap<String, DedupLaunchDialogRow> tmp) {
+            DedupLaunchDialog.savedWeights.put(segmentId,tmp);
+            new Thread (()->{
+                Connection conn = null;
+                PreparedStatement stmt=null;
+                try {
+                    conn = Tools.spawn_connection_from_pool();
+                    stmt = conn.prepareStatement("update users_x_projects set deduplication_weights = ? where project_id = ? and user_id = ?");
+                    stmt.setString(1, ComplexMap2JdbcObject.serializeFX(DedupLaunchDialog.savedWeights));
+                    stmt.setString(2,parent.account.getActive_project());
+                    stmt.setString(3,parent.account.getUser_id());
+                    stmt.execute();
+                } catch (ClassNotFoundException | SQLException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    stmt.close();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                try {
+                    conn.close();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }).start();
         }
 
         public ClassCaracteristic getCarac() {

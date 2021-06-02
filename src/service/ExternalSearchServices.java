@@ -160,10 +160,10 @@ public class ExternalSearchServices {
                     ||
                     (elem.get(2).equals(CustomSearchElements.UL_OR_DL) && !(sourceItem.getShort_desc_translated()!=null && sourceItem.getShort_desc_translated().length()>0))
                     ){
-                        searchSentence.set(searchSentence +" "+ WordUtils.getSearchWords(sourceItem.getShort_desc()));
+                        searchSentence.set(searchSentence.get() +" "+ WordUtils.getSearchWords(sourceItem.getShort_desc()));
                     }
                     else{
-                        searchSentence.set(searchSentence +" "+ WordUtils.getSearchWords(sourceItem.getShort_desc_translated()));
+                        searchSentence.set(searchSentence.get() +" "+ WordUtils.getSearchWords(sourceItem.getShort_desc_translated()));
                     }
                 }
                 else{
@@ -171,10 +171,10 @@ public class ExternalSearchServices {
                             ||
                             (elem.get(2).equals(CustomSearchElements.UL_OR_DL) && !(sourceItem.getLong_desc_translated()!=null && sourceItem.getLong_desc_translated().length()>0))
                     ){
-                        searchSentence.set(searchSentence +" "+ WordUtils.getSearchWords(sourceItem.getLong_desc()));
+                        searchSentence.set(searchSentence.get() +" "+ WordUtils.getSearchWords(sourceItem.getLong_desc()));
                     }
                     else{
-                        searchSentence.set(searchSentence +" "+ WordUtils.getSearchWords(sourceItem.getLong_desc_translated()));
+                        searchSentence.set(searchSentence.get() +" "+ WordUtils.getSearchWords(sourceItem.getLong_desc_translated()));
                     }
                 }
 
@@ -184,14 +184,14 @@ public class ExternalSearchServices {
                         ||
                     (elem.get(1).equals(CustomSearchElements.UL_OR_DL) && !(sourceItem.getClass_segment().getClassNameTranslated()!=null && sourceItem.getClass_segment().getClassNameTranslated().length()>0))
                 ){
-                    searchSentence.set(searchSentence +" "+ sourceItem.getClass_segment().getClassName());
+                    searchSentence.set(searchSentence.get() +" "+ sourceItem.getClass_segment().getClassName());
                 }
                 else{
-                    searchSentence.set(searchSentence +" "+ sourceItem.getClass_segment().getClassNameTranslated());
+                    searchSentence.set(searchSentence.get() +" "+ sourceItem.getClass_segment().getClassNameTranslated());
                 }
             }
             else if(elem.get(0).equals(CustomSearchElements.FREE_TEXT)){
-                searchSentence.set(searchSentence +" "+ elem.get(1));
+                searchSentence.set(searchSentence.get() +" "+ elem.get(1));
             }
             else{
                 ClassCaracteristic caracMatch = CharValuesLoader.active_characteristics.get(sourceSegment).stream().filter(carac ->
@@ -208,32 +208,32 @@ public class ExternalSearchServices {
                 }catch (Exception V){
                     
                 }
-
                 if(elem.get(1).equals(CustomSearchElements.VALUE)){
                     try{
                         if (!caracMatch.getIsNumeric() && caracMatch.getIsTranslatable()) {
-                            if (elem.get(2).equals(dataLanguageCode)
+                            if (elem.get(2).equals(CustomSearchElements.DL)
                                     ||
-                                    (elem.get(2).equals(userLanguageCode + " or " + dataLanguageCode) && !(sourceValue.getUserLanguageValue() != null && sourceValue.getUserLanguageValue().length() > 0))
+                                    (elem.get(2).equals(CustomSearchElements.DL_OR_UL) && sourceValue.getDataLanguageValue() != null && sourceValue.getDataLanguageValue().length() > 0)
+                                    ||
+                                    (elem.get(2).equals(CustomSearchElements.UL_OR_DL) && !(sourceValue.getUserLanguageValue() != null && sourceValue.getUserLanguageValue().length() > 0))
                             ) {
-                                searchSentence.set(searchSentence + " " + sourceValue.getDataLanguageValueRAW());
+                                searchSentence.set(searchSentence.get() + " " + sourceValue.getDataLanguageValueRAW());
                             } else {
-                                searchSentence.set(searchSentence + " " + sourceValue.getUserLanguageValueRAW());
+                                searchSentence.set(searchSentence.get() + " " + sourceValue.getUserLanguageValueRAW());
                             }
                         } else {
-                            searchSentence.set(searchSentence + " " + sourceValue.getRawDisplay());
+                            searchSentence.set(searchSentence.get() + " " + sourceValue.getRawDisplay());
                         }
                     }
                     catch (Exception V){
-
                     }
                 }
                 else if(elem.get(1).equals(CustomSearchElements.PATTERN)){
-                    searchSentence.set(searchSentence +" "+ sourceRule);
+                    searchSentence.set(searchSentence.get() +" "+ sourceRule);
                 }
                 else{
                     try{
-                        searchSentence.set(searchSentence +" "+ caracMatch.getCharacteristic_name()+" "+sourceValue.getRawDisplay());
+                        searchSentence.set(searchSentence.get() +" "+ caracMatch.getCharacteristic_name()+" "+sourceValue.getRawDisplay());
                     }catch (Exception V){
 
                     }
@@ -524,13 +524,13 @@ public class ExternalSearchServices {
         try{
             ArrayList<String> ret = new ArrayList<String>();
             ret.add(first.getValue());
-            if(second.getValue().toLowerCase().equals(dataLanguageCode)){
+            if(second.getValue().equals(dataLanguageCode)){
                 ret.add(CustomSearchElements.DL);
-            }else if(second.getValue().toLowerCase().equals(userLanguageCode)){
+            }else if(second.getValue().equals(userLanguageCode)){
                 ret.add(CustomSearchElements.UL);
-            }else if(second.getValue().toLowerCase().equals(userLanguageCode+" or "+dataLanguageCode)){
+            }else if(second.getValue().equals(userLanguageCode+" or "+dataLanguageCode)){
                 ret.add(CustomSearchElements.UL_OR_DL);
-            }else if(second.getValue().toLowerCase().equals(dataLanguageCode+" or "+userLanguageCode)){
+            }else if(second.getValue().equals(dataLanguageCode+" or "+userLanguageCode)){
                 ret.add(CustomSearchElements.DL_OR_UL);
             }else{
                 if(second.isEditable()){
@@ -540,11 +540,11 @@ public class ExternalSearchServices {
                 }
             }
             if(third.isVisible()){
-                if(third.getValue().toLowerCase().equals(dataLanguageCode)){
+                if(third.getValue().equals(dataLanguageCode)){
                     ret.add(CustomSearchElements.DL);
-                }else if(third.getValue().toLowerCase().equals(userLanguageCode)){
+                }else if(third.getValue().equals(userLanguageCode)){
                     ret.add(CustomSearchElements.UL);
-                }else if(third.getValue().toLowerCase().equals(userLanguageCode+" or "+dataLanguageCode)){
+                }else if(third.getValue().equals(userLanguageCode+" or "+dataLanguageCode)){
                     ret.add(CustomSearchElements.UL_OR_DL);
                 }else{
                     ret.add(CustomSearchElements.DL_OR_UL);

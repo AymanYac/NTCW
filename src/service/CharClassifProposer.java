@@ -160,9 +160,10 @@ public class CharClassifProposer {
 							CharDescriptionExportServices.addItemCharDataToPush(row, row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id());
 						});
 						CharDescriptionExportServices.flushItemDataToDB(parent.account);
-						clearPropButtons();
-						parent.refresh_ui_display();
-						parent.tableController.tableGrid.refresh();
+						if(!parent.charButton.isSelected()){
+							int idx = parent.tableController.tableGrid.getSelectionModel().getSelectedIndex();
+							parent.tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
+						}
 					});
 					lastestActiveCRIndex+=1;
 				});
