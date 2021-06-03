@@ -57,6 +57,8 @@ public class GlobalConstants {
 	public static final double DEDUP_NUM_APPROACHING_THRESH = 0.05;
 	public static final boolean DEDUP_CARAC_WISE = false;
 	public static final boolean TEMP_APPLY_RULES_ON_LONG_DESC_ONLY = true;
+	public static final int DEDUP_INFO_COL_NUMBER = 6;
+	public static final boolean DEDUP_SET_TARGET_CARS = false;
 
 
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
@@ -69,7 +71,7 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_4 = "4";
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
-	public static final boolean REDIRECT_OUTSTREAM = true;
+	public static final boolean REDIRECT_OUTSTREAM = false;
 	public static final String TOOL_VERSION = "5.7";
 	public static final String HOST_ADDRESS = "localhost";
 	//public static final String HOST_ADDRESS = "91.167.182.87";//"82.66.148.154";//"88.190.148.154";

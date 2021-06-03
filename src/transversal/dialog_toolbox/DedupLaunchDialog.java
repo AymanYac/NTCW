@@ -23,6 +23,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -30,17 +31,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
+import javafx.scene.text.*;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.util.Callback;
 import javafx.util.Pair;
-import model.ClassCaracteristic;
-import model.ClassSegment;
-import model.ClassSegmentClusterComboRow;
-import model.GlobalConstants;
+import model.*;
 import service.CharValuesLoader;
 import service.DeduplicationServices;
 import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
@@ -409,6 +406,8 @@ public class DedupLaunchDialog {
         tmp.setSequence(0);
         tmp.setCharacteristic_name("Item Class");
         tmp.setCharacteristic_id("CLASS_ID");
+        tmp.setIsNumeric(false);
+        tmp.setIsTranslatable(false);
         caracWeightTable.getItems().add(new DedupLaunchDialogRow(tmp,resetWeights));
         caracWeightTable.getItems().addAll(GenerateWeightList(value, valueCopy, resetWeights));
         refreshAllCarsProperty();
@@ -424,6 +423,8 @@ public class DedupLaunchDialog {
         tmp.setSequence(0);
         tmp.setCharacteristic_name("Item Class");
         tmp.setCharacteristic_id("CLASS_ID");
+        tmp.setIsNumeric(false);
+        tmp.setIsTranslatable(false);
         caracWeightTable.getItems().add(new DedupLaunchDialogRow(tmp,resetWeights));
         caracWeightTable.getItems().addAll(GenerateWeightList(sourceCharClassLink.getValue(), targetCharClassLink.getValue(),resetWeights));
         highlightRows.setAll(Collections.singleton(0));
@@ -447,12 +448,16 @@ public class DedupLaunchDialog {
                         //.map(car -> new Pair<ClassCaracteristic, Pair<BooleanProperty[],ArrayList<String>>>(car, new Pair<BooleanProperty[],ArrayList<String>>(new BooleanProperty[]{new SimpleBooleanProperty(true),new SimpleBooleanProperty(true)},new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"))))))
                         .map(car -> new DedupLaunchDialogRow(car,resetWeights))
                         .collect(Collectors.toCollection(ArrayList::new));
-                sourceCars.addAll(targetCars);
+                if(GlobalConstants.DEDUP_SET_TARGET_CARS){
+                    sourceCars.addAll(targetCars);
+                }
                 return sourceCars;
 
             }
             HashSet<ClassCaracteristic> uniqueIDCars = source.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toCollection(HashSet<ClassCaracteristic>::new));
-            uniqueIDCars.addAll(target.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toCollection(HashSet<ClassCaracteristic>::new)));
+            if(GlobalConstants.DEDUP_SET_TARGET_CARS){
+                uniqueIDCars.addAll(target.getRowSegments().stream().filter(s -> s.getValue().getValue()).map(s -> CharValuesLoader.active_characteristics.get(s.getKey().getSegmentId())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toCollection(HashSet<ClassCaracteristic>::new)));
+            }
             return uniqueIDCars.stream()
                     //.map(car -> new Pair<ClassCaracteristic, Pair<BooleanProperty[],ArrayList<String>>>(car, new Pair<BooleanProperty[],ArrayList<String>>(new BooleanProperty[]{new SimpleBooleanProperty(true),new SimpleBooleanProperty(true)},new ArrayList<>(Arrays.asList(new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"), new String("1.0"))))))
                     .map(car -> new DedupLaunchDialogRow(car,resetWeights))
@@ -620,8 +625,8 @@ public class DedupLaunchDialog {
             @Override
             public void onChanged(Change<? extends TablePosition> p) {
                 p.next();
-                if(p.getAddedSubList().stream().filter(c->c.getColumn()<4).findAny().isPresent()){
-                    ArrayList<Pair<Integer,Integer>> validSelection = caracWeightTable.getSelectionModel().getSelectedCells().stream().filter(c -> c.getColumn() > 3).map(c -> new Pair<Integer,Integer>(c.getRow(), c.getColumn())).collect(Collectors.toCollection(ArrayList::new));
+                if(p.getAddedSubList().stream().filter(c->c.getColumn()<GlobalConstants.DEDUP_INFO_COL_NUMBER).findAny().isPresent()){
+                    ArrayList<Pair<Integer,Integer>> validSelection = caracWeightTable.getSelectionModel().getSelectedCells().stream().filter(c -> c.getColumn() >= GlobalConstants.DEDUP_INFO_COL_NUMBER).map(c -> new Pair<Integer,Integer>(c.getRow(), c.getColumn())).collect(Collectors.toCollection(ArrayList::new));
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
@@ -664,7 +669,7 @@ public class DedupLaunchDialog {
                     DedupLaunchDialogRow firstRow = caracWeightTable.getItems().get(caracWeightTable.getSelectionModel().getSelectedIndices().stream().min(Comparator.naturalOrder()).get());
                     caracWeightTable.getSelectionModel().getSelectedCells().forEach(c->{
                         int itemIdx = c.getRow();
-                        int weightIdx = c.getColumn()-4;
+                        int weightIdx = c.getColumn()-GlobalConstants.DEDUP_INFO_COL_NUMBER;
                         caracWeightTable.getItems().get(itemIdx).getWeights().set(weightIdx,firstRow.getWeights().get(weightIdx));
                     });
                     caracWeightTable.refresh();
@@ -713,7 +718,7 @@ public class DedupLaunchDialog {
             FXCollections.sort(caracWeightTable.getItems(), comparator);
             return true;
         });
-        TableColumn col0 = new TableColumn("Sequence");
+        TableColumn col0 = new TableColumn("Sqc #");
         col0.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, Integer>, ObservableValue<Integer>>() {
             public ObservableValue<Integer> call(TableColumn.CellDataFeatures<DedupLaunchDialogRow, Integer> r) {
                 if(r.getValue().isNotSpecialRow()){
@@ -724,7 +729,7 @@ public class DedupLaunchDialog {
             }
         });
         col0.setResizable(false);
-        col0.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
+        col0.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(4.0/100.0));
 
         TableColumn col1 = new TableColumn("Characteristic name");
         col1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
@@ -737,7 +742,68 @@ public class DedupLaunchDialog {
             }
         });
         col1.setResizable(false);
-        col1.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(26.0 / 100.0));
+        col1.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(14.0 / 100.0));
+
+        TableColumn col1bis = new TableColumn("Charac. type");
+        col1bis.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<DedupLaunchDialogRow, String> r) {
+                if(r.getValue().isNotSpecialRow()){
+                    return new ReadOnlyObjectWrapper(r.getValue().getCarac().getIsNumeric()?
+                            ((r.getValue().getCarac().getAllowedUoms()!=null && r.getValue().getCarac().getAllowedUoms().size()>0)?"NUM with UoM":"NUM w/o Uom")
+                            :
+                            (r.getValue().getCarac().getIsTranslatable()?"TXT T":"TXT NT"));
+                }else{
+                    return new ReadOnlyObjectWrapper("");
+                }
+            }
+        });
+        col1bis.setResizable(false);
+        col1bis.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8 / 100.0));
+
+        TableColumn col1ter = new TableColumn("Charac. UoM");
+        col1ter.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<DedupLaunchDialogRow, String> r) {
+                if( r.getValue().getCarac().getAllowedUoms()==null || !r.getValue().isNotSpecialRow() ) {
+                    return new ReadOnlyObjectWrapper("");
+                }
+                ArrayList<Text> textes = new ArrayList<Text>();
+
+                boolean same_uom_family=true;
+                String base_uom_family=null;
+                for(String uom:r.getValue().getCarac().getAllowedUoms()) {
+                    if(base_uom_family!=null) {
+                        UnitOfMeasure loopUom = UnitOfMeasure.RunTimeUOMS.get(uom);
+                        if(!loopUom.getUom_base_id().equals(base_uom_family)) {
+                            same_uom_family = false;
+                            break;
+                        }
+                    }else {
+                        UnitOfMeasure loopUom = UnitOfMeasure.RunTimeUOMS.get(uom);
+                        base_uom_family = loopUom.getUom_base_id();
+                    }
+                }
+                for(int i=0;i<r.getValue().getCarac().getAllowedUoms().size();i++) {
+                    Text tmp = new Text(UnitOfMeasure.RunTimeUOMS.get(r.getValue().getCarac().getAllowedUoms().get(i)).getUom_symbol());
+                    tmp.setFill(Color.BLACK);
+                    tmp.setFont(Font.font(GlobalConstants.CHAR_UOM_FONT,GlobalConstants.CHAR_UOM_WEIGHT,GlobalConstants.CHAR_UOM_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
+                    textes.add(tmp);
+                    if(i!=r.getValue().getCarac().getAllowedUoms().size()-1) {
+                        tmp = new Text(same_uom_family?" or ":" or ");
+                        tmp.setFill(Color.BLACK);
+                        tmp.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,GlobalConstants.RULE_DISPLAY_SYNTAX_WEIGHT,GlobalConstants.ITALIC_DISPLAY_SYNTAX_POSTURE,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
+                        textes.add(tmp);
+                    }
+                }
+                TextFlow ret = new TextFlow(textes.toArray(new Text[textes.size()]));
+                ret.setMinHeight(0);
+                ret.setPrefHeight(0);
+                ret.setTextAlignment(TextAlignment.CENTER);
+                return new ReadOnlyObjectWrapper(ret);
+            }
+        });
+        col1ter.setResizable(false);
+        col1ter.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8 / 100.0));
+
 
         TableColumn sameCarCol = new TableColumn("Same charac.");
         sameCarCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
@@ -804,15 +870,15 @@ public class DedupLaunchDialog {
                     return;
                 }
                 t.getTableView().getSelectionModel().getSelectedCells().forEach(c->{
-                    if(c.getColumn()<4){
+                    if(c.getColumn()<GlobalConstants.DEDUP_INFO_COL_NUMBER){
                         return;
                     }
                     if (t.getTableView().getItems().get(c.getRow()).isNotSpecialRow()) {
                         ((DedupLaunchDialogRow) t.getTableView().getItems().get(
                                 c.getRow())
-                        ).getWeights().set(c.getColumn()-4, newVal);
+                        ).getWeights().set(c.getColumn()-GlobalConstants.DEDUP_INFO_COL_NUMBER, newVal);
                     } else {
-                        t.getTableView().getItems().stream().filter(r -> r.isNotSpecialRow()).forEach(r -> r.getWeights().set(c.getColumn()-4, newVal));
+                        t.getTableView().getItems().stream().filter(r -> r.isNotSpecialRow()).forEach(r -> r.getWeights().set(c.getColumn()-GlobalConstants.DEDUP_INFO_COL_NUMBER, newVal));
                     }
 
                 });
@@ -935,25 +1001,23 @@ public class DedupLaunchDialog {
         col7.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
 
         caracWeightTable.getColumns().add(col0);
-        columnBase.put(0,col0);
         caracWeightTable.getColumns().add(col1);
-        columnBase.put(1,col1);
+        caracWeightTable.getColumns().add(col1bis);
+        caracWeightTable.getColumns().add(col1ter);
         caracWeightTable.getColumns().add(sameCarCol);
-        columnBase.put(2,sameCarCol);
         caracWeightTable.getColumns().add(allDataCol);
-        columnBase.put(3,allDataCol);
         caracWeightTable.getColumns().add(col2);
-        columnBase.put(4,col2);
+        columnBase.put(GlobalConstants.DEDUP_INFO_COL_NUMBER,col2);
         caracWeightTable.getColumns().add(col3);
-        columnBase.put(5,col3);
+        columnBase.put(GlobalConstants.DEDUP_INFO_COL_NUMBER+1,col3);
         caracWeightTable.getColumns().add(col4);
-        columnBase.put(6,col4);
+        columnBase.put(GlobalConstants.DEDUP_INFO_COL_NUMBER+2,col4);
         caracWeightTable.getColumns().add(col5);
-        columnBase.put(7,col5);
+        columnBase.put(GlobalConstants.DEDUP_INFO_COL_NUMBER+3,col5);
         caracWeightTable.getColumns().add(col6);
-        columnBase.put(8,col6);
+        columnBase.put(GlobalConstants.DEDUP_INFO_COL_NUMBER+4,col6);
         caracWeightTable.getColumns().add(col7);
-        columnBase.put(9,col7);
+        columnBase.put(GlobalConstants.DEDUP_INFO_COL_NUMBER+5,col7);
 
 
     }
@@ -1041,7 +1105,7 @@ public class DedupLaunchDialog {
         Label transLabel1 = new Label("Compare values with:");
         grid.add(transLabel1,1,8);
         transLabel1.translateXProperty().bind(caracWeightTable.widthProperty().multiply(0.36));
-        Label transLabel2 = new Label("Scoring weight by comparison result type");
+        Label transLabel2 = new Label("Scoring weight by comparison result type:");
         grid.add(transLabel2,1,8);
         transLabel2.translateXProperty().bind(caracWeightTable.widthProperty().multiply(0.52));
 
