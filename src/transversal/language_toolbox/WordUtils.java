@@ -567,7 +567,9 @@ public class WordUtils {
 			Pattern p = Pattern.compile(numericPatternString);
 			//Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
 			//ligne 828/890. mauvais découpage et rempalcement %1, bug application règles numériques, exemple : MOLLA COM 185 5 21   (expected MOLLA COM %1 %2 %3)
-			Matcher m = p.matcher(selected_text.replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
+			//draft rule different than ctrl entrée rule
+			//"." removed on rule creation
+			Matcher m = p.matcher(selected_text.replace(" ","$TXT_SPACE$").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "$TXT_COMMA$").replace(".","$TXT_DOT$").replace("______","."));
 			while (m.find()) {
 				  ret.add(Double.valueOf( m.group(0)) );
 				}
@@ -593,18 +595,19 @@ public class WordUtils {
 			Pattern p = Pattern.compile("(?<!%)"+numericPatternString);
 			//Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
 			//ligne 828/890. mauvais découpage et rempalcement %1, bug application règles numériques, exemple : MOLLA COM 185 5 21   (expected MOLLA COM %1 %2 %3)
-			Matcher m = p.matcher(selected_text.replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
-
+			//draft rule different than ctrl entrée rule
+			//"." removed on rule creation
+			Matcher m = p.matcher(selected_text.replace(" ","$TXT_SPACE$").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "$TXT_COMMA$").replace(".","$TXT_DOT$").replace("______","."));
 			int i=0;
 			while (m.find()) {
 				i+=1;
 				//selected_text = selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______",".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
-				selected_text = selected_text.replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______",".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
+				selected_text = selected_text.replace(" ","$TXT_SPACE$").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "$TXT_COMMA$").replace(".","$TXT_DOT$").replace("______",".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
 				//ret.add(Double.valueOf( m.group(0)) );
 				  
 				}
 			
-			return selected_text;
+			return selected_text.replace("$TXT_SPACE$"," ").replace("$TXT_COMMA$",",").replace("$TXT_DOT$",".");
 		}
 
 
@@ -617,8 +620,12 @@ public class WordUtils {
 		    String patternPlusOverLaps = pattern+"(?=(" + "(.*)" + ")).";
 		    Pattern p = Pattern.compile(patternPlusOverLaps);
 		    
-		    Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
-			
+		    //Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
+			//ligne 828/890. mauvais découpage et rempalcement %1, bug application règles numériques, exemple : MOLLA COM 185 5 21   (expected MOLLA COM %1 %2 %3)
+			//draft rule different than ctrl entrée rule
+			//"." removed on rule creation
+			Matcher m = p.matcher(selected_text.replace(" ","$TXT_SPACE$").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "$TXT_COMMA$").replace(".","$TXT_DOT$").replace("______","."));
+
 			ArrayList<UnitOfMeasure> ret = new ArrayList<UnitOfMeasure>();
 			while (m.find()) {
 				UnitOfMeasure tmp = UnitOfMeasure.lookUpUomInText_V2(m.group(3),active_char.getAllowedUoms());
