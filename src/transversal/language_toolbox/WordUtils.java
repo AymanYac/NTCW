@@ -565,7 +565,9 @@ public class WordUtils {
 			//"HQH-12.2 -212v -21hQH+29 QSD2+3" -> "-12.2,212,-21,29,2,3"
 			
 			Pattern p = Pattern.compile(numericPatternString);
-			Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
+			//Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
+			//ligne 828/890. mauvais découpage et rempalcement %1, bug application règles numériques, exemple : MOLLA COM 185 5 21   (expected MOLLA COM %1 %2 %3)
+			Matcher m = p.matcher(selected_text.replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
 			while (m.find()) {
 				  ret.add(Double.valueOf( m.group(0)) );
 				}
@@ -589,8 +591,10 @@ public class WordUtils {
 			//"HQH-12.2 -212v -21hQH+29 QSD2+3" -> "-12.2,212,-21,29,2,3"
 			
 			Pattern p = Pattern.compile("(?<!%)"+numericPatternString);
-			Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
-			
+			//Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
+			//ligne 828/890. mauvais découpage et rempalcement %1, bug application règles numériques, exemple : MOLLA COM 185 5 21   (expected MOLLA COM %1 %2 %3)
+			Matcher m = p.matcher(selected_text.replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
+
 			int i=0;
 			while (m.find()) {
 				i+=1;
