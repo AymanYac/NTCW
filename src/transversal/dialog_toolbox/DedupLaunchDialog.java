@@ -347,21 +347,12 @@ public class DedupLaunchDialog {
                 dialog.close();
                 ArrayList<String> sourceSegmentIDS = sourceCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
                 ArrayList<String> targetSegmentIDS = targetCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
-                HashMap<String, ArrayList<Object>> weightTable = new HashMap<>();
-                caracWeightTable.getItems().forEach(r->{
-                    ArrayList<Object> tmp = new ArrayList<Object>();
-                    tmp.add(r.getCarac());//Carac
-                    tmp.add(r.getStrongWeight());//Strong
-                    tmp.add(r.getWeakWeight());//Weak
-                    tmp.add(r.getIncludedWeight());//Included
-                    tmp.add(r.getAlternativeWeight());//Alternative
-                    tmp.add(r.getUnknownWeight());//Unknown
-                    tmp.add(r.getMismatchWeight());//Mismatch
-
+                HashMap<String, DedupLaunchDialogRow> weightTable = new HashMap<>();
+                caracWeightTable.getItems().stream().filter(r->r.isNotSpecialRow()).forEach(r->{
                     if(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID){
-                        weightTable.put(r.getCarac().getCharacteristic_name(),tmp);
+                        weightTable.put(r.getCarac().getCharacteristic_name(),r);
                     }else{
-                        weightTable.put(r.getCarac().getCharacteristic_id(),tmp);
+                        weightTable.put(r.getCarac().getCharacteristic_id(),r);
                     }
                 });
                 if(GlobalConstants.DEDUP_CARAC_WISE){
@@ -1137,7 +1128,7 @@ public class DedupLaunchDialog {
         }*/
     }
 
-    private static class DedupLaunchDialogRow {
+    public static class DedupLaunchDialogRow {
         private final ClassCaracteristic carac;
         private final SimpleBooleanProperty sameCarac;
         private final SimpleBooleanProperty allCarac;

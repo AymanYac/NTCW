@@ -287,10 +287,10 @@ public class CharValuesLoader {
 		CharValuesLoader.active_characteristics.values().forEach(a->{
 			a.stream().forEach(car->{
 				try{
-					nameSakeCarIDs.get(unidec.decodeAndTrim(car.getCharacteristic_name().toLowerCase())).add(car.getCharacteristic_id());
+					nameSakeCarIDs.get(car.getCharacteristic_name()).add(car.getCharacteristic_id());
 				}catch (Exception V){
-					nameSakeCarIDs.put(unidec.decodeAndTrim(car.getCharacteristic_name().toLowerCase()),new ArrayList<>());
-					nameSakeCarIDs.get(unidec.decodeAndTrim(car.getCharacteristic_name().toLowerCase())).add(car.getCharacteristic_id());
+					nameSakeCarIDs.put(car.getCharacteristic_name(),new ArrayList<>());
+					nameSakeCarIDs.get(car.getCharacteristic_name()).add(car.getCharacteristic_id());
 				}
 			});
 		});

@@ -15,6 +15,7 @@ import service.CharValuesLoader;
 import service.DeduplicationServices;
 import service.TranslationServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
+import transversal.dialog_toolbox.DedupLaunchDialog;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
 
@@ -1038,7 +1039,7 @@ public class CharDescriptionExportServices {
 	}
 
 
-	public static void exportDedupReport(ConcurrentHashMap<String, HashMap<String, DeduplicationServices.ComparisonResult>> fullCompResults, HashMap<String, ArrayList<Object>> weightTable, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
+	public static void exportDedupReport(ConcurrentHashMap<String, HashMap<String, DeduplicationServices.ComparisonResult>> fullCompResults, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
 		File file = openExportFile(parent);
 		if(file==null){
 			return;
@@ -1057,7 +1058,9 @@ public class CharDescriptionExportServices {
 
 		fillDedupParamSheet(wb,paramSheet,weightTable.values());
 		AtomicInteger couplesIndx = new AtomicInteger(0);
+		AtomicInteger detailsIndx = new AtomicInteger(1);
 		Sheet finalCouplesSheet = couplesSheet;
+		Sheet finalDedupDetailSheet = dedupDetailSheet;
 		fullCompResults.values().forEach(e->{
 			AtomicReference<CharDescriptionRow> itemA = new AtomicReference<CharDescriptionRow>();
 			AtomicReference<CharDescriptionRow> itemB = new AtomicReference<CharDescriptionRow>();
@@ -1067,6 +1070,7 @@ public class CharDescriptionExportServices {
 			AtomicInteger alternativeMatches = new AtomicInteger();
 			AtomicInteger unknownMatches = new AtomicInteger();
 			AtomicInteger mismatches = new AtomicInteger();
+			AtomicReference<Double> score = new AtomicReference<>(0.0);
 			e.values().forEach(r->{
 				itemA.set(r.getItem_A());
 				itemB.set(r.getItem_B());
@@ -1090,13 +1094,220 @@ public class CharDescriptionExportServices {
 						mismatches.addAndGet(1);
 						break;
 				}
+				score.updateAndGet(v -> v + r.getScore());
+				appendDedupDetailLine(finalDedupDetailSheet,detailsIndx.addAndGet(1),r);
 			});
-			appendDedupCouple(finalCouplesSheet, couplesIndx.addAndGet(1),itemA.get(),itemB.get(),strongMatches.get(),weakMatches.get(),includedMatches.get(),alternativeMatches.get(),unknownMatches.get(),mismatches.get());
+			appendDedupCouple(finalCouplesSheet, couplesIndx.addAndGet(1),itemA.get(),itemB.get(),strongMatches.get(),weakMatches.get(),includedMatches.get(),alternativeMatches.get(),unknownMatches.get(),mismatches.get(),score.get());
 		});
 		closeExportFile(file,wb);
 	}
 
-	private static void appendDedupCouple(Sheet couplesSheet, int couplesIndx, CharDescriptionRow itemA, CharDescriptionRow itemB, int strongMatches, int weakMatches, int includedMatches, int alternativeMatches, int unknownMatches, int mismatches) {
+	private static void appendDedupDetailLine(Sheet finalDedupDetailSheet, int detailsIndx, DeduplicationServices.ComparisonResult result) {
+		if(detailsIndx>=GlobalConstants.EXCEL_MAX_ROW_COUNT){
+			return;
+		}
+		Row row = finalDedupDetailSheet.createRow(detailsIndx);
+		int currentCell = 0;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getItem_A().getClient_item_number());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getCar_A().getSequence().toString());
+		}catch (Exception V){
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(0);
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getCar_A().getCharacteristic_id());
+		}catch (Exception V){
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("CLASS_ID");
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getCar_A().getCharacteristic_name());
+		}catch (Exception V){
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("Item Class");
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getCar_A().getIsNumeric()?"NUM":"TXT");
+		}catch (Exception V){
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("TXT");
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getVal_A().getStdValue());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(UnitOfMeasure.RunTimeUOMS.get(result.getVal_A().getUom_id()).toString());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getVal_A().getUserLanguageValue());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getVal_A().getMin_value());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getVal_A().getMax_value());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("");
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("");
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("");
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getItem_B().getClient_item_number());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getCar_B().getSequence().toString());
+		}catch (Exception V){
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(0);
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getCar_B().getCharacteristic_id());
+		}catch (Exception V){
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("CLASS_ID");
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getCar_B().getCharacteristic_name());
+		}catch (Exception V){
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("Item Class");
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getCar_B().getIsNumeric()?"NUM":"TXT");
+		}catch (Exception V){
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("TXT");
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getVal_B().getStdValue());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(UnitOfMeasure.RunTimeUOMS.get(result.getVal_B().getUom_id()).toString());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getVal_B().getUserLanguageValue());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getVal_B().getMin_value());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getVal_B().getMax_value());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("");
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("");
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue("");
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getResultType());
+		}catch (Exception V){
+
+		}
+
+	}
+
+	private static void appendDedupCouple(Sheet couplesSheet, int couplesIndx, CharDescriptionRow itemA, CharDescriptionRow itemB, int strongMatches, int weakMatches, int includedMatches, int alternativeMatches, int unknownMatches, int mismatches, Double score) {
 		Row row = couplesSheet.createRow(couplesIndx);
 		Cell cell = row.createCell(0);
 		cell.setCellValue(itemA.getClient_item_number());
@@ -1114,9 +1325,11 @@ public class CharDescriptionExportServices {
 		cell.setCellValue(unknownMatches);
 		cell = row.createCell(7);
 		cell.setCellValue(mismatches);
+		cell = row.createCell(8);
+		cell.setCellValue(score);
 	}
 
-	private static void fillDedupParamSheet(SXSSFWorkbook wb, Sheet paramSheet, Collection<ArrayList<Object>> values) {
+	private static void fillDedupParamSheet(SXSSFWorkbook wb, Sheet paramSheet, Collection<DedupLaunchDialog.DedupLaunchDialogRow> values) {
 		AtomicInteger rowIndex = new AtomicInteger(7);
 		values.forEach(p->{
 			rowIndex.addAndGet(1);
@@ -1132,15 +1345,15 @@ public class CharDescriptionExportServices {
 
 			}
 			cell = row.createCell(3);
-			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("STRONG",p));
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("STRONG_MATCH",p));
 			cell = row.createCell(4);
-			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("WEAK",p));
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("WEAK_MATCH",p));
 			cell = row.createCell(5);
 			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("DESCRIPTION_MATCH",p));
 			cell = row.createCell(6);
-			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("ALTERNATIVE",p));
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("ALTERNATIVE_MATCH",p));
 			cell = row.createCell(7);
-			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("UNKNOWN",p));
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("UNKNOWN_MATCH",p));
 			cell = row.createCell(8);
 			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("MISMATCH",p));
 		});

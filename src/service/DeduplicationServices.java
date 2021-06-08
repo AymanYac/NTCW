@@ -5,6 +5,8 @@ import javafx.util.Pair;
 import model.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.ConfirmationDialog;
+import transversal.dialog_toolbox.DedupLaunchDialog;
+import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
@@ -23,7 +25,7 @@ import java.util.stream.IntStream;
 public class DeduplicationServices {
     private static ArrayList<String> sourceSegmentIDS;
     private static ArrayList<String> targetSegmentIDS;
-    private static HashMap<String, ArrayList<Object>> weightTable;
+    private static HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable;
     private static ArrayList<CharDescriptionRow> computeItems;
     private static ArrayList<Pair<CharDescriptionRow,CharDescriptionRow>> computeItemPairs;
     private static HashMap<String, ArrayList<String>> nameSakeCarIDs;
@@ -31,7 +33,7 @@ public class DeduplicationServices {
     private static double lastprogess;
     private static ConcurrentHashMap<String, HashMap<String, ComparisonResult>> fullCompResults;
 
-    public static void scoreDuplicatesForClassesFull(ArrayList<String> sourceSegmentIDs, ArrayList<String> targetSegmentIDs, HashMap<String, ArrayList<Object>> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, Double GLOBAL_MISMATCH_RATIO, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
+    public static void scoreDuplicatesForClassesFull(ArrayList<String> sourceSegmentIDs, ArrayList<String> targetSegmentIDs, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, Double GLOBAL_MISMATCH_RATIO, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
         lastprogess = 0;
         DeduplicationServices.unidec = Unidecode.toAscii();
         DeduplicationServices.sourceSegmentIDS = sourceSegmentIDs;
@@ -61,6 +63,18 @@ public class DeduplicationServices {
             HashMap<String, ComparisonResult> localCompStorage = new HashMap<String, ComparisonResult>();
             CharDescriptionRow item_A = e.getKey();
             CharDescriptionRow item_B = e.getValue();
+            CaracteristicValue data_a = new CaracteristicValue();
+            try {
+                data_a.setDataLanguageValue(Tools.get_project_segments(parent.account).get(item_A.getClass_segment_string().split("&&&")[0]).toString());
+            } catch (SQLException | ClassNotFoundException throwables) {
+                //throwables.printStackTrace();
+            }
+            CaracteristicValue data_b = new CaracteristicValue();
+            try {
+                data_b.setDataLanguageValue(Tools.get_project_segments(parent.account).get(item_B.getClass_segment_string().split("&&&")[0]).toString());
+            } catch (SQLException | ClassNotFoundException throwables) {
+                //throwables.printStackTrace();
+            }
             localCompStorage.put("CLASS_ID",new ComparisonResult(item_A,item_B,null,null,null,null,item_A.getClass_segment_string().equals(item_B.getClass_segment_string())?"STRONG_MATCH":"MISMATCH"));
             HashSet<ClassCaracteristic> checkedCarBInDescA = new HashSet<ClassCaracteristic>();
             String class_A = item_A.getClass_segment_string().split("&&&")[0];
@@ -89,8 +103,9 @@ public class DeduplicationServices {
                     if(!car_B.getIsNumeric().equals(car_A.getIsNumeric())){
                         return;
                     }
-                    String valCompare = compareValues(item_A, item_B, car_A, car_B,false);
-                    if(isSameCar(car_A,car_B)){
+                    DedupLaunchDialog.DedupLaunchDialogRow car_A_params = getCarParams(weightTable,car_A);
+                    if(car_A_params.isAllCarac() && isSameCar(car_A,car_B)){
+                        String valCompare = compareValues(item_A, item_B, car_A, car_B,false);
                         if(data_A == null && data_B == null){
                             ComparisonResult result = new ComparisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"UNKNOWN_MATCH");
                             hardStore(localCompStorage, car_A,result);
@@ -102,20 +117,21 @@ public class DeduplicationServices {
                                 return;
                             }
                         }
-                    }else{
+                    }else if(!car_A_params.isSameCarac()){
+                        String valCompare = compareValues(item_A, item_B, car_A, car_B,false);
                         if(valCompare.equals("WEAK_MATCH") || valCompare.equals("STRONG_MATCH")){
                             ComparisonResult result = new ComparisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"ALTERNATIVE_MATCH");
                             softStore(localCompStorage, car_A,result);
                         }
                     }
-                    if(!hasStored(localCompStorage, car_A)){
+                    if(car_A_params.isAllCarac() && !hasStored(localCompStorage, car_A)){
                         item_B.addDedupRulesForCar(car_A);
                         if(checkDescContainsVal(item_B,car_A,data_A,item_A)){
                             ComparisonResult result = new ComparisonResult(item_A,item_B,car_A,null,data_A,null,"DESCRIPTION_MATCH");
                             softStore(localCompStorage, car_A,result);
                         }
                     }
-                    if(!hasStored(localCompStorage, car_B)){
+                    if(GlobalConstants.DEDUP_SEARCH_TARGET_CAR_IN_SOURCE_DESC && !hasStored(localCompStorage, car_B)){
                         if(checkedCarBInDescA.add(car_B)){
                             item_A.addDedupRulesForCar(car_B);
                             if(checkDescContainsVal(item_A,car_B,data_B,item_B)){
@@ -124,7 +140,7 @@ public class DeduplicationServices {
                             }
                         }
                     }
-                    if(isSameCar(car_A,car_B) && !hasStored(localCompStorage, car_A) && !hasStored(localCompStorage, car_B)){
+                    if(car_A_params.isAllCarac() && isSameCar(car_A,car_B) && !hasStored(localCompStorage, car_A) && !hasStored(localCompStorage, car_B)){
                         if(data_A!=null && data_B!=null && data_A.getRawDisplay().length()>0 && data_B.getRawDisplay().length()>0){
                             ComparisonResult result = new ComparisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"MISMATCH");
                             softStore(localCompStorage, car_B,result);
@@ -153,6 +169,17 @@ public class DeduplicationServices {
         CharDescriptionExportServices.exportDedupReport(fullCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO, parent);
         ConfirmationDialog.show("Done", "Results saved", "OK");
 
+    }
+
+    private static DedupLaunchDialog.DedupLaunchDialogRow getCarParams(HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, ClassCaracteristic car) {
+        DedupLaunchDialog.DedupLaunchDialogRow ret = weightTable.get(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID ? car.getCharacteristic_name() : car.getCharacteristic_id());
+        if(ret!=null){
+            return ret;
+        }else{
+            DedupLaunchDialog.DedupLaunchDialogRow tmp = new DedupLaunchDialog.DedupLaunchDialogRow(car,true);
+            tmp.setAllCarac(false);
+            return tmp;
+        }
     }
 
     private static boolean hasCounterPart(ClassCaracteristic car_a, ArrayList<ClassCaracteristic> cars_b) {
@@ -251,6 +278,7 @@ public class DeduplicationServices {
         CaracteristicValue val_A;
         CaracteristicValue val_B;
         String ResultType;
+        Double score = 0.0;
 
 
         public ComparisonResult(CharDescriptionRow item_a, CharDescriptionRow item_b, ClassCaracteristic car_a, ClassCaracteristic car_b, CaracteristicValue data_a, CaracteristicValue data_b, String match_type) {
@@ -262,6 +290,7 @@ public class DeduplicationServices {
             setVal_A(data_a);
             setVal_B(data_b);
             setResultType(match_type);
+            setScore();
         }
 
         public CharDescriptionRow getItem_A() {
@@ -319,6 +348,24 @@ public class DeduplicationServices {
         public void setResultType(String resultType) {
             ResultType = resultType;
         }
+
+        public Double getScore() {
+            return score;
+        }
+
+        public void setScore(Double score) {
+            this.score = score;
+        }
+        private void setScore(){
+            if(getCar_A()!=null){
+                setScore(getWeightFromWeightTableRowValue(getResultType(),getCarParams(weightTable,car_A)));
+            }else if(getCar_B()!=null){
+                setScore(getWeightFromWeightTableRowValue(getResultType(),getCarParams(weightTable,car_B)));
+            }else{
+                setScore(getWeightFromWeightTableRowValue(getResultType(),weightTable.get(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID?"Item Class":"CLASS_ID")));
+            }
+
+        }
     }
 
     private static boolean isSameCar(ClassCaracteristic car_A, ClassCaracteristic car_B) {
@@ -335,7 +382,7 @@ public class DeduplicationServices {
         return DeduplicationServices.targetSegmentIDS.contains(item.getClass_segment_string().split("&&&")[0]);
     }
 
-    public static void scoreDuplicatesForClassesPairWise(ArrayList<String> sourceSegmentIDS, HashMap<String, ArrayList<Object>> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, Double GLOBAL_MISMATCH_RATIO) {
+    public static void scoreDuplicatesForClassesPairWise(ArrayList<String> sourceSegmentIDS, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, Double GLOBAL_MISMATCH_RATIO) {
         lastprogess = 0;
         DeduplicationServices.unidec = Unidecode.toAscii();
         DeduplicationServices.sourceSegmentIDS = sourceSegmentIDS;
@@ -666,22 +713,22 @@ public class DeduplicationServices {
         return false;
     }
 
-    private static void mismatch(AtomicReference<Double> score, AtomicReference<Integer> mismatches, ArrayList<Object> weights) {
+    private static void mismatch(AtomicReference<Double> score, AtomicReference<Integer> mismatches, DedupLaunchDialog.DedupLaunchDialogRow weights) {
         score.updateAndGet(v -> v + getWeightFromWeightTableRowValue("MISMATCH", weights));
         mismatches.updateAndGet(v->v+1);
     }
-    private static void descMatch(AtomicReference<Double> score, AtomicReference<Integer> descMatches, ArrayList<Object> weights) {
+    private static void descMatch(AtomicReference<Double> score, AtomicReference<Integer> descMatches, DedupLaunchDialog.DedupLaunchDialogRow weights) {
         score.updateAndGet(v -> v + getWeightFromWeightTableRowValue("DESCRIPTION_MATCH", weights));
         descMatches.updateAndGet(v->v+1);
     }
 
-    private static void weakMatch(AtomicReference<Double> score, AtomicReference<Integer> weakMatches, ArrayList<Object> weights) {
-        score.updateAndGet(v -> v + getWeightFromWeightTableRowValue("WEAK",weights));
+    private static void weakMatch(AtomicReference<Double> score, AtomicReference<Integer> weakMatches, DedupLaunchDialog.DedupLaunchDialogRow weights) {
+        score.updateAndGet(v -> v + getWeightFromWeightTableRowValue("WEAK_MATCH",weights));
         weakMatches.updateAndGet(v->v+1);
     }
 
-    private static void strongMatch(AtomicReference<Double> score, AtomicReference<Integer> strongMatches, ArrayList<Object> weights) {
-        score.updateAndGet(v -> v + getWeightFromWeightTableRowValue("STRONG",weights));
+    private static void strongMatch(AtomicReference<Double> score, AtomicReference<Integer> strongMatches, DedupLaunchDialog.DedupLaunchDialogRow weights) {
+        score.updateAndGet(v -> v + getWeightFromWeightTableRowValue("STRONG_MATCH",weights));
         strongMatches.updateAndGet(v->v+1);
     }
 
@@ -741,24 +788,25 @@ public class DeduplicationServices {
         return tmp.orElse(null);
     }
 
-    public static ClassCaracteristic getCarFromWeightTableRowValue(ArrayList<Object> value) {
-        return (ClassCaracteristic) value.get(0);
+    public static ClassCaracteristic getCarFromWeightTableRowValue(DedupLaunchDialog.DedupLaunchDialogRow value) {
+        return value.getCarac();
     }
-    public static Double getWeightFromWeightTableRowValue(String MATCH_TYPE, ArrayList<Object> value) {
+    public static Double getWeightFromWeightTableRowValue(String MATCH_TYPE, DedupLaunchDialog.DedupLaunchDialogRow value) {
         switch (MATCH_TYPE) {
-            case "STRONG":
-                return Double.parseDouble((String) value.get(1));
-            case "WEAK":
-                return Double.parseDouble((String) value.get(2));
+            case "STRONG_MATCH":
+                return Double.parseDouble((String) value.getStrongWeight());
+            case "WEAK_MATCH":
+                return Double.parseDouble((String) value.getWeakWeight());
             case "DESCRIPTION_MATCH":
-                return Double.parseDouble((String) value.get(3));
-            case "ALTERNATIVE":
-                return Double.parseDouble((String) value.get(4));
-            case "UNKNOWN":
-                return Double.parseDouble((String) value.get(5));
+                return Double.parseDouble((String) value.getIncludedWeight());
+            case "ALTERNATIVE_MATCH":
+                return Double.parseDouble((String) value.getAlternativeWeight());
+            case "UNKNOWN_MATCH":
+                return Double.parseDouble((String) value.getUnknownWeight());
             case "MISMATCH":
-                return Double.parseDouble((String) value.get(6));
+                return Double.parseDouble((String) value.getMismatchWeight());
         }
+        System.out.println(MATCH_TYPE);
         throw new RuntimeException();
     }
 
