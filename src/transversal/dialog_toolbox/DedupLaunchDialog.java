@@ -23,7 +23,6 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -79,6 +78,8 @@ public class DedupLaunchDialog {
     private static ClassSegment currentItemSegment;
     private static HashMap<String,HashMap<String,DedupLaunchDialogRow>> savedWeights;
     private static HashMap<Integer, TableColumn> columnBase = new HashMap<Integer, TableColumn>();
+    private static boolean isShiftDown = false;
+    private static boolean isCtrlDown = false;
 
 
     private static void showDetailedClassClusters(ClassSegment itemSegment,ComboBox<ClassSegmentClusterComboRow> ClassLink) {
@@ -356,10 +357,10 @@ public class DedupLaunchDialog {
                     }
                 });
                 if(GlobalConstants.DEDUP_CARAC_WISE){
-                    DeduplicationServices.scoreDuplicatesForClassesPairWise(sourceSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()),  1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())));
+                    DeduplicationServices.scoreDuplicatesForClassesPairWise(sourceCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()),  1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())));
                 }else{
                     try {
-                        DeduplicationServices.scoreDuplicatesForClassesFull(sourceSegmentIDS,targetSegmentIDS,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), 1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())), parent);
+                        DeduplicationServices.scoreDuplicatesForClassesFull(sourceCharClassLink,targetCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), 1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())), parent);
                     } catch (SQLException | ClassNotFoundException | IOException throwables) {
                         throwables.printStackTrace(System.err);
                     }
@@ -536,6 +537,15 @@ public class DedupLaunchDialog {
     }
     @SuppressWarnings("static-access")
     private static void create_dialog_fields() {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
+                new KeyEventDispatcher() {
+                    @Override
+                    public boolean dispatchKeyEvent(java.awt.event.KeyEvent e) {
+                        isShiftDown = e.isShiftDown();
+                        isCtrlDown = e.isControlDown();
+                        return false;
+                    }
+                });
         grid = new GridPane();
         grid.setMinWidth(Math.floor(Screen.getPrimary().getBounds().getWidth() * 0.85));
         minMatches = new TextField();
@@ -656,14 +666,100 @@ public class DedupLaunchDialog {
         caracWeightTable.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                if(event.getCode().equals(KeyCode.D) && event.isControlDown()){
-                    DedupLaunchDialogRow firstRow = caracWeightTable.getItems().get(caracWeightTable.getSelectionModel().getSelectedIndices().stream().min(Comparator.naturalOrder()).get());
-                    caracWeightTable.getSelectionModel().getSelectedCells().forEach(c->{
-                        int itemIdx = c.getRow();
-                        int weightIdx = c.getColumn()-GlobalConstants.DEDUP_INFO_COL_NUMBER;
-                        caracWeightTable.getItems().get(itemIdx).getWeights().set(weightIdx,firstRow.getWeights().get(weightIdx));
-                    });
+                try{
+                    if (event.getCode().equals(KeyCode.D) && event.isControlDown()) {
+                        DedupLaunchDialogRow firstRow = caracWeightTable.getItems().get(caracWeightTable.getSelectionModel().getSelectedIndices().stream().min(Comparator.naturalOrder()).get());
+                        caracWeightTable.getSelectionModel().getSelectedCells().forEach(c -> {
+                            int itemIdx = c.getRow();
+                            int weightIdx = c.getColumn() - GlobalConstants.DEDUP_INFO_COL_NUMBER;
+                            caracWeightTable.getItems().get(itemIdx).getWeights().set(weightIdx, firstRow.getWeights().get(weightIdx));
+                        });
+                        caracWeightTable.refresh();
+                    }
+
+                    Comparator<Integer> intComparator = new Comparator<Integer>() {
+                        @Override
+                        public int compare(Integer o1, Integer o2) {
+                            return o1.compareTo(o2);
+                        }
+                    };
+                    Integer minCol = caracWeightTable.getSelectionModel().getSelectedCells().stream().map(TablePosition::getColumn).min(intComparator).get();
+                    Integer maxCol = caracWeightTable.getSelectionModel().getSelectedCells().stream().map(TablePosition::getColumn).max(intComparator).get();
+                    Integer minRow = caracWeightTable.getSelectionModel().getSelectedCells().stream().map(TablePosition::getRow).min(intComparator).get();
+                    Integer maxRow = caracWeightTable.getSelectionModel().getSelectedCells().stream().map(TablePosition::getRow).max(intComparator).get();
+                    int focusedColumn = caracWeightTable.getFocusModel().getFocusedCell().getColumn();
+                    int focusedRow = caracWeightTable.getFocusModel().getFocusedCell().getRow();
+
+                    if (event.isControlDown()) {
+                        if (event.isShiftDown()) {
+                            if (event.getCode().equals(KeyCode.DOWN)) {
+                                caracWeightTable.getSelectionModel().selectRange(minRow, columnBase.get(minCol), caracWeightTable.getItems().size() - 1, columnBase.get(maxCol));
+                            }
+                            if (event.getCode().equals(KeyCode.UP)) {
+                                caracWeightTable.getSelectionModel().selectRange(0, columnBase.get(minCol), maxRow, columnBase.get(maxCol));
+                            }
+                            if (event.getCode().equals(KeyCode.RIGHT)) {
+                                caracWeightTable.getSelectionModel().selectRange(minRow, columnBase.get(minCol), maxRow, columnBase.get(columnBase.keySet().stream().max(intComparator).get()));
+                            }
+                            if (event.getCode().equals(KeyCode.LEFT)) {
+                                caracWeightTable.getSelectionModel().selectRange(minRow, columnBase.get(6), maxRow, columnBase.get(maxCol));
+                            }
+                        } else {
+                            if (event.getCode().equals(KeyCode.DOWN)) {
+                                caracWeightTable.getSelectionModel().clearSelection();
+                                caracWeightTable.getSelectionModel().select(caracWeightTable.getItems().size() - 1, columnBase.get(focusedColumn));
+                            }
+                            if (event.getCode().equals(KeyCode.UP)) {
+                                caracWeightTable.getSelectionModel().clearSelection();
+                                caracWeightTable.getSelectionModel().select(0, columnBase.get(focusedColumn));
+                            }
+                            if (event.getCode().equals(KeyCode.RIGHT)) {
+                                caracWeightTable.getSelectionModel().clearSelection();
+                                caracWeightTable.getSelectionModel().select(focusedRow, columnBase.get(columnBase.keySet().stream().max(intComparator).get()));
+                            }
+                            if (event.getCode().equals(KeyCode.LEFT)) {
+                                caracWeightTable.getSelectionModel().clearSelection();
+                                caracWeightTable.getSelectionModel().select(focusedRow, columnBase.get(6));
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        caracWeightTable.getFocusModel().focusRightCell();
+                                    }
+                                });
+                            }
+                        }
+                    } else {
+                        if (event.isShiftDown()) {
+                            if (event.getCode().equals(KeyCode.DOWN) || event.getCode().equals(KeyCode.UP) || event.getCode().equals(KeyCode.LEFT) || event.getCode().equals(KeyCode.RIGHT)) {
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Integer locminCol = caracWeightTable.getSelectionModel().getSelectedCells().stream().map(TablePosition::getColumn).min(intComparator).get();
+                                        Integer locmaxCol = caracWeightTable.getSelectionModel().getSelectedCells().stream().map(TablePosition::getColumn).max(intComparator).get();
+                                        Integer locminRow = caracWeightTable.getSelectionModel().getSelectedCells().stream().map(TablePosition::getRow).min(intComparator).get();
+                                        Integer locmaxRow = caracWeightTable.getSelectionModel().getSelectedCells().stream().map(TablePosition::getRow).max(intComparator).get();
+                                        caracWeightTable.getSelectionModel().selectRange(locminRow, columnBase.get(locminCol), locmaxRow, columnBase.get(locmaxCol));
+                                        caracWeightTable.getFocusModel().focus(focusedRow, columnBase.get(focusedColumn));
+                                        if (event.getCode().equals(KeyCode.UP)) {
+                                            caracWeightTable.getFocusModel().focusAboveCell();
+                                        }
+                                        if (event.getCode().equals(KeyCode.DOWN)) {
+                                            caracWeightTable.getFocusModel().focusBelowCell();
+                                        }
+                                        if (event.getCode().equals(KeyCode.RIGHT)) {
+                                            caracWeightTable.getFocusModel().focusRightCell();
+                                        }
+                                        if (event.getCode().equals(KeyCode.LEFT)) {
+                                            caracWeightTable.getFocusModel().focusLeftCell();
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
                     caracWeightTable.refresh();
+                }catch (Exception V){
+
                 }
             }
         });
@@ -754,42 +850,7 @@ public class DedupLaunchDialog {
         TableColumn col1ter = new TableColumn("Charac. UoM");
         col1ter.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DedupLaunchDialogRow, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<DedupLaunchDialogRow, String> r) {
-                if( r.getValue().getCarac().getAllowedUoms()==null || !r.getValue().isNotSpecialRow() ) {
-                    return new ReadOnlyObjectWrapper("");
-                }
-                ArrayList<Text> textes = new ArrayList<Text>();
-
-                boolean same_uom_family=true;
-                String base_uom_family=null;
-                for(String uom:r.getValue().getCarac().getAllowedUoms()) {
-                    if(base_uom_family!=null) {
-                        UnitOfMeasure loopUom = UnitOfMeasure.RunTimeUOMS.get(uom);
-                        if(!loopUom.getUom_base_id().equals(base_uom_family)) {
-                            same_uom_family = false;
-                            break;
-                        }
-                    }else {
-                        UnitOfMeasure loopUom = UnitOfMeasure.RunTimeUOMS.get(uom);
-                        base_uom_family = loopUom.getUom_base_id();
-                    }
-                }
-                for(int i=0;i<r.getValue().getCarac().getAllowedUoms().size();i++) {
-                    Text tmp = new Text(UnitOfMeasure.RunTimeUOMS.get(r.getValue().getCarac().getAllowedUoms().get(i)).getUom_symbol());
-                    tmp.setFill(Color.BLACK);
-                    tmp.setFont(Font.font(GlobalConstants.CHAR_UOM_FONT,GlobalConstants.CHAR_UOM_WEIGHT,GlobalConstants.CHAR_UOM_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
-                    textes.add(tmp);
-                    if(i!=r.getValue().getCarac().getAllowedUoms().size()-1) {
-                        tmp = new Text(same_uom_family?" or ":" or ");
-                        tmp.setFill(Color.BLACK);
-                        tmp.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,GlobalConstants.RULE_DISPLAY_SYNTAX_WEIGHT,GlobalConstants.ITALIC_DISPLAY_SYNTAX_POSTURE,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
-                        textes.add(tmp);
-                    }
-                }
-                TextFlow ret = new TextFlow(textes.toArray(new Text[textes.size()]));
-                ret.setMinHeight(0);
-                ret.setPrefHeight(0);
-                ret.setTextAlignment(TextAlignment.CENTER);
-                return new ReadOnlyObjectWrapper(ret);
+                return new ReadOnlyObjectWrapper(getUomDisplay(r.getValue()));
             }
         });
         col1ter.setResizable(false);
@@ -1011,6 +1072,52 @@ public class DedupLaunchDialog {
         columnBase.put(GlobalConstants.DEDUP_INFO_COL_NUMBER+5,col7);
 
 
+    }
+
+    public static String getUomDisplay(DedupLaunchDialogRow r) {
+        if( r.getCarac().getAllowedUoms()==null || !r.isNotSpecialRow() ) {
+            return "";
+        }
+        ArrayList<Text> textes = new ArrayList<Text>();
+
+        boolean same_uom_family=true;
+        String base_uom_family=null;
+        for(String uom:r.getCarac().getAllowedUoms()) {
+            if(base_uom_family!=null) {
+                UnitOfMeasure loopUom = UnitOfMeasure.RunTimeUOMS.get(uom);
+                if(!loopUom.getUom_base_id().equals(base_uom_family)) {
+                    same_uom_family = false;
+                    break;
+                }
+            }else {
+                UnitOfMeasure loopUom = UnitOfMeasure.RunTimeUOMS.get(uom);
+                base_uom_family = loopUom.getUom_base_id();
+            }
+        }
+        for(int i=0;i<r.getCarac().getAllowedUoms().size();i++) {
+            Text tmp = new Text(UnitOfMeasure.RunTimeUOMS.get(r.getCarac().getAllowedUoms().get(i)).getUom_symbol());
+            tmp.setFill(Color.BLACK);
+            tmp.setFont(Font.font(GlobalConstants.CHAR_UOM_FONT,GlobalConstants.CHAR_UOM_WEIGHT,GlobalConstants.CHAR_UOM_POSTURE,GlobalConstants.CHAR_DISPLAY_FONT_SIZE));
+            textes.add(tmp);
+            if(i!=r.getCarac().getAllowedUoms().size()-1) {
+                tmp = new Text(same_uom_family?" or ":" or ");
+                tmp.setFill(Color.BLACK);
+                tmp.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,GlobalConstants.RULE_DISPLAY_SYNTAX_WEIGHT,GlobalConstants.ITALIC_DISPLAY_SYNTAX_POSTURE,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
+                textes.add(tmp);
+            }
+        }
+        TextFlow ret = new TextFlow(textes.toArray(new Text[textes.size()]));
+        ret.setMinHeight(0);
+        ret.setPrefHeight(0);
+        ret.setTextAlignment(TextAlignment.CENTER);
+
+        StringBuilder sb = new StringBuilder();
+        for (Node node : ret.getChildren()) {
+            if (node instanceof Text) {
+                sb.append(((Text) node).getText());
+            }
+        }
+        return sb.toString();
     }
 
     private static void refreshAllCarsProperty() {

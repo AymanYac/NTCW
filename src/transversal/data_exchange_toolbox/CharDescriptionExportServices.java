@@ -2,9 +2,11 @@ package transversal.data_exchange_toolbox;
 
 import controllers.Char_description;
 import javafx.concurrent.Task;
+import javafx.scene.control.ComboBox;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
 import model.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -49,6 +51,7 @@ public class CharDescriptionExportServices {
 	public static ConcurrentLinkedQueue<Pair<ClassCaracteristic,String>> caracDeleteBuffer = new ConcurrentLinkedQueue<Pair<ClassCaracteristic,String>>();
 
 	private static PreparedStatement stmt;
+	private static ArrayList<ArrayList<Object>> miscellanousQueue;
 
 	public static void ExportItemDataForClass(String targetClass, Char_description parent,boolean exportReview, boolean exportBase, boolean exportTaxo, boolean exportKV) throws ClassNotFoundException, SQLException, IOException {
 		
@@ -1039,7 +1042,7 @@ public class CharDescriptionExportServices {
 	}
 
 
-	public static void exportDedupReport(ConcurrentHashMap<String, HashMap<String, DeduplicationServices.ComparisonResult>> fullCompResults, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
+	public static void exportDedupReport(ConcurrentHashMap<String, HashMap<String, DeduplicationServices.ComparisonResult>> fullCompResults, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
 		File file = openExportFile(parent);
 		if(file==null){
 			return;
@@ -1048,7 +1051,10 @@ public class CharDescriptionExportServices {
 		SXSSFWorkbook wb = new SXSSFWorkbook(5000); // keep 5000 rows in memory, exceeding rows will be flushed to disk
 		Sheet paramSheet = null;
 		paramSheet = wb.createSheet("Matching parameters");
-		createDudupParamHeader(wb,paramSheet,global_min_matches,global_max_mismatches,global_mismatch_ratio);
+		createDudupParamHeader(wb,paramSheet,global_min_matches,global_max_mismatches,global_mismatch_ratio,sourceCharClassLink.getValue().toString(),targetCharClassLink.getValue().toString());
+		Sheet classSheet = null;
+		classSheet = wb.createSheet("Matched class detail");
+		fillClassSheet(wb,classSheet,sourceCharClassLink.getValue(),targetCharClassLink.getValue());
 		Sheet couplesSheet = null;
 		couplesSheet = wb.createSheet("Matching couples");
 		createDedupCoupleHeader(wb,couplesSheet);
@@ -1057,10 +1063,9 @@ public class CharDescriptionExportServices {
 		createDedupDetailsHeader(wb,dedupDetailSheet);
 
 		fillDedupParamSheet(wb,paramSheet,weightTable.values());
-		AtomicInteger couplesIndx = new AtomicInteger(0);
-		AtomicInteger detailsIndx = new AtomicInteger(1);
 		Sheet finalCouplesSheet = couplesSheet;
 		Sheet finalDedupDetailSheet = dedupDetailSheet;
+		CharDescriptionExportServices.miscellanousQueue = new ArrayList<>();
 		fullCompResults.values().forEach(e->{
 			AtomicReference<CharDescriptionRow> itemA = new AtomicReference<CharDescriptionRow>();
 			AtomicReference<CharDescriptionRow> itemB = new AtomicReference<CharDescriptionRow>();
@@ -1095,19 +1100,147 @@ public class CharDescriptionExportServices {
 						break;
 				}
 				score.updateAndGet(v -> v + r.getScore());
-				appendDedupDetailLine(finalDedupDetailSheet,detailsIndx.addAndGet(1),r);
+				
 			});
-			appendDedupCouple(finalCouplesSheet, couplesIndx.addAndGet(1),itemA.get(),itemB.get(),strongMatches.get(),weakMatches.get(),includedMatches.get(),alternativeMatches.get(),unknownMatches.get(),mismatches.get(),score.get());
+			queueDedupCouple(itemA.get(),itemB.get(),strongMatches.get(),weakMatches.get(),includedMatches.get(),alternativeMatches.get(),unknownMatches.get(),mismatches.get(),score.get());
 		});
+		CharDescriptionExportServices.miscellanousQueue.sort(new Comparator<ArrayList<Object>>() {
+			@Override
+			public int compare(ArrayList<Object> o1, ArrayList<Object> o2) {
+				return Double.compare((Double) o2.get(8),(Double) o1.get(8));
+			}
+		});
+		AtomicInteger coupleRank = new AtomicInteger(0);
+		AtomicInteger detailsIndx = new AtomicInteger(0);
+		CharDescriptionExportServices.miscellanousQueue.forEach(e->{
+			CharDescriptionRow itemA = (CharDescriptionRow) e.get(0);
+			CharDescriptionRow itemB = (CharDescriptionRow) e.get(1);
+			int strongMatches = (int) e.get(2);
+			int weakMatches = (int) e.get(3);
+			int includedMatches = (int) e.get(4);
+			int alternativeMatches = (int) e.get(5);
+			int unknownMatches = (int) e.get(6);
+			int mismatches = (int) e.get(7);
+			Double score = (Double) e.get(8);
+			appendDedupCouple(finalCouplesSheet, coupleRank.addAndGet(1),itemA,itemB,strongMatches,weakMatches,includedMatches,alternativeMatches,unknownMatches,mismatches,score);
+			ArrayList<DeduplicationServices.ComparisonResult> details = fullCompResults.get(itemA.getItem_id() + "<=>" + itemB.getItem_id()).values().stream().collect(Collectors.toCollection(ArrayList::new));
+			details.sort(new Comparator<DeduplicationServices.ComparisonResult>() {
+				@Override
+				public int compare(DeduplicationServices.ComparisonResult o1, DeduplicationServices.ComparisonResult o2) {
+					Integer a1=99;
+					Integer a2=99;
+					Integer b1=99;
+					Integer b2=99;
+					try{
+						a1=o1.getCar_A().getSequence();
+					}catch (Exception V){
+						if(o1.getVal_A()!=null) a1=0;
+					}
+					try{
+						a2=o2.getCar_A().getSequence();
+					}catch (Exception V){
+						if(o2.getVal_A()!=null) a2=0;
+					}
+					try{
+						b1=o1.getCar_B().getSequence();
+					}catch (Exception V){
+						if(o1.getVal_B()!=null) b1=0;
+					}
+					try{
+						b2=o2.getCar_B().getSequence();
+					}catch (Exception V){
+						if(o2.getVal_B()!=null) b2=0;
+					}
+					int ret_a = Integer.compare(a1, a2);
+					int ret_b = Integer.compare(b1, b2);
+					return ret_a*100 + ret_b;
+				}
+			});
+			details.forEach(r->{
+				appendDedupDetailLine(finalDedupDetailSheet,detailsIndx.addAndGet(1),r,coupleRank.get());
+			});
+		});
+		//appendDedupDetailLine(finalDedupDetailSheet,detailsIndx.addAndGet(1),r);
+		//appendDedupCouple(finalCouplesSheet, couplesIndx.addAndGet(1),itemA.get(),itemB.get(),strongMatches.get(),weakMatches.get(),includedMatches.get(),alternativeMatches.get(),unknownMatches.get(),mismatches.get(),score.get());
 		closeExportFile(file,wb);
 	}
 
-	private static void appendDedupDetailLine(Sheet finalDedupDetailSheet, int detailsIndx, DeduplicationServices.ComparisonResult result) {
+	private static void queueDedupCouple(CharDescriptionRow itemA, CharDescriptionRow itemB, int strong, int weak, int included, int alternative, int unknown, int mismatch, Double score) {
+		ArrayList<Object> tmp = new ArrayList<Object>();
+		tmp.add(itemA);
+		tmp.add(itemB);
+		tmp.add(strong);
+		tmp.add(weak);
+		tmp.add(included);
+		tmp.add(alternative);
+		tmp.add(unknown);
+		tmp.add(mismatch);
+		tmp.add(score);
+		CharDescriptionExportServices.miscellanousQueue.add(tmp);
+	}
+
+	private static void fillClassSheet(SXSSFWorkbook wb, Sheet classSheet, ClassSegmentClusterComboRow source, ClassSegmentClusterComboRow target) {
+		Row firstRow = classSheet.createRow(0);
+		firstRow.createCell(0).setCellValue("Compare items of:");
+		firstRow.createCell(3).setCellValue("Compare with items of:");
+		createHeaderRow(wb,classSheet,new String[] {
+				"Class ID",
+				"Class Name",
+				"",
+				"Class ID",
+				"Class Name"}, new IndexedColors[] {
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.WHITE,
+				IndexedColors.DARK_BLUE,
+				IndexedColors.DARK_BLUE,
+		}, 1);
+		AtomicInteger sourceIdx = new AtomicInteger(1);
+		source.getRowSegments().stream().filter(r->r.getValue().getValue()).forEach(r->{
+			String classID = r.getKey().getClassNumber();
+			String className = r.getKey().getClassName();
+			try{
+				classSheet.getRow(sourceIdx.addAndGet(1)).createCell(0).setCellValue(classID);
+			}catch (Exception V){
+				classSheet.createRow(sourceIdx.get()).createCell(0).setCellValue(classID);
+			}
+			classSheet.getRow(sourceIdx.get()).createCell(1).setCellValue(className);
+		});
+		AtomicInteger targetIdx = new AtomicInteger(1);
+		target.getRowSegments().stream().filter(r->r.getValue().getValue()).forEach(r->{
+			String classID = r.getKey().getClassNumber();
+			String className = r.getKey().getClassName();
+			try{
+				classSheet.getRow(targetIdx.addAndGet(1)).createCell(3).setCellValue(classID);
+			}catch (Exception V){
+				classSheet.createRow(targetIdx.get()).createCell(3).setCellValue(classID);
+			}
+			classSheet.getRow(targetIdx.get()).createCell(4).setCellValue(className);
+		});
+
+	}
+
+	private static void appendDedupDetailLine(Sheet finalDedupDetailSheet, int detailsIndx, DeduplicationServices.ComparisonResult result, int coupleRank) {
+		int headerOffset=1;
 		if(detailsIndx>=GlobalConstants.EXCEL_MAX_ROW_COUNT){
 			return;
 		}
-		Row row = finalDedupDetailSheet.createRow(detailsIndx);
+		Row row = finalDedupDetailSheet.createRow(detailsIndx+headerOffset);
 		int currentCell = 0;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(coupleRank);
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(result.getItem_A().getClient_item_number()+"|"+result.getItem_B().getClient_item_number());
+		}catch (Exception V){
+
+		}
+		currentCell+=1;
 		try{
 			Cell cell = row.createCell(currentCell);
 			cell.setCellValue(result.getItem_A().getClient_item_number());
@@ -1117,34 +1250,42 @@ public class CharDescriptionExportServices {
 		currentCell+=1;
 		try{
 			Cell cell = row.createCell(currentCell);
-			cell.setCellValue(result.getCar_A().getSequence().toString());
+			cell.setCellValue(result.getCar_A().getSequence());
 		}catch (Exception V){
-			Cell cell = row.createCell(currentCell);
-			cell.setCellValue(0);
+			if(result.getVal_A()!=null){
+				Cell cell = row.createCell(currentCell);
+				cell.setCellValue(0);
+			}
 		}
 		currentCell+=1;
 		try{
 			Cell cell = row.createCell(currentCell);
 			cell.setCellValue(result.getCar_A().getCharacteristic_id());
 		}catch (Exception V){
-			Cell cell = row.createCell(currentCell);
-			cell.setCellValue("CLASS_ID");
+			if(result.getVal_A()!=null) {
+				Cell cell = row.createCell(currentCell);
+				cell.setCellValue("CLASS_ID");
+			}
 		}
 		currentCell+=1;
 		try{
 			Cell cell = row.createCell(currentCell);
 			cell.setCellValue(result.getCar_A().getCharacteristic_name());
 		}catch (Exception V){
-			Cell cell = row.createCell(currentCell);
-			cell.setCellValue("Item Class");
+			if(result.getVal_A()!=null){
+				Cell cell = row.createCell(currentCell);
+				cell.setCellValue("Item Class");
+			}
 		}
 		currentCell+=1;
 		try{
 			Cell cell = row.createCell(currentCell);
 			cell.setCellValue(result.getCar_A().getIsNumeric()?"NUM":"TXT");
 		}catch (Exception V){
-			Cell cell = row.createCell(currentCell);
-			cell.setCellValue("TXT");
+			if(result.getVal_A()!=null) {
+				Cell cell = row.createCell(currentCell);
+				cell.setCellValue("TXT");
+			}
 		}
 		currentCell+=1;
 		try{
@@ -1212,34 +1353,42 @@ public class CharDescriptionExportServices {
 		currentCell+=1;
 		try{
 			Cell cell = row.createCell(currentCell);
-			cell.setCellValue(result.getCar_B().getSequence().toString());
+			cell.setCellValue(result.getCar_B().getSequence());
 		}catch (Exception V){
-			Cell cell = row.createCell(currentCell);
-			cell.setCellValue(0);
+			if(result.getVal_B()!=null) {
+				Cell cell = row.createCell(currentCell);
+				cell.setCellValue(0);
+			}
 		}
 		currentCell+=1;
 		try{
 			Cell cell = row.createCell(currentCell);
 			cell.setCellValue(result.getCar_B().getCharacteristic_id());
 		}catch (Exception V){
-			Cell cell = row.createCell(currentCell);
-			cell.setCellValue("CLASS_ID");
+			if(result.getVal_B()!=null) {
+				Cell cell = row.createCell(currentCell);
+				cell.setCellValue("CLASS_ID");
+			}
 		}
 		currentCell+=1;
 		try{
 			Cell cell = row.createCell(currentCell);
 			cell.setCellValue(result.getCar_B().getCharacteristic_name());
 		}catch (Exception V){
-			Cell cell = row.createCell(currentCell);
-			cell.setCellValue("Item Class");
+			if(result.getVal_B()!=null) {
+				Cell cell = row.createCell(currentCell);
+				cell.setCellValue("Item Class");
+			}
 		}
 		currentCell+=1;
 		try{
 			Cell cell = row.createCell(currentCell);
 			cell.setCellValue(result.getCar_B().getIsNumeric()?"NUM":"TXT");
 		}catch (Exception V){
-			Cell cell = row.createCell(currentCell);
-			cell.setCellValue("TXT");
+			if(result.getVal_B()!=null) {
+				Cell cell = row.createCell(currentCell);
+				cell.setCellValue("TXT");
+			}
 		}
 		currentCell+=1;
 		try{
@@ -1300,68 +1449,102 @@ public class CharDescriptionExportServices {
 		currentCell+=1;
 		try{
 			Cell cell = row.createCell(currentCell);
-			cell.setCellValue(result.getResultType());
+			cell.setCellValue(StringUtils.capitalize(result.getResultType().toLowerCase()).replace("_"," "));
 		}catch (Exception V){
 
 		}
 
 	}
 
-	private static void appendDedupCouple(Sheet couplesSheet, int couplesIndx, CharDescriptionRow itemA, CharDescriptionRow itemB, int strongMatches, int weakMatches, int includedMatches, int alternativeMatches, int unknownMatches, int mismatches, Double score) {
-		Row row = couplesSheet.createRow(couplesIndx);
+	private static void appendDedupCouple(Sheet couplesSheet, int couplesRank, CharDescriptionRow itemA, CharDescriptionRow itemB, int strongMatches, int weakMatches, int includedMatches, int alternativeMatches, int unknownMatches, int mismatches, Double score) {
+		int headerOffset=0;
+		Row row = couplesSheet.createRow(couplesRank+headerOffset);
 		Cell cell = row.createCell(0);
-		cell.setCellValue(itemA.getClient_item_number());
+		cell.setCellValue(couplesRank);
 		cell = row.createCell(1);
-		cell.setCellValue(itemB.getClient_item_number());
+		cell.setCellValue(itemA.getClient_item_number()+"|"+itemB.getClient_item_number());
 		cell = row.createCell(2);
-		cell.setCellValue(strongMatches);
+		cell.setCellValue(itemA.getClient_item_number());
 		cell = row.createCell(3);
-		cell.setCellValue(weakMatches);
+		cell.setCellValue(itemA.getShort_desc());
 		cell = row.createCell(4);
-		cell.setCellValue(includedMatches);
+		cell.setCellValue(itemA.getClass_segment().getClassNumber());
 		cell = row.createCell(5);
-		cell.setCellValue(alternativeMatches);
+		cell.setCellValue(itemA.getClass_segment().getClassName());
 		cell = row.createCell(6);
-		cell.setCellValue(unknownMatches);
+		cell.setCellValue(itemB.getClient_item_number());
 		cell = row.createCell(7);
-		cell.setCellValue(mismatches);
+		cell.setCellValue(itemB.getShort_desc());
 		cell = row.createCell(8);
+		cell.setCellValue(itemB.getClass_segment().getClassNumber());
+		cell = row.createCell(9);
+		cell.setCellValue(itemB.getClass_segment().getClassName());
+		cell = row.createCell(10);
+		cell.setCellValue(strongMatches);
+		cell = row.createCell(11);
+		cell.setCellValue(weakMatches);
+		cell = row.createCell(12);
+		cell.setCellValue(includedMatches);
+		cell = row.createCell(13);
+		cell.setCellValue(alternativeMatches);
+		cell = row.createCell(14);
+		cell.setCellValue(unknownMatches);
+		cell = row.createCell(15);
+		cell.setCellValue(mismatches);
+		cell = row.createCell(16);
 		cell.setCellValue(score);
 	}
 
 	private static void fillDedupParamSheet(SXSSFWorkbook wb, Sheet paramSheet, Collection<DedupLaunchDialog.DedupLaunchDialogRow> values) {
 		AtomicInteger rowIndex = new AtomicInteger(7);
-		values.forEach(p->{
+		values.stream().sorted(new Comparator<DedupLaunchDialog.DedupLaunchDialogRow>() {
+			@Override
+			public int compare(DedupLaunchDialog.DedupLaunchDialogRow o1, DedupLaunchDialog.DedupLaunchDialogRow o2) {
+				return Integer.compare(o1.getCarac().getSequence(),o2.getCarac().getSequence());
+			}
+		}).forEach(p->{
 			rowIndex.addAndGet(1);
 			Row row = paramSheet.createRow(rowIndex.get());
 			Cell cell = row.createCell(0);
-			cell.setCellValue(DeduplicationServices.getCarFromWeightTableRowValue(p).getCharacteristic_id());
+			cell.setCellValue(DeduplicationServices.getCarFromWeightTableRowValue(p).getSequence());
 			cell = row.createCell(1);
-			cell.setCellValue(DeduplicationServices.getCarFromWeightTableRowValue(p).getCharacteristic_name());
+			cell.setCellValue(DeduplicationServices.getCarFromWeightTableRowValue(p).getCharacteristic_id());
 			cell = row.createCell(2);
+			cell.setCellValue(DeduplicationServices.getCarFromWeightTableRowValue(p).getCharacteristic_name());
+			cell = row.createCell(3);
 			try{
 				cell.setCellValue(DeduplicationServices.getCarFromWeightTableRowValue(p).getIsNumeric()?"NUM":"TXT");
 			}catch (Exception V){
 
 			}
-			cell = row.createCell(3);
-			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("STRONG_MATCH",p));
 			cell = row.createCell(4);
-			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("WEAK_MATCH",p));
+			try{
+				cell.setCellValue(DedupLaunchDialog.getUomDisplay(p));
+			}catch (Exception V){
+
+			}
 			cell = row.createCell(5);
-			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("DESCRIPTION_MATCH",p));
+			cell.setCellValue(p.isSameCarac()?"TRUE":"FALSE");
 			cell = row.createCell(6);
-			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("ALTERNATIVE_MATCH",p));
+			cell.setCellValue(p.isAllCarac()?"TRUE":"FALSE");
 			cell = row.createCell(7);
-			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("UNKNOWN_MATCH",p));
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("STRONG_MATCH",p));
 			cell = row.createCell(8);
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("WEAK_MATCH",p));
+			cell = row.createCell(9);
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("DESCRIPTION_MATCH",p));
+			cell = row.createCell(10);
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("ALTERNATIVE_MATCH",p));
+			cell = row.createCell(11);
+			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("UNKNOWN_MATCH",p));
+			cell = row.createCell(12);
 			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("MISMATCH",p));
 		});
 	}
 
 	private static void createDedupDetailsHeader(SXSSFWorkbook wb, Sheet dedupDetailSheet) {
 		Row row = dedupDetailSheet.createRow(0);
-		Cell cell = row.createCell(0);
+		Cell cell = row.createCell(2);
 		cell.setCellValue("Item 1");
 		XSSFCellStyle item1Style = (XSSFCellStyle) wb.createCellStyle();
 		item1Style.setAlignment(HorizontalAlignment.LEFT);
@@ -1371,7 +1554,7 @@ public class CharDescriptionExportServices {
 		item1Style.setFont(item1Font);
 		cell.setCellStyle(item1Style);
 
-		cell = row.createCell(13);
+		cell = row.createCell(15);
 		cell.setCellValue("Item 2");
 		XSSFCellStyle item2Style = (XSSFCellStyle) wb.createCellStyle();
 		item2Style.setAlignment(HorizontalAlignment.LEFT);
@@ -1382,6 +1565,8 @@ public class CharDescriptionExportServices {
 		cell.setCellStyle(item2Style);
 
 		createHeaderRow(wb,dedupDetailSheet,new String[] {
+				"Rank",
+				"Couple ID",
 				"Client Item Number",
 				"Characteristic Sequence",
 				"Characteristic ID",
@@ -1409,6 +1594,8 @@ public class CharDescriptionExportServices {
 				"Rule",
 				"Value status",
 				"Characteristic matching result"}, new IndexedColors[] {
+				IndexedColors.RED,
+				IndexedColors.RED,
 				IndexedColors.SEA_GREEN,
 				IndexedColors.SEA_GREEN,
 				IndexedColors.SEA_GREEN,
@@ -1442,8 +1629,16 @@ public class CharDescriptionExportServices {
 
 	private static void createDedupCoupleHeader(SXSSFWorkbook wb, Sheet couplesSheet) {
 		createHeaderRow(wb,couplesSheet,new String[] {
+				"Rank",
+				"Couple ID",
 				"Client Item Number 1",
+				"Short description",
+				"Class ID",
+				"Class Name",
 				"Client Item Number 2",
+				"Short description",
+				"Class ID",
+				"Class Name",
 				"# of strong matches",
 				"# of weak matches",
 				"# of included matches",
@@ -1451,8 +1646,16 @@ public class CharDescriptionExportServices {
 				"# of unknown matches",
 				"# of mismatches",
 				"Matching score"}, new IndexedColors[] {
+				IndexedColors.RED,
+				IndexedColors.RED,
 				IndexedColors.SEA_GREEN,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.DARK_BLUE,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.RED,
 				IndexedColors.RED,
 				IndexedColors.RED,
@@ -1461,7 +1664,7 @@ public class CharDescriptionExportServices {
 		}, 0);
 	}
 
-	private static void createDudupParamHeader(SXSSFWorkbook wb, Sheet paramSheet, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio) {
+	private static void createDudupParamHeader(SXSSFWorkbook wb, Sheet paramSheet, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, String sourceString, String targetString) {
 
 		XSSFCellStyle paramNameStyle = (XSSFCellStyle) wb.createCellStyle();
 		paramNameStyle.setAlignment(HorizontalAlignment.RIGHT);
@@ -1502,25 +1705,49 @@ public class CharDescriptionExportServices {
 		cell.setCellValue(global_mismatch_ratio);
 		cell.setCellStyle(paramValueStyle);
 
+		row = paramSheet.createRow(4);
+		cell = row.createCell(1);
+		cell.setCellValue("Compare item of:");
+		cell.setCellStyle(paramNameStyle);
+		cell = row.createCell(2);
+		cell.setCellValue(sourceString);
+		cell.setCellStyle(paramValueStyle);
+
+		row = paramSheet.createRow(5);
+		cell = row.createCell(1);
+		cell.setCellValue("Compare with items of:");
+		cell.setCellStyle(paramNameStyle);
+		cell = row.createCell(2);
+		cell.setCellValue(targetString);
+		cell.setCellStyle(paramValueStyle);
+
 		createHeaderRow(wb,paramSheet,new String[] {
+				"Sequence",
 				"Characteristic ID",
 				"Characteristic name",
 				"Characteristic type",
+				"UoM",
+				"Same charac",
+				"All data",
 				"Strong match weight",
 				"Weak match weight",
 				"Included weight",
 				"Alternative weight",
 				"Unknown weight",
 				"Mismatch weight"}, new IndexedColors[] {
+				IndexedColors.BLACK,
 				IndexedColors.SEA_GREEN,
 				IndexedColors.SEA_GREEN,
 				IndexedColors.SEA_GREEN,
 				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
-		}, 6);
+		}, 7);
 	}
 }
