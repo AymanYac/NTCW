@@ -694,28 +694,35 @@ public class DedupLaunchDialog {
                         if (event.isShiftDown()) {
                             if (event.getCode().equals(KeyCode.DOWN)) {
                                 caracWeightTable.getSelectionModel().selectRange(minRow, columnBase.get(minCol), caracWeightTable.getItems().size() - 1, columnBase.get(maxCol));
+                                caracWeightTable.refresh();
                             }
                             if (event.getCode().equals(KeyCode.UP)) {
                                 caracWeightTable.getSelectionModel().selectRange(0, columnBase.get(minCol), maxRow, columnBase.get(maxCol));
+                                caracWeightTable.refresh();
                             }
                             if (event.getCode().equals(KeyCode.RIGHT)) {
                                 caracWeightTable.getSelectionModel().selectRange(minRow, columnBase.get(minCol), maxRow, columnBase.get(columnBase.keySet().stream().max(intComparator).get()));
+                                caracWeightTable.refresh();
                             }
                             if (event.getCode().equals(KeyCode.LEFT)) {
                                 caracWeightTable.getSelectionModel().selectRange(minRow, columnBase.get(6), maxRow, columnBase.get(maxCol));
+                                caracWeightTable.refresh();
                             }
                         } else {
                             if (event.getCode().equals(KeyCode.DOWN)) {
                                 caracWeightTable.getSelectionModel().clearSelection();
                                 caracWeightTable.getSelectionModel().select(caracWeightTable.getItems().size() - 1, columnBase.get(focusedColumn));
+                                caracWeightTable.refresh();
                             }
                             if (event.getCode().equals(KeyCode.UP)) {
                                 caracWeightTable.getSelectionModel().clearSelection();
                                 caracWeightTable.getSelectionModel().select(0, columnBase.get(focusedColumn));
+                                caracWeightTable.refresh();
                             }
                             if (event.getCode().equals(KeyCode.RIGHT)) {
                                 caracWeightTable.getSelectionModel().clearSelection();
                                 caracWeightTable.getSelectionModel().select(focusedRow, columnBase.get(columnBase.keySet().stream().max(intComparator).get()));
+                                caracWeightTable.refresh();
                             }
                             if (event.getCode().equals(KeyCode.LEFT)) {
                                 caracWeightTable.getSelectionModel().clearSelection();
@@ -724,6 +731,7 @@ public class DedupLaunchDialog {
                                     @Override
                                     public void run() {
                                         caracWeightTable.getFocusModel().focusRightCell();
+                                        caracWeightTable.refresh();
                                     }
                                 });
                             }
@@ -752,12 +760,12 @@ public class DedupLaunchDialog {
                                         if (event.getCode().equals(KeyCode.LEFT)) {
                                             caracWeightTable.getFocusModel().focusLeftCell();
                                         }
+                                        caracWeightTable.refresh();
                                     }
                                 });
                             }
                         }
                     }
-                    caracWeightTable.refresh();
                 }catch (Exception V){
 
                 }
@@ -952,7 +960,7 @@ public class DedupLaunchDialog {
                 }
             }
         });
-        col2.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
+        col2.setCellFactory(EditCell.<DedupLaunchDialogRow>forTableColumn());
         col2.setOnEditCommit(editCommitHandler);
         col2.setResizable(false);
         col2.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
@@ -971,7 +979,7 @@ public class DedupLaunchDialog {
                 }
             }
         });
-        col3.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
+        col3.setCellFactory(EditCell.<DedupLaunchDialogRow>forTableColumn());
         col3.setOnEditCommit(editCommitHandler);
         col3.setResizable(false);
         col3.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
@@ -990,7 +998,7 @@ public class DedupLaunchDialog {
                 }
             }
         });
-        col4.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
+        col4.setCellFactory(EditCell.<DedupLaunchDialogRow>forTableColumn());
         col4.setOnEditCommit(editCommitHandler);
         col4.setResizable(false);
         col4.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
@@ -1009,7 +1017,7 @@ public class DedupLaunchDialog {
                 }
             }
         });
-        col5.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
+        col5.setCellFactory(EditCell.<DedupLaunchDialogRow>forTableColumn());
         col5.setOnEditCommit(editCommitHandler);
         col5.setResizable(false);
         col5.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
@@ -1028,7 +1036,7 @@ public class DedupLaunchDialog {
                 }
             }
         });
-        col6.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
+        col6.setCellFactory(EditCell.<DedupLaunchDialogRow>forTableColumn());
         col6.setOnEditCommit(editCommitHandler);
         col6.setResizable(false);
         col6.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
@@ -1047,7 +1055,7 @@ public class DedupLaunchDialog {
                 }
             }
         });
-        col7.setCellFactory(TextFieldTableCell.<DedupLaunchDialogRow>forTableColumn());
+        col7.setCellFactory(EditCell.<DedupLaunchDialogRow>forTableColumn());
         col7.setOnEditCommit(editCommitHandler);
         col7.setResizable(false);
         col7.prefWidthProperty().bind(caracWeightTable.widthProperty().multiply(8.0/100.0));
