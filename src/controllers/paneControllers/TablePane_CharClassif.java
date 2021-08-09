@@ -1271,8 +1271,8 @@ public class TablePane_CharClassif {
 			account.getDescriptionSortColumns().add(c.getText());
 			account.getDescriptionSortDirs().add(c.getSortType().toString());
 		}
-		int SI = tableGrid.getSelectionModel().getSelectedIndex();
-
+		CharDescriptionRow SI = tableGrid.getSelectionModel().getSelectedItem();
+		int SC = new Integer(selected_col);
 		refresh_table_with_segment(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment());
 
 		if(account.getDescriptionSortColumns().stream().filter(tc->!tableGrid.getColumns().stream().map(c->c.getText()).collect(Collectors.toList()).contains(tc)).findAny().isPresent()){
@@ -1282,11 +1282,15 @@ public class TablePane_CharClassif {
 			restoreLastSessionLayout();
 			//tableGrid.getSelectionModel().clearAndSelect(SI);
 		}
-		try{
-			//Parent.charPaneController.tableGrid.scrollTo(Parent.charPaneController.tableGrid.getSelectionModel().getSelectedIndex());
-		}catch (Exception E){
-
-		}
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				tableGrid.getSelectionModel().clearSelection();
+				tableGrid.getSelectionModel().select(SI);
+				selected_col = SC-1;
+				nextChar();
+			}
+		});
 		allowOverWriteAccountPreference=true;
 	}
 

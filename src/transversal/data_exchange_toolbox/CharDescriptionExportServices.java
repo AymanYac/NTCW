@@ -352,7 +352,7 @@ public class CharDescriptionExportServices {
 
 				loopCell = row.createCell(5);
 				try{
-					loopCell.setCellValue(item.getData(itemClass).get(carac.getCharacteristic_id()).getStdValue());
+					loopCell.setCellValue(item.getData(itemClass).get(carac.getCharacteristic_id()).getStdValueRounded());
 				}catch(Exception V) {
 
 				}

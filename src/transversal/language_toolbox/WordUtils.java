@@ -1197,6 +1197,14 @@ public class WordUtils {
 		}
 	}
 
+    public static String rewriteNumeric(String value) {
+		try{
+			return String.valueOf(WordUtils.Rewriter.DecimalUtils.round(Double.parseDouble(value.replace(",",".")),3));
+		}catch (Exception V){
+			return null;
+		}
+    }
+
 
     public abstract static class Rewriter {
 		private Pattern pattern;

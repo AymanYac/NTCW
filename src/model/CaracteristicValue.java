@@ -57,6 +57,25 @@ public class CaracteristicValue implements Serializable {
 	public void setValue_id(String value_id) {
 		this.value_id = value_id;
 	}
+	public String getNominal_value_truncated() {
+		try {
+			double val = Double.valueOf(getNominal_value());
+			if(val == (long) val) {
+				return getNominal_value();
+			}
+			return String.format("%.2f", Double.valueOf(getNominal_value()));
+		}catch(Exception V) {
+			V.printStackTrace();
+			return "";
+		}
+	}
+	public String getNominal_value_rounded(){
+		try{
+			return String.valueOf(WordUtils.Rewriter.DecimalUtils.round(Double.parseDouble(getNominal_value()),3));
+		}catch (Exception V){
+			return null;
+		}
+	}
 	public String getNominal_value() {
 		return nominal_value;
 	}
@@ -107,6 +126,14 @@ public class CaracteristicValue implements Serializable {
 		}
 		return getNominal_value();
 	}
+	//Std value is nominal value if numeric, datalanguageValue else
+	public String getStdValueRounded() {
+		String text_val = getDataLanguageValue();
+		if(text_val!=null) {
+			return text_val;
+		}
+		return getNominal_value_rounded();
+	}
 
 	//Display value is user formatted display value (value column in table and item export)
 	public String getDisplayValue(Char_description parent) {
@@ -121,7 +148,7 @@ public class CaracteristicValue implements Serializable {
 		return ret;
 	}
 	
-	public Pair<ArrayList<String>, TextFlow> getFormatedDisplayAndUomPair(boolean projectSupportsTranslation,boolean projectRequiresTranslation, ClassCaracteristic parentChar) {
+	public Pair<ArrayList<String>, TextFlow> getFormatedDisplayAndUomPair(boolean projectSupportsTranslation,boolean projectRequiresConversion, ClassCaracteristic parentChar) {
 		ArrayList<Text> textes = new ArrayList<Text>();
 		String local_uom_symbol="";
 		UnitOfMeasure local_uom = null;
@@ -148,7 +175,7 @@ public class CaracteristicValue implements Serializable {
 			try{
 				
 				UnitOfMeasure current_uom = UnitOfMeasure.RunTimeUOMS.get(getUom_id());
-				if((!(current_uom!=null)) || parentChar.getAllowedUoms().contains(current_uom.getUom_id()) || projectRequiresTranslation) {
+				if((!(current_uom!=null)) || parentChar.getAllowedUoms().contains(current_uom.getUom_id()) || projectRequiresConversion) {
 					//Either there's no uom or the uom is included in the allowed uoms
 					//Or the user doesn't want conversion
 					//No conversion and show the input value
@@ -225,6 +252,7 @@ public class CaracteristicValue implements Serializable {
 			
 			if(local_Nominal_value!=null && local_Nominal_value.replace(" ","").length() > 0) {
 				//Has nominal value
+				local_Nominal_value = WordUtils.rewriteNumeric(local_Nominal_value);
 				@SuppressWarnings("static-access")
 				Text tmp = new Text(local_Nominal_value+" "+local_uom_symbol);
 				tmp.setFill(GlobalConstants.CHAR_NUM_COLOR);
@@ -448,23 +476,7 @@ public class CaracteristicValue implements Serializable {
 			}
 		}
 	}
-	
-	
-	
-	
-	public String getNominal_value_truncated() {
-		try {
-			double val = Double.valueOf(getNominal_value());
-			if(val == (long) val) {
-				return getNominal_value();
-			}
-			return String.format("%.2f", Double.valueOf(getNominal_value()));
-		}catch(Exception V) {
-			V.printStackTrace();
-			return "";
-		}
-	}
-	
+
 	@Override
 	public boolean equals(Object o)
 	{

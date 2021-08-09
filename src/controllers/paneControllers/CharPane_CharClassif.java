@@ -12,6 +12,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import model.*;
 import service.CharValuesLoader;
+import service.TableViewExtra;
 import transversal.dialog_toolbox.CaracDeclarationDialog;
 import transversal.generic.Tools;
 
@@ -35,7 +36,8 @@ public class CharPane_CharClassif {
 	
 	private ArrayList<CharPaneRow> paneRows = new ArrayList<CharPaneRow>();
 	private boolean triggerItemTableRefresh;
-	
+	private TableViewExtra tvx;
+
 	public void load_item_chars() {
 		this.paneRows.clear();
 		try {
@@ -54,6 +56,7 @@ public class CharPane_CharClassif {
 			});
 		}
 		this.tableGrid.getItems().clear();
+		//tvx.rows.clear();
 		this.paneRows.sort(new Comparator<CharPaneRow>() {
 			@Override
 			public int compare(CharPaneRow o1, CharPaneRow o2) {
@@ -61,10 +64,10 @@ public class CharPane_CharClassif {
 			}
 		});
 		this.tableGrid.getItems().addAll( this.paneRows);
-
 		try {
 			triggerItemTableRefresh = false;
 			this.tableGrid.getSelectionModel().select(Math.floorMod(this.parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).size()));
+			tvx.scrollToSelection();
 			triggerItemTableRefresh = true;
 		}catch(Exception V) {
 			
@@ -77,6 +80,7 @@ public class CharPane_CharClassif {
 	public void setParent(Char_description char_description) {
 		this.parent = char_description;
 		this.tableGrid.getItems().addAll( this.paneRows);
+		this.tvx = new TableViewExtra(this.tableGrid);
 		critcalityColumn.setCellValueFactory(new PropertyValueFactory<>("Criticality"));
 		charNameColumn.setCellValueFactory(new PropertyValueFactory<String, CharPaneRow>("Char_name_complete"));
 		//charNameColumn.setCellFactory(model.mouseHoverTableCell.forCharNameTranslation(this.tableGrid));
@@ -118,6 +122,7 @@ public class CharPane_CharClassif {
 		});
 		tableGrid.setRowFactory(tv -> {
 			TableRow<CharPaneRow> row = new TableRow<>();
+			tvx.rows.add(row);
 			row.setOnDragDetected(event -> {
 				System.out.println("start drag detected");
 				if (! row.isEmpty()) {
