@@ -56,6 +56,7 @@ public class CharPane_CharClassif {
 			});
 		}
 		this.tableGrid.getItems().clear();
+		//tvx.rows.clear();
 		this.paneRows.sort(new Comparator<CharPaneRow>() {
 			@Override
 			public int compare(CharPaneRow o1, CharPaneRow o2) {
@@ -63,7 +64,6 @@ public class CharPane_CharClassif {
 			}
 		});
 		this.tableGrid.getItems().addAll( this.paneRows);
-		this.tvx = new TableViewExtra(this.tableGrid);
 		try {
 			triggerItemTableRefresh = false;
 			this.tableGrid.getSelectionModel().select(Math.floorMod(this.parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(selected_row.getClass_segment_string().split("&&&")[0]).size()));
@@ -122,6 +122,7 @@ public class CharPane_CharClassif {
 		});
 		tableGrid.setRowFactory(tv -> {
 			TableRow<CharPaneRow> row = new TableRow<>();
+			tvx.rows.add(row);
 			row.setOnDragDetected(event -> {
 				System.out.println("start drag detected");
 				if (! row.isEmpty()) {
@@ -184,7 +185,6 @@ public class CharPane_CharClassif {
 					event.consume();
 				}
 				System.out.println("end drag drop");
-				this.tvx = new TableViewExtra(this.tableGrid);
 				try {
 					flushCaracDefinitionToDB(parent.account);
 				} catch (SQLException | ClassNotFoundException throwables) {

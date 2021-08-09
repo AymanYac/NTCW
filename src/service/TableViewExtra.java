@@ -27,7 +27,7 @@ public class TableViewExtra<T> // com.sun.javafx: implements ChangeListener<Skin
 
   // com.sun.javafx: private VirtualFlow<?> flow;
 
-  LinkedHashSet<TableRow<T>> rows = new LinkedHashSet<>();
+  public LinkedHashSet<TableRow<T>> rows = new LinkedHashSet<>();
   private int firstIndex;
   private int lastIndex;
 
@@ -157,11 +157,6 @@ public class TableViewExtra<T> // com.sun.javafx: implements ChangeListener<Skin
 
       for(TableRow<T> r : rows)
       {
-          try{
-
-          }catch (Exception V){
-
-          }
           double minY = r.getBoundsInParent().getMinY();
           double maxY = r.getBoundsInParent().getMaxY();
 

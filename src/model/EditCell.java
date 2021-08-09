@@ -2,7 +2,6 @@ package model;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -21,6 +20,7 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
     private TextField textField;
     private boolean escapePressed = false;
     private TablePosition<S, ?> tablePos = null;
+    private boolean triggerEditCommitOnTextFieldEscape = true;
 
     public EditCell(final StringConverter<T> converter) {
         super(converter);
@@ -84,7 +84,7 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
             // this is a cancel event after escape key
             super.cancelEdit();
             setText(getItemText()); // restore the original text in the view
-        } else {
+        } else if(triggerEditCommitOnTextFieldEscape) {
             // this is not a cancel event after escape key
             // we interpret it as commit.
             String newText = textField.getText();
@@ -153,6 +153,8 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
             } else if (event.getCode() == KeyCode.RIGHT
                     || event.getCode() == KeyCode.TAB) {
                 HashSet<TablePosition> old = new HashSet<TablePosition>(getTableView().getSelectionModel().getSelectedCells());
+                textField.fireEvent(new ActionEvent());
+                triggerEditCommitOnTextFieldEscape = false;
                 getTableView().getSelectionModel().selectNext();
                 HashSet<TablePosition> current = new HashSet<TablePosition>(getTableView().getSelectionModel().getSelectedCells());
                 if(current.size()>1){
@@ -160,9 +162,12 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
                     current.removeAll(old);
                     getTableView().getSelectionModel().select(current.iterator().next().getRow(),current.iterator().next().getTableColumn());
                 }
+                triggerEditCommitOnTextFieldEscape = true;
                 event.consume();
             } else if (event.getCode() == KeyCode.LEFT) {
                 HashSet<TablePosition> old = new HashSet<TablePosition>(getTableView().getSelectionModel().getSelectedCells());
+                textField.fireEvent(new ActionEvent());
+                triggerEditCommitOnTextFieldEscape = false;
                 getTableView().getSelectionModel().selectPrevious();
                 HashSet<TablePosition> current = new HashSet<TablePosition>(getTableView().getSelectionModel().getSelectedCells());
                 if(current.size()>1){
@@ -170,9 +175,12 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
                     current.removeAll(old);
                     getTableView().getSelectionModel().select(current.iterator().next().getRow(),current.iterator().next().getTableColumn());
                 }
+                triggerEditCommitOnTextFieldEscape = true;
                 event.consume();
             } else if (event.getCode() == KeyCode.UP) {
                 HashSet<TablePosition> old = new HashSet<TablePosition>(getTableView().getSelectionModel().getSelectedCells());
+                textField.fireEvent(new ActionEvent());
+                triggerEditCommitOnTextFieldEscape = false;
                 getTableView().getSelectionModel().selectAboveCell();
                 HashSet<TablePosition> current = new HashSet<TablePosition>(getTableView().getSelectionModel().getSelectedCells());
                 if(current.size()>1){
@@ -180,9 +188,12 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
                     current.removeAll(old);
                     getTableView().getSelectionModel().select(current.iterator().next().getRow(),current.iterator().next().getTableColumn());
                 }
+                triggerEditCommitOnTextFieldEscape = true;
                 event.consume();
             } else if (event.getCode() == KeyCode.DOWN) {
                 HashSet<TablePosition> old = new HashSet<TablePosition>(getTableView().getSelectionModel().getSelectedCells());
+                textField.fireEvent(new ActionEvent());
+                triggerEditCommitOnTextFieldEscape = false;
                 getTableView().getSelectionModel().selectBelowCell();
                 HashSet<TablePosition> current = new HashSet<TablePosition>(getTableView().getSelectionModel().getSelectedCells());
                 if(current.size()>1){
@@ -190,6 +201,7 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
                     current.removeAll(old);
                     getTableView().getSelectionModel().select(current.iterator().next().getRow(),current.iterator().next().getTableColumn());
                 }
+                triggerEditCommitOnTextFieldEscape = true;
                 event.consume();
             }
         });
