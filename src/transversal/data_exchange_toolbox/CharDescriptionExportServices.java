@@ -1042,7 +1042,7 @@ public class CharDescriptionExportServices {
 	}
 
 
-	public static void exportDedupReport(ConcurrentHashMap<String, HashMap<String, DeduplicationServices.ComparisonResult>> fullCompResults, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
+	public static void exportDedupReport(ConcurrentHashMap<String, HashMap<String, DeduplicationServices.ComparisonResult>> fullCompResults, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, Double topCouplesPercentage, int topCouplesNumber, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
 		File file = openExportFile(parent);
 		if(file==null){
 			return;
@@ -1061,6 +1061,15 @@ public class CharDescriptionExportServices {
 		Sheet dedupDetailSheet = null;
 		dedupDetailSheet = wb.createSheet("Detailed matching results");
 		createDedupDetailsHeader(wb,dedupDetailSheet);
+		Sheet itemClassSheet = null;
+		itemClassSheet = wb.createSheet("Project items");
+		createDedupItemClassHeader(wb,itemClassSheet);
+		for(CharDescriptionRow item:CharItemFetcher.allRowItems) {
+			String itemClass = item.getClass_segment_string().split("&&&")[0];
+			ArrayList<ClassCaracteristic> itemChars = CharValuesLoader.active_characteristics.get(item.getClass_segment_string().split("&&&")[0]);
+			appendDedupItemClassLine(item,itemClassSheet,itemChars,parent);
+		}
+
 
 		fillDedupParamSheet(wb,paramSheet,weightTable.values());
 		Sheet finalCouplesSheet = couplesSheet;
@@ -1113,6 +1122,9 @@ public class CharDescriptionExportServices {
 		AtomicInteger coupleRank = new AtomicInteger(0);
 		AtomicInteger detailsIndx = new AtomicInteger(0);
 		CharDescriptionExportServices.miscellanousQueue.forEach(e->{
+			if(coupleRank.get()>=topCouplesNumber || coupleRank.get()>Math.floor(miscellanousQueue.size()*(topCouplesPercentage/100.0))){
+				return;
+			}
 			CharDescriptionRow itemA = (CharDescriptionRow) e.get(0);
 			CharDescriptionRow itemB = (CharDescriptionRow) e.get(1);
 			int strongMatches = (int) e.get(2);
@@ -1163,6 +1175,31 @@ public class CharDescriptionExportServices {
 		//appendDedupDetailLine(finalDedupDetailSheet,detailsIndx.addAndGet(1),r);
 		//appendDedupCouple(finalCouplesSheet, couplesIndx.addAndGet(1),itemA.get(),itemB.get(),strongMatches.get(),weakMatches.get(),includedMatches.get(),alternativeMatches.get(),unknownMatches.get(),mismatches.get(),score.get());
 		closeExportFile(file,wb);
+	}
+
+	private static void appendDedupItemClassLine(CharDescriptionRow item, Sheet itemClassSheet, ArrayList<ClassCaracteristic> itemChars, Char_description parent) {
+		reviewRowIdx+=1;
+		Row row = itemClassSheet.createRow(reviewRowIdx);
+		Cell loopCell;
+
+		loopCell = row.createCell(0);
+		loopCell.setCellValue(item.getClient_item_number());
+
+		loopCell = row.createCell(1);
+		loopCell.setCellValue(item.getShort_desc());
+
+		loopCell = row.createCell(2);
+		loopCell.setCellValue(item.getLong_desc());
+
+		loopCell = row.createCell(3);
+		loopCell.setCellValue(item.getMaterial_group());
+
+		loopCell = row.createCell(4);
+		loopCell.setCellValue(item.getClass_segment_string().split("&&&")[2]);
+
+		loopCell = row.createCell(5);
+		loopCell.setCellValue(item.getClass_segment_string().split("&&&")[1]);
+
 	}
 
 	private static void queueDedupCouple(CharDescriptionRow itemA, CharDescriptionRow itemB, int strong, int weak, int included, int alternative, int unknown, int mismatch, Double score) {
@@ -1540,6 +1577,23 @@ public class CharDescriptionExportServices {
 			cell = row.createCell(12);
 			cell.setCellValue(DeduplicationServices.getWeightFromWeightTableRowValue("MISMATCH",p));
 		});
+	}
+
+	private static void createDedupItemClassHeader(SXSSFWorkbook wb, Sheet itemClassSheet){
+		Row reviewHeader = createHeaderRow(wb,itemClassSheet,new String[] {
+				"Client Item Number",
+				"Short description",
+				"Long description",
+				"Material Group",
+				"Classification number",
+				"Classification name"}, new IndexedColors[] {
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN
+		}, 0);
 	}
 
 	private static void createDedupDetailsHeader(SXSSFWorkbook wb, Sheet dedupDetailSheet) {

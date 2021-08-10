@@ -34,7 +34,7 @@ public class DeduplicationServices {
     private static double lastprogess;
     private static ConcurrentHashMap<String, HashMap<String, ComparisonResult>> fullCompResults;
 
-    public static void scoreDuplicatesForClassesFull(ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, Double GLOBAL_MISMATCH_RATIO, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
+    public static void scoreDuplicatesForClassesFull(ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, double GLOBAL_MISMATCH_RATIO, Double topCouplesPercentage, int topCouplesNumber, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
         DeduplicationServices.sourceSegmentIDS = sourceCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
         DeduplicationServices.targetSegmentIDS = targetCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
         lastprogess = 0;
@@ -171,7 +171,7 @@ public class DeduplicationServices {
         });
         System.out.println("::::::::::::::::::::::::::::: RETAINED ITEMS : "+fullCompResults.size()+" ::::::::::::::::::::::::::::: in "+Duration.between(start,Instant.now()).getSeconds() +" seconds");
         ConfirmationDialog.show("Done", "RETAINED ITEMS : "+fullCompResults.size(), "OK");
-        CharDescriptionExportServices.exportDedupReport(fullCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,sourceCharClassLink,targetCharClassLink, parent);
+        CharDescriptionExportServices.exportDedupReport(fullCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,sourceCharClassLink,targetCharClassLink,topCouplesPercentage,topCouplesNumber, parent);
         ConfirmationDialog.show("Done", "Results saved", "OK");
 
     }

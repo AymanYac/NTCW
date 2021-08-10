@@ -60,6 +60,8 @@ public class DedupLaunchDialog {
     private static TextField minMatches;
     private static TextField maxMismatches;
     private static TextField minMatchMismatchRatio;
+    private static TextField topCouplesNumber;
+    private static TextField topCouplesPercentage;
 
     private static ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink;
     private static ComboBox<ClassSegmentClusterComboRow> targetCharClassLink;
@@ -261,6 +263,11 @@ public class DedupLaunchDialog {
                     Integer.parseInt(maxMismatches.getText());
                     double minMatchMismatchRatio = 1.0 / (Double.parseDouble(DedupLaunchDialog.minMatchMismatchRatio.getText()));
                     ((Button) dialog.getDialogPane().lookupButton(validateButtonType)).setDisable(false);
+                    double percentage = Double.parseDouble(topCouplesPercentage.getText());
+                    if(percentage<0 || percentage>100.0){
+                        throw new Exception();
+                    }
+                    Integer.parseUnsignedInt(topCouplesNumber.getText());
                 } catch (Exception V) {
                     ((Button) dialog.getDialogPane().lookupButton(validateButtonType)).setDisable(true);
                 }
@@ -269,6 +276,9 @@ public class DedupLaunchDialog {
         minMatches.textProperty().addListener(paramListner);
         maxMismatches.textProperty().addListener(paramListner);
         minMatchMismatchRatio.textProperty().addListener(paramListner);
+        topCouplesNumber.textProperty().addListener(paramListner);
+        topCouplesPercentage.textProperty().addListener(paramListner);
+
         allCarsPropertySelected.addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -360,7 +370,7 @@ public class DedupLaunchDialog {
                     DeduplicationServices.scoreDuplicatesForClassesPairWise(sourceCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()),  1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())));
                 }else{
                     try {
-                        DeduplicationServices.scoreDuplicatesForClassesFull(sourceCharClassLink,targetCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), 1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())), parent);
+                        DeduplicationServices.scoreDuplicatesForClassesFull(sourceCharClassLink,targetCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), 1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())),Double.parseDouble(topCouplesPercentage.getText()), Integer.parseUnsignedInt(topCouplesNumber.getText()) ,parent);
                     } catch (SQLException | ClassNotFoundException | IOException throwables) {
                         throwables.printStackTrace(System.err);
                     }
@@ -581,6 +591,19 @@ public class DedupLaunchDialog {
                 }
             }
         });
+        //
+        topCouplesNumber = new TextField();
+        topCouplesNumber.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if(event.getCode().equals(KeyCode.ENTER)){
+                    event.consume();
+                    skipToNextField(topCouplesPercentage);
+
+                }
+            }
+        });
+        topCouplesPercentage = new TextField();
 
         sourceCharClassLink = new ComboBox<ClassSegmentClusterComboRow>();
         sourceCharClassLink.setMaxWidth(Integer.MAX_VALUE);
@@ -1218,6 +1241,15 @@ public class DedupLaunchDialog {
 
         grid.add(caracWeightTable,1,9);
         GridPane.setColumnSpan(caracWeightTable,GridPane.REMAINING);
+
+        Label headerLabel3 = new Label("Characteristic settings");
+        headerLabel3.setUnderline(true);
+        grid.add(headerLabel3, 1, 10);
+        grid.add(   new Label("Number of top couples to export"), 1, 11);
+        grid.add(topCouplesNumber,3,11);
+        grid.add(new Label("Percent of top couples to export"), 1, 12);
+        grid.add(topCouplesPercentage,3,12);
+
     }
 
     private static void skipToNextField(Node node) {
