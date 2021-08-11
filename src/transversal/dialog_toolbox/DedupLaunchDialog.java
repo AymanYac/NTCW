@@ -1242,7 +1242,7 @@ public class DedupLaunchDialog {
         grid.add(caracWeightTable,1,9);
         GridPane.setColumnSpan(caracWeightTable,GridPane.REMAINING);
 
-        Label headerLabel3 = new Label("Characteristic settings");
+        Label headerLabel3 = new Label("Export settings");
         headerLabel3.setUnderline(true);
         grid.add(headerLabel3, 1, 10);
         grid.add(   new Label("Number of top couples to export"), 1, 11);

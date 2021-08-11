@@ -439,7 +439,11 @@ public class CharDescriptionExportServices {
 		loopCell.setCellValue(item.getShort_desc());
 
 		loopCell = row.createCell(3);
-		loopCell.setCellValue(item.getLong_desc());
+		try{
+			loopCell.setCellValue(item.getLong_desc());
+		}catch (Exception V){
+			loopCell.setCellValue(item.getLong_desc().substring(0,32766));
+		}
 		
 		loopCell = row.createCell(4);
 		loopCell.setCellValue(item.getMaterial_group());
@@ -1189,7 +1193,11 @@ public class CharDescriptionExportServices {
 		loopCell.setCellValue(item.getShort_desc());
 
 		loopCell = row.createCell(2);
-		loopCell.setCellValue(item.getLong_desc());
+		try{
+			loopCell.setCellValue(item.getLong_desc());
+		}catch (Exception V){
+			loopCell.setCellValue(item.getLong_desc().substring(0,32766));
+		}
 
 		loopCell = row.createCell(3);
 		loopCell.setCellValue(item.getMaterial_group());
