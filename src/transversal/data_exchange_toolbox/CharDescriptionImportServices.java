@@ -228,16 +228,20 @@ public class CharDescriptionImportServices {
 		hr.createCell(ImportItemRow.columnMap.size()).setCellValue("Comment");
 
 		ImportItemRow.rejectedRows.forEach(p->{
-			rejected_row_num+=1;
-			Row reject_row = sheet.createRow(rejected_row_num);
-			reject_row.createCell(0).setCellValue(p.getKey().getRowNum());
-			IntStream.range(1,ImportItemRow.columnMap.size()).forEach(idx->{
-				try{
-					reject_row.createCell(idx).setCellValue(p.getKey().getCell(idx-1).getStringCellValue());
-				}catch (Exception V){
-				}
-			});
-			reject_row.createCell(ImportItemRow.columnMap.size()).setCellValue(p.getValue());
+			try{
+				rejected_row_num += 1;
+				Row reject_row = sheet.createRow(rejected_row_num);
+				reject_row.createCell(0).setCellValue(p.getKey().getRowNum());
+				IntStream.range(1, ImportItemRow.columnMap.size()).forEach(idx -> {
+					try {
+						reject_row.createCell(idx).setCellValue(p.getKey().getCell(idx - 1).getStringCellValue());
+					} catch (Exception V) {
+					}
+				});
+				reject_row.createCell(ImportItemRow.columnMap.size()).setCellValue(p.getValue());
+			}catch (Exception V){
+				V.printStackTrace(System.err);
+			}
 			//System.out.println("Error on row "+String.valueOf(p.getKey().getRowNum()+1)+">"+p.getValue());
 		});;
 	}
