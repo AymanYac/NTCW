@@ -263,12 +263,9 @@ public class DedupLaunchDialog {
                     Integer.parseInt(maxMismatches.getText());
                     double minMatchMismatchRatio = 1.0 / (Double.parseDouble(DedupLaunchDialog.minMatchMismatchRatio.getText()));
                     ((Button) dialog.getDialogPane().lookupButton(validateButtonType)).setDisable(false);
-                    double percentage = Double.parseDouble(topCouplesPercentage.getText());
-                    if(percentage<0 || percentage>100.0){
-                        throw new Exception();
-                    }
-                    Integer.parseUnsignedInt(topCouplesNumber.getText());
                 } catch (Exception V) {
+                    topCouplesPercentage.setText("100.0");
+                    topCouplesNumber.setText(String.valueOf(GlobalConstants.EXCEL_MAX_ROW_COUNT));
                     ((Button) dialog.getDialogPane().lookupButton(validateButtonType)).setDisable(true);
                 }
             }
@@ -370,7 +367,22 @@ public class DedupLaunchDialog {
                     DeduplicationServices.scoreDuplicatesForClassesPairWise(sourceCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()),  1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())));
                 }else{
                     try {
-                        DeduplicationServices.scoreDuplicatesForClassesFull(sourceCharClassLink,targetCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), 1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())),Double.parseDouble(topCouplesPercentage.getText()), Integer.parseUnsignedInt(topCouplesNumber.getText()) ,parent);
+                        double maxPercentage = 100.0;
+                        try{
+                            maxPercentage = Double.parseDouble(topCouplesPercentage.getText());
+                            if (maxPercentage < 0 || maxPercentage > 100.0) {
+                                maxPercentage = 100.0;
+                            }
+                        }catch (Exception V){
+
+                        }
+                        int maxRows = GlobalConstants.EXCEL_MAX_ROW_COUNT;
+                        try{
+                            maxRows = Integer.parseUnsignedInt(topCouplesNumber.getText());
+                        }catch (Exception V){
+
+                        }
+                        DeduplicationServices.scoreDuplicatesForClassesFull(sourceCharClassLink,targetCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), 1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())),maxPercentage, maxRows ,parent);
                     } catch (SQLException | ClassNotFoundException | IOException throwables) {
                         throwables.printStackTrace(System.err);
                     }

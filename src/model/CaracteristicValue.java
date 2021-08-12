@@ -11,6 +11,7 @@ import transversal.language_toolbox.WordUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -223,17 +224,17 @@ public class CaracteristicValue implements Serializable {
 								V.printStackTrace(System.err);
 							}
 							try{
-								local_Nominal_value = String.valueOf( new BigDecimal( local_Nominal_value.replace(",", ".").replace(" ", "") ).divide(loopUom.getUom_multiplier())).replace(".", ",");
+								local_Nominal_value = String.valueOf( new BigDecimal( local_Nominal_value.replace(",", ".").replace(" ", "") ).divide(loopUom.getUom_multiplier(),2, RoundingMode.HALF_EVEN)).replace(".", ",");
 							}catch(Exception V) {
 								
 							}
 							try{
-								local_Max_value = String.valueOf( new BigDecimal( local_Max_value.replace(",", ".").replace(" ", "") ).divide(loopUom.getUom_multiplier())).replace(".", ",");
+								local_Max_value = String.valueOf( new BigDecimal( local_Max_value.replace(",", ".").replace(" ", "") ).divide(loopUom.getUom_multiplier(),2, RoundingMode.HALF_EVEN)).replace(".", ",");
 							}catch(Exception V) {
 								
 							}
 							try{
-								local_Min_value = String.valueOf( new BigDecimal( local_Min_value.replace(",", ".").replace(" ", "") ).divide( loopUom.getUom_multiplier())).replace(".", ",");
+								local_Min_value = String.valueOf( new BigDecimal( local_Min_value.replace(",", ".").replace(" ", "") ).divide( loopUom.getUom_multiplier(),2, RoundingMode.HALF_EVEN)).replace(".", ",");
 							}catch(Exception V) {
 								
 							}
