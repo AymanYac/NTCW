@@ -103,15 +103,10 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
 
     private TextField getTextField() {
 
-        final TextField textField = new TextField(getItemText());
-
-        textField.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("hi");
-            }
-        });
+        //final TextField textField = new TextField("XHXHX");
+        if(textField==null){
+            textField = CellUtilsCustom.createTextField(this,getConverter());
+        }
 
         // Use onAction here rather than onKeyReleased (with check for Enter),
         textField.setOnAction(event -> {
@@ -222,7 +217,7 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
         } else {
             if (isEditing()) {
                 if (textField != null) {
-                    textField.setText(getItemText());
+                    //textField.setText(getItemText());
                 }
                 setText(null);
                 setGraphic(textField);
@@ -235,7 +230,7 @@ public class EditCell<S, T> extends TextFieldTableCell<S, T> {
 
     private void startEdit(final TextField textField) {
         if (textField != null) {
-            textField.setText(getItemText());
+            //textField.setText(getItemText());
         }
         setText(null);
         setGraphic(textField);

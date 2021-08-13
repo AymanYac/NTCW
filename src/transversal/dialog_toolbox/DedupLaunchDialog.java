@@ -264,8 +264,8 @@ public class DedupLaunchDialog {
                     double minMatchMismatchRatio = 1.0 / (Double.parseDouble(DedupLaunchDialog.minMatchMismatchRatio.getText()));
                     ((Button) dialog.getDialogPane().lookupButton(validateButtonType)).setDisable(false);
                 } catch (Exception V) {
-                    topCouplesPercentage.setText("100.0");
-                    topCouplesNumber.setText(String.valueOf(GlobalConstants.EXCEL_MAX_ROW_COUNT));
+                    //topCouplesPercentage.setText("100.0");
+                    //topCouplesNumber.setText(String.valueOf(GlobalConstants.EXCEL_MAX_ROW_COUNT));
                     ((Button) dialog.getDialogPane().lookupButton(validateButtonType)).setDisable(true);
                 }
             }
