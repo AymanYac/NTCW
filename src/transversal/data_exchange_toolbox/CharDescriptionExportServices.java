@@ -1068,6 +1068,7 @@ public class CharDescriptionExportServices {
 		Sheet itemClassSheet = null;
 		itemClassSheet = wb.createSheet("Project items");
 		createDedupItemClassHeader(wb,itemClassSheet);
+		reviewRowIdx = 0;
 		for(CharDescriptionRow item:CharItemFetcher.allRowItems) {
 			String itemClass = item.getClass_segment_string().split("&&&")[0];
 			ArrayList<ClassCaracteristic> itemChars = CharValuesLoader.active_characteristics.get(item.getClass_segment_string().split("&&&")[0]);
