@@ -4,6 +4,7 @@ import controllers.Char_description;
 import javafx.concurrent.Task;
 import javafx.scene.control.ComboBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 import model.*;
 import org.apache.commons.lang3.StringUtils;
@@ -566,7 +567,7 @@ public class CharDescriptionExportServices {
         fileChooser.getExtensionFilters().add(extFilter);
         
         //Show save file dialog
-        return fileChooser.showSaveDialog(parent.exportButton.getScene().getWindow());
+        return fileChooser.showSaveDialog(new Stage());
 		
 	}
 

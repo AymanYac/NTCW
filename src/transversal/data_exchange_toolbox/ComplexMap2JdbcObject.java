@@ -1,6 +1,7 @@
 package transversal.data_exchange_toolbox;
 
 import com.google.gson.Gson;
+import model.ClassSegmentClusterComboRow;
 import model.UserAccount;
 import org.hildan.fxgson.FxGson;
 import org.postgresql.util.PGobject;
@@ -88,5 +89,64 @@ public class ComplexMap2JdbcObject {
 		return fxGson.fromJson(string,type);
 	}
 
+	public static class DedupSettings {
+		String match;
+		String mismatch;
+		String ratio;
+		ClassSegmentClusterComboRow source;
+		ClassSegmentClusterComboRow target;
+		HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weights;
+
+		public DedupSettings() {
+		}
+
+		public String getMatch() {
+			return match;
+		}
+
+		public void setMatch(String match) {
+			this.match = match;
+		}
+
+		public String getMismatch() {
+			return mismatch;
+		}
+
+		public void setMismatch(String mismatch) {
+			this.mismatch = mismatch;
+		}
+
+		public String getRatio() {
+			return ratio;
+		}
+
+		public void setRatio(String ratio) {
+			this.ratio = ratio;
+		}
+
+		public ClassSegmentClusterComboRow getSource() {
+			return source;
+		}
+
+		public void setSource(ClassSegmentClusterComboRow source) {
+			this.source = source;
+		}
+
+		public ClassSegmentClusterComboRow getTarget() {
+			return target;
+		}
+
+		public void setTarget(ClassSegmentClusterComboRow target) {
+			this.target = target;
+		}
+
+		public HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> getWeights() {
+			return weights;
+		}
+
+		public void setWeights(HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weights) {
+			this.weights = weights;
+		}
+	}
 
 }

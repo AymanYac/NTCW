@@ -82,6 +82,11 @@ public class DedupLaunchDialog {
     private static HashMap<Integer, TableColumn> columnBase = new HashMap<Integer, TableColumn>();
     private static boolean isShiftDown = false;
     private static boolean isCtrlDown = false;
+    private static String previousMatchSetting;
+    private static String previousMismatchSetting;
+    private static String previousRatioSetting;
+    private static ClassSegmentClusterComboRow previousSource;
+    private static ClassSegmentClusterComboRow previousTarget;
 
 
     private static void showDetailedClassClusters(ClassSegment itemSegment,ComboBox<ClassSegmentClusterComboRow> ClassLink) {
@@ -219,8 +224,25 @@ public class DedupLaunchDialog {
         // Request focus on the char name by default.
         Platform.runLater(() -> {
             minMatches.requestFocus();
-            sourceCharClassLink.getSelectionModel().select(0);
-            targetCharClassLink.getSelectionModel().select(targetCharClassLink.getItems().size()-1);
+            minMatches.setText(previousMatchSetting);
+            maxMismatches.setText(previousMismatchSetting);
+            minMatchMismatchRatio.setText(previousRatioSetting);
+            if(previousSource!=null){
+                if(!sourceCharClassLink.getItems().contains(previousSource)){
+                    sourceCharClassLink.getItems().add(previousSource);
+                }
+                sourceCharClassLink.getSelectionModel().select(previousSource);
+            }else{
+                sourceCharClassLink.getSelectionModel().select(0);
+            }
+            if(previousTarget!=null){
+                if(!targetCharClassLink.getItems().contains(previousTarget)){
+                    targetCharClassLink.getItems().add(previousTarget);
+                }
+                targetCharClassLink.getSelectionModel().select(previousTarget);
+            }else {
+                targetCharClassLink.getSelectionModel().select(targetCharClassLink.getItems().size() - 1);
+            }
         });
         dialog.showAndWait();
     }
@@ -238,7 +260,17 @@ public class DedupLaunchDialog {
         ResultSet rs = stmt.executeQuery();
         rs.next();
         try {
-            DedupLaunchDialog.savedWeights = (HashMap<String, HashMap<String, DedupLaunchDialogRow>>) ComplexMap2JdbcObject.deserializeFX(rs.getString("deduplication_weights"),new TypeToken<HashMap<String,HashMap<String,DedupLaunchDialogRow>>>(){}.getType());
+            HashMap<String,ComplexMap2JdbcObject.DedupSettings> tmp = (HashMap<String,ComplexMap2JdbcObject.DedupSettings>) ComplexMap2JdbcObject.deserializeFX(rs.getString("deduplication_weights"), new TypeToken<HashMap<String,ComplexMap2JdbcObject.DedupSettings>>() {}.getType());
+            String segmentId = tmp.keySet().stream().findAny().get();
+            ComplexMap2JdbcObject.DedupSettings settings = tmp.get(segmentId);
+            DedupLaunchDialog.savedWeights = new HashMap<>();
+            DedupLaunchDialog.savedWeights.put(segmentId,settings.getWeights());
+            previousMatchSetting = settings.getMatch();
+            previousMismatchSetting = settings.getMismatch();
+            previousRatioSetting = settings.getRatio();
+            previousSource = settings.getSource();
+            previousTarget = settings.getTarget();
+            //DedupLaunchDialog.savedWeights = (HashMap<String, HashMap<String, DedupLaunchDialogRow>>) ComplexMap2JdbcObject.deserializeFX(rs.getString("deduplication_weights"),new TypeToken<HashMap<String,HashMap<String,DedupLaunchDialogRow>>>(){}.getType());
         }catch(Exception V) {
             V.printStackTrace(System.err);
             DedupLaunchDialog.savedWeights = new HashMap<String, HashMap<String, DedupLaunchDialogRow>>();
@@ -393,15 +425,23 @@ public class DedupLaunchDialog {
 
         Button saveBT = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
         saveBT.addEventFilter(ActionEvent.ACTION, event -> {
-            HashMap<String, DedupLaunchDialogRow> tmp = new HashMap<String, DedupLaunchDialogRow>();
+            HashMap<String, DedupLaunchDialogRow> carWeights = new HashMap<String, DedupLaunchDialogRow>();
             caracWeightTable.getItems().stream().filter(r->r!=null && r.isNotSpecialRow()).forEach(r->{
                 if(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID){
-                    tmp.put(r.getCarac().getCharacteristic_name(),r);
+                    carWeights.put(r.getCarac().getCharacteristic_name(),r);
                 }else{
-                    tmp.put(r.getCarac().getCharacteristic_id(),r);
+                    carWeights.put(r.getCarac().getCharacteristic_id(),r);
                 }
             });
-            DedupLaunchDialogRow.saveWeights(currentItemSegment.getSegmentId(),tmp);
+            ComplexMap2JdbcObject.DedupSettings settings = new ComplexMap2JdbcObject.DedupSettings();
+            settings.setMatch(minMatches.getText());
+            settings.setMismatch(maxMismatches.getText());
+            settings.setRatio(minMatchMismatchRatio.getText());
+            settings.setSource(sourceCharClassLink.getValue());
+            settings.setTarget(targetCharClassLink.getValue());
+            settings.setWeights(carWeights);
+            HashMap<String, ArrayList<Object>> tmp = new HashMap<String, ArrayList<Object>>();
+            DedupLaunchDialogRow.saveWeights(currentItemSegment.getSegmentId(),settings);
             event.consume();
         });
         Button resetBT = (Button) dialog.getDialogPane().lookupButton(resetButtonType);
@@ -1327,15 +1367,18 @@ public class DedupLaunchDialog {
             this.specialRow = true;
         }
 
-        public static void saveWeights(String segmentId, HashMap<String, DedupLaunchDialogRow> tmp) {
-            DedupLaunchDialog.savedWeights.put(segmentId,tmp);
+        public static void saveWeights(String segmentId, ComplexMap2JdbcObject.DedupSettings settings) {
+            HashMap<String, DedupLaunchDialogRow> carWeights = settings.getWeights();
+            DedupLaunchDialog.savedWeights.put(segmentId,carWeights);
             new Thread (()->{
                 Connection conn = null;
                 PreparedStatement stmt=null;
                 try {
                     conn = Tools.spawn_connection_from_pool();
                     stmt = conn.prepareStatement("update users_x_projects set deduplication_weights = ? where project_id = ? and user_id = ?");
-                    stmt.setString(1, ComplexMap2JdbcObject.serializeFX(DedupLaunchDialog.savedWeights));
+                    HashMap<String, ComplexMap2JdbcObject.DedupSettings> toStore = new HashMap<String, ComplexMap2JdbcObject.DedupSettings>();
+                    toStore.put(segmentId,settings);
+                    stmt.setString(1, ComplexMap2JdbcObject.serializeFX(toStore));
                     stmt.setString(2,parent.account.getActive_project());
                     stmt.setString(3,parent.account.getUser_id());
                     stmt.execute();
