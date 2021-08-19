@@ -8,7 +8,7 @@ BEGIN
 EXECUTE format('
    CREATE SCHEMA IF NOT EXISTS %I',  project_id);
 EXECUTE format('
-   CREATE TABLE IF NOT EXISTS %I.project_segments(segment_id character varying primary key, level_1_number character varying, level_1_name character varying, level_1_name_translated character varying, level_2_number character varying, level_2_name character varying, level_2_name_translated character varying, level_3_number character varying, level_3_name character varying, level_3_name_translated character varying, level_4_number character varying, level_4_name character varying, level_4_name_translated character varying)',
+   CREATE TABLE IF NOT EXISTS %I.project_segments(segment_id character varying primary key, level_1_number character varying, level_1_name character varying, level_1_name_translated character varying, level_2_number character varying, level_2_name character varying, level_2_name_translated character varying, level_3_number character varying, level_3_name character varying, level_3_name_translated character varying, level_4_number character varying, level_4_name character varying, level_4_name_translated character varying, deduplication_parameters character varying)',
    project_id);
 
 EXECUTE format('
