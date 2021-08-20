@@ -23,10 +23,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -49,6 +46,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -778,6 +776,28 @@ public class DedupLaunchDialog {
                     int focusedRow = caracWeightTable.getFocusModel().getFocusedCell().getRow();
 
                     if (event.isControlDown()) {
+                        if(event.getCode().equals(KeyCode.V)){
+                            final Clipboard clipboard = Clipboard.getSystemClipboard();
+                            AtomicInteger loopRowIdx = new AtomicInteger(caracWeightTable.getFocusModel().getFocusedCell().getRow() - 1);
+                            AtomicInteger loopColumnIdx = new AtomicInteger(0);
+
+                            Arrays.stream(clipboard.getContent(DataFormat.PLAIN_TEXT).toString().split("\n")).sequential().forEach(line->{
+                                loopRowIdx.addAndGet(1);
+                                loopColumnIdx.set(caracWeightTable.getFocusModel().getFocusedCell().getColumn() - 7);
+
+                                Arrays.stream(line.split("\t")).sequential().forEach(elem->{
+                                    try{
+                                        double weight = Double.parseDouble(elem.trim());
+                                        caracWeightTable.getItems().get(loopRowIdx.get()).getWeights().set(loopColumnIdx.addAndGet(1),String.valueOf(weight));
+                                    }catch (Exception V){
+
+                                    }
+                                });
+                            });
+                            caracWeightTable.refresh();
+                            caracWeightTable.getFocusModel().focus(loopRowIdx.get(),columnBase.get(loopColumnIdx.get()));
+                            event.consume();
+                        }
                         if (event.isShiftDown()) {
                             if (event.getCode().equals(KeyCode.DOWN)) {
                                 caracWeightTable.getSelectionModel().selectRange(minRow, columnBase.get(minCol), caracWeightTable.getItems().size() - 1, columnBase.get(maxCol));
