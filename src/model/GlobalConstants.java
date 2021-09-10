@@ -60,9 +60,10 @@ public class GlobalConstants {
 	public static final int DEDUP_INFO_COL_NUMBER = 6;
 	public static final boolean DEDUP_SET_TARGET_CARS = false;
     public static final int EXCEL_MAX_ROW_COUNT = 1048575;
+    public static final int MAX_DEDUP_PAIRS_IN_MEMORY = 100000;
 
 
-	public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
+    public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS = 5;
 	public static boolean USE_TAXOIMPORT_NEW_SCHEMA = true;
 	
@@ -73,7 +74,7 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
 	public static final boolean REDIRECT_OUTSTREAM = true;
-	public static final String TOOL_VERSION = "5.9.1.2";
+	public static final String TOOL_VERSION = "5.9.2";
 	public static final String HOST_ADDRESS = "localhost";
 	//public static final String HOST_ADDRESS = "91.167.182.87";//"82.66.148.154";//"88.190.148.154";
 	//public static final String HOST_ADDRESS = "192.168.0.22";

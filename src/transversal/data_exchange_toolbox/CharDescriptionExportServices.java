@@ -1,6 +1,7 @@
 package transversal.data_exchange_toolbox;
 
 import controllers.Char_description;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.scene.control.ComboBox;
 import javafx.stage.FileChooser;
@@ -1091,7 +1092,7 @@ public class CharDescriptionExportServices {
 			AtomicInteger unknownMatches = new AtomicInteger();
 			AtomicInteger mismatches = new AtomicInteger();
 			AtomicReference<Double> score = new AtomicReference<>(0.0);
-			e.values().forEach(r->{
+			e.values().stream().filter(r->r.getItem_A()!=null).forEach(r->{
 				itemA.set(r.getItem_A());
 				itemB.set(r.getItem_B());
 				switch (r.getResultType()){
@@ -1117,6 +1118,9 @@ public class CharDescriptionExportServices {
 				score.updateAndGet(v -> v + r.getScore());
 				
 			});
+			if(!score.get().equals(e.get("PAIR_SCORE").getScore())){
+				throw new RuntimeException();
+			}
 			queueDedupCouple(itemA.get(),itemB.get(),strongMatches.get(),weakMatches.get(),includedMatches.get(),alternativeMatches.get(),unknownMatches.get(),mismatches.get(),score.get());
 		});
 		CharDescriptionExportServices.miscellanousQueue.sort(new Comparator<ArrayList<Object>>() {
@@ -1243,7 +1247,13 @@ public class CharDescriptionExportServices {
 				IndexedColors.DARK_BLUE,
 		}, 1);
 		AtomicInteger sourceIdx = new AtomicInteger(1);
-		source.getRowSegments().stream().filter(r->r.getValue().getValue()).forEach(r->{
+		Comparator<Pair<ClassSegment, SimpleBooleanProperty>> classSegmentComparator = new Comparator<Pair<ClassSegment, SimpleBooleanProperty>>() {
+			@Override
+			public int compare(Pair<ClassSegment, SimpleBooleanProperty> o1, Pair<ClassSegment, SimpleBooleanProperty> o2) {
+				return o1.getKey().getClassName().compareTo(o2.getKey().getClassName());
+			}
+		};
+		source.getRowSegments().stream().filter(r->r.getValue().getValue()).sorted(classSegmentComparator).forEach(r->{
 			String classID = r.getKey().getClassNumber();
 			String className = r.getKey().getClassName();
 			try{
@@ -1254,7 +1264,7 @@ public class CharDescriptionExportServices {
 			classSheet.getRow(sourceIdx.get()).createCell(1).setCellValue(className);
 		});
 		AtomicInteger targetIdx = new AtomicInteger(1);
-		target.getRowSegments().stream().filter(r->r.getValue().getValue()).forEach(r->{
+		target.getRowSegments().stream().filter(r->r.getValue().getValue()).sorted(classSegmentComparator).forEach(r->{
 			String classID = r.getKey().getClassNumber();
 			String className = r.getKey().getClassName();
 			try{

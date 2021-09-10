@@ -220,7 +220,7 @@ public class CharDescriptionRow {
 					
 				});
 			}catch(Exception V) {
-				//V.printStackTrace(System.err);
+				V.printStackTrace(System.err);
 			}
 		}
 
@@ -232,7 +232,11 @@ public class CharDescriptionRow {
 		}
 
 		public void reEvaluateCharRules(){
+			if(this.getClient_item_number().equals("99000845995")){
+				System.out.println("DEBUG");
+			}
 			CharDescriptionRow r = this;
+			r.getRuleResults().values().forEach(v->v.removeIf(result -> result.getGenericCharRule()==null));
 			//For each couple active item I / rule N
 			r.getRuleResults().values().forEach(a->{
 				a.stream().filter(result -> !result.isDraft()).forEach(result->{
@@ -481,7 +485,7 @@ public class CharDescriptionRow {
 		}
     }
 
-	private boolean hasClearValue() {
+	public boolean hasClearValue() {
 		String itemClass = getClass_segment_string().split("&&&")[0];
 		return CharValuesLoader.active_characteristics.get(itemClass).stream().anyMatch(
 				c -> !(getData(itemClass).get(c.getCharacteristic_id()) != null && getData(itemClass).get(c.getCharacteristic_id()).getParentChar() != null && getData(itemClass).get(c.getCharacteristic_id()).getDisplayValue(false,false).length() > 0));
@@ -529,7 +533,7 @@ public class CharDescriptionRow {
 	public ArrayList<CaracteristicValue> addDedupCandidateForCar(ClassCaracteristic targetCar) {
 		ArrayList<CharRuleResult> candidates = new ArrayList<>();
 		try{
-			candidates.addAll(getRuleResults().get(targetCar.getCharacteristic_id()));
+			candidates.addAll(getRuleResults().get(targetCar.getCharacteristic_id()).stream().filter(result -> !result.isOrphan()).collect(Collectors.toCollection(ArrayList::new)));
 		}catch (Exception V){
 
 		}

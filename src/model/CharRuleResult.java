@@ -190,7 +190,7 @@ public class CharRuleResult implements Serializable {
 		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
 		String thisPattern = unidecode.decodeAndTrim(getGenericCharRule().getRuleMarker());
 		String targetPattern = unidecode.decodeAndTrim(r.getGenericCharRule().getRuleMarker());
-		return StringUtils.containsIgnoreCase(thisPattern, targetPattern) && thisPattern.length()>targetPattern.length();
+		return StringUtils.containsIgnoreCase(thisPattern.replaceAll("%\\d","%d"), targetPattern.replaceAll("%\\d","%d")) && thisPattern.length()>targetPattern.length();
 	}
 	public boolean isSuperBlockOf(CharRuleResult r) {
 		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();

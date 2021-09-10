@@ -43,6 +43,7 @@ import java.net.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Char_description {
 
@@ -159,7 +160,7 @@ public class Char_description {
 
 
 	public AutoCompleteBox_CharValue valueAutoComplete;
-	private boolean draftingRule=false;
+	public boolean draftingRule=false;
 	public CaracteristicValue lastInputValue;
 
 
@@ -889,7 +890,16 @@ public class Char_description {
 		}
 
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.U)){
-			tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.switchUnknownValues(account,null));
+			ArrayList<Boolean> unknownCardinality = tableController.tableGrid.getSelectionModel().getSelectedItems().stream().map(CharDescriptionRow::hasClearValue).collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ArrayList::new));
+			if(unknownCardinality.size()==1){
+				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.switchUnknownValues(account,null));
+			}else{
+				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account,null));
+			}
+			if(!charButton.isSelected()){
+				int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
+				tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
+			}
 			refresh_ui_display();
 			tableController.tableGrid.refresh();
 			CharDescriptionExportServices.flushItemDataToDB(account);
@@ -1013,7 +1023,7 @@ public class Char_description {
 	}
 	private boolean validateValueField(ClassCaracteristic active_char,TextField target_field) throws SQLException {
 		String originalValue = target_field.getText();
-		if(!(originalValue!=null) || originalValue.length()==0) {
+		if(originalValue == null || originalValue.length()==0) {
 			return false;
 		}
 		if(active_char.getIsNumeric()) {
@@ -1033,6 +1043,47 @@ public class Char_description {
 			String finishingText = null;
 			if(active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0) {
 				//Numeric with uom
+				//New code for manual value arithmetic
+				if(textBetweenNumbers.size()>0){
+					finishingText = textBetweenNumbers.get(textBetweenNumbers.size()-1);
+					if(originalValue.trim().endsWith(finishingText)) {
+						originalValue = originalValue.substring(0,originalValue.trim().length()-finishingText.length());
+						ArrayList<UnitOfMeasure> uomsInSelection = WordUtils.parseCompatibleUoMs("%9"+finishingText.trim(),active_char);
+						finishingUom = uomsInSelection.get(0);
+						if(finishingUom!=null) {
+							uom_field.setText(finishingUom.toString());
+						}else{
+							UoMDeclarationDialog.UomDeclarationPopUpAfterFailedFieldValidation(finishingText, uom_field, active_char);
+						}
+					}
+				}
+				if(numValuesInSelection.size()>1){
+					if(numValuesInSelection.size()==2 && finishingText.trim().equals("")){
+						target_field.setText(null);
+						min_field_uom.setText(WordUtils.DoubleToString(Collections.min(numValuesInSelection)));
+						max_field_uom.setText(WordUtils.DoubleToString(Collections.max(numValuesInSelection)));
+						return false;
+					}
+					try{
+						target_field.setText(String.valueOf(WordUtils.EVALUATE_ARITHMETIC(originalValue.trim().toLowerCase().replace("x","*"))));
+						return false;
+					}catch (Exception V){
+						target_field.setText(null);
+						return true;
+					}
+				}else{
+					if(numValuesInSelection.size()==0) {
+						target_field.setText(null);
+						return true;
+					}
+					if(numValuesInSelection.size()==1) {
+						target_field.setText(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+						return false;
+					}
+				}
+				target_field.setText(null);
+				return true;
+				/* old code before manual value arithmetic
 				try{
 					finishingText = textBetweenNumbers.get(textBetweenNumbers.size()-1);
 					if(originalValue.trim().endsWith(finishingText)) {
@@ -1116,9 +1167,40 @@ public class Char_description {
 				}
 				target_field.setText(null);
 				return true;
+				*/
 			}else {
-				
 				//Numeric w/o UOM
+				//New code : Implement arithmetics in manual value editing
+				if(numValuesInSelection.size()>1){
+					finishingText = textBetweenNumbers.get(textBetweenNumbers.size()-1);
+					if(originalValue.trim().endsWith(finishingText)) {
+						target_field.setText(null);
+						return true;
+					}
+					if(numValuesInSelection.size()==2 && finishingText.trim().equals("")){
+						target_field.setText(null);
+						min_field.setText(WordUtils.DoubleToString(Collections.min(numValuesInSelection)));
+						max_field.setText(WordUtils.DoubleToString(Collections.max(numValuesInSelection)));
+						return false;
+					}
+					try{
+						target_field.setText(String.valueOf(WordUtils.EVALUATE_ARITHMETIC(originalValue.trim().toLowerCase().replace("x","*"))));
+						return false;
+					}catch (Exception V){
+						target_field.setText(null);
+						return true;
+					}
+				}else{
+					if(numValuesInSelection.size()==0) {
+						target_field.setText(null);
+						return true;
+					}
+					if(numValuesInSelection.size()==1) {
+						target_field.setText(WordUtils.DoubleToString(numValuesInSelection.get(0)));
+						return false;
+					}
+				}
+				/* old code : before implementing manual value arithmetics
 				try{
 					finishingText = textBetweenNumbers.get(textBetweenNumbers.size()-1);
 					if(originalValue.trim().endsWith(finishingText)) {
@@ -1170,7 +1252,7 @@ public class Char_description {
 					min_field.setText(WordUtils.DoubleToString(Collections.min(numValuesInSelection)));
 					max_field.setText(WordUtils.DoubleToString(Collections.max(numValuesInSelection)));
 					return false;
-				}
+				}*/
 				target_field.setText(null);
 				return true;
 			}
@@ -2381,24 +2463,14 @@ public class Char_description {
 			}
 		}
 	}
-	public void preparePatternProposition(int i, String buttonText, CaracteristicValue preparedValue,
-			String preparedRule, ClassCaracteristic active_char) {
-		
-		preparedRule=WordUtils.reducePatternRuleSeparators(preparedRule);
-		try{
-			proposer.addSemiAutoProposition(buttonText,preparedValue,preparedRule,active_char);
-		}catch(Exception V) {
-			
-		}
-		
-	}
+
 	public void preparePatternProposition(String buttonText, CaracteristicValue preparedValue,
-			String preparedRule, ClassCaracteristic active_char) {
+										  String preparedRule, ClassCaracteristic active_char, String selectedText) {
 		if(active_char.getIsNumeric()) {
 			preparedRule=WordUtils.reducePatternRuleSeparators(preparedRule);
 		}
 		try{
-			proposer.addSemiAutoProposition(buttonText,preparedValue,preparedRule,active_char);
+			proposer.addSemiAutoProposition(buttonText,preparedValue,preparedRule,active_char,selectedText);
 		}catch(Exception V) {
 			
 		}

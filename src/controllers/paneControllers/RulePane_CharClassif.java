@@ -114,7 +114,14 @@ public class RulePane_CharClassif {
                                 try{
                                     valueFieldUoM.setValue(valueFieldUoM.getItems().stream().filter(u-> StringUtils.equalsIgnoreCase(u.getUom_symbol(),symbol)).findAny().get());
                                 }catch (Exception V){
-                                    valueFieldUoM.getSelectionModel().clearAndSelect(0);
+                                    try {
+                                        UnitOfMeasure newUom = UnitOfMeasure.RunTimeUOMS.values().stream().filter(loopUom -> loopUom.getUom_symbol().equalsIgnoreCase(symbol)).findAny().get();
+                                        valueFieldUoM.getItems().add(newUom);
+                                        valueFieldUoM.setValue(newUom);
+                                    }catch (Exception E){
+                                        valueFieldUoM.getSelectionModel().clearAndSelect(0);
+                                    }
+
                                 }
                             }
                         });
@@ -481,13 +488,20 @@ public class RulePane_CharClassif {
             GenericCharRule oldRule = ruleView.getSelectionModel().getSelectedItem().getGenericCharRule();
             new Thread(()->{
                 parent.tableController.ReevaluateItems(CharPatternServices.unApplyRule(oldRule,caracCombo.getValue(),parent.account));
-            }).start();
-            try{
-                oldRule.dropGenericCharRule();
-                CharPatternServices.suppressGenericRuleInDB(parent.account.getActive_project(),oldRule.getCharRuleId(),true);
-            }catch (Exception V){
+                try{
+                    oldRule.dropGenericCharRule();
+                    CharPatternServices.suppressGenericRuleInDB(parent.account.getActive_project(),oldRule.getCharRuleId(),true);
+                }catch (Exception V){
 
-            }
+                }
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        parent.refresh_ui_display();
+                        parent.tableController.tableGrid.refresh();
+                    }
+                });
+            }).start();
         }
         parent.refresh_ui_display();
         parent.tableController.tableGrid.refresh();
@@ -522,11 +536,10 @@ public class RulePane_CharClassif {
                 CharPatternServices.quickApplyRule(newRule,caracCombo.getValue(),parent);
                 items2Reevaluate.addAll(CharPatternServices.applyRule(newRule, caracCombo.getValue(), parent.account));
             }
-
+            parent.tableController.ReevaluateItems(items2Reevaluate);
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    parent.tableController.ReevaluateItems(items2Reevaluate);
                     parent.refresh_ui_display();
                     parent.tableController.tableGrid.refresh();
                 }

@@ -42,8 +42,24 @@ public class CharClassifProposer {
 	public void
 
 	addSemiAutoProposition(String buttonText, CaracteristicValue preparedValue, String preparedRule,
-			ClassCaracteristic active_char) {
-		
+			ClassCaracteristic active_char,String selectedText) {
+		if(parent.draftingRule){
+			CharDescriptionRow activeRow = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+			String activeClass = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
+			int activeCharIndex = parent.tableController.selected_col;
+			ArrayList<ClassCaracteristic> activeChars = CharValuesLoader.active_characteristics.get(activeClass);
+			ClassCaracteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
+			GenericCharRule newRule = new GenericCharRule(preparedRule);
+			newRule.setRegexMarker(activeChar);
+			if(newRule.parseSuccess()) {
+				newRule.storeGenericCharRule();
+				CharRuleResult draft = new CharRuleResult(newRule, activeChar, selectedText, parent.account);
+				draft.setStatus("Draft");
+				draft.setActionValue(preparedValue);
+				activeRow.addRuleResult2Row(draft);
+			}
+			return;
+		}
 		for(int i=0;i<=lastestActiveSAIndex;i++) {
 			Button loopBtn = parent.propButtons.get(i);
 			System.out.println("Checking for button "+loopBtn.getText());

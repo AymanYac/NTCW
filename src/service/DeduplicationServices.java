@@ -1,7 +1,9 @@
 package service;
 
 import controllers.Char_description;
+import javafx.application.Platform;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ProgressBar;
 import javafx.util.Pair;
 import model.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
@@ -34,7 +36,7 @@ public class DeduplicationServices {
     private static double lastprogess;
     private static ConcurrentHashMap<String, HashMap<String, ComparisonResult>> fullCompResults;
 
-    public static void scoreDuplicatesForClassesFull(ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, double GLOBAL_MISMATCH_RATIO, Double topCouplesPercentage, int topCouplesNumber, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
+    public static void scoreDuplicatesForClassesFull(ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, double GLOBAL_MISMATCH_RATIO, Double topCouplesPercentage, int topCouplesNumber, Char_description parent, ProgressBar progressBar) throws SQLException, ClassNotFoundException, IOException {
         DeduplicationServices.sourceSegmentIDS = sourceCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
         DeduplicationServices.targetSegmentIDS = targetCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
         lastprogess = 0;
@@ -157,23 +159,58 @@ public class DeduplicationServices {
                 });
             });
             doneComparisons.addAndGet(1);
+            if(itemPairIsViable(localCompStorage.values(),GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,0)){
+                aggregatePairScore(localCompStorage);
+                fullCompResults.put(item_A.getItem_id()+"<=>"+item_B.getItem_id(),localCompStorage);
+            }
             if(Math.random()<0.001){
                 double progress = (doneComparisons.get() * 100.0) / computeItemPairs.size();
                 if(progress-lastprogess>2){
                     lastprogess = progress;
                     System.out.println(LocalDateTime.now().getHour()+":"+LocalDateTime.now().getMinute()+" > "+ WordUtils.Rewriter.DecimalUtils.round(progress)+"%");
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setProgress(progress/100.0);
+                        }
+                    });
+                    if(fullCompResults.size()>GlobalConstants.MAX_DEDUP_PAIRS_IN_MEMORY){
+                        AtomicInteger numberOfRemovals = new AtomicInteger(0);
+                        AtomicInteger minScoreOfRemoval = new AtomicInteger(0);
+                        fullCompResults.values().stream().map(p->p.get("PAIR_SCORE").getScore()).collect(Collectors.toCollection(ArrayList::new)).stream().sorted().forEach(lowestScoreFirst->{
+                            if(numberOfRemovals.get()+GlobalConstants.MAX_DEDUP_PAIRS_IN_MEMORY < fullCompResults.size()){
+                                numberOfRemovals.addAndGet(1);
+                                minScoreOfRemoval.set((int) Math.floor(lowestScoreFirst));
+                            }
+                        });
+                        fullCompResults.entrySet().removeIf(p->p.getValue().get("PAIR_SCORE").getScore()<=minScoreOfRemoval.get());
+                    }
                 }
                 //printConsoleSummary(item_A,item_B, localCompStorage);
             }
-            if(itemPairIsViable(localCompStorage.values(),GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,0)){
-                fullCompResults.put(item_A.getItem_id()+"<=>"+item_B.getItem_id(),localCompStorage);
-            }
         });
         System.out.println("::::::::::::::::::::::::::::: RETAINED ITEMS : "+fullCompResults.size()+" ::::::::::::::::::::::::::::: in "+Duration.between(start,Instant.now()).getSeconds() +" seconds");
-        ConfirmationDialog.show("Done", "RETAINED ITEMS : "+fullCompResults.size(), "OK");
-        CharDescriptionExportServices.exportDedupReport(fullCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,sourceCharClassLink,targetCharClassLink,topCouplesPercentage,topCouplesNumber, parent);
-        ConfirmationDialog.show("Done", "Results saved", "OK");
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                ConfirmationDialog.show("Done", "RETAINED ITEMS : "+fullCompResults.size(), "OK");
+                try {
+                    CharDescriptionExportServices.exportDedupReport(fullCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,sourceCharClassLink,targetCharClassLink,topCouplesPercentage,topCouplesNumber, parent);
+                } catch (SQLException | ClassNotFoundException | IOException throwables) {
+                    throwables.printStackTrace();
+                }
+                ConfirmationDialog.show("Done", "Results saved", "OK");
+            }
+        });
 
+    }
+
+    private static void aggregatePairScore(HashMap<String, ComparisonResult> e) {
+        AtomicReference<Double> score = new AtomicReference<>(0.0);
+        e.values().forEach(r->{
+            score.updateAndGet(v -> v + r.getScore());
+        });
+        e.put("PAIR_SCORE",new ComparisonResult(score.get()));
     }
 
     private static DedupLaunchDialog.DedupLaunchDialogRow getCarParams(HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, ClassCaracteristic car) {
@@ -297,6 +334,11 @@ public class DeduplicationServices {
             setVal_B(data_b);
             setResultType(match_type);
             setScore();
+        }
+
+        public ComparisonResult(Double score) {
+            super();
+            setScore(score);
         }
 
         public CharDescriptionRow getItem_A() {

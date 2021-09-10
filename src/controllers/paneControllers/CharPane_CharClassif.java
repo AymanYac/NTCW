@@ -2,6 +2,8 @@ package controllers.paneControllers;
 
 import controllers.Char_description;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -10,6 +12,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.util.Callback;
 import model.*;
 import service.CharValuesLoader;
 import service.TableViewExtra;
@@ -32,7 +35,7 @@ public class CharPane_CharClassif {
 	@FXML private TableColumn<?, ?> seqColumn;
 	@FXML private TableColumn<String, CharPaneRow> charNameColumn;
 	@FXML private TableColumn<?, ?> uomColumn;
-	@FXML private TableColumn<?, ?> valueColumn;
+	@FXML private TableColumn<CharPaneRow, String> valueColumn;
 	
 	private ArrayList<CharPaneRow> paneRows = new ArrayList<CharPaneRow>();
 	private boolean triggerItemTableRefresh;
@@ -70,7 +73,7 @@ public class CharPane_CharClassif {
 			tvx.scrollToSelection();
 			triggerItemTableRefresh = true;
 		}catch(Exception V) {
-			
+			triggerItemTableRefresh = true;
 		}
 
 		
@@ -90,7 +93,29 @@ public class CharPane_CharClassif {
 		seqColumn.setCellValueFactory(new PropertyValueFactory<>("Char_sequence"));
 		uomColumn.setCellValueFactory(new PropertyValueFactory<>("Uom_display"));
 		
-		valueColumn.setCellValueFactory(new PropertyValueFactory<>("Value_display"));
+		//valueColumn.setCellValueFactory(new PropertyValueFactory<>("Value_display"));
+		valueColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<CharPaneRow, String>, ObservableValue<String>>() {
+			public ObservableValue<String> call(TableColumn.CellDataFeatures<CharPaneRow, String> r) {
+				try{
+					CaracteristicValue val = r.getValue().getValue();
+					String dsp = null;
+					try{
+						dsp = val.getDisplayValue(false,false);
+					}catch (Exception V){
+
+					}
+					if(dsp!=null && dsp.length()>0){
+						return new ReadOnlyObjectWrapper(dsp);
+					}else if (parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getRulePropositions(r.getValue().getCarac().getCharacteristic_id()).size()>0){
+						return new ReadOnlyObjectWrapper<>("*PENDING*");
+					}
+					return null;
+				}catch(Exception V) {
+					//Object has null data at daataIndex
+					return null;
+				}
+			}
+		});
 		//valueColumn.setCellFactory(mouseHoverTableCell.forTableColumn());
 		
 		
@@ -100,24 +125,18 @@ public class CharPane_CharClassif {
 		valueColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
 		
 		tableGrid.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-		    if (newSelection != null && this.triggerItemTableRefresh) {
-		    	Platform.runLater(new Runnable (){
+			if (newSelection != null && this.triggerItemTableRefresh) {
+				Platform.runLater(new Runnable (){
 
 					@Override
 					public void run() {
-						System.out.println("Reordering ");
-				    	parent.tableController.selected_col=((CharPaneRow) newSelection).getChar_index()-1;
-				    	parent.tableController.nextChar();
+						parent.tableController.selected_col=((CharPaneRow) newSelection).getChar_index()-1;
+						parent.tableController.nextChar();
 					}
-						    		
-		    	});
-		    	
-		    }else {
-		    	/*
-		    	triggerItemTableRefresh = false;
-				this.tableGrid.getSelectionModel().select(Math.floorMod(this.parent.tableController.selected_col,this.parent.tableController.active_characteristics.size()));
-				triggerItemTableRefresh = true;*/
-		    }
+
+				});
+
+			}
 		    
 		});
 		tableGrid.setRowFactory(tv -> {

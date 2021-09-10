@@ -1024,7 +1024,7 @@ public class TablePane_CharClassif {
 						return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result -> result.getStatus()!=null && result.getStatus().equals("Applied")).findAny().get().getMatchedBlock());
 					}
 					if(activeData.getSource().equals(DataInputMethods.SEMI_CHAR_DESC)){
-						return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result -> result.getGenericCharRule().getRuleSyntax()!=null && result.getGenericCharRule().getRuleSyntax().equals(activeData.getRule_id())).findAny().get().getMatchedBlock());
+						return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result->result.getGenericCharRule()!=null).filter(result -> result.getGenericCharRule().getRuleSyntax()!=null && result.getGenericCharRule().getRuleSyntax().equals(activeData.getRule_id())).findAny().get().getMatchedBlock());
 					}
 					return new ReadOnlyObjectWrapper(activeData.getRule_id());
                 }catch(Exception V) {

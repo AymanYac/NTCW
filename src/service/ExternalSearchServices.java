@@ -200,10 +200,10 @@ public class ExternalSearchServices {
                 String sourceRule ="";
                 try {
                     if (sourceValue.getSource().equals(DataInputMethods.AUTO_CHAR_DESC)) {
-                        sourceRule = sourceItem.getRuleResults().get(caracMatch.getCharacteristic_id()).stream().filter(result -> result.getStatus() != null && result.getStatus().equals("Applied")).findAny().get().getMatchedBlock();
+                        sourceRule = sourceItem.getRuleResults().get(caracMatch.getCharacteristic_id()).stream().filter(result -> !result.isOrphan()).filter(result -> result.getStatus() != null && result.getStatus().equals("Applied")).findAny().get().getMatchedBlock();
                     }
                     if (sourceValue.getSource().equals(DataInputMethods.SEMI_CHAR_DESC)) {
-                        sourceRule = sourceItem.getRuleResults().get(caracMatch.getCharacteristic_id()).stream().filter(result -> result.getGenericCharRule().getRuleSyntax() != null && result.getGenericCharRule().getRuleSyntax().equals(sourceValue.getRule_id())).findAny().get().getMatchedBlock();
+                        sourceRule = sourceItem.getRuleResults().get(caracMatch.getCharacteristic_id()).stream().filter(result -> !result.isOrphan()).filter(result -> result.getGenericCharRule().getRuleSyntax() != null && result.getGenericCharRule().getRuleSyntax().equals(sourceValue.getRule_id())).findAny().get().getMatchedBlock();
                     }
                 }catch (Exception V){
                     

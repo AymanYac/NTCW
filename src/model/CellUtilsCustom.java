@@ -219,7 +219,8 @@ class CellUtilsCustom {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                textField.setStyle("-fx-border-color:#BD392F");
+                textField.setStyle("-fx-border-color:#1EA185");
+                textField.setStyle("-fx-font-size:11px");
                 textField.toFront();
             }
         });

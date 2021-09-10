@@ -84,7 +84,6 @@ public class GenericCharRule {
 			//removed ).*
 			regexMarker="(?="+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[0], GenericCharRule.SEP_CLASS,true))+")";
 		}
-
 		return;
 	}
 

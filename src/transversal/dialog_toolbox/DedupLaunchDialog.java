@@ -11,6 +11,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -31,6 +33,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import model.*;
@@ -382,52 +386,95 @@ public class DedupLaunchDialog {
         });
         Button validationButton = (Button) dialog.getDialogPane().lookupButton(validateButtonType);
         validationButton.setDisable(true);
-        validationButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                try{
-                    saveDedupParameters();
-                }catch (Exception E){
+        validationButton.addEventFilter(ActionEvent.ACTION, event -> {
+            event.consume();
+            try{
+                saveDedupParameters();
+            }catch (Exception E){
 
-                }
-                dialog.close();
-                ArrayList<String> sourceSegmentIDS = sourceCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
-                ArrayList<String> targetSegmentIDS = targetCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
-                HashMap<String, DedupLaunchDialogRow> weightTable = new HashMap<>();
-                caracWeightTable.getItems().stream().filter(r->r.isNotSpecialRow()).forEach(r->{
-                    if(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID){
-                        weightTable.put(r.getCarac().getCharacteristic_name(),r);
-                    }else{
-                        weightTable.put(r.getCarac().getCharacteristic_id(),r);
-                    }
-                });
-                if(GlobalConstants.DEDUP_CARAC_WISE){
-                    DeduplicationServices.scoreDuplicatesForClassesPairWise(sourceCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()),  1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())));
-                }else{
-                    try {
-                        double maxPercentage = 100.0;
-                        try{
-                            maxPercentage = Double.parseDouble(topCouplesPercentage.getText());
-                            if (maxPercentage < 0 || maxPercentage > 100.0) {
-                                maxPercentage = 100.0;
-                            }
-                        }catch (Exception V){
-
-                        }
-                        int maxRows = GlobalConstants.EXCEL_MAX_ROW_COUNT;
-                        try{
-                            maxRows = Integer.parseUnsignedInt(topCouplesNumber.getText());
-                        }catch (Exception V){
-
-                        }
-                        DeduplicationServices.scoreDuplicatesForClassesFull(sourceCharClassLink,targetCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), 1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())),maxPercentage, maxRows ,parent);
-                    } catch (SQLException | ClassNotFoundException | IOException throwables) {
-                        throwables.printStackTrace(System.err);
-                    }
-                }
-                showReport();
             }
-        });
+            //dialog.close();
+            Dialog<Object> progressDialog = new Dialog<>();
+            progressDialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+            progressDialog.getDialogPane().getStyleClass().add("customDialog");
+            GridPane progressGrid = new GridPane();
+            progressGrid.add(new Label("Progress:"),0,0);
+            ProgressBar progressBar = new ProgressBar();
+            progressBar.setMinWidth(1024);
+            progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+            progressGrid.add(progressBar,0,1);
+            progressDialog.getDialogPane().setContent(progressGrid);
+            ArrayList<String> sourceSegmentIDS = sourceCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<String> targetSegmentIDS = targetCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
+            HashMap<String, DedupLaunchDialogRow> weightTable = new HashMap<>();
+            caracWeightTable.getItems().stream().filter(r->r.isNotSpecialRow()).forEach(r->{
+                if(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID){
+                    weightTable.put(r.getCarac().getCharacteristic_name(),r);
+                }else{
+                    weightTable.put(r.getCarac().getCharacteristic_id(),r);
+                }
+            });
+            if(GlobalConstants.DEDUP_CARAC_WISE){
+                DeduplicationServices.scoreDuplicatesForClassesPairWise(sourceCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()),  1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())));
+            }else{
+                try {
+                    double maxPercentage = 100.0;
+                    try{
+                        maxPercentage = Double.parseDouble(topCouplesPercentage.getText());
+                        if (maxPercentage < 0 || maxPercentage > 100.0) {
+                            maxPercentage = 100.0;
+                        }
+                    }catch (Exception V){
+
+                    }
+                    int maxRows = GlobalConstants.EXCEL_MAX_ROW_COUNT;
+                    try{
+                        maxRows = Integer.parseUnsignedInt(topCouplesNumber.getText());
+                    }catch (Exception V){
+
+                    }
+                    progressDialog.show();
+                    Window window = progressDialog.getDialogPane().getScene().getWindow();
+                    window.setOnCloseRequest(ev -> window.hide());
+                    double finalMaxPercentage = maxPercentage;
+                    int finalMaxRows = maxRows;
+                    Task dedupTask = new Task<Void>() {
+                        @Override
+                        protected Void call() throws Exception {
+                            DeduplicationServices.scoreDuplicatesForClassesFull(sourceCharClassLink,targetCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), 1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())), finalMaxPercentage, finalMaxRows,parent,progressBar);
+                            return null;
+                        }
+                    };
+                    dedupTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+                        @Override
+                        public void handle(WorkerStateEvent event) {
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    progressBar.setProgress(1);
+                                    progressDialog.getDialogPane().getScene().getWindow().hide();
+                                    progressDialog.hide();
+                                }
+                            });
+                        }
+                    });
+                    dedupTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
+                        @Override
+                        public void handle(WorkerStateEvent event) {
+                            Throwable problem = dedupTask.getException();
+                            problem.printStackTrace(System.err);
+                        }
+                    });
+                    Thread dedupThread = new Thread(dedupTask);
+                    dedupThread.setName("Dedup Task Thread");
+                    dedupThread.setDaemon(true);
+                    dedupThread.start();
+                } catch (Exception throwables) {
+                    throwables.printStackTrace(System.err);
+                }
+            }
+            }
+        );
 
         Button saveBT = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
         saveBT.addEventFilter(ActionEvent.ACTION, event -> {
@@ -551,41 +598,6 @@ public class DedupLaunchDialog {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private static void showReport() {
-        Dialog dialog = new Dialog<>();
-        dialog.setTitle("Listing dropped characteristic insertion");
-        dialog.setHeaderText("Duplicate characteristic name within segments is not allowed. The following classes have not been changed:");
-        dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
-        dialog.getDialogPane().getStyleClass().add("customDialog");
-
-        // Set the button types.
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(10, 10, 10, 10));
-        TableView<ClassSegment> tableview = new TableView<ClassSegment>();
-
-        TableColumn col1 = new TableColumn("Class ID");
-        col1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ClassSegment, String>, ObservableValue<String>>() {
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<ClassSegment, String> r) {
-                return new ReadOnlyObjectWrapper(r.getValue().getClassNumber());
-            }
-        });
-        col1.setResizable(false);
-        //col1.prefWidthProperty().bind(tableview.widthProperty().multiply(1.0 / (1.0*(firstRow.getSegmentGranularity()+1))));
-        tableview.getColumns().add(col1);
-
-        ArrayList<String> headerColumn = new ArrayList<String>();
-        headerColumn.add("Domain");
-        headerColumn.add("Group");
-        headerColumn.add("Family");
-        headerColumn.add("Category");
-        grid.add(tableview,0,0);
-        tableview.setMinWidth(800);
-        dialog.getDialogPane().setContent(grid);
-        //dialog.showAndWait();
-    }
 
     private static void create_dialog() {
         dialog = new Dialog<>();
@@ -600,7 +612,7 @@ public class DedupLaunchDialog {
         dialog.getDialogPane().getStyleClass().add("customDialog");
 
         // Set the button types.
-        validateButtonType = new ButtonType("Launch", ButtonData.OK_DONE);
+        validateButtonType = new ButtonType("Launch", ButtonData.APPLY);
         saveButtonType = new ButtonType("Save parameters", ButtonData.LEFT);
         resetButtonType = new ButtonType("Reset weights", ButtonBar.ButtonData.LEFT);
         ButtonType cancelButtonType = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
