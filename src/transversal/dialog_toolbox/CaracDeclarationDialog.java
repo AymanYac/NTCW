@@ -1,5 +1,6 @@
 package transversal.dialog_toolbox;
 
+import com.google.gson.internal.LinkedHashTreeMap;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import controllers.Char_description;
 import javafx.application.Platform;
@@ -7,6 +8,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -32,7 +34,9 @@ import javafx.util.StringConverter;
 import model.*;
 import org.apache.commons.lang3.StringUtils;
 import service.CharItemFetcher;
+import service.CharPatternServices;
 import service.CharValuesLoader;
+import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 
@@ -565,6 +569,7 @@ public class CaracDeclarationDialog {
 
 	public static ArrayList<ClassSegment> dispatchCaracOnClassesReturnDropped(ClassCaracteristic newCarac, ArrayList<Pair<ClassSegment, SimpleBooleanProperty>> targetClasses, ClassSegment currentItemSegment, UserAccount account,Char_description parent)  {
 		ArrayList<ClassSegment> droppedClassInsertions = new ArrayList<ClassSegment>();
+		HashMap<String,Pair<String,String>> ruleRerunTargets = new HashMap<String,Pair<String,String>>();
 		targetClasses.parallelStream().filter(p->p.getValue().getValue()).map(Pair::getKey).forEach(s->{
 
 			if(!(CharValuesLoader.active_characteristics.get(s.getSegmentId()) !=null)){
@@ -643,6 +648,7 @@ public class CaracDeclarationDialog {
 					parent.tableController.selected_col=copy.getSequence()-1;
 				}
 				CharValuesLoader.active_characteristics.get(s.getSegmentId()).add(copy);
+				ruleRerunTargets.put(s.getSegmentId()+copy.getCharacteristic_id(),new Pair<String,String>(s.getSegmentId(), copy.getCharacteristic_id()));
 				addCaracDefinitionToPush(copy,s);
 			}
 			CharValuesLoader.active_characteristics.get(s.getSegmentId()).sort(new Comparator<ClassCaracteristic>() {
@@ -657,6 +663,35 @@ public class CaracDeclarationDialog {
 		} catch (SQLException | ClassNotFoundException throwables) {
 			throwables.printStackTrace();
 		}
+
+
+		Task rerunTask = new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				ruleRerunTargets.values().parallelStream().forEach(p->{
+					String loopSegmentId = p.getKey();
+					String loopCar = p.getValue();
+					ArrayList<String> loopCars = new ArrayList<String>();
+					loopCars.add(loopCar);
+					ArrayList<CharDescriptionRow> loopItems = CharItemFetcher.allRowItems.parallelStream().filter(r -> r.getClass_segment_string().startsWith(p.getKey())).collect(Collectors.toCollection(ArrayList::new));
+					CharPatternServices.ruleRerun(loopItems, parent.account, loopCars);
+				});
+				return null;
+			}
+		};
+		rerunTask.setOnSucceeded(e->{
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					parent.refresh_ui_display();
+				}
+			});
+			CharDescriptionExportServices.flushItemDataToDB(parent.account);
+		});
+		Thread thread = new Thread(rerunTask);; thread.setDaemon(true);
+		thread.setName("Rerunning rules after char Import");
+		thread.start();
+
 		return droppedClassInsertions;
 	}
 

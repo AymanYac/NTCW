@@ -3,7 +3,9 @@ package service;
 import com.google.gson.reflect.TypeToken;
 import controllers.Char_description;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import model.*;
+import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
@@ -2661,8 +2663,8 @@ public class CharPatternServices {
 		int activeCharIndex = parent.tableController.selected_col;
 		ArrayList<ClassCaracteristic> activeChars = CharValuesLoader.active_characteristics.get(activeClass);
 		ClassCaracteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
-		GenericCharRule newRule = new GenericCharRule(parent.rule_field.getText());
-		newRule.setRegexMarker(activeChar);
+		GenericCharRule newRule = new GenericCharRule(parent.rule_field.getText(), activeChar);
+		newRule.setRegexMarker();
 		if(newRule.parseSuccess()) {
 			newRule.storeGenericCharRule();
 			try {
@@ -2704,7 +2706,7 @@ public class CharPatternServices {
 						}
 						identifiedPattern = identifiedPattern.substring(0,identifiedPattern.length()-1);
 						System.out.println("\t\t=>Full Match >"+identifiedPattern);
-						r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,identifiedPattern,parent.account));
+						r.addRuleResult2Row(new CharRuleResult(newRule,identifiedPattern,parent.account));
 					}
 					r.reEvaluateCharRules();
 				}
@@ -2750,7 +2752,7 @@ public class CharPatternServices {
 						}
 						identifiedPattern = identifiedPattern.substring(0,identifiedPattern.length()-1);
 						//System.out.println("\t\t=>Full Match >"+identifiedPattern);
-						r.addRuleResult2Row(new CharRuleResult(newRule,activeChar,identifiedPattern,account));
+						r.addRuleResult2Row(new CharRuleResult(newRule,identifiedPattern,account));
 						items2Reevaluate.add(r.getItem_id());
 					}
 				});
@@ -2762,7 +2764,7 @@ public class CharPatternServices {
 		HashSet<String> items2Reevaluate = new HashSet<String>();
 		CharItemFetcher.allRowItems.parallelStream().filter(r->r.getRuleResults().get(activeChar.getCharacteristic_id())!=null)
 				.filter(r->r.getRuleResults().get(activeChar.getCharacteristic_id()).stream().anyMatch(result->result.getGenericCharRule()!=null && result.getGenericCharRuleID().equals(oldRule.getCharRuleId()))).forEach(r->{
-				r.dropRuleResultFromRow(new CharRuleResult(oldRule,activeChar,null, account));
+				r.dropRuleResultFromRow(new CharRuleResult(oldRule,null, account));
 				items2Reevaluate.add(r.getItem_id());
 		});
 		return items2Reevaluate;
@@ -2775,12 +2777,13 @@ public class CharPatternServices {
 	}
 	public static void suppressGenericRuleInDB(String active_project, ArrayList<String> charRuleIds, boolean isSuppressed) throws SQLException, ClassNotFoundException {
 		Connection conn = Tools.spawn_connection_from_pool();
-		PreparedStatement stmt = conn.prepareStatement("insert into "+active_project+".project_description_patterns values (?,?,?) on conflict(generic_char_rule_id) do update set issuppressed = excluded.issuppressed");
+		PreparedStatement stmt = conn.prepareStatement("insert into "+active_project+".project_description_patterns(generic_char_rule_id, source_characteristic_id, generic_char_rule_json, isSuppressed) values (?,?,?,?) on conflict(generic_char_rule_id) do update set issuppressed = excluded.issuppressed");
 		charRuleIds.forEach(charRuleId->{
 			try {
 				stmt.setString(1,charRuleId);
-				stmt.setString(2,ComplexMap2JdbcObject.serialize(descriptionRules.get(charRuleId)));
-				stmt.setBoolean(3,isSuppressed);
+				stmt.setString(2,descriptionRules.get(charRuleId).getParentChar().getCharacteristic_id());
+				stmt.setString(3,ComplexMap2JdbcObject.serialize(descriptionRules.get(charRuleId)));
+				stmt.setBoolean(4,isSuppressed);
 				stmt.addBatch();
 			} catch (SQLException throwables) {
 				throwables.printStackTrace();
@@ -2804,5 +2807,60 @@ public class CharPatternServices {
 		stmt.close();
 		conn.close();
 
+	}
+
+	public static void applyNewClassRules(List<CharDescriptionRow> databaseSyncList, Char_description parent) {
+		Task rerunTask = new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				ruleRerun(databaseSyncList, parent.account, null);
+				return null;
+			}
+		};
+		rerunTask.setOnSucceeded(e->{
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					parent.refresh_ui_display();
+				}
+			});
+			CharDescriptionExportServices.flushItemDataToDB(parent.account);
+		});
+		Thread thread = new Thread(rerunTask);; thread.setDaemon(true);
+		thread.setName("Rerunning rules after reclassif");
+		thread.start();
+
+	}
+
+	public static void ruleRerun(List<CharDescriptionRow> targetItemList, UserAccount account, ArrayList<String> restrictingToCars) {
+		targetItemList.parallelStream().forEach(r -> {
+			ArrayList<GenericCharRule> itemRules = getRulesAssociatedToCars(CharValuesLoader.active_characteristics.get(r.getClass_segment_string().split("&&&")[0]), restrictingToCars);
+			itemRules.forEach(newRule -> {
+				try {
+					Pattern regexPattern = Pattern.compile(newRule.getRegexMarker(), Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+					Matcher m;
+					m = regexPattern.matcher(" " + r.getAccentFreeDescriptionsNoCR(GlobalConstants.TEMP_APPLY_RULES_ON_LONG_DESC_ONLY) + " ");
+					while (m.find()) {
+						//System.out.println("matches desc> "+r.getAccentFreeDescriptionsNoCR()+" ");
+						String identifiedPattern = "";
+						for (int j = 1; j <= newRule.ruleCompositionRank(); j++) {
+							//System.out.println("\tfor identified pattern in group("+String.valueOf(j)+"): "+m.group((newRule.ruleCompositionRank()>1?2:1)*j));
+							identifiedPattern = identifiedPattern + m.group((newRule.ruleCompositionRank() > 1 ? 2 : 1) * j) + "+";
+						}
+						identifiedPattern = identifiedPattern.substring(0, identifiedPattern.length() - 1);
+						//System.out.println("\t\t=>Full Match >"+identifiedPattern);
+						r.addRuleResult2Row(new CharRuleResult(newRule, identifiedPattern, account));
+					}
+				} catch (Exception V) {
+					V.printStackTrace(System.err);
+				}
+			});
+			r.reEvaluateCharRules();
+		});
+	}
+
+	private static ArrayList<GenericCharRule> getRulesAssociatedToCars(ArrayList<ClassCaracteristic> classCaracteristics, ArrayList<String> restrictingToCars) {
+		HashSet<String> targetCars = classCaracteristics.stream().map(ClassCaracteristic::getCharacteristic_id).filter(carId ->restrictingToCars==null || restrictingToCars.contains(carId)).collect(Collectors.toCollection(HashSet::new));
+		return descriptionRules.values().parallelStream().filter(rule->targetCars.contains(rule.getParentChar().getCharacteristic_id())).collect(Collectors.toCollection(ArrayList::new));
 	}
 }

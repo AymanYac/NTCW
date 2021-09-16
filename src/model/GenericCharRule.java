@@ -26,6 +26,7 @@ public class GenericCharRule {
 	//public static final String NUM_CLASS = "(?!0+\\\\.00)(?=.{1,9}(?:\\\\.|$))(?!0(?!\\\\.))\\\\d{1,3}(?:[, ]\\\\d{3})*(?:\\\\.\\\\d+)?";
 	private String ruleSyntax;
 	private static  Unidecode unidecode;
+	private ClassCaracteristic parentChar;
 
 	public String getCharRuleId() {
 		return charRuleId;
@@ -50,7 +51,7 @@ public class GenericCharRule {
 	public String getRegexMarker() {
 		return regexMarker;
 	}
-	public void setRegexMarker(ClassCaracteristic sourceChar) {
+	public void setRegexMarker() {
 		unidecode=unidecode!=null?unidecode: Unidecode.toAscii();
 		String[] composedMarkers = WordUtils.splitComposedPattern(unidecode.decode(ruleMarker));
 		/*
@@ -93,7 +94,7 @@ public class GenericCharRule {
 		return (parseFailed!=null)?!parseFailed:null;
 	}
 	
-	public GenericCharRule(String active_rule) {
+	public GenericCharRule(String active_rule, ClassCaracteristic parentCharVar) {
 		//SEP_CLASS = " \\.,;:-=/";
 		//SEP_CLASS = " [.],;:-[+]=/";
 		//SEP_CLASS = " [.],;:[+]=/";
@@ -105,6 +106,7 @@ public class GenericCharRule {
 			//Problem parsing the marker
 			parseFailed = true;
 		}
+		setParentChar(parentCharVar);
 		
 	}
 
@@ -165,4 +167,10 @@ public class GenericCharRule {
 		return WordUtils.splitComposedPattern(ruleMarker).length;
 	}
 
+	public ClassCaracteristic getParentChar() {
+		return this.parentChar;
+	}
+	public void setParentChar(ClassCaracteristic parentChar){
+		this.parentChar = parentChar;
+	}
 }

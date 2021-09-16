@@ -399,7 +399,7 @@ public class ImportTaxoRow {
 		}catch (Exception V){
 			return null;
 		}
-		GenericCharRule newRule = new GenericCharRule(WordUtils.correctDescriptionRuleSyntax(row_rule_id));
+		GenericCharRule newRule = new GenericCharRule(WordUtils.correctDescriptionRuleSyntax(row_rule_id), CharDescriptionImportServices.chid2Carac.get(rowCharId));
 		if(!newRule.parseSuccess()){
 			Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be parsed. Check syntax");
 			rejectedRows.add(rejectedRow);
@@ -407,7 +407,7 @@ public class ImportTaxoRow {
 		}
 		if(rowCharId!=null && CharDescriptionImportServices.chid2Carac.get(rowCharId)!=null){
 			ClassCaracteristic rowCarac = CharDescriptionImportServices.chid2Carac.get(rowCharId);
-			newRule.setRegexMarker(rowCarac);
+			newRule.setRegexMarker();
 			if(newRule.parseSuccess()) {
 				newRule.storeGenericCharRule();
 				return new Pair<GenericCharRule,ClassCaracteristic>(newRule,rowCarac);

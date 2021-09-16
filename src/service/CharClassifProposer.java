@@ -49,11 +49,11 @@ public class CharClassifProposer {
 			int activeCharIndex = parent.tableController.selected_col;
 			ArrayList<ClassCaracteristic> activeChars = CharValuesLoader.active_characteristics.get(activeClass);
 			ClassCaracteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
-			GenericCharRule newRule = new GenericCharRule(preparedRule);
-			newRule.setRegexMarker(activeChar);
+			GenericCharRule newRule = new GenericCharRule(preparedRule, activeChar);
+			newRule.setRegexMarker();
 			if(newRule.parseSuccess()) {
 				newRule.storeGenericCharRule();
-				CharRuleResult draft = new CharRuleResult(newRule, activeChar, selectedText, parent.account);
+				CharRuleResult draft = new CharRuleResult(newRule, selectedText, parent.account);
 				draft.setStatus("Draft");
 				draft.setActionValue(preparedValue);
 				activeRow.addRuleResult2Row(draft);

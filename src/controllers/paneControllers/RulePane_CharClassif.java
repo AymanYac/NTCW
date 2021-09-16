@@ -460,8 +460,8 @@ public class RulePane_CharClassif {
         if(ruleView.getSelectionModel().getSelectedItem()!=null && ruleView.getSelectionModel().getSelectedItem().isDraft()){
             parent.tableController.tableGrid.getSelectionModel().getSelectedItem().dropRuleResultFromRow(ruleView.getSelectionModel().getSelectedItem());
         }
-        GenericCharRule newRule = new GenericCharRule(loadRuleFromPane(true));
-        newRule.setRegexMarker(caracCombo.getValue());
+        GenericCharRule newRule = new GenericCharRule(loadRuleFromPane(true), caracCombo.getValue());
+        newRule.setRegexMarker();
         if(newRule.parseSuccess()) {
             newRule.storeGenericCharRule();
             try{
@@ -522,8 +522,8 @@ public class RulePane_CharClassif {
                     e.printStackTrace();
                 }
             }
-            GenericCharRule newRule = new GenericCharRule(loadRuleFromPane(true));
-            newRule.setRegexMarker(caracCombo.getValue());
+            GenericCharRule newRule = new GenericCharRule(loadRuleFromPane(true), caracCombo.getValue());
+            newRule.setRegexMarker();
             if (newRule.parseSuccess()) {
                 newRule.storeGenericCharRule();
                 try {

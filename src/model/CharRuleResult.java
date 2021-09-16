@@ -19,14 +19,12 @@ public class CharRuleResult implements Serializable {
 	private String matchedBlock;
 	private CaracteristicValue actionValue;
 	private ArrayList<CharRuleResult> superRules= new ArrayList<CharRuleResult>();
-	private ClassCaracteristic parentChar;
 	private String status;
 	private static Unidecode unidecode;
 
-	public CharRuleResult(GenericCharRule activeGenericCharRule, ClassCaracteristic parentChar, String matchedGroup, UserAccount account) {
+	public CharRuleResult(GenericCharRule activeGenericCharRule, String matchedGroup, UserAccount account) {
 		this.genericCharRuleID = activeGenericCharRule.getCharRuleId();
 		this.matchedBlock = matchedGroup;
-		this.parentChar = parentChar;
 		try{
 			ruleActionToValue(account);
 			action2ValueSuccess=true;
@@ -73,7 +71,7 @@ public class CharRuleResult implements Serializable {
 
 	public void ruleActionToValue(UserAccount account) {
 		actionValue = new CaracteristicValue();
-		actionValue.setParentChar(parentChar);
+		actionValue.setParentChar(getGenericCharRule().getParentChar());
 		actionValue.setSource(DataInputMethods.AUTO_CHAR_DESC);
 		GenericCharRule genericCharRule = CharPatternServices.descriptionRules.get(genericCharRuleID);
 		for(String action: genericCharRule.getRuleActions()) {
@@ -211,10 +209,7 @@ public class CharRuleResult implements Serializable {
 		return CharPatternServices.descriptionRules.get(getGenericCharRuleID());
 	}
 
-	public ClassCaracteristic getSourceChar() {return parentChar;}
-	public void setParentChar(ClassCaracteristic newValue) {
-		parentChar=newValue;
-	}
+	public ClassCaracteristic getSourceChar() {return getGenericCharRule().getParentChar();}
 
 	public void clearSuperRules() {
 		superRules = new ArrayList<CharRuleResult>();
@@ -252,8 +247,10 @@ public class CharRuleResult implements Serializable {
     }
 
 	public CharRuleResult shallowCopy(ClassCaracteristic newValue,UserAccount account) {
-		CharRuleResult tmp = new CharRuleResult(getGenericCharRule(),newValue,matchedBlock,account);
-		return tmp;
+		GenericCharRule tmpRule = new GenericCharRule(getGenericCharRule().getRuleSyntax(),newValue);
+		tmpRule.storeGenericCharRule();
+		CharRuleResult tmpResult = new CharRuleResult(tmpRule,matchedBlock,account);
+		return tmpResult;
 	}
 
 	public boolean isOrphan() {

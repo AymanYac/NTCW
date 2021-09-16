@@ -232,9 +232,6 @@ public class CharDescriptionRow {
 		}
 
 		public void reEvaluateCharRules(){
-			if(this.getClient_item_number().equals("99000845995")){
-				System.out.println("DEBUG");
-			}
 			CharDescriptionRow r = this;
 			r.getRuleResults().values().forEach(v->v.removeIf(result -> result.getGenericCharRule()==null));
 			//For each couple active item I / rule N
@@ -501,13 +498,13 @@ public class CharDescriptionRow {
 			dedupResults.put(targetCar.getCharacteristic_id(), new ArrayList<CharRuleResult>());
 			ArrayList<GenericCharRule> dedupRules = new ArrayList<>();
 			if(targetCar.getAllowedUoms()!=null){
-				dedupRules = targetCar.getAllowedUoms().stream().map(uomid -> "%1<NOM %1><UOM '" + UnitOfMeasure.RunTimeUOMS.get(uomid).getUom_symbol() + "'").map(loopRuleString -> new GenericCharRule(loopRuleString)).collect(Collectors.toCollection(ArrayList::new));
+				dedupRules = targetCar.getAllowedUoms().stream().map(uomid -> "%1<NOM %1><UOM '" + UnitOfMeasure.RunTimeUOMS.get(uomid).getUom_symbol() + "'").map(loopRuleString -> new GenericCharRule(loopRuleString, targetCar)).collect(Collectors.toCollection(ArrayList::new));
 			}else{
-				dedupRules.add(new GenericCharRule("%1<NOM %1>"));
+				dedupRules.add(new GenericCharRule("%1<NOM %1>", targetCar));
 			}
 			dedupRules.forEach(newRule->{
 				newRule.storeGenericCharRule();
-				newRule.setRegexMarker(targetCar);
+				newRule.setRegexMarker();
 				if(newRule.parseSuccess()) {
 					Matcher m;
 					Pattern regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
@@ -520,7 +517,7 @@ public class CharDescriptionRow {
 						identifiedPattern = identifiedPattern.substring(0,identifiedPattern.length()-1);
 						UserAccount tmpaccount = new UserAccount();
 						tmpaccount.setUser_id("VIRTUAL_DEDUP_RULE");
-						addDedupResult2Row(new CharRuleResult(newRule,targetCar,identifiedPattern,tmpaccount));
+						addDedupResult2Row(new CharRuleResult(newRule,identifiedPattern,tmpaccount));
 					}
 				}});
 		}

@@ -432,7 +432,7 @@ public class TablePane_CharClassif {
 		
 		tableGrid.refresh();
 		Tools.CharDescriptionRow2ClassEvent(databaseSyncList,account,DataInputMethods.MANUAL);
-		
+		CharPatternServices.applyNewClassRules(databaseSyncList,Parent);
 		
 	}
 	private void processClassChange(String target_class_id, String target_class_name, HashMap<CharDescriptionRow, String> itemPreviousClasses) throws ClassNotFoundException, SQLException {

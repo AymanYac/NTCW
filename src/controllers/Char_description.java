@@ -2375,11 +2375,11 @@ public class Char_description {
 			int activeCharIndex = tableController.selected_col;
 			ArrayList<ClassCaracteristic> activeChars = CharValuesLoader.active_characteristics.get(activeClass);
 			ClassCaracteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
-			GenericCharRule newRule = new GenericCharRule(ruleString);
-			newRule.setRegexMarker(activeChar);
+			GenericCharRule newRule = new GenericCharRule(ruleString, activeChar);
+			newRule.setRegexMarker();
 			if(newRule.parseSuccess()) {
 				newRule.storeGenericCharRule();
-				CharRuleResult draft = new CharRuleResult(newRule, activeChar, selectedText, account);
+				CharRuleResult draft = new CharRuleResult(newRule, selectedText, account);
 				draft.setStatus("Draft");
 				draft.setActionValue(pattern_value);
 				activeRow.addRuleResult2Row(draft);
