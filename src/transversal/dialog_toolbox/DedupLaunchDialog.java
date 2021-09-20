@@ -353,12 +353,14 @@ public class DedupLaunchDialog {
             sourceCharClassLink.valueProperty().addListener(new ChangeListener<ClassSegmentClusterComboRow>() {
                 @Override
                 public void changed(ObservableValue<? extends ClassSegmentClusterComboRow> observable, ClassSegmentClusterComboRow oldValue, ClassSegmentClusterComboRow newValue) {
+                    saveDedupParameters();
                     targetCharClassLink.setValue(newValue);
                 }
             });
             targetCharClassLink.valueProperty().addListener(new ChangeListener<ClassSegmentClusterComboRow>() {
                 @Override
                 public void changed(ObservableValue<? extends ClassSegmentClusterComboRow> observable, ClassSegmentClusterComboRow oldValue, ClassSegmentClusterComboRow targetValue) {
+                    saveDedupParameters();
                     fillWeightTable(false);
                 }
             });

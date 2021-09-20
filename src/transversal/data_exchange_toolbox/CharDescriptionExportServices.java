@@ -438,7 +438,11 @@ public class CharDescriptionExportServices {
 		loopCell.setCellValue(item.getClient_item_number());
 		
 		loopCell = row.createCell(2);
-		loopCell.setCellValue(item.getShort_desc());
+		try{
+			loopCell.setCellValue(item.getShort_desc());
+		}catch (Exception V){
+			loopCell.setCellValue(item.getShort_desc().substring(0,32766));
+		}
 
 		loopCell = row.createCell(3);
 		try{
@@ -1196,7 +1200,11 @@ public class CharDescriptionExportServices {
 		loopCell.setCellValue(item.getClient_item_number());
 
 		loopCell = row.createCell(1);
-		loopCell.setCellValue(item.getShort_desc());
+		try{
+			loopCell.setCellValue(item.getShort_desc());
+		}catch (Exception V){
+			loopCell.setCellValue(item.getShort_desc().substring(0,32766));
+		}
 
 		loopCell = row.createCell(2);
 		try{
