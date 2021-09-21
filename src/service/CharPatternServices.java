@@ -2785,8 +2785,8 @@ public class CharPatternServices {
 				stmt.setString(3,ComplexMap2JdbcObject.serialize(descriptionRules.get(charRuleId)));
 				stmt.setBoolean(4,isSuppressed);
 				stmt.addBatch();
-			} catch (SQLException throwables) {
-				throwables.printStackTrace();
+			} catch (Exception throwables) {
+				//throwables.printStackTrace();
 			}
 
 		});

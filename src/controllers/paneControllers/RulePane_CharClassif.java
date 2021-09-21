@@ -516,10 +516,8 @@ public class RulePane_CharClassif {
                 oldRule.dropGenericCharRule();
                 try {
                     CharPatternServices.suppressGenericRuleInDB( parent.account.getActive_project(), oldRule.getCharRuleId(), true);
-                } catch (SQLException throwables) {
+                } catch (Exception throwables) {
                     throwables.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
                 }
             }
             GenericCharRule newRule = new GenericCharRule(loadRuleFromPane(true), caracCombo.getValue());
@@ -528,10 +526,8 @@ public class RulePane_CharClassif {
                 newRule.storeGenericCharRule();
                 try {
                     CharPatternServices.suppressGenericRuleInDB(parent.account.getActive_project(), newRule.getCharRuleId(), false);
-                } catch (SQLException throwables) {
+                } catch (Exception throwables) {
                     throwables.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
                 }
                 CharPatternServices.quickApplyRule(newRule,caracCombo.getValue(),parent);
                 items2Reevaluate.addAll(CharPatternServices.applyRule(newRule, caracCombo.getValue(), parent.account));
