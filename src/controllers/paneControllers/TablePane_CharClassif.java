@@ -332,7 +332,8 @@ public class TablePane_CharClassif {
 	}
 
 	private void scrollToSelectedItem(CharDescriptionRow tmp) {
-		tvX.scrollToIndex(tableGrid.getItems().indexOf(tmp));
+		int target = tableGrid.getItems().indexOf(tmp);
+		tvX.scrollToIndex(Math.min(target+1,tableGrid.getItems().size()-1));
 	}
 
 	public String translate2UserLanguage(String description) throws IOException {

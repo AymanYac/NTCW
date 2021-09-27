@@ -2392,6 +2392,14 @@ public class Char_description {
 			if(!proposer.selectionFromBrowser){
 				tmp.setSource(DataInputMethods.SEMI_CHAR_DESC);
 				assignValueOnSelectedItems(tmp);
+				try{
+					if (!charButton.isSelected()) {
+						int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
+						tableController.tableGrid.getSelectionModel().clearAndSelect(idx + 1);
+					}
+				}catch (Exception V){
+
+				}
 				new Thread(()->{
 					CharPatternServices.applyItemRule(this);
 					CharDescriptionExportServices.flushItemDataToDB(account);

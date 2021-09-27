@@ -281,7 +281,7 @@ public class WordUtils {
 			return null;
 		}
 		//Transformer la syntaxe de la rule pattern neonec en regex
-		String SEP_CLASS=GenericCharRule.SEP_CLASS;
+		//String SEP_CLASS=GenericCharRule.SEP_CLASS;
 		//StringBuilder markerToConsume = new StringBuilder(rule.neonecToRegexMarker(SEP_CLASS).replace("\\Q", "").replace("\\E", ""));
 		StringBuilder markerToConsume = new StringBuilder(WordUtils.quoteCompositionMarkerInDescPattern(rule.getRuleMarker()));
 		StringBuilder matchedBlockToConsume = new StringBuilder(matchedBlock);
@@ -299,13 +299,13 @@ public class WordUtils {
 		//Chercher l'identified pattern dans la description, en assignant les variables
 		while (markerToConsume.length()>0){
 			if(
-					ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"#",digitCharacters,SEP_CLASS)!=null ||
-							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"@",alphaCharacters,SEP_CLASS)!=null ||
-							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"%d",numerals,SEP_CLASS)!=null ||
-							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(|+0)",optionalSeparators,SEP_CLASS)!=null ||
-							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(|+1)",mandatorySeparators,SEP_CLASS)!=null ||
-							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(*+0)",optionalStrings,SEP_CLASS)!=null ||
-							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(*+1)",mandatoryStrings,SEP_CLASS)!=null){
+					ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"#",digitCharacters)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"@",alphaCharacters)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"%d",numerals)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(|+0)",optionalSeparators)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(|+1)",mandatorySeparators)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(*+0)",optionalStrings)!=null ||
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(*+1)",mandatoryStrings)!=null){
 			}else if(markerToConsume.toString().startsWith("\"")){
 				markerToConsume = new StringBuilder(markerToConsume.substring(1));
 			}else {
@@ -367,7 +367,7 @@ public class WordUtils {
 		}
 		return value.toString();
 	}
-	private static Boolean ALPHANUM_PATTERN_STEP_USING_NEONEC(StringBuilder markerToConsume, StringBuilder matchedBlockToConsume, String stepNeonec, ArrayList<String> stepValues,String SEP_CLASS) {
+	private static Boolean ALPHANUM_PATTERN_STEP_USING_NEONEC(StringBuilder markerToConsume, StringBuilder matchedBlockToConsume, String stepNeonec, ArrayList<String> stepValues) {
 		if(stepNeonec.equals("%d")){
 			if(markerToConsume.toString().startsWith("%")){
 				char idx = markerToConsume.toString().charAt(1);
@@ -375,7 +375,7 @@ public class WordUtils {
 					markerToConsume.replace(0,2,"");
                     //Pattern p = Pattern.compile("(?=("+"^(?=\\s*\\S).*$[-+]?[0-9]{0,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false))+")",Pattern.CASE_INSENSITIVE);
 					//Pattern p = Pattern.compile("("+"-?(?:[0-9]{1,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
-					Pattern p = Pattern.compile("^("+"-?(?:[0-9]{1,3}(?:[. ,]+[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)+"$"),Pattern.CASE_INSENSITIVE);
+					Pattern p = Pattern.compile("^("+"-?(?:[0-9]{1,3}(?:[. ,]+[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(), false)+"$"),Pattern.CASE_INSENSITIVE);
 					//Pattern p = Pattern.compile("("+"[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					//Pattern p = Pattern.compile("("+"([-]?((?:\\d+|(?:\\d{1,3}(?:,\\d{3})*))(?:\\.\\d+)?))"+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
 					Matcher m = p.matcher(matchedBlockToConsume);
@@ -402,9 +402,9 @@ public class WordUtils {
 			}
 		}
 		else if(markerToConsume.toString().startsWith(stepNeonec)){
-			String stepRegex=WordUtils.neonecObjectSyntaxToRegex(stepNeonec,SEP_CLASS,false);
+			String stepRegex=WordUtils.neonecObjectSyntaxToRegex(stepNeonec, false);
 			markerToConsume.replace(0,stepNeonec.length(),"");
-			Pattern p = Pattern.compile("("+stepRegex+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(),SEP_CLASS,false)),Pattern.CASE_INSENSITIVE);
+			Pattern p = Pattern.compile("("+stepRegex+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(), false)),Pattern.CASE_INSENSITIVE);
 			Matcher m = p.matcher(matchedBlockToConsume);
 			if(m.find()){
 				String consumableMatch = String.valueOf(m.group(1));
@@ -417,7 +417,7 @@ public class WordUtils {
 		return null;
 	}
 
-	public static String neonecObjectSyntaxToRegex(String markerToConsume, String SEP_CLASS,boolean inSeparators) {
+	public static String neonecObjectSyntaxToRegex(String markerToConsume, boolean inSeparators) {
 		if(inSeparators){
 			markerToConsume="$$$$$$$$$"+markerToConsume+"$$$$$$$$$$$$$$$$$$";
 			markerToConsume="(|+1)"+markerToConsume;
@@ -427,8 +427,10 @@ public class WordUtils {
 				.replaceAll("%\\d(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)",  Matcher.quoteReplacement(GenericCharRule.NUM_CLASS))
 				.replaceAll("#(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[0-9]")
 				.replaceAll("@(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[a-z]")
-				.replaceAll("\\(\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + SEP_CLASS + "]*?")
-				.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + SEP_CLASS + "]+?")
+				.replaceAll("(^.+)\\(?=\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)(.+$)", "$1[" + GenericCharRule.SEP_CLASS + "]*?$2")
+				.replaceAll("(^.+)\\(?=\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)(.+$)", "$1[" + GenericCharRule.SEP_CLASS + "]+?$2")
+				.replaceAll("\\(\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS_NO_VERTICAL + "]*?")
+				.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS_NO_VERTICAL + "]+?")
 				.replaceAll("\\(\\*\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".*?")
 				.replaceAll("\\(\\*\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".+?");
 

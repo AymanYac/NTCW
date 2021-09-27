@@ -17,7 +17,10 @@ public class GenericCharRule {
 	private ArrayList<String> ruleActions;
 	private String regexMarker;
 	private Boolean parseFailed;
-	public static String SEP_CLASS;
+
+	public static String SEP_CLASS = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)"+"-";
+	public static String SEP_CLASS_NO_VERTICAL = " '\\.,;:\\+=/\\\\[\\\\]\\\\(\\\\)"+"-";
+
 	//public static final String NUM_CLASS = "[-+]?[0-9]+(?:[. ,]?[0-9]{3,3})*[0-9]*(?:[.,][0-9]+)?";
 	//public static final String NUM_CLASS = "[-+]?[0-9]{0,3}(?:[. ,]?[0-9]{3,3})*|[0-9]+(?:[.,][0-9]+)?";
 	public static final String NUM_CLASS = "-?(?:[0-9]{1,3}(?:[. ,]+[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?";
@@ -75,7 +78,7 @@ public class GenericCharRule {
 			regexMarker="^";
 			for(int i=0;i<composedMarkers.length;i++){
 				regexMarker+="(?=.*("
-						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], GenericCharRule.SEP_CLASS,true))
+						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], true))
 						+"))";
 			}
 			regexMarker+=".*$";
@@ -83,7 +86,7 @@ public class GenericCharRule {
 			//The rule rank is == 1, the rule is simple
 			//removed .*(
 			//removed ).*
-			regexMarker="(?="+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[0], GenericCharRule.SEP_CLASS,true))+")";
+			regexMarker="(?="+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[0], true))+")";
 		}
 		return;
 	}
@@ -98,7 +101,6 @@ public class GenericCharRule {
 		//SEP_CLASS = " \\.,;:-=/";
 		//SEP_CLASS = " [.],;:-[+]=/";
 		//SEP_CLASS = " [.],;:[+]=/";
-		SEP_CLASS = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)"+"-";
 		try {
 			parseRule(active_rule);
 			parseFailed = false;

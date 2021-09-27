@@ -2,6 +2,8 @@ package service;
 
 import controllers.Char_description;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.util.Pair;
 import model.*;
@@ -181,6 +183,14 @@ public class CharClassifProposer {
 							parent.tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
 						}
 					});
+					ContextMenu cm = new ContextMenu();
+					MenuItem m = new MenuItem("Remove this value from custom suggestions");
+					m.setOnAction(event -> {
+						customValues.get(activeChar.getCharacteristic_id()).remove(v);
+						parent.refresh_ui_display();
+					});
+					cm.getItems().add(m);
+					btn.setContextMenu(cm);
 					lastestActiveCRIndex+=1;
 				});
 			}catch(Exception V) {
