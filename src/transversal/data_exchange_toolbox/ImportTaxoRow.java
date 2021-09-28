@@ -384,7 +384,7 @@ public class ImportTaxoRow {
 			parseValue(current_row,account);
 			
 		}
-		if(!segmentParseHasFailed()){
+		if(!segmentParseHasFailed() && !caracParseHasFailed()){
 			return parseRule(current_row,account);
 		}
 		return null;
@@ -396,10 +396,20 @@ public class ImportTaxoRow {
 		try{
 			row_rule_id = current_row.getCell(columnMap.get("descriptionRule")).getStringCellValue();
 			rowCharId = current_row.getCell(columnMap.get("charId")).getStringCellValue();
+			if(row_rule_id.replace(" ","").length()==0){
+				throw new Exception();
+			}
 		}catch (Exception V){
 			return null;
 		}
-		GenericCharRule newRule = new GenericCharRule(WordUtils.correctDescriptionRuleSyntax(row_rule_id), CharDescriptionImportServices.chid2Carac.get(rowCharId));
+		GenericCharRule newRule=null;
+		try{
+			newRule = new GenericCharRule(WordUtils.correctDescriptionRuleSyntax(row_rule_id), CharDescriptionImportServices.chid2Carac.get(rowCharId));
+		}catch (Exception V){
+			Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be parsed. Check syntax");
+			rejectedRows.add(rejectedRow);
+			return null;
+		}
 		if(!newRule.parseSuccess()){
 			Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Description Rule could not be parsed. Check syntax");
 			rejectedRows.add(rejectedRow);
