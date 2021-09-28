@@ -1079,7 +1079,7 @@ public class CharDescriptionExportServices {
 		conn.close();
 	}
 
-	public static void flushItemDataToDB(UserAccount account) {
+	public static void flushItemDataToDBThreaded(UserAccount account) {
 		if(itemDataBuffer.peek()!=null) {
 			Task<Void> dbFlushTask = new Task<Void>() {
 			    

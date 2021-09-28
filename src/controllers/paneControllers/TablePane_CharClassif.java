@@ -223,7 +223,7 @@ public class TablePane_CharClassif {
 			}
 		}
 		try{
-			scrollToSelectedItem(tmp);
+			scrollToSelectedItem(tmp, 0);
 		}catch (Exception V){
 
 		}
@@ -331,9 +331,12 @@ public class TablePane_CharClassif {
 		
 	}
 
-	private void scrollToSelectedItem(CharDescriptionRow tmp) {
+	private void scrollToSelectedItem(CharDescriptionRow tmp, int offset) {
 		int target = tableGrid.getItems().indexOf(tmp);
-		tvX.scrollToIndex(Math.min(target+1,tableGrid.getItems().size()-1));
+		if(tvX.getFirstVisibleIndex()>target-offset || tvX.getLastVisibleIndex()<target-offset){
+			tvX.scrollToIndex(Math.max(target-offset,0));
+		}
+
 	}
 
 	public String translate2UserLanguage(String description) throws IOException {
@@ -474,14 +477,14 @@ public class TablePane_CharClassif {
 					}
 				});
 			}
-			CharDescriptionExportServices.flushItemDataToDB(account);
+			CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 		}
 	}
-	private void jumpNext() {
+	public void jumpNext() {
 		
 		int currentIdx = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
 		tableGrid.getSelectionModel().clearAndSelect(1+ currentIdx);
-		scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
+		scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem(), 1);
 	}
 
 	public void setUserAccount(UserAccount account) throws SQLException {
@@ -1182,7 +1185,7 @@ public class TablePane_CharClassif {
 				}else{
 					tableGrid.getSelectionModel().clearAndSelect(Math.max(0,min));
 				}
-				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
+				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem(), 0);
 			}else {
 				while(! ( data_previous.length()>0 ) ) {
 					min-=1;
@@ -1198,7 +1201,7 @@ public class TablePane_CharClassif {
 				}else{
 					tableGrid.getSelectionModel().clearAndSelect(Math.max(0,min-1));
 				}
-				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
+				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem(), 0);
 
 			}
 		}catch(Exception V) {
@@ -1240,7 +1243,7 @@ public class TablePane_CharClassif {
 				}else{
 					tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max));
 				}
-				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
+				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem(), 0);
 			}else {
 				while(! ( data_next.length()>0 ) ) {
 					max+=1;
@@ -1256,7 +1259,7 @@ public class TablePane_CharClassif {
 				}else{
 					tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max+1));
 				}
-				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem());
+				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem(), 0);
 
 			}
 		}catch(Exception V) {
@@ -1321,6 +1324,6 @@ public class TablePane_CharClassif {
 
     public void ReevaluateItems(HashSet<String> items2Update) {
 		 CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(CharDescriptionRow::reEvaluateCharRules);
-		 CharDescriptionExportServices.flushItemDataToDB(account);
+		 CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 	}
 }

@@ -639,11 +639,11 @@ public class ExternalSearchServices {
             urlFieldColor("red");
         }
         if(lastManualInputTime!=null && Duration.between(lastManualInputTime,LocalDateTime.now()).getSeconds() > GlobalConstants.ManualValuesBufferFlushTime){
-            CharDescriptionExportServices.flushItemDataToDB(parent.account);
+            CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account);
             lastManualInputTime = LocalDateTime.now();
             System.out.println("Flushing manual values after "+String.valueOf(GlobalConstants.ManualValuesBufferFlushTime)+ " seconds");
         }else if(manualInputCounter%GlobalConstants.ManualValuesBufferFlushSize ==0){
-            CharDescriptionExportServices.flushItemDataToDB(parent.account);
+            CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account);
             lastManualInputTime = LocalDateTime.now();
             System.out.println("Flushing manual values after "+String.valueOf(GlobalConstants.ManualValuesBufferFlushSize)+ " inputs");
         }

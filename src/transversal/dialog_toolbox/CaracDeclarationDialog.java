@@ -1,7 +1,5 @@
 package transversal.dialog_toolbox;
 
-import com.google.gson.internal.LinkedHashTreeMap;
-import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -10,7 +8,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -42,7 +39,6 @@ import transversal.language_toolbox.Unidecode;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -686,7 +682,7 @@ public class CaracDeclarationDialog {
 					parent.refresh_ui_display();
 				}
 			});
-			CharDescriptionExportServices.flushItemDataToDB(parent.account);
+			CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account);
 		});
 		Thread thread = new Thread(rerunTask);; thread.setDaemon(true);
 		thread.setName("Rerunning rules after char Import");

@@ -304,7 +304,7 @@ public class Char_description {
 				assignValueOnSelectedItems(val);
 				ExternalSearchServices.refreshUrlAfterElemChange(parent);
 				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::reEvaluateCharRules);
-				CharDescriptionExportServices.flushItemDataToDB(account);
+				CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 			}
 		});
 		
@@ -573,7 +573,8 @@ public class Char_description {
 					}
 				}
 				if(!charButton.isSelected()){
-					tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
+					tableController.jumpNext();
+					//tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
 				}
 			}catch(Exception V) {
 				V.printStackTrace(System.err);
@@ -897,12 +898,13 @@ public class Char_description {
 				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account,null));
 			}
 			if(!charButton.isSelected()){
-				int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
-				tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
+				tableController.jumpNext();
+				//int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
+				//tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
 			}
 			refresh_ui_display();
 			tableController.tableGrid.refresh();
-			CharDescriptionExportServices.flushItemDataToDB(account);
+			CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 		}
 
 		return;
@@ -917,8 +919,9 @@ public class Char_description {
 			assignValueOnSelectedItems(val);
 			ExternalSearchServices.manualValueInput();
 			if(!charButton.isSelected()){
-				int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
-				tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
+				tableController.jumpNext();
+				//int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
+				//tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
 			}
 		}
 	}
@@ -1402,7 +1405,7 @@ public class Char_description {
 			}
 			ConfirmationDialog.show("Saving latest modifications", "Click (OK) to persist local changes to remote server. This should only take a few seconds", "OK");
 			try{
-				CharDescriptionExportServices.flushItemDataToDB(account);
+				CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 				while (CharDescriptionExportServices.itemDataBuffer.peek() != null) {
 					try {
 						TimeUnit.MILLISECONDS.sleep(500);
@@ -1498,7 +1501,7 @@ public class Char_description {
 				CharItemFetcher.allRowItems.parallelStream().forEach(CharDescriptionRow::reEvaluateCharRules);
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account);
+				CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 			}
 		});
 
@@ -1508,7 +1511,7 @@ public class Char_description {
 				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(charDescriptionRow -> charDescriptionRow.clearUnknownValues(null));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account);
+				CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 			}
 		});
 		MenuItem mark_as_known = new MenuItem("Mark blank values as UNKNOWN (selected items)         Ctrl+U");
@@ -1517,7 +1520,7 @@ public class Char_description {
 				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account, null));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account);
+				CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 			}
 		});
 
@@ -1530,7 +1533,7 @@ public class Char_description {
 				CharItemFetcher.allRowItems.forEach(r->r.clearUnknownValues(active_char.getCharacteristic_id()));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account);
+				CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 			}
 		});
 		MenuItem mark_as_known_active_char = new MenuItem("Mark blank values as UNKNOWN (active characteristic)");
@@ -1542,7 +1545,7 @@ public class Char_description {
 				CharItemFetcher.allRowItems.forEach(r->r.markUnknownClearValues(account,active_char.getCharacteristic_id()));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account);
+				CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 			}
 		});
 
@@ -1552,7 +1555,7 @@ public class Char_description {
 				tableController.tableGrid.getItems().forEach(charDescriptionRow -> charDescriptionRow.clearUnknownValues(null));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account);
+				CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 			}
 		});
 		MenuItem mark_as_known_class = new MenuItem("Mark blank values as UNKNOWN (active class)");
@@ -1564,7 +1567,7 @@ public class Char_description {
 				tableController.tableGrid.getItems().forEach(r->r.markUnknownClearValues(account, null));
 				refresh_ui_display();
 				tableController.tableGrid.refresh();
-				CharDescriptionExportServices.flushItemDataToDB(account);
+				CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 			}
 		});
 		MenuItem launchDedup = new MenuItem("Launch Deduplication settings");
@@ -2392,6 +2395,7 @@ public class Char_description {
 			if(!proposer.selectionFromBrowser){
 				tmp.setSource(DataInputMethods.SEMI_CHAR_DESC);
 				assignValueOnSelectedItems(tmp);
+				CharDescriptionRow targetItem = tableController.tableGrid.getSelectionModel().getSelectedItem();
 				try{
 					if (!charButton.isSelected()) {
 						int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
@@ -2400,9 +2404,10 @@ public class Char_description {
 				}catch (Exception V){
 
 				}
+				String finalRuleString = ruleString;
 				new Thread(()->{
-					CharPatternServices.applyItemRule(this);
-					CharDescriptionExportServices.flushItemDataToDB(account);
+					CharPatternServices.applyItemRule(this,targetItem, finalRuleString);
+					CharDescriptionExportServices.flushItemDataToDBThreaded(account);
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {

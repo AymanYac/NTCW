@@ -2658,12 +2658,12 @@ public class CharPatternServices {
 		return null;
 	}
 
-	public static void applyItemRule(Char_description parent){
-		String activeClass = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
+	public static void applyItemRule(Char_description parent,CharDescriptionRow targetItem, String targetRuleString){
+		String activeClass = targetItem.getClass_segment_string().split("&&&")[0];
 		int activeCharIndex = parent.tableController.selected_col;
 		ArrayList<ClassCaracteristic> activeChars = CharValuesLoader.active_characteristics.get(activeClass);
 		ClassCaracteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
-		GenericCharRule newRule = new GenericCharRule(parent.rule_field.getText(), activeChar);
+		GenericCharRule newRule = new GenericCharRule(targetRuleString, activeChar);
 		newRule.setRegexMarker();
 		if(newRule.parseSuccess()) {
 			newRule.storeGenericCharRule();
@@ -2824,7 +2824,7 @@ public class CharPatternServices {
 					parent.refresh_ui_display();
 				}
 			});
-			CharDescriptionExportServices.flushItemDataToDB(parent.account);
+			CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account);
 		});
 		Thread thread = new Thread(rerunTask);; thread.setDaemon(true);
 		thread.setName("Rerunning rules after reclassif");
