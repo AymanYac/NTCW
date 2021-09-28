@@ -101,6 +101,7 @@ public class TablePane_CharClassif {
 
 	private List<String> classItems;
 	private boolean allowOverWriteAccountPreference = true;
+	private boolean autoScrollToSelection=true;
 
 	public void restoreLastSessionLayout() {
 		try{
@@ -223,7 +224,9 @@ public class TablePane_CharClassif {
 			}
 		}
 		try{
-			scrollToSelectedItem(tmp, 0);
+			if(autoScrollToSelection){
+				scrollToSelectedItem(tmp, 0);
+			}
 		}catch (Exception V){
 
 		}
@@ -483,8 +486,10 @@ public class TablePane_CharClassif {
 	public void jumpNext() {
 		
 		int currentIdx = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
+		autoScrollToSelection=false;
 		tableGrid.getSelectionModel().clearAndSelect(1+ currentIdx);
 		scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem(), 1);
+		autoScrollToSelection=true;
 	}
 
 	public void setUserAccount(UserAccount account) throws SQLException {
