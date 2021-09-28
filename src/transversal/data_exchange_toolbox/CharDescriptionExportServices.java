@@ -14,10 +14,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
-import service.CharItemFetcher;
-import service.CharValuesLoader;
-import service.DeduplicationServices;
-import service.TranslationServices;
+import service.*;
 import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.DedupLaunchDialog;
 import transversal.dialog_toolbox.ExceptionDialog;
@@ -44,6 +41,7 @@ public class CharDescriptionExportServices {
 	private static int baseRowIdx;
 	private static int taxoRowIdx;
 	private static int knownValueRowIdx;
+	private static int knownRulesSheetIdx;
 
 	public static ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>> itemDataBuffer = new ConcurrentLinkedQueue<Pair<String, Pair<CaracteristicValue,ClassCaracteristic>>>();
 	//public static ConcurrentHashMap<String,CharDescriptionRow> itemRuleBuffer = new ConcurrentHashMap<String,CharDescriptionRow>();
@@ -55,7 +53,7 @@ public class CharDescriptionExportServices {
 	private static PreparedStatement stmt;
 	private static ArrayList<ArrayList<Object>> miscellanousQueue;
 
-	public static void ExportItemDataForClass(String targetClass, Char_description parent,boolean exportReview, boolean exportBase, boolean exportTaxo, boolean exportKV) throws ClassNotFoundException, SQLException, IOException {
+	public static void ExportItemDataForClass(String targetClass, Char_description parent, boolean exportReview, boolean exportBase, boolean exportTaxo, boolean exportKV, boolean exportRules) throws ClassNotFoundException, SQLException, IOException {
 		
 		File file = openExportFile(parent);
 		
@@ -138,18 +136,59 @@ public class CharDescriptionExportServices {
 			});
 
 		}
-
-
+		Sheet knownRulesSheet = null;
+		if(exportRules){
+			knownRulesSheet = wb.createSheet("Known rules");
+			createKnownRulesHeader(knownRulesSheet,wb);
+			knownRulesSheetIdx = 0;
+			Sheet finalKnownRulesSheet = knownRulesSheet;
+			CharValuesLoader.active_characteristics.values().stream().flatMap(a -> a.stream()).collect(Collectors.toCollection(HashSet::new)).forEach(carac->{
+				ArrayList<GenericCharRule> caracRules = CharPatternServices.descriptionRules.values().parallelStream().filter(rule->rule.getParentChar()!=null && rule.getParentChar().getCharacteristic_id().equals(carac.getCharacteristic_id())).collect(Collectors.toCollection(ArrayList::new));
+				caracRules.sort(new Comparator<GenericCharRule>() {
+					@Override
+					public int compare(GenericCharRule o1, GenericCharRule o2) {
+						return o1.getRuleSyntax().compareTo(o2.getRuleSyntax());
+					}
+				});
+				caracRules.forEach(rule->{
+					appendKnownRuleRow(carac,rule, finalKnownRulesSheet);
+				});
+			});
+		}
 
 
         
-        setColumnWidths(reviewSheet,baseSheet, exportBase,exportReview,exportTaxo,exportKV);
+        setColumnWidths(reviewSheet,baseSheet,knownRulesSheet, exportBase,exportReview,exportTaxo,exportKV,exportRules);
         
         closeExportFile(file,wb);
 		
 		ConfirmationDialog.show("File saved", "Results successfully saved in\n"+file.getAbsolutePath(), "OK");
 		
 		
+	}
+
+
+	private static void createKnownRulesHeader(Sheet knownRulesSheet, SXSSFWorkbook wb) {
+		Row reviewHeader = createHeaderRow(wb,knownRulesSheet,new String[] {
+				"Characteristic ID",
+				"Characteristic Name",
+				"Characteristic Type",
+				"Rule Syntax",
+				"Rule Marker",
+				"Rule action 1",
+				"Rule action 2",
+				"Rule action 3",
+				"Rule action 4"}, new IndexedColors[] {
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.SEA_GREEN,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT,
+				IndexedColors.GREY_80_PERCENT
+		}, 0);
 	}
 
 	private static void createReviewHeader(SXSSFWorkbook wb, Sheet reviewSheet) {
@@ -223,8 +262,21 @@ public class CharDescriptionExportServices {
         wb.close();
 	}
 
-	private static void setColumnWidths(Sheet reviewSheet, Sheet baseSheet, boolean exportBase, boolean exportReview, boolean exportTaxo, boolean exportKV) {
+	private static void setColumnWidths(Sheet reviewSheet, Sheet baseSheet, Sheet ruleSheet, boolean exportBase, boolean exportReview, boolean exportTaxo, boolean exportKV, boolean exportRules) {
 
+		if(exportRules){
+			ruleSheet.setColumnWidth(0,256*15);
+			ruleSheet.setColumnWidth(1,256*30);
+			ruleSheet.setColumnWidth(2,256*18);
+			ruleSheet.setColumnWidth(3,256*104);
+			ruleSheet.setColumnWidth(4,256*85);
+			ruleSheet.setColumnWidth(5,256*42);
+			ruleSheet.setColumnWidth(6,256*12);
+			ruleSheet.setColumnWidth(7,256*12);
+			ruleSheet.setColumnWidth(8,256*12);
+			ruleSheet.setZoom(80);
+			ruleSheet.createFreezePane(0,1);
+		}
 		if(exportReview){
 			reviewSheet.setColumnWidth(0,256*17);
 			reviewSheet.setColumnWidth(1,256*17);
@@ -263,6 +315,32 @@ public class CharDescriptionExportServices {
 			baseSheet.createFreezePane(0, 1);
 		}
 
+	}
+
+	private static void appendKnownRuleRow(ClassCaracteristic carac, GenericCharRule rule, Sheet knownRulesSheet) {
+		knownRulesSheetIdx+=1;
+		Row row = knownRulesSheet.createRow(knownRulesSheetIdx);
+		Cell loopCell = row.createCell(0);
+		loopCell.setCellValue(carac.getCharacteristic_id());
+
+		loopCell = row.createCell(1);
+		loopCell.setCellValue(carac.getCharacteristic_name());
+
+		loopCell = row.createCell(2);
+		loopCell.setCellValue(carac.getIsNumeric()?"NUM":"TXT");
+
+		loopCell = row.createCell(3);
+		loopCell.setCellValue(rule.getRuleSyntax());
+
+		loopCell = row.createCell(4);
+		loopCell.setCellValue(rule.getRuleMarker());
+
+		AtomicInteger actionIdx= new AtomicInteger(0);
+		rule.getRuleActions().forEach(action->{
+			actionIdx.addAndGet(1);
+			Cell actionCell = row.createCell(4 + actionIdx.get());
+			actionCell.setCellValue(action);
+		});
 	}
 
 	private static void appendKnownValueRow(ClassCaracteristic carac, CharValueTextSuggestion sugg, Sheet knownValueSheet) {

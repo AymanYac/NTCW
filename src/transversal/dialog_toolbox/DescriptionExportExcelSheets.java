@@ -42,6 +42,10 @@ public class DescriptionExportExcelSheets {
         CheckBox kvCB = new CheckBox();
         kvCB.setSelected(true);
         grid.add(kvCB,1,3);
+        grid.add(new Label("Export known rules"),0,4);
+        CheckBox rlCB = new CheckBox();
+        rlCB.setSelected(true);
+        grid.add(rlCB,1,4);
 
         ColumnConstraints c1 = new ColumnConstraints();
         c1.setPercentWidth(80);
@@ -61,6 +65,7 @@ public class DescriptionExportExcelSheets {
                 tmp.add(baseCB.isSelected());
                 tmp.add(taxoCB.isSelected());
                 tmp.add(kvCB.isSelected());
+                tmp.add(rlCB.isSelected());
                 return tmp;
             }
             return null;

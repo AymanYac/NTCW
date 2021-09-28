@@ -194,7 +194,7 @@ public class Char_description {
 		try {
 			Optional<ArrayList<Boolean>> choice = DescriptionExportExcelSheets.choicePopUp();
 			if(choice.isPresent()){
-				CharDescriptionExportServices.ExportItemDataForClass(null,this,choice.get().get(0),choice.get().get(1),choice.get().get(2),choice.get().get(3));
+				CharDescriptionExportServices.ExportItemDataForClass(null,this,choice.get().get(0),choice.get().get(1),choice.get().get(2),choice.get().get(3),choice.get().get(4));
 			}
 
 		} catch (IOException e) {
@@ -1413,7 +1413,7 @@ public class Char_description {
 			}catch (Exception V){
 				ConfirmationDialog.show("Could not reach server", "Click (OK) to export project data to spreadsheet", "OK");
 				try {
-					CharDescriptionExportServices.ExportItemDataForClass(null,this,true,true,true,true);
+					CharDescriptionExportServices.ExportItemDataForClass(null,this,true,true,true,true, true);
 				} catch (ClassNotFoundException | SQLException | IOException classNotFoundException) {
 					classNotFoundException.printStackTrace();
 				}
