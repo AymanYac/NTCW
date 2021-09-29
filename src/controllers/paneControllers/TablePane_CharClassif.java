@@ -338,6 +338,11 @@ public class TablePane_CharClassif {
 		int target = tableGrid.getItems().indexOf(tmp);
 		if(tvX.getFirstVisibleIndex()>target-offset || tvX.getLastVisibleIndex()<target-offset){
 			tvX.scrollToIndex(Math.max(target-offset,0));
+			return;
+		}
+		if (offset==1 && tvX.getLastVisibleIndex()<target){
+			System.out.println("Scroll advance");
+			tableGrid.scrollTo(Math.max(target-offset,0));
 		}
 
 	}
