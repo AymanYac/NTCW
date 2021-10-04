@@ -485,7 +485,7 @@ public class TablePane_CharClassif {
 					}
 				});
 			}
-			CharDescriptionExportServices.flushItemDataToDBThreaded(account);
+			CharDescriptionExportServices.flushItemDataToDBThreaded(account, null);
 		}
 	}
 	public void jumpNext() {
@@ -1334,6 +1334,6 @@ public class TablePane_CharClassif {
 
     public void ReevaluateItems(HashSet<String> items2Update) {
 		 CharItemFetcher.allRowItems.parallelStream().filter(r-> items2Update.contains(r.getItem_id())).forEach(CharDescriptionRow::reEvaluateCharRules);
-		 CharDescriptionExportServices.flushItemDataToDBThreaded(account);
+		 CharDescriptionExportServices.flushItemDataToDBThreaded(account, null);
 	}
 }

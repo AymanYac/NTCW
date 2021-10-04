@@ -2824,7 +2824,7 @@ public class CharPatternServices {
 					parent.refresh_ui_display();
 				}
 			});
-			CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account);
+			CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account, null);
 		});
 		Thread thread = new Thread(rerunTask);; thread.setDaemon(true);
 		thread.setName("Rerunning rules after reclassif");

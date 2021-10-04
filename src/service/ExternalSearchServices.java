@@ -639,11 +639,11 @@ public class ExternalSearchServices {
             urlFieldColor("red");
         }
         if(lastManualInputTime!=null && Duration.between(lastManualInputTime,LocalDateTime.now()).getSeconds() > GlobalConstants.ManualValuesBufferFlushTime){
-            CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account);
+            CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account, null);
             lastManualInputTime = LocalDateTime.now();
             System.out.println("Flushing manual values after "+String.valueOf(GlobalConstants.ManualValuesBufferFlushTime)+ " seconds");
         }else if(manualInputCounter%GlobalConstants.ManualValuesBufferFlushSize ==0){
-            CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account);
+            CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account, null);
             lastManualInputTime = LocalDateTime.now();
             System.out.println("Flushing manual values after "+String.valueOf(GlobalConstants.ManualValuesBufferFlushSize)+ " inputs");
         }
@@ -659,8 +659,10 @@ public class ExternalSearchServices {
         }
     }
 
-    public static void clearingURL(){
-        set_lien_article_carac(null);
+    public static void clearingURL(boolean forceClearLinkFromItem){
+        if(forceClearLinkFromItem){
+            set_lien_article_carac(null);
+        }
         lien_actif=null;
         refreshUrlAfterElemChange(parent);
     }

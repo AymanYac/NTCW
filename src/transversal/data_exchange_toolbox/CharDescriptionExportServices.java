@@ -1,6 +1,7 @@
 package transversal.data_exchange_toolbox;
 
 import controllers.Char_description;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 import javafx.scene.control.ComboBox;
@@ -1029,7 +1030,12 @@ public class CharDescriptionExportServices {
 			stmt3.executeBatch();
 		}catch (Exception V){
 			V.printStackTrace(System.err);
-			ExceptionDialog.show("Connection Error","Could not reach server","Item values could not be saved. Please restart");
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					ExceptionDialog.show("Connection Error","Could not reach server","Item values could not be saved. Please restart");
+				}
+			});
 			throw new RuntimeException(V.getCause());
 		}
 
@@ -1079,7 +1085,7 @@ public class CharDescriptionExportServices {
 		conn.close();
 	}
 
-	public static void flushItemDataToDBThreaded(UserAccount account) {
+	public static void flushItemDataToDBThreaded(UserAccount account, Runnable runTaskOnFailed) {
 		if(itemDataBuffer.peek()!=null) {
 			Task<Void> dbFlushTask = new Task<Void>() {
 			    
@@ -1096,6 +1102,10 @@ public class CharDescriptionExportServices {
 			    Throwable problem = dbFlushTask.getException();
 			    /* code to execute if task throws exception */
 				problem.printStackTrace(System.err);
+				if(runTaskOnFailed!=null){
+					System.out.println("PERFORMING SESSION DUMP ON TO LOCAL DISK");
+					runTaskOnFailed.run();
+				}
 				throw new RuntimeException(dbFlushTask.getException());
 			});
 

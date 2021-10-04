@@ -139,7 +139,7 @@ public class CharClassifProposer {
 					sc.setSource(DataInputMethods.SEMI_CHAR_DESC);
 					CharValuesLoader.updateRuntimeDataForItem(row,segment,result.getSourceChar().getCharacteristic_id(),sc);
 					CharDescriptionExportServices.addItemCharDataToPush(row, segment, charId);
-					CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account);
+					CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account, null);
 					clearPropButtons();
 					if(!parent.charButton.isSelected()){
 						try {
@@ -183,7 +183,7 @@ public class CharClassifProposer {
 							//parent.tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
 						}
 						parent.tableController.tableGrid.refresh();
-						CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account);
+						CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account, null);
 					});
 					ContextMenu cm = new ContextMenu();
 					MenuItem m = new MenuItem("Remove this value from custom suggestions");
