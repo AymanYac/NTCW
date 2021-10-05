@@ -1419,7 +1419,12 @@ public class Char_description {
 					}
 				}
 			};
-			CharDescriptionExportServices.flushItemDataToDBThreaded(account,onFailed);
+			//CharDescriptionExportServices.flushItemDataToDBThreaded(account,onFailed);
+			try{
+				CharDescriptionExportServices.flushItemDataToDBNoThread(account);
+			}catch (Exception V){
+				onFailed.run();
+			}
 		});
 		
 		urlLink.textProperty().addListener(new ChangeListener<String>() {
