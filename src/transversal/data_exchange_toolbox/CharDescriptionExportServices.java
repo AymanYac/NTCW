@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -53,6 +54,7 @@ public class CharDescriptionExportServices {
 
 	private static PreparedStatement stmt;
 	private static ArrayList<ArrayList<Object>> miscellanousQueue;
+	private static AtomicBoolean threadedDBFlushActive = new AtomicBoolean(false);
 
 	public static void ExportItemDataForClass(String targetClass, Char_description parent, boolean exportReview, boolean exportBase, boolean exportTaxo, boolean exportKV, boolean exportRules) throws ClassNotFoundException, SQLException, IOException {
 		
@@ -1096,9 +1098,10 @@ public class CharDescriptionExportServices {
 			    }
 			};
 			dbFlushTask.setOnSucceeded(e -> {
-
+				threadedDBFlushActive.set(false);
 				});
 			dbFlushTask.setOnFailed(e -> {
+				threadedDBFlushActive.set(false);
 			    Throwable problem = dbFlushTask.getException();
 			    /* code to execute if task throws exception */
 				problem.printStackTrace(System.err);
@@ -1111,12 +1114,16 @@ public class CharDescriptionExportServices {
 
 			dbFlushTask.setOnCancelled(e -> {
 			    /* task was cancelled */
-				
+				threadedDBFlushActive.set(false);
 			});
 			
 			Thread dbFlushThread = new Thread(dbFlushTask);; dbFlushThread.setDaemon(true);
 			dbFlushThread.setName("CharacDBFlush");
-			dbFlushThread.start();
+			if(!threadedDBFlushActive.getAndSet(true)){
+				dbFlushThread.start();
+			}else{
+				System.out.println("******* QUEUING CARAC DB FLUSH *******");
+			}
 			
 		}
 		return;
