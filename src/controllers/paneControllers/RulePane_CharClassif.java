@@ -171,6 +171,21 @@ public class RulePane_CharClassif {
                 }
             }
         });
+        ruleView.setRowFactory( tv -> {
+            TableRow<CharRuleResult> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    CharRuleResult rowData = row.getItem();
+                    CaracteristicValue val = rowData.getActionValue().shallowCopy(parent.account);
+                    //val.setRule_id(null);
+                    val.setSource(DataInputMethods.SEMI_CHAR_DESC);
+                    parent.assignValueOnSelectedItems(val);
+                    parent.tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::reEvaluateCharRules);
+                    parent.refresh_ui_display();
+                }
+            });
+            return row ;
+        });
         caracCombo.valueProperty().addListener(new ChangeListener<ClassCaracteristic>() {
             @Override
             public void changed(ObservableValue<? extends ClassCaracteristic> observable, ClassCaracteristic oldValue, ClassCaracteristic newValue) {
