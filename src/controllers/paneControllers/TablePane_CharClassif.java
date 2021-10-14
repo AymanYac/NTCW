@@ -463,27 +463,50 @@ public class TablePane_CharClassif {
 			if(row.getClass_segment_string().equals(itemPreviousClasses.get(row))) {
 				//No class change
 			}else {
-				String itemClass = row.getClass_segment_string().split("&&&")[0];
-				row.getData(itemClass).entrySet().forEach(e->{
-					CaracteristicValue value = e.getValue();
-					if(value!=null) {
-						//Fresh value loaded during values assignement by new class
-					}else {
-						//Try to allign the new empty value on the old one
-						ClassCaracteristic new_char = CharValuesLoader.active_characteristics.get(itemClass).stream().filter(c->c.getCharacteristic_id().equals(e.getKey())).findAny().get();
-						//Search for an old char with the same name
-						CharValuesLoader.active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).stream().filter(old_char->{
-							if(
-									old_char.getCharacteristic_name().toLowerCase().equals(new_char.getCharacteristic_name().toLowerCase())
-							) {
-								row.getData(itemClass).put(new_char.getCharacteristic_id(),row.getData(itemPreviousClasses.get(row).split("&&&")[0]).get(old_char.getCharacteristic_id()));
-								CharDescriptionExportServices.addItemCharDataToPush(row,row.getClass_segment_string().split("&&&")[0],new_char.getCharacteristic_id());
-								return true;
+				String currentClass = row.getClass_segment_string().split("&&&")[0];
+				String previousClass = itemPreviousClasses.get(row).split("&&&")[0];
+				if(GlobalConstants.ITEM_CHAR_DATA_TO_BE_COPIED_FROM_SAME_CARS_ONLY_WHEN_RECLASSIFIYING){
+					CharValuesLoader.active_characteristics.get(currentClass).forEach(car -> {
+						CaracteristicValue previousValue = row.getData(previousClass).get(car.getCharacteristic_id());
+						CaracteristicValue currentValue = row.getData(currentClass).get(car.getCharacteristic_id());
+						if (previousValue != null) {
+							if (currentValue != null) {
+								if (currentValue.getRawDisplay().length() == 0) {
+									row.getData(currentClass).put(car.getCharacteristic_id(), previousValue);
+									CharDescriptionExportServices.addItemCharDataToPush(row, currentClass, car.getCharacteristic_id());
+								} else if (previousValue.getDescriptionTime().isAfter(currentValue.getDescriptionTime())) {
+									row.getData(currentClass).put(car.getCharacteristic_id(), previousValue);
+									CharDescriptionExportServices.addItemCharDataToPush(row, currentClass, car.getCharacteristic_id());
+								}
+							} else {
+								row.getData(currentClass).put(car.getCharacteristic_id(), previousValue);
+								CharDescriptionExportServices.addItemCharDataToPush(row, currentClass, car.getCharacteristic_id());
 							}
-							return false;
-						}).findFirst();
-					}
-				});
+						}
+					});
+				}else{
+					//BAD CODE ONLY COPIES TO EXISTING CARAC FIELDS
+					row.getData(currentClass).entrySet().forEach(e->{
+						CaracteristicValue value = e.getValue();
+						if(value!=null) {
+							//Fresh value loaded during values assignement by new class
+						}else {
+							//Try to allign the new empty value on the old one
+							ClassCaracteristic new_char = CharValuesLoader.active_characteristics.get(currentClass).stream().filter(c->c.getCharacteristic_id().equals(e.getKey())).findAny().get();
+							//Search for an old char with the same name
+							CharValuesLoader.active_characteristics.get(itemPreviousClasses.get(row).split("&&&")[0]).stream().filter(old_char->{
+								if(
+										old_char.getCharacteristic_name().toLowerCase().equals(new_char.getCharacteristic_name().toLowerCase())
+								) {
+									row.getData(currentClass).put(new_char.getCharacteristic_id(),row.getData(itemPreviousClasses.get(row).split("&&&")[0]).get(old_char.getCharacteristic_id()));
+									CharDescriptionExportServices.addItemCharDataToPush(row,row.getClass_segment_string().split("&&&")[0],new_char.getCharacteristic_id());
+									return true;
+								}
+								return false;
+							}).findFirst();
+						}
+					});
+				}
 			}
 			CharDescriptionExportServices.flushItemDataToDBThreaded(account, null);
 		}

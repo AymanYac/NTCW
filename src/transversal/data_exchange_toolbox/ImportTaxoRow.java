@@ -496,7 +496,12 @@ public class ImportTaxoRow {
 			segmentParseFail();
 			return;
 		}
-		
+		if(tmpSegment.getLevelNumber(level).length()==0 || tmpSegment.getLevelName(level).length()==0){
+			Pair<Row,String> rejectedRow = new Pair<Row,String>(current_row,"Level name or number level"+String.valueOf(level+1)+" is too short");
+			rejectedRows.add(rejectedRow);
+			segmentParseFail();
+			return;
+		}
 		tmpSegment.setSegmentGranularity(level+1);
 		
 		Optional<Entry<String, ClassSegment>> lineage = CharDescriptionImportServices.sid2Segment.entrySet().stream().filter(e->e.getValue().getLevelNumber(level)!=null).filter(e->e.getValue().getLevelNumber(level).equals(tmpSegment.getLevelNumber(level))).findAny();

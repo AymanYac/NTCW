@@ -128,9 +128,9 @@ public class AutoCompleteTextField {
                     String text = getText();
                     Pattern pattern;
                     if (isCaseSensitive()) {
-                        pattern = Pattern.compile(".*" + unidecode.decode(text) + ".*");
+                        pattern = Pattern.compile(".*" + Pattern.quote(unidecode.decode(text)) + ".*");
                     } else {
-                        pattern = Pattern.compile(".*" + unidecode.decode(text) + ".*",
+                        pattern = Pattern.compile(".*" + Pattern.quote(unidecode.decode(text)) + ".*",
                                 Pattern.CASE_INSENSITIVE);
                     }
 
