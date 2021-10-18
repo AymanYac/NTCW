@@ -208,19 +208,38 @@ public class CharDescriptionRow {
 
 		
 		public void disableSubTextRules(String charId) {
-			try {
-				ruleResults.get(charId).stream().forEach(r->{
-					
-					Optional<CharRuleResult> SuperRule = ruleResults.get(charId).stream()
-					.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r)||rloop.isRedudantWith(r)) ).findAny();
-					if(SuperRule.isPresent()) {
-						//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
-						r.addSuperRule(SuperRule);
+			if(GlobalConstants.CHAR_DESC_PATTERN_SPAN_SUPERRULES_ACCROS_CHARS){
+				CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).forEach(classCarac->{
+					try {
+						ruleResults.get(charId).stream().forEach(r->{
+
+							Optional<CharRuleResult> SuperRule = ruleResults.get(classCarac.getCharacteristic_id()).stream()
+									.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r)||( classCarac.getCharacteristic_id().equals(charId)&&rloop.isRedudantWith(r) ) )).findAny();
+							if(SuperRule.isPresent()) {
+								//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
+								r.addSuperRule(SuperRule);
+							}
+
+						});
+					}catch(Exception V) {
+						V.printStackTrace(System.err);
 					}
-					
 				});
-			}catch(Exception V) {
-				V.printStackTrace(System.err);
+			}else{
+				try {
+					ruleResults.get(charId).stream().forEach(r->{
+
+						Optional<CharRuleResult> SuperRule = ruleResults.get(charId).stream()
+								.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r)||rloop.isRedudantWith(r)) ).findAny();
+						if(SuperRule.isPresent()) {
+							//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
+							r.addSuperRule(SuperRule);
+						}
+
+					});
+				}catch(Exception V) {
+					V.printStackTrace(System.err);
+				}
 			}
 		}
 
