@@ -212,12 +212,15 @@ public class CharDescriptionRow {
 				CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).forEach(classCarac->{
 					try {
 						ruleResults.get(charId).stream().forEach(r->{
-
-							Optional<CharRuleResult> SuperRule = ruleResults.get(classCarac.getCharacteristic_id()).stream()
-									.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r)||( classCarac.getCharacteristic_id().equals(charId)&&rloop.isRedudantWith(r) ) )).findAny();
-							if(SuperRule.isPresent()) {
-								//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
-								r.addSuperRule(SuperRule);
+							ArrayList<CharRuleResult> caracRules = ruleResults.get(classCarac.getCharacteristic_id());
+							if(caracRules!=null){
+								Optional<CharRuleResult> SuperRule = caracRules.stream()
+										.filter(rloop->rloop!=null)
+										.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r)||( classCarac.getCharacteristic_id().equals(charId)&&rloop.isRedudantWith(r) ) )).findAny();
+								if(SuperRule.isPresent()) {
+									//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
+									r.addSuperRule(SuperRule);
+								}
 							}
 
 						});
