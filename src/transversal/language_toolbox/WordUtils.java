@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -418,22 +420,26 @@ public class WordUtils {
 	}
 
 	public static String neonecObjectSyntaxToRegex(String markerToConsume, boolean inSeparators) {
+		//markerToConsume=markerToConsume.replaceAll("~\"","\"\\\\Q\"\\\\E\"");
+		markerToConsume=markerToConsume.replace("~\"","\"&&&&&&&&&&&&\"");
 		if(inSeparators){
 			markerToConsume="$$$$$$$$$"+markerToConsume+"$$$$$$$$$$$$$$$$$$";
 			markerToConsume="(|+1)"+markerToConsume;
 			markerToConsume=markerToConsume+"(|+1)";
 		}
-		String ret = markerToConsume
-				.replaceAll("%\\d(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)",  Matcher.quoteReplacement(GenericCharRule.NUM_CLASS))
-				.replaceAll("#(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[0-9]")
-				.replaceAll("@(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[a-z]")
-				.replaceAll("(^.+)\\(?=\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)(.+$)", "$1[" + GenericCharRule.SEP_CLASS + "]*?$2")
-				.replaceAll("(^.+)\\(?=\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)(.+$)", "$1[" + GenericCharRule.SEP_CLASS + "]+?$2")
-				.replaceAll("\\(\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS_NO_VERTICAL + "]*?")
-				.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS_NO_VERTICAL + "]+?")
-				.replaceAll("\\(\\*\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".*?")
-				.replaceAll("\\(\\*\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".+?");
+		String ret = markerToConsume;
+		ret=ret.replaceAll("%\\d(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)",  Matcher.quoteReplacement(GenericCharRule.NUM_CLASS));
+		ret=ret.replaceAll("#(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[0-9]");
+		ret=ret.replaceAll("@(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[a-z]");
+		ret=ret.replaceAll("(^.+)\\(?=\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)(.+$)", "$1[" + GenericCharRule.SEP_CLASS + "]*?$2");
+		ret=ret.replaceAll("(^.+)\\(?=\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)(.+$)", "$1[" + GenericCharRule.SEP_CLASS + "]+?$2");
+		ret=ret.replaceAll("\\(\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS_NO_VERTICAL + "]*?");
+		ret=ret.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS_NO_VERTICAL + "]+?");
+		ret=ret.replaceAll("\\(\\*\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".*?");
+		ret=ret.replaceAll("\\(\\*\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".+?");
 
+		ret=ret.replace("\"\"","");
+		ret=ret.replace("&&&&&&&&&&&&","\\Q\"\\E");
 		ret = ret.replace("$$$$$$$$$$$$$$$$$$",")");
 		ret = ret.replace("$$$$$$$$$","(");
 		return ret;
@@ -833,6 +839,26 @@ public class WordUtils {
 			//String q = Pattern.quote(ruleMarker);
 			//return q.substring(2).substring(0,q.length()-4);
 		}
+
+	public static String quoteStringsInDescPatternExperimental(String ruleMarker) {
+		System.out.print(ruleMarker+"=>");
+		Pattern p = Pattern.compile("(?<!~)\"");
+		Matcher m = p.matcher(ruleMarker);
+		//33"~"" -> 33%%%~"%%%
+		//(|+0)"qsdqsd"(|+1)"vvv" -> (|+0)%%%qsdqsd%%%(|+1)%%%vvv%%%
+		AtomicReference<String> target = new AtomicReference<>(m.replaceAll("%%%"));
+		System.out.print(target+"=>");
+		AtomicInteger quoteIdx = new AtomicInteger(0);
+		AtomicReference<String> ret = new AtomicReference<>("");
+		Arrays.stream(target.get().split("%%%")).sequential().forEach(split->{
+			ret.set(ret.get()+split+(quoteIdx.getAndAdd(1)%2==0?"\\Q":"\\E"));
+		});
+		System.out.println(ret.get().substring(0,ret.get().length()-2));
+		return ret.get().substring(0,ret.get().length()-2);
+		//return m.replaceAll("\\\\Q"+"$1"+"\\\\E");
+		//String q = Pattern.quote(ruleMarker);
+		//return q.substring(2).substring(0,q.length()-4);
+	}
 
 		public static String quoteCompositionMarkerInDescPattern(String ruleMarker) {
 			Pattern p = Pattern.compile("\\+(?=[^ *\\d|%])(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
