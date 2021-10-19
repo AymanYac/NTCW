@@ -431,10 +431,10 @@ public class WordUtils {
 		ret=ret.replaceAll("%\\d(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)",  Matcher.quoteReplacement(GenericCharRule.NUM_CLASS));
 		ret=ret.replaceAll("#(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[0-9]");
 		ret=ret.replaceAll("@(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[a-z]");
-		ret=ret.replaceAll("(^.+)\\(?=\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)(.+$)", "$1[" + GenericCharRule.SEP_CLASS + "]*?$2");
-		ret=ret.replaceAll("(^.+)\\(?=\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)(.+$)", "$1[" + GenericCharRule.SEP_CLASS + "]+?$2");
-		ret=ret.replaceAll("\\(\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS_NO_VERTICAL + "]*?");
-		ret=ret.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS_NO_VERTICAL + "]+?");
+		ret=ret.replaceAll("(^.+)\\(?=\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)(.+$)", "$1[" + GenericCharRule.SEP_CLASS_NO_VERTICAL + "]*?$2");
+		ret=ret.replaceAll("(^.+)\\(?=\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)(.+$)", "$1[" + GenericCharRule.SEP_CLASS_NO_VERTICAL + "]+?$2");
+		ret=ret.replaceAll("\\(\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS + "]*?");
+		ret=ret.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS + "]+?");
 		ret=ret.replaceAll("\\(\\*\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".*?");
 		ret=ret.replaceAll("\\(\\*\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".+?");
 
