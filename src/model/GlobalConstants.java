@@ -62,7 +62,7 @@ public class GlobalConstants {
     public static final int EXCEL_MAX_ROW_COUNT = 1048575;
     public static final int MAX_DEDUP_PAIRS_IN_MEMORY = 100000;
     public static final boolean ITEM_CHAR_DATA_TO_BE_COPIED_FROM_SAME_CARS_ONLY_WHEN_RECLASSIFIYING = true;
-	public static final boolean CHAR_DESC_PATTERN_SPAN_SUPERRULES_ACCROS_CHARS = true;
+	public static final boolean CHAR_DESC_PATTERN_SPAN_SUPERRULES_ACCROS_CHARS = false;
 
 
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
