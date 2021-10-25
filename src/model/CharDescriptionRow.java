@@ -206,142 +206,187 @@ public class CharDescriptionRow {
 	}
 
 
-		
-		public void disableSubTextRules(String charId) {
-			if(GlobalConstants.CHAR_DESC_PATTERN_SPAN_SUPERRULES_ACCROS_CHARS){
-				CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).forEach(classCarac->{
-					try {
-						ruleResults.get(charId).stream().forEach(r->{
-							ArrayList<CharRuleResult> caracRules = ruleResults.get(classCarac.getCharacteristic_id());
-							if(caracRules!=null){
-								Optional<CharRuleResult> SuperRule = caracRules.stream()
-										.filter(rloop->rloop!=null)
-										.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r)||( classCarac.getCharacteristic_id().equals(charId)&&rloop.isRedudantWith(r) ) )).findAny();
-								if(SuperRule.isPresent()) {
-									//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
-									r.addSuperRule(SuperRule);
-								}
-							}
-
-						});
-					}catch(Exception V) {
-						V.printStackTrace(System.err);
-					}
-				});
-			}else{
-				try {
-					ruleResults.get(charId).stream().forEach(r->{
-
-						Optional<CharRuleResult> SuperRule = ruleResults.get(charId).stream()
-								.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r)||rloop.isRedudantWith(r)) ).findAny();
+	public void disableRedundantSpanningRules(String charId){
+		CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).stream().filter(classCaracteristic -> !classCaracteristic.getCharacteristic_id().equals(charId)).forEach(classCarac->{
+			try {
+				ruleResults.get(charId).stream().forEach(r->{
+					ArrayList<CharRuleResult> caracRules = ruleResults.get(classCarac.getCharacteristic_id());
+					if(caracRules!=null){
+						Optional<CharRuleResult> SuperRule = caracRules.stream()
+								.filter(rloop->rloop!=null)
+								.filter(rloop->(rloop.isSpanningRedundantWith(r) && rloop.sharesCurrentItemValue(classCarac,getData(getClass_segment_string().split("&&&")[0]).get(classCarac.getCharacteristic_id())))).findAny();
 						if(SuperRule.isPresent()) {
 							//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
 							r.addSuperRule(SuperRule);
+						}
+					}
+
+				});
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
+			}
+		});
+	}
+
+	public void disableSubSpanningRules(String charId){
+		CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).stream().filter(classCaracteristic -> !classCaracteristic.getCharacteristic_id().equals(charId)).forEach(classCarac->{
+			try {
+				ruleResults.get(charId).stream().forEach(r->{
+					ArrayList<CharRuleResult> caracRules = ruleResults.get(classCarac.getCharacteristic_id());
+					if(caracRules!=null){
+						Optional<CharRuleResult> SuperRule = caracRules.stream()
+								.filter(rloop->rloop!=null)
+								.filter(rloop->(rloop.isSuperBlockOf(r, false) && rloop.isSuperValueOf(r))).findAny();
+						if(SuperRule.isPresent()) {
+							//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
+							r.addSuperRule(SuperRule);
+						}
+					}
+
+				});
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
+			}
+		});
+	}
+
+	public void disableSubTextRules(String charId) {
+		if(GlobalConstants.CHAR_DESC_PATTERN_SPAN_SUPERRULES_ACCROS_CHARS){
+			CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).forEach(classCarac->{
+				try {
+					ruleResults.get(charId).stream().forEach(r->{
+						ArrayList<CharRuleResult> caracRules = ruleResults.get(classCarac.getCharacteristic_id());
+						if(caracRules!=null){
+							Optional<CharRuleResult> SuperRule = caracRules.stream()
+									.filter(rloop->rloop!=null)
+									.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r, false)||( classCarac.getCharacteristic_id().equals(charId)&&rloop.isRedudantWith(r) ) )).findAny();
+							if(SuperRule.isPresent()) {
+								//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
+								r.addSuperRule(SuperRule);
+							}
 						}
 
 					});
 				}catch(Exception V) {
 					V.printStackTrace(System.err);
 				}
+			});
+		}else{
+			try {
+				ruleResults.get(charId).stream().forEach(r->{
+
+					Optional<CharRuleResult> SuperRule = ruleResults.get(charId).stream()
+							.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r, false)||rloop.isRedudantWith(r)) ).findAny();
+					if(SuperRule.isPresent()) {
+						//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
+						r.addSuperRule(SuperRule);
+					}
+
+				});
+			}catch(Exception V) {
+				V.printStackTrace(System.err);
 			}
 		}
+	}
 
-		public boolean itemHasDisplayValue(CharRuleResult r){
-			String targetVal = r.getActionValue().getDisplayValue(false, false);
-			return getData(getClass_segment_string().split("&&&")[0]).values().stream().filter(loopVal->
-				loopVal!=null && StringUtils.equalsIgnoreCase(loopVal.getDisplayValue(false,false),targetVal)
-			).findAny().isPresent();
-		}
+	public boolean itemHasDisplayValue(CharRuleResult r){
+		String targetVal = r.getActionValue().getDisplayValue(false, false);
+		return getData(getClass_segment_string().split("&&&")[0]).values().stream().anyMatch(loopVal->
+			loopVal!=null && StringUtils.equalsIgnoreCase(loopVal.getDisplayValue(false,false),targetVal));
+	}
 
-		public void reEvaluateCharRules(){
-			CharDescriptionRow r = this;
-			r.getRuleResults().values().forEach(v->v.removeIf(result -> result.getGenericCharRule()==null));
-			//For each couple active item I / rule N
-			r.getRuleResults().values().forEach(a->{
-				a.stream().filter(result -> !result.isDraft()).forEach(result->{
-					//The status of the rule N becomes empty for the item I
-					result.setStatus(null);
-					result.clearSuperRules();
-				});
+	public void reEvaluateCharRules(){
+		CharDescriptionRow r = this;
+		r.getRuleResults().values().forEach(v->v.removeIf(result -> result.getGenericCharRule()==null));
+		//For each couple active item I / rule N
+		r.getRuleResults().values().forEach(a->{
+			a.stream().filter(result -> !result.isDraft()).forEach(result->{
+				//The status of the rule N becomes empty for the item I
+				result.setStatus(null);
+				result.clearSuperRules();
 			});
-			//Supress all auto values on the item
-			r.getData(r.getClass_segment_string().split("&&&")[0]).entrySet()
-					.removeIf(e->e.getValue()!=null && (!(e.getValue().getSource()!=null) ||e.getValue().getSource().equals(DataInputMethods.AUTO_CHAR_DESC)));
+		});
+		//Supress all auto values on the item
+		r.getData(r.getClass_segment_string().split("&&&")[0]).entrySet()
+				.removeIf(e->e.getValue()!=null && (!(e.getValue().getSource()!=null) ||e.getValue().getSource().equals(DataInputMethods.AUTO_CHAR_DESC)));
 
-			//For each couple active item I / rule N
-			//The pattern of the rule is included in the pattern of another rule applying to the same item and characteristic
-			//The value of the rule is equal to the value of another rule N' applying to the same characteristic
-			// 	and The identified pattern of N is strictly longer than the identified pattern of N'
-			//The status remains empty
-			r.getRuleResults().keySet().forEach(charId ->r.disableSubTextRules(charId));
+		//For each couple active item I / rule N
+		//The pattern of the rule is included in the pattern of another rule applying to the same item and characteristic
+		//The value of the rule is equal to the value of another rule N' applying to the same characteristic
+		// 	and The identified pattern of N is strictly longer than the identified pattern of N'
+		//The status remains empty
+		r.getRuleResults().keySet().forEach(r::disableSubTextRules);
+		r.getRuleResults().keySet().forEach(r::disableSubSpanningRules);
+		r.getRuleResults().keySet().forEach(r::disableRedundantSpanningRules);
 
-			//The status of the row becomes "Suggestion j+1" for the item I,with j the highest suggestion # already present (initiated at 1)
-			HashMap<String, ArrayList<CaracteristicValue>> knownRuleValues = new HashMap<String, ArrayList<CaracteristicValue>>();
-			r.getRuleResults().entrySet().stream().forEach(e->e.getValue().stream().filter(result->!result.isSubRule() && !result.isDraft() && !result.isOrphan()).forEach(result -> {
-				try{
-					int valIndx = knownRuleValues.get(e.getKey()).indexOf(result.getActionValue());
-					if(valIndx==-1){
-						//New value
-						knownRuleValues.get(e.getKey()).add(result.getActionValue());
-						result.setStatus("Suggestion "+String.valueOf(knownRuleValues.get(e.getKey()).size()));
-					}else{
-						//Known value
-						//result.setStatus("Suggestion "+String.valueOf(valIndx)+1);
-						//Clear this value for visibility
-						result.setStatus(null);
-					}
-				}catch (Exception V){
-					knownRuleValues.put(e.getKey(),new ArrayList<CaracteristicValue>());
+
+		//The status of the row becomes "Suggestion j+1" for the item I,with j the highest suggestion # already present (initiated at 1)
+		HashMap<String, ArrayList<CaracteristicValue>> knownRuleValues = new HashMap<String, ArrayList<CaracteristicValue>>();
+		r.getRuleResults().entrySet().stream().forEach(e->e.getValue().stream().filter(result->!result.isSubRule() && !result.isDraft() && !result.isOrphan()).forEach(result -> {
+			try{
+				int valIndx = knownRuleValues.get(e.getKey()).indexOf(result.getActionValue());
+				if(valIndx==-1){
+					//New value
 					knownRuleValues.get(e.getKey()).add(result.getActionValue());
 					result.setStatus("Suggestion "+String.valueOf(knownRuleValues.get(e.getKey()).size()));
+				}else{
+					//Known value
+					//result.setStatus("Suggestion "+String.valueOf(valIndx)+1);
+					//Clear this value for visibility
+					result.setStatus(null);
 				}
-			}));
+			}catch (Exception V){
+				knownRuleValues.put(e.getKey(),new ArrayList<CaracteristicValue>());
+				knownRuleValues.get(e.getKey()).add(result.getActionValue());
+				result.setStatus("Suggestion "+String.valueOf(knownRuleValues.get(e.getKey()).size()));
+			}
+		}));
 
-			//For each couple active item I / rule N
-			r.getRuleResults().keySet().forEach(charId->{
-				ArrayList<CharRuleResult> suggestions = r.getRuleResults().get(charId)
-						.stream()
-						.filter(result -> result.getStatus()!=null && result.getStatus().startsWith("Suggestion "))
-						.collect(Collectors.toCollection(ArrayList::new));
-				if(suggestions.size()==1){
-					//The status is "Suggestion 1" and The value of the row is not similar to the the value of another row with a status different from "empty"
-					//=>wording: The status is "Suggestion 1" and other rows with similar value are empty or suggestion 1
-					//There is no status different from "Suggestion 1" or "Empty" for another row related to the same characteristic
-					if(!r.itemHasDisplayValue(suggestions.get(0))) {
-						//The value of the row is not similar to the item value for another characteristic
-						suggestions.get(0).setStatus("Applied");
-					}
-				}else if(!suggestions.stream().anyMatch(result -> result.getStatus().equals("Suggestion 2"))){
-					suggestions.forEach(result -> result.setStatus("Applied"));
+		//For each couple active item I / rule N
+		r.getRuleResults().keySet().forEach(charId->{
+			ArrayList<CharRuleResult> suggestions = r.getRuleResults().get(charId)
+					.stream()
+					.filter(result -> result.getStatus()!=null && result.getStatus().startsWith("Suggestion "))
+					.collect(Collectors.toCollection(ArrayList::new));
+			if(suggestions.size()==1){
+				//The status is "Suggestion 1" and The value of the row is not similar to the the value of another row with a status different from "empty"
+				//=>wording: The status is "Suggestion 1" and other rows with similar value are empty or suggestion 1
+				//There is no status different from "Suggestion 1" or "Empty" for another row related to the same characteristic
+				if(!r.itemHasDisplayValue(suggestions.get(0))) {
+					//The value of the row is not similar to the item value for another characteristic
+					suggestions.get(0).setStatus("Applied");
 				}
-			});
+			}else if(!suggestions.stream().anyMatch(result -> result.getStatus().equals("Suggestion 2"))){
+				suggestions.stream().filter(s->!s.isQuasiRedundantSpanningRule(charId,getRuleResults())).forEach(result -> result.setStatus("Applied"));
+			}
+		});
 
-			//The characteristic value is updated based on the applied rule
-			r.getRuleResults().keySet().forEach(charId->{
-				Optional<CharRuleResult> appliedResult = r.getRuleResults().get(charId).stream()
-						.filter(result -> result.getStatus()!=null).filter(result -> result.getStatus().equals("Applied")).findAny();
-				if(appliedResult.isPresent()){
-					String itemClass=r.getClass_segment_string().split("&&&")[0];
-					if(r.getData(itemClass)!=null){
-						if(r.getData(itemClass).get(charId)!=null){
-							if(r.getData(itemClass).get(charId).getSource()!=null){
-								return;
-							}
+		//The characteristic value is updated based on the applied rule
+		r.getRuleResults().keySet().forEach(charId->{
+			Optional<CharRuleResult> appliedResult = r.getRuleResults().get(charId).stream()
+					.filter(result -> result.getStatus()!=null).filter(result -> result.getStatus().equals("Applied")).findAny();
+			if(appliedResult.isPresent()){
+				String itemClass=r.getClass_segment_string().split("&&&")[0];
+				if(r.getData(itemClass)!=null){
+					if(r.getData(itemClass).get(charId)!=null){
+						if(r.getData(itemClass).get(charId).getSource()!=null){
+							return;
 						}
 					}
-					//The remaining value can only be auto, assign the "Applied" Rule value
-					CharValuesLoader.updateRuntimeDataForItem(r,itemClass,charId,appliedResult.get().getActionValue());
-
 				}
+				//The remaining value can only be auto, assign the "Applied" Rule value
+				CharValuesLoader.updateRuntimeDataForItem(r,itemClass,charId,appliedResult.get().getActionValue());
+
+			}
+		});
+		r.getRuleResults().values().forEach(a->{
+			a.stream().filter(result -> !result.isDraft()).forEach(result->{
+				//The status of the rule N becomes empty for the item I
+				result.clearSuperRules();
 			});
-			r.getRuleResults().values().forEach(a->{
-				a.stream().filter(result -> !result.isDraft()).forEach(result->{
-					//The status of the rule N becomes empty for the item I
-					result.clearSuperRules();
-				});
-			});
-			CharDescriptionExportServices.addItemCharDataToPush(r);
-		}
+		});
+		CharDescriptionExportServices.addItemCharDataToPush(r);
+	}
 
     public boolean hasDataInCurrentClassForCarac(String characteristic_id) {
 			String itemClass = getClass_segment_string().split("&&&")[0];

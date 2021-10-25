@@ -593,4 +593,24 @@ public class CaracteristicValue implements Serializable {
 		}
 		throw new RuntimeException();
 	}
+
+    public ArrayList<Double> getNonNullNumericsWithRepeat() {
+		ArrayList<Double> ret = new ArrayList<Double>();
+		try{
+			ret.add(Double.parseDouble(getNominal_value()));
+		}catch (Exception V){
+
+		}
+		try{
+			ret.add(Double.parseDouble(getMin_value()));
+		}catch (Exception V){
+
+		}
+		try{
+			ret.add(Double.parseDouble(getMax_value()));
+		}catch (Exception V){
+
+		}
+		return ret;
+    }
 }

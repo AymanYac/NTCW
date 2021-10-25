@@ -1,6 +1,5 @@
 package model;
 
-import com.fathzer.soft.javaluator.DoubleEvaluator;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import service.CharPatternServices;
@@ -9,8 +8,7 @@ import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 
 public class CharRuleResult implements Serializable {
 
@@ -190,11 +188,36 @@ public class CharRuleResult implements Serializable {
 		String targetPattern = unidecode.decodeAndTrim(r.getGenericCharRule().getRuleMarker());
 		return StringUtils.containsIgnoreCase(thisPattern.replaceAll("%\\d","%d"), targetPattern.replaceAll("%\\d","%d")) && thisPattern.length()>targetPattern.length();
 	}
-	public boolean isSuperBlockOf(CharRuleResult r) {
+	public boolean isSuperBlockOf(CharRuleResult r, boolean allowEquality) {
 		unidecode = (unidecode!=null)?unidecode:Unidecode.toAscii();
 		String thisBlock = unidecode.decodeAndTrim(getMatchedBlock());
 		String targetBlock = unidecode.decodeAndTrim(r.getMatchedBlock());
-		return StringUtils.containsIgnoreCase(thisBlock, targetBlock) && thisBlock.length()>targetBlock.length();
+		return StringUtils.containsIgnoreCase(thisBlock, targetBlock) && (thisBlock.length()>targetBlock.length() || allowEquality);
+	}
+	public boolean isEqualValueOf(CharRuleResult r){
+		try{
+			return r.getActionValue()!=null && getActionValue()!=null
+					&& r.getActionValue().getDisplayValue(false,false).equalsIgnoreCase(getActionValue().getDisplayValue(false,false));
+		}catch (Exception V){
+			return false;
+		}
+	}
+	
+	public boolean isSuperValueOf(CharRuleResult r){
+		if(getGenericCharRule().getParentChar().getIsNumeric()){
+			ArrayList<Double> thisNums = getActionValue().getNonNullNumericsWithRepeat();
+			ArrayList<Double> targetNums = r.getActionValue().getNonNullNumericsWithRepeat();
+			Optional<Double> missingLoopInThis = targetNums.stream().filter(num -> !thisNums.remove(num)).findAny();
+			return !missingLoopInThis.isPresent();
+		}else{
+			String thisTxt = getActionValue().getDataLanguageValue();
+			String targetTxt = r.getActionValue().getDataLanguageValue();
+			if(targetTxt.length()<GlobalConstants.SEARCH_WORD_LARGE){
+				return new ArrayList<String>(Arrays.asList(thisTxt.split("["+GenericCharRule.SEP_CLASS+"]|\""))).stream().anyMatch(elem->elem.trim().equalsIgnoreCase(targetTxt.trim()));
+			}else{
+				return thisTxt.toLowerCase().contains(targetTxt.toLowerCase());
+			}
+		}
 	}
 	public void addSuperRule(Optional<CharRuleResult> superRule) {
 		superRules.add(superRule.get());
@@ -258,4 +281,17 @@ public class CharRuleResult implements Serializable {
 	}
 
 
+	public boolean sharesCurrentItemValue(ClassCaracteristic classCarac, CaracteristicValue currentItemValue) {
+		return currentItemValue!=null && !currentItemValue.getSource().equals(DataInputMethods.AUTO_CHAR_DESC) && getActionValue()!=null
+				&& currentItemValue.getDisplayValue(false,false).equalsIgnoreCase(getActionValue().getDisplayValue(false,false));
+	}
+
+
+	public boolean isQuasiRedundantSpanningRule(String charId, HashMap<String, ArrayList<CharRuleResult>> ruleResults) {
+		return ruleResults.entrySet().stream().filter(e->!e.getKey().equals(charId)).map(e->e.getValue()).flatMap(Collection::stream).filter(r->!r.isSubRule()).anyMatch(r->isSpanningRedundantWith(r));
+	}
+
+	boolean isSpanningRedundantWith(CharRuleResult r) {
+		return isSuperBlockOf(r,true) && r.isSuperBlockOf(this,true) && isEqualValueOf(r);
+	}
 }
