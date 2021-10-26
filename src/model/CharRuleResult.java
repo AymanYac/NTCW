@@ -208,10 +208,13 @@ public class CharRuleResult implements Serializable {
 			return false;
 		}
 		if(getGenericCharRule().getParentChar().getIsNumeric()){
-			ArrayList<Double> thisNums = getActionValue().getNonNullNumericsWithRepeat();
-			ArrayList<Double> targetNums = r.getActionValue().getNonNullNumericsWithRepeat();
-			Optional<Double> missingLoopInThis = targetNums.stream().filter(num -> !thisNums.remove(num)).findAny();
-			return !missingLoopInThis.isPresent();
+			if( (getActionValue().getUom_id()!=null?getActionValue().getUom_id():"").equalsIgnoreCase((r.getActionValue().getUom_id()!=null?r.getActionValue().getUom_id():"")) ){
+				ArrayList<Double> thisNums = getActionValue().getNonNullNumericsWithRepeat();
+				ArrayList<Double> targetNums = r.getActionValue().getNonNullNumericsWithRepeat();
+				Optional<Double> missingLoopInThis = targetNums.stream().filter(num -> !thisNums.remove(num)).findAny();
+				return !missingLoopInThis.isPresent();
+			}
+			return false;
 		}else{
 			String thisTxt = getActionValue().getDataLanguageValue();
 			String targetTxt = r.getActionValue().getDataLanguageValue();
