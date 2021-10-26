@@ -833,9 +833,10 @@ public class WordUtils {
 		}
 
 		public static String quoteStringsInDescPattern(String ruleMarker) {
+			ruleMarker=ruleMarker.replace("\\Q\"\\E","\\Q'\\E");
 			Pattern p = Pattern.compile("\"([^\"]*)\"");
 			Matcher m = p.matcher(ruleMarker);
-			return m.replaceAll("\\\\Q"+"$1"+"\\\\E");
+			return m.replaceAll("\\\\Q"+"$1"+"\\\\E").replace("\\Q'\\E","\\Q\"\\E").replace("\\E\\Q","");
 			//String q = Pattern.quote(ruleMarker);
 			//return q.substring(2).substring(0,q.length()-4);
 		}
