@@ -204,6 +204,9 @@ public class CharRuleResult implements Serializable {
 	}
 	
 	public boolean isSuperValueOf(CharRuleResult r){
+		if(!getGenericCharRule().getParentChar().getIsNumeric().equals(r.getGenericCharRule().getParentChar().getIsNumeric())){
+			return false;
+		}
 		if(getGenericCharRule().getParentChar().getIsNumeric()){
 			ArrayList<Double> thisNums = getActionValue().getNonNullNumericsWithRepeat();
 			ArrayList<Double> targetNums = r.getActionValue().getNonNullNumericsWithRepeat();
@@ -212,11 +215,14 @@ public class CharRuleResult implements Serializable {
 		}else{
 			String thisTxt = getActionValue().getDataLanguageValue();
 			String targetTxt = r.getActionValue().getDataLanguageValue();
-			if(targetTxt.length()<GlobalConstants.SEARCH_WORD_LARGE){
-				return new ArrayList<String>(Arrays.asList(thisTxt.split("["+GenericCharRule.SEP_CLASS+"]|\""))).stream().anyMatch(elem->elem.trim().equalsIgnoreCase(targetTxt.trim()));
-			}else{
-				return thisTxt.toLowerCase().contains(targetTxt.toLowerCase());
+			if(thisTxt!=null && targetTxt!=null && thisTxt.length()>0 && targetTxt.length()>0){
+				if(targetTxt.length()<GlobalConstants.SEARCH_WORD_LARGE){
+					return new ArrayList<String>(Arrays.asList(thisTxt.split("["+GenericCharRule.SEP_CLASS+"]|\""))).stream().anyMatch(elem->elem.trim().equalsIgnoreCase(targetTxt.trim()));
+				}else{
+					return thisTxt.toLowerCase().contains(targetTxt.toLowerCase());
+				}
 			}
+			return false;
 		}
 	}
 	public void addSuperRule(Optional<CharRuleResult> superRule) {
@@ -288,7 +294,7 @@ public class CharRuleResult implements Serializable {
 
 
 	public boolean isQuasiRedundantSpanningRule(String charId, HashMap<String, ArrayList<CharRuleResult>> ruleResults) {
-		return ruleResults.entrySet().stream().filter(e->!e.getKey().equals(charId)).map(e->e.getValue()).flatMap(Collection::stream).filter(r->!r.isSubRule()).anyMatch(r->isSpanningRedundantWith(r));
+		return ruleResults.entrySet().stream().filter(e->!e.getKey().equals(charId)).map(e->e.getValue()).flatMap(Collection::stream).filter(r->!r.isSubRule()).anyMatch(r->r.isSpanningRedundantWith(this));
 	}
 
 	boolean isSpanningRedundantWith(CharRuleResult r) {
