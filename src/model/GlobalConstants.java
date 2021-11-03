@@ -63,6 +63,7 @@ public class GlobalConstants {
     public static final int MAX_DEDUP_PAIRS_IN_MEMORY = 100000;
     public static final boolean ITEM_CHAR_DATA_TO_BE_COPIED_FROM_SAME_CARS_ONLY_WHEN_RECLASSIFIYING = true;
 	public static final boolean CHAR_DESC_PATTERN_SPAN_SUPERRULES_ACCROS_CHARS = false;
+	public static final boolean PROMOTE_SUGGESTION_TO_APPLIED_OLD_SCHEMA = false;
 
 
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
@@ -76,7 +77,7 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
 	public static final boolean REDIRECT_OUTSTREAM = true;
-	public static final String TOOL_VERSION = "5.9.8.2";
+	public static final String TOOL_VERSION = "5.9.8.3";
 	public static final String HOST_ADDRESS = "localhost";
 	//public static final String HOST_ADDRESS = "91.167.182.87";//"82.66.148.154";//"88.190.148.154";
 	//public static final String HOST_ADDRESS = "192.168.0.22";

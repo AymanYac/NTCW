@@ -209,7 +209,7 @@ public class CharDescriptionRow {
 	public void disableRedundantSpanningRules(String charId){
 		CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).stream().filter(classCaracteristic -> !classCaracteristic.getCharacteristic_id().equals(charId)).forEach(classCarac->{
 			try {
-				ruleResults.get(charId).stream().forEach(r->{
+				ruleResults.get(charId).stream().filter(result->!result.isSubRule() && !result.isDraft() && !result.isOrphan()).forEach(r->{
 					ArrayList<CharRuleResult> caracRules = ruleResults.get(classCarac.getCharacteristic_id());
 					if(caracRules!=null){
 						Optional<CharRuleResult> SuperRule = caracRules.stream()
@@ -231,12 +231,12 @@ public class CharDescriptionRow {
 	public void disableSubSpanningRules(String charId){
 		CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).stream().filter(classCaracteristic -> !classCaracteristic.getCharacteristic_id().equals(charId)).forEach(classCarac->{
 			try {
-				ruleResults.get(charId).stream().forEach(r->{
+				ruleResults.get(charId).stream().filter(result->!result.isSubRule() && !result.isDraft() && !result.isOrphan()).forEach(r->{
 					ArrayList<CharRuleResult> caracRules = ruleResults.get(classCarac.getCharacteristic_id());
 					if(caracRules!=null){
 						Optional<CharRuleResult> SuperRule = caracRules.stream()
 								.filter(rloop->rloop!=null)
-								.filter(rloop->(rloop.isSuperBlockOf(r, false) && rloop.isSuperValueOf(r))).findAny();
+								.filter(rloop->( rloop.isSuperBlockOf(r, false) && rloop.isSuperValueOf(r) && rloop.sharesCurrentItemValue(classCarac,getData(getClass_segment_string().split("&&&")[0]).get(classCarac.getCharacteristic_id())) )).findAny();
 						if(SuperRule.isPresent()) {
 							//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
 							r.addSuperRule(SuperRule);
@@ -254,12 +254,12 @@ public class CharDescriptionRow {
 		if(GlobalConstants.CHAR_DESC_PATTERN_SPAN_SUPERRULES_ACCROS_CHARS){
 			CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).forEach(classCarac->{
 				try {
-					ruleResults.get(charId).stream().forEach(r->{
+					ruleResults.get(charId).stream().filter(result->!result.isSubRule() && !result.isDraft() && !result.isOrphan()).forEach(r->{
 						ArrayList<CharRuleResult> caracRules = ruleResults.get(classCarac.getCharacteristic_id());
 						if(caracRules!=null){
 							Optional<CharRuleResult> SuperRule = caracRules.stream()
 									.filter(rloop->rloop!=null)
-									.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r, false)||( classCarac.getCharacteristic_id().equals(charId)&&rloop.isRedudantWith(r) ) )).findAny();
+									.filter(rloop->rloop!=r).filter(rloop->( rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r, false)||( classCarac.getCharacteristic_id().equals(charId)&&rloop.isRedudantWith(r) ) )).findAny();
 							if(SuperRule.isPresent()) {
 								//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
 								r.addSuperRule(SuperRule);
@@ -273,7 +273,7 @@ public class CharDescriptionRow {
 			});
 		}else{
 			try {
-				ruleResults.get(charId).stream().forEach(r->{
+				ruleResults.get(charId).stream().filter(result->!result.isSubRule() && !result.isDraft() && !result.isOrphan()).forEach(r->{
 
 					Optional<CharRuleResult> SuperRule = ruleResults.get(charId).stream()
 							.filter(rloop->rloop!=r).filter(rloop->(rloop.isSuperMarkerOf(r)||rloop.isSuperBlockOf(r, false)||rloop.isRedudantWith(r)) ).findAny();
@@ -289,9 +289,9 @@ public class CharDescriptionRow {
 		}
 	}
 
-	public boolean itemHasDisplayValue(CharRuleResult r){
+	public boolean HasDisplayValue(CharRuleResult r, String charId){
 		String targetVal = r.getActionValue().getDisplayValue(false, false);
-		return getData(getClass_segment_string().split("&&&")[0]).values().stream().anyMatch(loopVal->
+		return getData(getClass_segment_string().split("&&&")[0]).entrySet().stream().filter(e->charId==null || !e.getKey().equals(charId)).map(e->e.getValue()).anyMatch(loopVal->
 			loopVal!=null && StringUtils.equalsIgnoreCase(loopVal.getDisplayValue(false,false),targetVal));
 	}
 
@@ -319,48 +319,79 @@ public class CharDescriptionRow {
 		r.getRuleResults().keySet().forEach(r::disableSubSpanningRules);
 		r.getRuleResults().keySet().forEach(r::disableRedundantSpanningRules);
 
-
-		//The status of the row becomes "Suggestion j+1" for the item I,with j the highest suggestion # already present (initiated at 1)
-		HashMap<String, ArrayList<CaracteristicValue>> knownRuleValues = new HashMap<String, ArrayList<CaracteristicValue>>();
-		r.getRuleResults().entrySet().stream().forEach(e->e.getValue().stream().filter(result->!result.isSubRule() && !result.isDraft() && !result.isOrphan()).forEach(result -> {
-			try{
-				int valIndx = knownRuleValues.get(e.getKey()).indexOf(result.getActionValue());
-				if(valIndx==-1){
-					//New value
+		if (!GlobalConstants.PROMOTE_SUGGESTION_TO_APPLIED_OLD_SCHEMA) {
+			r.getRuleResults().keySet().forEach(charId -> {
+				/*System.out.println(charId+"->"+CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).stream().filter(car->car.getCharacteristic_id().equals(charId)).findAny().get().getCharacteristic_name());
+				if(charId.equalsIgnoreCase("TXTT0271")){
+					System.out.println(charId);
+				}*/
+				ArrayList<CharRuleResult> applicableRules = r.getRuleResults().get(charId).stream().filter(result -> !result.isSubRule() && !result.isDraft() && !result.isOrphan())
+						.filter(s -> !s.shouldBeLeftAsSuggestion(charId, getRuleResults(), getData(getClass_segment_string().split("&&&")[0]))).filter(s -> !r.HasDisplayValue(s,charId)).collect(Collectors.toCollection(ArrayList::new));
+				int applicableRulesCardinality = applicableRules.stream().map(ar -> ar.getActionValue().getDisplayValue(false, false)).collect(Collectors.toCollection(HashSet::new)).size();
+				if (applicableRulesCardinality == 1 && !r.HasDisplayValue(applicableRules.get(0),null)) {
+					applicableRules.forEach(ar -> ar.setStatus("Applied"));
+				}
+				ArrayList<CaracteristicValue> knownRuleValues = new ArrayList<CaracteristicValue>();
+				r.getRuleResults().get(charId).stream().filter(result -> !result.isSubRule() && !result.isDraft() && !result.isOrphan()).filter(result -> result.getStatus() == null).forEach(result -> {
+					int valIndx = knownRuleValues.indexOf(result.getActionValue());
+					if (valIndx == -1) {
+						//New value
+						knownRuleValues.add(result.getActionValue());
+						result.setStatus("Suggestion " + String.valueOf(knownRuleValues.size()));
+					} else {
+						//Known value
+						//result.setStatus("Suggestion "+String.valueOf(valIndx)+1);
+						//Clear this value for visibility
+						result.setStatus(null);
+					}
+				});
+				if (applicableRulesCardinality == 1 && !r.HasDisplayValue(applicableRules.get(0),null)) {
+					applicableRules.forEach(ar -> ar.setStatus(null));
+					applicableRules.get(0).setStatus("Applied");
+				}
+			});
+		}else{
+			//The status of the row becomes "Suggestion j+1" for the item I,with j the highest suggestion # already present (initiated at 1)
+			HashMap<String, ArrayList<CaracteristicValue>> knownRuleValues = new HashMap<String, ArrayList<CaracteristicValue>>();
+			r.getRuleResults().entrySet().stream().forEach(e -> e.getValue().stream().filter(result -> !result.isSubRule() && !result.isDraft() && !result.isOrphan()).forEach(result -> {
+				try {
+					int valIndx = knownRuleValues.get(e.getKey()).indexOf(result.getActionValue());
+					if (valIndx == -1) {
+						//New value
+						knownRuleValues.get(e.getKey()).add(result.getActionValue());
+						result.setStatus("Suggestion " + String.valueOf(knownRuleValues.get(e.getKey()).size()));
+					} else {
+						//Known value
+						//result.setStatus("Suggestion "+String.valueOf(valIndx)+1);
+						//Clear this value for visibility
+						result.setStatus(null);
+					}
+				} catch (Exception V) {
+					knownRuleValues.put(e.getKey(), new ArrayList<CaracteristicValue>());
 					knownRuleValues.get(e.getKey()).add(result.getActionValue());
-					result.setStatus("Suggestion "+String.valueOf(knownRuleValues.get(e.getKey()).size()));
-				}else{
-					//Known value
-					//result.setStatus("Suggestion "+String.valueOf(valIndx)+1);
-					//Clear this value for visibility
-					result.setStatus(null);
+					result.setStatus("Suggestion " + String.valueOf(knownRuleValues.get(e.getKey()).size()));
 				}
-			}catch (Exception V){
-				knownRuleValues.put(e.getKey(),new ArrayList<CaracteristicValue>());
-				knownRuleValues.get(e.getKey()).add(result.getActionValue());
-				result.setStatus("Suggestion "+String.valueOf(knownRuleValues.get(e.getKey()).size()));
-			}
-		}));
+			}));
 
-		//For each couple active item I / rule N
-		r.getRuleResults().keySet().forEach(charId->{
-			ArrayList<CharRuleResult> suggestions = r.getRuleResults().get(charId)
-					.stream()
-					.filter(result -> result.getStatus()!=null && result.getStatus().startsWith("Suggestion "))
-					.collect(Collectors.toCollection(ArrayList::new));
-			if(suggestions.size()==1){
-				//The status is "Suggestion 1" and The value of the row is not similar to the the value of another row with a status different from "empty"
-				//=>wording: The status is "Suggestion 1" and other rows with similar value are empty or suggestion 1
-				//There is no status different from "Suggestion 1" or "Empty" for another row related to the same characteristic
-				if(!r.itemHasDisplayValue(suggestions.get(0))) {
-					//The value of the row is not similar to the item value for another characteristic
-					suggestions.get(0).setStatus("Applied");
+			//For each couple active item I / rule N
+			r.getRuleResults().keySet().forEach(charId -> {
+				ArrayList<CharRuleResult> suggestions = r.getRuleResults().get(charId)
+						.stream()
+						.filter(result -> result.getStatus() != null && result.getStatus().startsWith("Suggestion "))
+						.collect(Collectors.toCollection(ArrayList::new));
+				if (suggestions.size() == 1) {
+					//The status is "Suggestion 1" and The value of the row is not similar to the the value of another row with a status different from "empty"
+					//=>wording: The status is "Suggestion 1" and other rows with similar value are empty or suggestion 1
+					//There is no status different from "Suggestion 1" or "Empty" for another row related to the same characteristic
+					if (!r.HasDisplayValue(suggestions.get(0), charId)) {
+						//The value of the row is not similar to the item value for another characteristic
+						suggestions.get(0).setStatus("Applied");
+					}
+				} else if (!suggestions.stream().anyMatch(result -> result.getStatus().equals("Suggestion 2"))) {
+					suggestions.stream().filter(s -> !s.isQuasiRedundantSpanningRule(charId, getRuleResults())).forEach(result -> result.setStatus("Applied"));
 				}
-			}else if(!suggestions.stream().anyMatch(result -> result.getStatus().equals("Suggestion 2"))){
-				suggestions.stream().filter(s->!s.isQuasiRedundantSpanningRule(charId,getRuleResults())).forEach(result -> result.setStatus("Applied"));
-			}
-		});
-
+			});
+		}
 		//The characteristic value is updated based on the applied rule
 		r.getRuleResults().keySet().forEach(charId->{
 			Optional<CharRuleResult> appliedResult = r.getRuleResults().get(charId).stream()

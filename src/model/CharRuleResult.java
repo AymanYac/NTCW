@@ -295,12 +295,27 @@ public class CharRuleResult implements Serializable {
 				&& currentItemValue.getDisplayValue(false,false).equalsIgnoreCase(getActionValue().getDisplayValue(false,false));
 	}
 
+	public boolean shouldBeLeftAsSuggestion(String charId, HashMap<String, ArrayList<CharRuleResult>> ruleResults, HashMap<String, CaracteristicValue> itemData) {
+		return isQuasiRedundantSpanningRule(charId,ruleResults)
+				||
+				isQuasiSubSpanningRule(charId,ruleResults,itemData);
+	}
 
 	public boolean isQuasiRedundantSpanningRule(String charId, HashMap<String, ArrayList<CharRuleResult>> ruleResults) {
-		return ruleResults.entrySet().stream().filter(e->!e.getKey().equals(charId)).map(e->e.getValue()).flatMap(Collection::stream).filter(r->!r.isSubRule()).anyMatch(r->r.isSpanningRedundantWith(this));
+		return ruleResults.entrySet().stream().filter(e->!e.getKey().equals(charId)).map(e->e.getValue()).flatMap(Collection::stream).filter(r->!r.isSubRule() && !r.isDraft() && !r.isOrphan()).anyMatch(r->r.isSpanningRedundantWith(this));
+	}
+
+	private boolean isQuasiSubSpanningRule(String charId, HashMap<String, ArrayList<CharRuleResult>> ruleResults, HashMap<String, CaracteristicValue> itemData) {
+		return ruleResults.entrySet().stream().filter(e->!e.getKey().equals(charId)).map(e->e.getValue()).flatMap(Collection::stream).filter(r->!r.isSubRule() && !r.isDraft() && !r.isOrphan()).anyMatch(r->r.isOverSpanningOn(this,itemData));
 	}
 
 	boolean isSpanningRedundantWith(CharRuleResult r) {
 		return isSuperBlockOf(r,true) && r.isSuperBlockOf(this,true) && isEqualValueOf(r);
 	}
+
+	boolean isOverSpanningOn(CharRuleResult r, HashMap<String, CaracteristicValue> itemData){
+		return isSuperBlockOf(r, false) && isSuperValueOf(r)
+				&& !(itemData.get(getSourceChar().getCharacteristic_id())!=null && !itemData.get(getSourceChar().getCharacteristic_id()).getDisplayValue(false,false).equals("*UNKNOWN*"));
+	}
+
 }
