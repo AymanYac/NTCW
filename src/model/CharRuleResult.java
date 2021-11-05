@@ -296,21 +296,22 @@ public class CharRuleResult implements Serializable {
 	}
 
 	public boolean shouldBeLeftAsSuggestion(String charId, HashMap<String, ArrayList<CharRuleResult>> ruleResults, HashMap<String, CaracteristicValue> itemData) {
-		return isQuasiRedundantSpanningRule(charId,ruleResults)
+		return isQuasiRedundantSpanningRule(charId,ruleResults,itemData)
 				||
 				isQuasiSubSpanningRule(charId,ruleResults,itemData);
 	}
 
-	public boolean isQuasiRedundantSpanningRule(String charId, HashMap<String, ArrayList<CharRuleResult>> ruleResults) {
-		return ruleResults.entrySet().stream().filter(e->!e.getKey().equals(charId)).map(e->e.getValue()).flatMap(Collection::stream).filter(r->!r.isSubRule() && !r.isDraft() && !r.isOrphan()).anyMatch(r->r.isSpanningRedundantWith(this));
+	public boolean isQuasiRedundantSpanningRule(String charId, HashMap<String, ArrayList<CharRuleResult>> ruleResults, HashMap<String, CaracteristicValue> itemData) {
+		return ruleResults.entrySet().stream().filter(e->!e.getKey().equals(charId)).map(e->e.getValue()).flatMap(Collection::stream).filter(r->!r.isSubRule() && !r.isDraft() && !r.isOrphan()).anyMatch(r->r.isSpanningRedundantWith(this,itemData));
 	}
 
 	private boolean isQuasiSubSpanningRule(String charId, HashMap<String, ArrayList<CharRuleResult>> ruleResults, HashMap<String, CaracteristicValue> itemData) {
 		return ruleResults.entrySet().stream().filter(e->!e.getKey().equals(charId)).map(e->e.getValue()).flatMap(Collection::stream).filter(r->!r.isSubRule() && !r.isDraft() && !r.isOrphan()).anyMatch(r->r.isOverSpanningOn(this,itemData));
 	}
 
-	boolean isSpanningRedundantWith(CharRuleResult r) {
-		return isSuperBlockOf(r,true) && r.isSuperBlockOf(this,true) && isEqualValueOf(r);
+	boolean isSpanningRedundantWith(CharRuleResult r, HashMap<String, CaracteristicValue> itemData) {
+		return isSuperBlockOf(r,true) && r.isSuperBlockOf(this,true) && isEqualValueOf(r)
+				&& (itemData==null || !(itemData.get(getSourceChar().getCharacteristic_id())!=null && !itemData.get(getSourceChar().getCharacteristic_id()).getDisplayValue(false,false).equals("*UNKNOWN*")));
 	}
 
 	boolean isOverSpanningOn(CharRuleResult r, HashMap<String, CaracteristicValue> itemData){

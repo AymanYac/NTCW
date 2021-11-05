@@ -214,7 +214,7 @@ public class CharDescriptionRow {
 					if(caracRules!=null){
 						Optional<CharRuleResult> SuperRule = caracRules.stream()
 								.filter(rloop->rloop!=null)
-								.filter(rloop->(rloop.isSpanningRedundantWith(r) && rloop.sharesCurrentItemValue(classCarac,getData(getClass_segment_string().split("&&&")[0]).get(classCarac.getCharacteristic_id())))).findAny();
+								.filter(rloop->(rloop.isSpanningRedundantWith(r,null) && rloop.sharesCurrentItemValue(classCarac,getData(getClass_segment_string().split("&&&")[0]).get(classCarac.getCharacteristic_id())))).findAny();
 						if(SuperRule.isPresent()) {
 							//System.out.println(SuperRule.get().getGenericCharRule().getRuleMarker()+" is a super rule for "+r.getGenericCharRule().getRuleMarker());
 							r.addSuperRule(SuperRule);
@@ -289,7 +289,7 @@ public class CharDescriptionRow {
 		}
 	}
 
-	public boolean HasDisplayValue(CharRuleResult r, String charId){
+	public boolean HasDisplayValueExceptForChar(CharRuleResult r, String charId){
 		String targetVal = r.getActionValue().getDisplayValue(false, false);
 		return getData(getClass_segment_string().split("&&&")[0]).entrySet().stream().filter(e->charId==null || !e.getKey().equals(charId)).map(e->e.getValue()).anyMatch(loopVal->
 			loopVal!=null && StringUtils.equalsIgnoreCase(loopVal.getDisplayValue(false,false),targetVal));
@@ -322,22 +322,25 @@ public class CharDescriptionRow {
 		if (!GlobalConstants.PROMOTE_SUGGESTION_TO_APPLIED_OLD_SCHEMA) {
 			r.getRuleResults().keySet().forEach(charId -> {
 				/*System.out.println(charId+"->"+CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).stream().filter(car->car.getCharacteristic_id().equals(charId)).findAny().get().getCharacteristic_name());
-				if(charId.equalsIgnoreCase("TXTT0271")){
+				if(charId.equalsIgnoreCase("NUMU0113")){
 					System.out.println(charId);
 				}*/
 				ArrayList<CharRuleResult> applicableRules = r.getRuleResults().get(charId).stream().filter(result -> !result.isSubRule() && !result.isDraft() && !result.isOrphan())
-						.filter(s -> !s.shouldBeLeftAsSuggestion(charId, getRuleResults(), getData(getClass_segment_string().split("&&&")[0]))).filter(s -> !r.HasDisplayValue(s,charId)).collect(Collectors.toCollection(ArrayList::new));
+						.filter(s -> !s.shouldBeLeftAsSuggestion(charId, getRuleResults(), getData(getClass_segment_string().split("&&&")[0]))).collect(Collectors.toCollection(ArrayList::new));
 				int applicableRulesCardinality = applicableRules.stream().map(ar -> ar.getActionValue().getDisplayValue(false, false)).collect(Collectors.toCollection(HashSet::new)).size();
-				if (applicableRulesCardinality == 1 && !r.HasDisplayValue(applicableRules.get(0),null)) {
+				boolean applicableRuleElected = false;
+				if (applicableRulesCardinality == 1 && !r.HasDisplayValueExceptForChar(applicableRules.get(0),null)) {
+					applicableRuleElected=true;
 					applicableRules.forEach(ar -> ar.setStatus("Applied"));
 				}
 				ArrayList<CaracteristicValue> knownRuleValues = new ArrayList<CaracteristicValue>();
+				boolean finalApplicableRuleElected = applicableRuleElected;
 				r.getRuleResults().get(charId).stream().filter(result -> !result.isSubRule() && !result.isDraft() && !result.isOrphan()).filter(result -> result.getStatus() == null).forEach(result -> {
 					int valIndx = knownRuleValues.indexOf(result.getActionValue());
 					if (valIndx == -1) {
 						//New value
 						knownRuleValues.add(result.getActionValue());
-						result.setStatus("Suggestion " + String.valueOf(knownRuleValues.size()));
+						result.setStatus(finalApplicableRuleElected ?"":"Suggestion " + String.valueOf(knownRuleValues.size()));
 					} else {
 						//Known value
 						//result.setStatus("Suggestion "+String.valueOf(valIndx)+1);
@@ -345,7 +348,7 @@ public class CharDescriptionRow {
 						result.setStatus(null);
 					}
 				});
-				if (applicableRulesCardinality == 1 && !r.HasDisplayValue(applicableRules.get(0),null)) {
+				if (applicableRuleElected) {
 					applicableRules.forEach(ar -> ar.setStatus(null));
 					applicableRules.get(0).setStatus("Applied");
 				}
@@ -383,12 +386,12 @@ public class CharDescriptionRow {
 					//The status is "Suggestion 1" and The value of the row is not similar to the the value of another row with a status different from "empty"
 					//=>wording: The status is "Suggestion 1" and other rows with similar value are empty or suggestion 1
 					//There is no status different from "Suggestion 1" or "Empty" for another row related to the same characteristic
-					if (!r.HasDisplayValue(suggestions.get(0), charId)) {
+					if (!r.HasDisplayValueExceptForChar(suggestions.get(0), charId)) {
 						//The value of the row is not similar to the item value for another characteristic
 						suggestions.get(0).setStatus("Applied");
 					}
 				} else if (!suggestions.stream().anyMatch(result -> result.getStatus().equals("Suggestion 2"))) {
-					suggestions.stream().filter(s -> !s.isQuasiRedundantSpanningRule(charId, getRuleResults())).forEach(result -> result.setStatus("Applied"));
+					suggestions.stream().filter(s -> !s.isQuasiRedundantSpanningRule(charId, getRuleResults(),null)).forEach(result -> result.setStatus("Applied"));
 				}
 			});
 		}
