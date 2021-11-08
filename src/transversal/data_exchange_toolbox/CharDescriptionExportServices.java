@@ -1130,7 +1130,7 @@ public class CharDescriptionExportServices {
 	}
 
 	private static void addItemRuleBufferElement2StatementBatch(CharDescriptionRow row, PreparedStatement finalStmt) {
-		row.getRuleResults().entrySet().forEach(e->{
+		row.getRuleResultsFull().entrySet().forEach(e->{
 			try {
 				String charId = e.getKey();
 				finalStmt.setString(1,row.getItem_id());

@@ -561,7 +561,7 @@ public class CharPatternServices {
 //					The selection includes 1 and only 1 numerical value (including decimals with "." or "," or negative values)?
 				if(numValuesInSelection.size()==1) {
 					System.out.println("The selection includes 1 and only 1 numerical value");
-					boolean letterInSelection = figureInSelection = processedText.chars().mapToObj((c->(char) c)).anyMatch(c -> Character.isAlphabetic(c) || c.equals('"'));
+					boolean letterInSelection = figureInSelection = processedText.chars().mapToObj((c->(char) c)).anyMatch(c -> Character.isAlphabetic(c) || c.equals('"') || c.equals('\''));
 					if(letterInSelection) {
 //						The selection includes at least 1 letter
 						System.out.println("The selection includes at least 1 letter");

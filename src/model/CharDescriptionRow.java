@@ -196,7 +196,13 @@ public class CharDescriptionRow {
 		}
 
 	public HashMap<String, ArrayList<CharRuleResult>> getRuleResults() {
-		return ruleResults;
+		HashMap<String, ArrayList<CharRuleResult>> ret = new HashMap<String, ArrayList<CharRuleResult>>();
+		ruleResults.entrySet().stream()
+		.filter(e -> CharValuesLoader.active_characteristics.get(getClass_segment_string().split("&&&")[0]).stream().map(carac -> carac.getCharacteristic_id()).collect(Collectors.toCollection(ArrayList::new)).contains(e.getKey()))
+		.forEach(entry->{
+			ret.put(entry.getKey(),entry.getValue());
+		});
+		return ret;
 	}
 
 	public void setRuleResults( HashMap<String, ArrayList<CharRuleResult>> SerializedRuleResults) {
@@ -297,6 +303,7 @@ public class CharDescriptionRow {
 
 	public void reEvaluateCharRules(){
 		CharDescriptionRow r = this;
+		//remove orphane rule results
 		r.getRuleResults().values().forEach(v->v.removeIf(result -> result.getGenericCharRule()==null));
 		//For each couple active item I / rule N
 		r.getRuleResults().values().forEach(a->{
@@ -641,5 +648,9 @@ public class CharDescriptionRow {
 
 		}
 		return candidates.stream().filter(cand->cand!=null).map(cand->cand.getActionValue()).collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	public HashMap<String, ArrayList<CharRuleResult>> getRuleResultsFull() {
+		return ruleResults;
 	}
 }
