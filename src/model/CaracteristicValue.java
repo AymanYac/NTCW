@@ -496,9 +496,14 @@ public class CaracteristicValue implements Serializable {
 		try{
 			String concatData = "";
 			try {
-				concatData += getStdValue();
+				concatData += getDataLanguageValue();
 			}catch(Exception V) {
 				
+			}
+			try {
+				concatData += getNominal_value();
+			}catch(Exception V) {
+
 			}
 			try {
 				concatData += getMin_value();
@@ -509,6 +514,11 @@ public class CaracteristicValue implements Serializable {
 				concatData += getMax_value();
 			}catch(Exception V) {
 				
+			}
+			try {
+				concatData += getUom_id();
+			}catch(Exception V) {
+
 			}
 			
 			return unidecode.decodeAndTrim(concatData.toUpperCase()).hashCode() ;

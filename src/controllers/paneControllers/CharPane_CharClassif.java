@@ -18,6 +18,7 @@ import service.CharValuesLoader;
 import service.TableViewExtra;
 import transversal.dialog_toolbox.CaracDeclarationDialog;
 import transversal.generic.Tools;
+import transversal.language_toolbox.WordUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public class CharPane_CharClassif {
 					CaracteristicValue val = r.getValue().getValue();
 					String dsp = null;
 					try{
-						dsp = val.getDisplayValue(false,false);
+						dsp = r.getValue().getCarac().getIsCritical()? val.getDisplayValue(false,false): WordUtils.textFlowToString(r.getValue().getValue_display());
 					}catch (Exception V){
 
 					}
