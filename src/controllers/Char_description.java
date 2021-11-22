@@ -2014,13 +2014,16 @@ public class Char_description {
 					
 					//Add the allowed uoms to the autocomplete box
 					for(String uom_id:active_char.getAllowedUoms()) {
-						this.uom_field.getEntries().add(UnitOfMeasure.RunTimeUOMS.get(uom_id));
-						if(!conversionToggle.isSelected()) {
-							if(this.uom_field.getEntries().contains(local_uom)) {
-								
-							}else {
-								this.uom_field.getEntries().add(local_uom);
-							}
+						UnitOfMeasure loopUom = UnitOfMeasure.RunTimeUOMS.get(uom_id);
+						if(loopUom!=null){
+							this.uom_field.getEntries().add(loopUom);
+						}
+					}
+					if(!conversionToggle.isSelected()) {
+						if(local_uom!=null && this.uom_field.getEntries().contains(local_uom)) {
+
+						}else if(local_uom!=null){
+							this.uom_field.getEntries().add(local_uom);
 						}
 					}
 					

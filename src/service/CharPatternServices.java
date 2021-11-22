@@ -51,7 +51,7 @@ public class CharPatternServices {
 		//Let's clean the selection from all separators and do the same thing for the known values
 		String[] SEPARATORS = new String[] {",",":","\\.","-"," ","/"};
 		System.out.println("Trying to match the selection with known values");
-		for(CaracteristicValue known_value:active_char.getKnownValues().stream().filter(k->(k!=null) && (k.getStdValue()!=null)).collect(Collectors.toList())) {
+		for(CaracteristicValue known_value:active_char.getKnownValues().stream().filter(k->(k!=null) && (k.getDataLanguageValue()!=null)).collect(Collectors.toList())) {
 			String separator_free_known = known_value.getDataLanguageValue();
 			String separator_free_selected = corrected_text;
 			for(String sep:SEPARATORS) {
