@@ -22,7 +22,9 @@ public class GenericCharRule {
 	public static String SEP_CLASS_NO_VERTICAL = " '\\.,;:\\+=/\\\\[\\\\]\\\\(\\\\)"+"-";
 
 	//public static final String NUM_CLASS = "-?(?:[0-9]{1,3}(?:[. ,]+[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?";
-	public static final String NUM_CLASS = "-?(?:[0-9]{1,3}(?:[[ ]?.,]?[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?";
+	public static final String NUM_CLASS_POSITIVE = "(?:[0-9]{1,3}(?:[[ ]?.,]?[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?";
+	public static final String NUM_CLASS = "-?"+GenericCharRule.NUM_CLASS_POSITIVE;
+
 	private String ruleSyntax;
 	private static  Unidecode unidecode;
 	private ClassCaracteristic parentChar;
@@ -73,7 +75,11 @@ public class GenericCharRule {
 			//The rule rank is supp to 1, the rule is composed
 			regexMarker="^";
 			for(int i=0;i<composedMarkers.length;i++){
-				regexMarker+="(?=.*("
+				//added ? after * in (?=.*
+				//* matches the previous token between zero and unlimited times, as many times as possible, giving back as needed (greedy)
+				//*? matches the previous token between zero and unlimited times, as few times as possible, expanding as needed (lazy)
+				//Because we want the .* block to be as small as possible when the meaningful block to be as large as possible (at least on 2nd degree groups)
+				regexMarker+="(?=.*?("
 						+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(composedMarkers[i], true))
 						+"))";
 			}

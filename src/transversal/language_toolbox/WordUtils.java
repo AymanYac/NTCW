@@ -562,7 +562,10 @@ public class WordUtils {
 			if(!(selected_text!=null)) {
 				return ret;
 			}
-			
+			/*
+			Used GenericCharRule.NUM_CLASS to fetch numerics
+
+
 			//(including decimals with "." or "," or negative values
 			
 			String numericPatternString="";
@@ -581,8 +584,12 @@ public class WordUtils {
 			while (m.find()) {
 				  ret.add(Double.valueOf( m.group(0)) );
 				}
-			
-			
+			*/
+			Pattern patt = Pattern.compile("["+GenericCharRule.SEP_CLASS+"]+?"+"("+GenericCharRule.NUM_CLASS+")",Pattern.CASE_INSENSITIVE);
+			Matcher mat = patt.matcher(" "+selected_text);
+			while(mat.find()){
+				ret.add(Double.valueOf(WordUtils.EVALUATE_ARITHMETIC(mat.group(1))));
+			}
 			return ret;
 		}
 		
@@ -592,7 +599,9 @@ public class WordUtils {
 				return "";
 			}
 			//(including decimals with "." or "," or negative values
-			
+			/*
+			//Used GenericCharRule.NUM_CLASS to fetch numerics
+
 			String numericPatternString="";
 			//patternString = "(-?\\+?\\d+(\\.\\d+)?)";
 			//"HQH-12-212 hQH+29 QSD2+3" -> "-12,212,+29,2,3"
@@ -613,9 +622,17 @@ public class WordUtils {
 				selected_text = selected_text.replace(" ","$TXT_SPACE$").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "$TXT_COMMA$").replace(".","$TXT_DOT$").replace("______",".").replaceFirst("(?<!%)"+Pattern.quote(m.group(0)), "%"+String.valueOf(i));
 				//ret.add(Double.valueOf( m.group(0)) );
 				  
-				}
-			
-			return selected_text.replace("$TXT_SPACE$"," ").replace("$TXT_COMMA$",",").replace("$TXT_DOT$",".");
+				}*/
+			selected_text = " "+selected_text;
+			Pattern patt = Pattern.compile("["+GenericCharRule.SEP_CLASS+"]+?"+"("+GenericCharRule.NUM_CLASS+")",Pattern.CASE_INSENSITIVE);
+			Matcher mat = patt.matcher(selected_text);
+			int i=0;
+			while(mat.find()){
+				i+=1;
+				selected_text = selected_text.replaceFirst("(?<!%)"+Pattern.quote(mat.group(1)), "%"+String.valueOf(i));
+			}
+			return selected_text;
+			//return selected_text.replace("$TXT_SPACE$"," ").replace("$TXT_COMMA$",",").replace("$TXT_DOT$",".");
 		}
 
 
@@ -625,14 +642,19 @@ public class WordUtils {
 			//~ is used to escape intext quotes so as not to be mistaken with rule syntax quotes
 			selected_text = selected_text.replace("~\"","\"");
 			String pattern = "(-?\\d+(\\.\\d+)?)";
-		    String patternPlusOverLaps = pattern+"(?=(" + "(.*)" + ")).";
-		    Pattern p = Pattern.compile(patternPlusOverLaps);
+			//Used GenericCharRule.NUM_CLASS to fetch numerics
+		    //String patternPlusOverLaps = pattern+"(?=(" + "(.*)" + ")).";
+			String patternPlusOverLaps = "(("+GenericCharRule.NUM_CLASS_POSITIVE+"))"+"(?=(" + "(.*)" + ")).";
+			Pattern p = Pattern.compile(patternPlusOverLaps);
 		    
 		    //Matcher m = p.matcher(selected_text.replace(" ","").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "").replace(".","").replace("______","."));
 			//ligne 828/890. mauvais découpage et rempalcement %1, bug application règles numériques, exemple : MOLLA COM 185 5 21   (expected MOLLA COM %1 %2 %3)
 			//draft rule different than ctrl entrée rule
 			//"." removed on rule creation
-			Matcher m = p.matcher(selected_text.replace(" ","$TXT_SPACE$").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "$TXT_COMMA$").replace(".","$TXT_DOT$").replace("______","."));
+
+			//Used GenericCharRule.NUM_CLASS to fetch numerics
+			//Matcher m = p.matcher(selected_text.replace(" ","$TXT_SPACE$").replaceAll("(.*)[,.]([0-9]+.*)","$1______$2").replace(",", "$TXT_COMMA$").replace(".","$TXT_DOT$").replace("______","."));
+			Matcher m = p.matcher(selected_text);
 
 			ArrayList<UnitOfMeasure> ret = new ArrayList<UnitOfMeasure>();
 			while (m.find()) {

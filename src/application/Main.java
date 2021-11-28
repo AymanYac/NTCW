@@ -40,7 +40,9 @@ public class Main extends Application {
 	public static void main(String[] args) throws FileNotFoundException {
 		Locale.setDefault(Locale.ENGLISH);
 		if(GlobalConstants.REDIRECT_OUTSTREAM){
-			System.setOut(new PrintStream(new FileOutputStream(GlobalConstants.OUT_LOG, true)));
+			if(!GlobalConstants.REDIRECT_ERR_ONLY){
+				System.setOut(new PrintStream(new FileOutputStream(GlobalConstants.OUT_LOG, true)));
+			}
 			System.setErr(new PrintStream(new FileOutputStream(GlobalConstants.OUT_LOG, true)));
 			System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX >" + LocalDateTime.now() + "< XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 			System.err.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX >" + LocalDateTime.now() + "< XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
