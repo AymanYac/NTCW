@@ -182,12 +182,12 @@ public class ExternalSearchServices {
             else if (elem.get(0).equals(CustomSearchElements.CATEGORY)){
                 if(elem.get(1).equals(CustomSearchElements.DL)
                         ||
-                    (elem.get(1).equals(CustomSearchElements.UL_OR_DL) && !(sourceItem.getClass_segment().getClassNameTranslated()!=null && sourceItem.getClass_segment().getClassNameTranslated().length()>0))
+                    (elem.get(1).equals(CustomSearchElements.UL_OR_DL) && !(sourceItem.getClass_segment(true).getClassNameTranslated()!=null && sourceItem.getClass_segment(true).getClassNameTranslated().length()>0))
                 ){
-                    searchSentence.set(searchSentence.get() +" "+ sourceItem.getClass_segment().getClassName());
+                    searchSentence.set(searchSentence.get() +" "+ sourceItem.getClass_segment(true).getClassName());
                 }
                 else{
-                    searchSentence.set(searchSentence.get() +" "+ sourceItem.getClass_segment().getClassNameTranslated());
+                    searchSentence.set(searchSentence.get() +" "+ sourceItem.getClass_segment(true).getClassNameTranslated());
                 }
             }
             else if(elem.get(0).equals(CustomSearchElements.FREE_TEXT)){

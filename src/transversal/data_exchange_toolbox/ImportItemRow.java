@@ -6,11 +6,9 @@ import org.apache.poi.ss.usermodel.Row;
 import service.TranslationServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
-import transversal.language_toolbox.WordUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,7 +27,7 @@ public class ImportItemRow {
     
 	public void parseItemRow(Row current_row, UserAccount account) {
 		item = setItem(current_row);
-		if(!itemParseHasFailed && item.getClass_segment()!=null && rowGetCharNumber(current_row)!=null) {
+		if(!itemParseHasFailed && item.getClass_segment(false)!=null && rowGetCharNumber(current_row)!=null) {
 			
 			value = setCaracValue(current_row,item,rowGetCharNumber(current_row));
 		}
@@ -60,7 +58,7 @@ public class ImportItemRow {
 		if(knownCarac!=null) {
 			//The carac is known
 			
-			ClassCaracteristic knownTemplate = CharDescriptionImportServices.classSpecificFields.get(charID).get(item.getClass_segment().getClassNumber());
+			ClassCaracteristic knownTemplate = CharDescriptionImportServices.classSpecificFields.get(charID).get(item.getClass_segment(false).getClassNumber());
 			if(knownTemplate!=null) {
 				if(knownCarac.getIsNumeric()) {
 					//The carac is numeric
@@ -207,7 +205,7 @@ public class ImportItemRow {
 			}else {
 				
 				//The carac is not declared in this segment (unknown template)
-				rejectedRows.add(new Pair<Row,String>(current_row,"Non blocking Warning: Characteristic: "+charID+" is not declared for the item's category: "+item.getClass_segment().getClassNumber()));
+				rejectedRows.add(new Pair<Row,String>(current_row,"Non blocking Warning: Characteristic: "+charID+" is not declared for the item's category: "+item.getClass_segment(false).getClassNumber()));
 				//valueParseHasFailed = true;
 				//return null;
 			}
@@ -265,7 +263,10 @@ public class ImportItemRow {
 			}else {
 				if(row_class_number.length()>0) {
 					rejectedRows.add(new Pair<Row,String>(current_row,"Class number unknown: "+row_class_number+". Item created but not classified"));
+				}else{
+					rejectedRows.add(new Pair<Row,String>(current_row,"Class number unknown. Item created but not classified"));
 				}
+				itemParseHasFailed=true;
 				row_item.setClass_segment(null);
 			}
 
@@ -286,7 +287,7 @@ public class ImportItemRow {
 				known_item.setLong_desc_translated(forceUpdate?row_item.getLong_desc_translated():known_item.getLong_desc_translated());
 				known_item.setMaterial_group(forceUpdate?row_item.getMaterial_group():known_item.getMaterial_group());
 				known_item.setPreclassif(forceUpdate?row_item.getPreclassif():known_item.getPreclassif());
-				known_item.setClass_segment((forceUpdate && row_item.getClass_segment()!=null)?row_item.getClass_segment():known_item.getClass_segment());
+				known_item.setClass_segment((forceUpdate && row_item.getClass_segment(false)!=null)?row_item.getClass_segment(false):known_item.getClass_segment(false));
 
 				CharDescriptionImportServices.client2Item.put(known_item.getClient_item_number().toLowerCase(), known_item);
 				return known_item;

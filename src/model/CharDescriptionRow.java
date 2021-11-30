@@ -175,14 +175,14 @@ public class CharDescriptionRow {
 		public void setClass_segment_string(String class_segment_string) {
 			this.class_segment_string = class_segment_string;
 		}
-		public ClassSegment getClass_segment() {
-			if(class_segment!=null){
+		public ClassSegment getClass_segment(boolean fetchFromBase) {
+			if(class_segment!=null || !fetchFromBase){
 				return class_segment;
 			}
 			try {
 				return Tools.get_project_segments(null).get(class_segment_string.split("&&&")[0]);
 			} catch (SQLException | ClassNotFoundException throwables) {
-				throwables.printStackTrace();
+	//			throwables.printStackTrace();
 				return null;
 			}
 		}

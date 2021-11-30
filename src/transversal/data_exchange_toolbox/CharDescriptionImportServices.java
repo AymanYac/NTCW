@@ -207,7 +207,7 @@ public class CharDescriptionImportServices {
 		conn.close();
 		
 		//Uploading classes
-		Tools.CharDescriptionRow2ClassEvent(client2Item.values().stream().filter(i->i.getClass_segment()!=null).collect(Collectors.toList()), account, DataInputMethods.PROJECT_SETUP_UPLOAD);
+		Tools.CharDescriptionRow2ClassEvent(client2Item.values().stream().filter(i->i.getClass_segment(false)!=null).collect(Collectors.toList()), account, DataInputMethods.PROJECT_SETUP_UPLOAD);
 	}
 
 

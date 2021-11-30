@@ -585,7 +585,7 @@ public class WordUtils {
 				  ret.add(Double.valueOf( m.group(0)) );
 				}
 			*/
-			Pattern patt = Pattern.compile("["+GenericCharRule.SEP_CLASS+"]+?"+"("+GenericCharRule.NUM_CLASS+")",Pattern.CASE_INSENSITIVE);
+			Pattern patt = Pattern.compile("["+GenericCharRule.SEP_CLASS+GenericCharRule.ALPHABET_CLASS+GenericCharRule.SPECIAL_CLASS+"]+?"+"("+GenericCharRule.NUM_CLASS+")",Pattern.CASE_INSENSITIVE);
 			Matcher mat = patt.matcher(" "+selected_text);
 			while(mat.find()){
 				ret.add(Double.valueOf(WordUtils.EVALUATE_ARITHMETIC(mat.group(1))));
@@ -624,7 +624,7 @@ public class WordUtils {
 				  
 				}*/
 			selected_text = " "+selected_text;
-			Pattern patt = Pattern.compile("["+GenericCharRule.SEP_CLASS+"]+?"+"("+GenericCharRule.NUM_CLASS+")",Pattern.CASE_INSENSITIVE);
+			Pattern patt = Pattern.compile("["+GenericCharRule.SEP_CLASS+GenericCharRule.ALPHABET_CLASS+GenericCharRule.SPECIAL_CLASS+"]+?"+"("+GenericCharRule.NUM_CLASS+")",Pattern.CASE_INSENSITIVE);
 			Matcher mat = patt.matcher(selected_text);
 			int i=0;
 			while(mat.find()){
@@ -659,7 +659,9 @@ public class WordUtils {
 			ArrayList<UnitOfMeasure> ret = new ArrayList<UnitOfMeasure>();
 			while (m.find()) {
 				UnitOfMeasure tmp = UnitOfMeasure.lookUpUomInText_V2(m.group(3),active_char.getAllowedUoms());
-				ret.add(tmp);
+				if(tmp!=null){
+					ret.add(tmp);
+				}
 				}
 			//Add nulls to avoid IndexOutOfBoundsException when checking more uoms
 			ret.add(null);

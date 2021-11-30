@@ -243,7 +243,7 @@ public class DeduplicationServices {
             String carID = e.getKey();
             ComparisonResult comparaisonResult = e.getValue();
             if(e.getKey().equals("CLASS_ID")){
-                pairComparison.getAndSet(pairComparison.get() + "\n\t>" + "ITEM_CLASS<=>ITEM_CLASS:"+comparaisonResult.getItem_A().getClass_segment().getClassNumber()+"-"+comparaisonResult.getItem_A().getClass_segment().getClassName()+"<=>"+comparaisonResult.getItem_B().getClass_segment().getClassNumber()+"-"+comparaisonResult.getItem_B().getClass_segment().getClassName()+":"+comparaisonResult.getResultType());
+                pairComparison.getAndSet(pairComparison.get() + "\n\t>" + "ITEM_CLASS<=>ITEM_CLASS:"+comparaisonResult.getItem_A().getClass_segment(true).getClassNumber()+"-"+comparaisonResult.getItem_A().getClass_segment(true).getClassName()+"<=>"+comparaisonResult.getItem_B().getClass_segment(true).getClassNumber()+"-"+comparaisonResult.getItem_B().getClass_segment(true).getClassName()+":"+comparaisonResult.getResultType());
                 return;
             }
             carComparison.set("");

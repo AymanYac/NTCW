@@ -1,5 +1,6 @@
 package controllers;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -537,8 +538,13 @@ public class Project_selection {
 										Boolean newValue) {
 									 if (circle.isSelected()) { 
 								            //circle.setSelected(false);
-								            ExceptionDialog.empty_project_selected();
-								            circle.setSelected(false);
+										 Platform.runLater(new Runnable() {
+											 @Override
+											 public void run() {
+												 ExceptionDialog.empty_project_selected();
+												 circle.setSelected(false);
+											 }
+										 });
 								        } else {
 								            // ...
 								        }

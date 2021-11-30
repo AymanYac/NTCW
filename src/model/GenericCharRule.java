@@ -20,6 +20,8 @@ public class GenericCharRule {
 
 	public static String SEP_CLASS = " '\\.,;:\\+=/\\\\|\\\\[\\\\]\\\\(\\\\)"+"-";
 	public static String SEP_CLASS_NO_VERTICAL = " '\\.,;:\\+=/\\\\[\\\\]\\\\(\\\\)"+"-";
+	public static String ALPHABET_CLASS = "abcdefghijklmnopqrstuvwxyz";
+	public static String SPECIAL_CLASS = "°\"";
 
 	//public static final String NUM_CLASS = "-?(?:[0-9]{1,3}(?:[. ,]+[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?";
 	public static final String NUM_CLASS_POSITIVE = "(?:[0-9]{1,3}(?:[[ ]?.,]?[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?";
