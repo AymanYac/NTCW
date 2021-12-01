@@ -180,6 +180,7 @@ public class RulePane_CharClassif {
                     //val.setRule_id(null);
                     val.setSource(DataInputMethods.SEMI_CHAR_DESC);
                     parent.assignValueOnSelectedItems(val);
+                    parent.tableController.jumpNext();
                     parent.refresh_ui_display();
                 }
             });

@@ -299,16 +299,19 @@ public class WordUtils {
 		ArrayList<String> mandatoryStrings = new ArrayList<>();
 		ArrayList<String> optionalStrings = new ArrayList<>();
 		//Chercher l'identified pattern dans la description, en assignant les variables
+		boolean inQuotes=false;
 		while (markerToConsume.length()>0){
-			if(
+			if(!inQuotes && (
 					ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"#",digitCharacters)!=null ||
 							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"@",alphaCharacters)!=null ||
 							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"%d",numerals)!=null ||
 							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(|+0)",optionalSeparators)!=null ||
 							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(|+1)",mandatorySeparators)!=null ||
 							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(*+0)",optionalStrings)!=null ||
-							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(*+1)",mandatoryStrings)!=null){
+							ALPHANUM_PATTERN_STEP_USING_NEONEC(markerToConsume,matchedBlockToConsume,"(*+1)",mandatoryStrings)!=null)
+			){
 			}else if(markerToConsume.toString().startsWith("\"")){
+				inQuotes=!inQuotes;
 				markerToConsume = new StringBuilder(markerToConsume.substring(1));
 			}else {
 				markerToConsume = new StringBuilder(markerToConsume.substring(1));
@@ -406,7 +409,7 @@ public class WordUtils {
 		else if(markerToConsume.toString().startsWith(stepNeonec)){
 			String stepRegex=WordUtils.neonecObjectSyntaxToRegex(stepNeonec, false);
 			markerToConsume.replace(0,stepNeonec.length(),"");
-			Pattern p = Pattern.compile("("+stepRegex+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(), false)),Pattern.CASE_INSENSITIVE);
+			Pattern p = Pattern.compile("("+stepRegex+")"+WordUtils.quoteStringsInDescPattern(WordUtils.neonecObjectSyntaxToRegex(markerToConsume.toString(), false)+"$"),Pattern.CASE_INSENSITIVE);
 			Matcher m = p.matcher(matchedBlockToConsume);
 			if(m.find()){
 				String consumableMatch = String.valueOf(m.group(1));
@@ -436,7 +439,9 @@ public class WordUtils {
 		ret=ret.replaceAll("\\(\\|\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS + "]*?");
 		ret=ret.replaceAll("\\(\\|\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "[" + GenericCharRule.SEP_CLASS + "]+?");
 		ret=ret.replaceAll("\\(\\*\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".*?");
+		//ret=ret.replaceAll("\\(\\*\\+0\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "(?:.?)*");
 		ret=ret.replaceAll("\\(\\*\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", ".+?");
+		//ret=ret.replaceAll("\\(\\*\\+1\\)(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", "(?:.?)+");
 
 		ret=ret.replace("\"\"","");
 		ret=ret.replace("&&&&&&&&&&&&","\\Q\"\\E");
