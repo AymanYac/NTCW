@@ -535,7 +535,7 @@ public class DeduplicationServices {
                 return "STRONG_MATCH";
 
             }
-            if(valB.contains(valA)){
+            if(WordUtils.textIncludes(valB,valA)){
                 return "WEAK_MATCH";
 
             }
@@ -553,7 +553,7 @@ public class DeduplicationServices {
                 return "STRONG_MATCH";
 
             }
-            if(valA.contains(valB)){
+            if(WordUtils.textIncludes(valA,valB)){
                 return "WEAK_MATCH";
 
             }

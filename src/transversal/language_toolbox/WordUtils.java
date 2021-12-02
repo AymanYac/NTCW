@@ -1266,6 +1266,17 @@ public class WordUtils {
 		}
     }
 
+	public static boolean textIncludes(String major, String minor) {
+		if(major!=null && minor!=null && major.length()>0 && minor.length()>0){
+			if(minor.length()<=GlobalConstants.SEARCH_WORD_LARGE){
+				return new ArrayList<String>(Arrays.asList(major.split("["+GenericCharRule.SEP_CLASS+"]|\""))).stream().anyMatch(elem->elem.trim().equalsIgnoreCase(minor.trim()));
+			}else{
+				return major.toLowerCase().contains(minor.toLowerCase());
+			}
+		}
+		return false;
+	}
+
 
     public abstract static class Rewriter {
 		private Pattern pattern;
