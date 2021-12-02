@@ -20,6 +20,7 @@ import transversal.dialog_toolbox.ConfirmationDialog;
 import transversal.dialog_toolbox.DedupLaunchDialog;
 import transversal.dialog_toolbox.ExceptionDialog;
 import transversal.generic.Tools;
+import transversal.language_toolbox.WordUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -658,6 +659,7 @@ public class CharDescriptionExportServices {
 	}
 
 	private static Row createHeaderRow(SXSSFWorkbook wb, Sheet targetSheet, String[] columnTitles, IndexedColors[] columnColors, Integer headerRowOffset) {
+		targetSheet.createFreezePane(0,headerRowOffset+1);
 		Row headerRow = targetSheet.createRow(headerRowOffset);
 		for(int i=0;i<columnTitles.length;i++) {
 			Cell cell = headerRow.createCell(i);
@@ -1147,7 +1149,7 @@ public class CharDescriptionExportServices {
 	}
 
 
-	public static void exportDedupReport(ConcurrentHashMap<String, HashMap<String, DeduplicationServices.ComparisonResult>> fullCompResults, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, Double topCouplesPercentage, int topCouplesNumber, Char_description parent) throws SQLException, ClassNotFoundException, IOException {
+	public static void exportDedupReport(ConcurrentHashMap<String, HashMap<String, DeduplicationServices.ComparisonResult>> fullCompResults, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, Double topCouplesPercentage, int topCouplesNumber, Char_description parent, int comparisonsMade) throws SQLException, ClassNotFoundException, IOException {
 		File file = openExportFile(parent);
 		if(file==null){
 			return;
@@ -1156,7 +1158,7 @@ public class CharDescriptionExportServices {
 		SXSSFWorkbook wb = new SXSSFWorkbook(5000); // keep 5000 rows in memory, exceeding rows will be flushed to disk
 		Sheet paramSheet = null;
 		paramSheet = wb.createSheet("Matching parameters");
-		createDudupParamHeader(wb,paramSheet,global_min_matches,global_max_mismatches,global_mismatch_ratio,sourceCharClassLink.getValue().toString(),targetCharClassLink.getValue().toString());
+		createDudupParamHeader(wb,paramSheet,global_min_matches,global_max_mismatches,global_mismatch_ratio,sourceCharClassLink.getValue().toString(),targetCharClassLink.getValue().toString(), comparisonsMade);
 		Sheet classSheet = null;
 		classSheet = wb.createSheet("Matched class detail");
 		fillClassSheet(wb,classSheet,sourceCharClassLink.getValue(),targetCharClassLink.getValue());
@@ -1613,7 +1615,13 @@ public class CharDescriptionExportServices {
 		}catch (Exception V){
 
 		}
+		currentCell+=1;
+		try{
+			Cell cell = row.createCell(currentCell);
+			cell.setCellValue(WordUtils.rewriteNumeric(String.valueOf(result.getScore())));
+		}catch (Exception V){
 
+		}
 	}
 
 	private static void appendDedupCouple(Sheet couplesSheet, int couplesRank, CharDescriptionRow itemA, CharDescriptionRow itemB, int strongMatches, int weakMatches, int includedMatches, int alternativeMatches, int unknownMatches, int mismatches, Double score) {
@@ -1656,7 +1664,7 @@ public class CharDescriptionExportServices {
 	}
 
 	private static void fillDedupParamSheet(SXSSFWorkbook wb, Sheet paramSheet, Collection<DedupLaunchDialog.DedupLaunchDialogRow> values) {
-		AtomicInteger rowIndex = new AtomicInteger(7);
+		AtomicInteger rowIndex = new AtomicInteger(8);
 		values.stream().sorted(new Comparator<DedupLaunchDialog.DedupLaunchDialogRow>() {
 			@Override
 			public int compare(DedupLaunchDialog.DedupLaunchDialogRow o1, DedupLaunchDialog.DedupLaunchDialogRow o2) {
@@ -1770,7 +1778,8 @@ public class CharDescriptionExportServices {
 				"Source",
 				"Rule",
 				"Value status",
-				"Characteristic matching result"}, new IndexedColors[] {
+				"Characteristic matching result",
+				"Characteristic matching score"}, new IndexedColors[] {
 				IndexedColors.RED,
 				IndexedColors.RED,
 				IndexedColors.SEA_GREEN,
@@ -1799,6 +1808,7 @@ public class CharDescriptionExportServices {
 				IndexedColors.DARK_BLUE,
 				IndexedColors.DARK_BLUE,
 				IndexedColors.DARK_BLUE,
+				IndexedColors.RED,
 				IndexedColors.RED
 		}, 1);
 
@@ -1841,7 +1851,7 @@ public class CharDescriptionExportServices {
 		}, 0);
 	}
 
-	private static void createDudupParamHeader(SXSSFWorkbook wb, Sheet paramSheet, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, String sourceString, String targetString) {
+	private static void createDudupParamHeader(SXSSFWorkbook wb, Sheet paramSheet, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, String sourceString, String targetString, int comparisonsMade) {
 
 		XSSFCellStyle paramNameStyle = (XSSFCellStyle) wb.createCellStyle();
 		paramNameStyle.setAlignment(HorizontalAlignment.RIGHT);
@@ -1898,6 +1908,14 @@ public class CharDescriptionExportServices {
 		cell.setCellValue(targetString);
 		cell.setCellStyle(paramValueStyle);
 
+		row = paramSheet.createRow(6);
+		cell = row.createCell(1);
+		cell.setCellValue("Total number of comparisons:");
+		cell.setCellStyle(paramNameStyle);
+		cell=row.createCell(2);
+		cell.setCellValue(comparisonsMade);
+		cell.setCellStyle(paramValueStyle);
+
 		createHeaderRow(wb,paramSheet,new String[] {
 				"Sequence",
 				"Characteristic ID",
@@ -1925,6 +1943,6 @@ public class CharDescriptionExportServices {
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
-		}, 7);
+		}, 8);
 	}
 }

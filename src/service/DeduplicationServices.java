@@ -195,7 +195,7 @@ public class DeduplicationServices {
             public void run() {
                 ConfirmationDialog.show("Done", "RETAINED ITEMS : "+fullCompResults.size(), "OK");
                 try {
-                    CharDescriptionExportServices.exportDedupReport(fullCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,sourceCharClassLink,targetCharClassLink,topCouplesPercentage,topCouplesNumber, parent);
+                    CharDescriptionExportServices.exportDedupReport(fullCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,sourceCharClassLink,targetCharClassLink,topCouplesPercentage,topCouplesNumber, parent,computeItemPairs.size());
                 } catch (SQLException | ClassNotFoundException | IOException throwables) {
                     throwables.printStackTrace();
                 }

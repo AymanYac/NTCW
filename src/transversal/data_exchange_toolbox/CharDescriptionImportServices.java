@@ -56,7 +56,13 @@ public class CharDescriptionImportServices {
 
 		CharDescriptionImportServices.projectGranularity=projectGranularity;
 		CharValuesLoader.fetchAllKnownValuesAssociated2Items(active_project,true);
-		
+		try {
+			ImportTaxoRow.rejectedRows.clear();
+			ImportItemRow.rejectedRows.clear();
+		}catch (Exception V){
+
+		}
+
 
 
 		ImportTaxoRow.setColumnMap();
