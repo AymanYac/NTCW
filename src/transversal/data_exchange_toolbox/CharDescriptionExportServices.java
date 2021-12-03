@@ -1618,7 +1618,7 @@ public class CharDescriptionExportServices {
 		currentCell+=1;
 		try{
 			Cell cell = row.createCell(currentCell);
-			cell.setCellValue(WordUtils.rewriteNumeric(String.valueOf(result.getScore())));
+			cell.setCellValue(Double.valueOf(WordUtils.rewriteNumeric(String.valueOf(result.getScore()))));
 		}catch (Exception V){
 
 		}

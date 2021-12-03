@@ -1266,10 +1266,10 @@ public class WordUtils {
 		}
     }
 
-	public static boolean textIncludes(String major, String minor) {
+	public static boolean textIncludes(String major, String minor, boolean allowShortInclusion) {
 		if(major!=null && minor!=null && major.length()>0 && minor.length()>0){
 			if(minor.length()<=GlobalConstants.SEARCH_WORD_LARGE){
-				return new ArrayList<String>(Arrays.asList(major.split("["+GenericCharRule.SEP_CLASS+"]|\""))).stream().anyMatch(elem->elem.trim().equalsIgnoreCase(minor.trim()));
+				return new ArrayList<String>(Arrays.asList(major.split("["+GenericCharRule.SEP_CLASS+"]|\""))).stream().anyMatch(elem->allowShortInclusion && elem.trim().equalsIgnoreCase(minor.trim()));
 			}else{
 				return major.toLowerCase().contains(minor.toLowerCase());
 			}

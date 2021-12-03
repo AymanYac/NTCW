@@ -112,7 +112,7 @@ public class DeduplicationServices {
                         return;
                     }
                     if(isSameCar(car_A,car_B)){
-                        String valCompare = compareValues(item_A, item_B, car_A, car_B,false);
+                        String valCompare = compareValues(item_A, item_B, car_A, car_B,false, !isSameCar(car_A,car_B));
                         if(data_A == null && data_B == null){
                             ComparisonResult result = new ComparisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"UNKNOWN_MATCH");
                             hardStore(localCompStorage, car_A,result);
@@ -125,7 +125,7 @@ public class DeduplicationServices {
                             }
                         }
                     }else if(car_A_params.isAllCarac() || car_B_params.isAllCarac()){
-                        String valCompare = compareValues(item_A, item_B, car_A, car_B,false);
+                        String valCompare = compareValues(item_A, item_B, car_A, car_B,false,!isSameCar(car_A,car_B));
                         if(valCompare.equals("WEAK_MATCH") || valCompare.equals("STRONG_MATCH")){
                             ComparisonResult result = new ComparisonResult(item_A,item_B,car_A,car_B,data_A,data_B,"ALTERNATIVE_MATCH");
                             softStore(localCompStorage, car_A,result);
@@ -470,7 +470,7 @@ public class DeduplicationServices {
                                 break;
                         }
                     }else{
-                        String txtCompare = compareTxtValues(item_A,item_B,car,car,true);
+                        String txtCompare = compareTxtValues(item_A,item_B,car,car,true, !isSameCar(car,car));
                         switch (txtCompare) {
                             case "STRONG_MATCH":
                                 strongMatch(score, strongMatches, e.getValue());
@@ -507,18 +507,18 @@ public class DeduplicationServices {
             }
         });
     }
-    private static String compareValues(CharDescriptionRow item_a, CharDescriptionRow item_b, ClassCaracteristic car_a, ClassCaracteristic car_b, boolean checkDescs) {
+    private static String compareValues(CharDescriptionRow item_a, CharDescriptionRow item_b, ClassCaracteristic car_a, ClassCaracteristic car_b, boolean checkDescs, boolean usedForAlternative) {
         if(!car_a.getIsNumeric().equals(car_b.getIsNumeric())){
             return "";
         }
         if(car_a.getIsNumeric()){
             return compareNumValues(item_a,item_b,car_a,car_b,checkDescs);
         }else{
-            return compareTxtValues(item_a,item_b,car_a,car_b,checkDescs);
+            return compareTxtValues(item_a,item_b,car_a,car_b,checkDescs,usedForAlternative);
         }
     }
 
-    private static String compareTxtValues(CharDescriptionRow item_A,CharDescriptionRow item_B, ClassCaracteristic carA, ClassCaracteristic carB,boolean checkDescs){
+    private static String compareTxtValues(CharDescriptionRow item_A, CharDescriptionRow item_B, ClassCaracteristic carA, ClassCaracteristic carB, boolean checkDescs, boolean usedForAlternative){
         Pair<String, String> DLa = getField(item_A, "DL", carA);
         Pair<String, String> DLb = getField(item_B, "DL", carB);
         String valA = null;
@@ -535,7 +535,7 @@ public class DeduplicationServices {
                 return "STRONG_MATCH";
 
             }
-            if(WordUtils.textIncludes(valB,valA)){
+            if(WordUtils.textIncludes(valB,valA,!usedForAlternative)){
                 return "WEAK_MATCH";
 
             }
@@ -553,7 +553,7 @@ public class DeduplicationServices {
                 return "STRONG_MATCH";
 
             }
-            if(WordUtils.textIncludes(valA,valB)){
+            if(WordUtils.textIncludes(valA,valB,!usedForAlternative)){
                 return "WEAK_MATCH";
 
             }
