@@ -35,6 +35,7 @@ public class DeduplicationServices {
     private static Unidecode unidec;
     private static double lastprogess;
     private static ConcurrentHashMap<String, HashMap<String, ComparisonResult>> fullCompResults;
+    private static ConcurrentHashMap<String, ComparisonResult> clearedCompResults;
 
     public static void scoreDuplicatesForClassesFull(ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, double GLOBAL_MISMATCH_RATIO, Double topCouplesPercentage, int topCouplesNumber, Char_description parent, ProgressBar progressBar) throws SQLException, ClassNotFoundException, IOException {
         DeduplicationServices.sourceSegmentIDS = sourceCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
@@ -44,6 +45,7 @@ public class DeduplicationServices {
         DeduplicationServices.weightTable = weightTable;
         DeduplicationServices.nameSakeCarIDs = CharValuesLoader.getNameSakeCarIDs();
         DeduplicationServices.fullCompResults = new ConcurrentHashMap<String, HashMap<String, ComparisonResult>>();
+        DeduplicationServices.clearedCompResults = new ConcurrentHashMap<String, ComparisonResult>();
         DeduplicationServices.computeItemPairs = new ArrayList<>();
         ArrayList<CharDescriptionRow> inClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> isInSourceClass(item)).collect(Collectors.toCollection(ArrayList::new));
         ArrayList<CharDescriptionRow> outClass = CharItemFetcher.allRowItems.parallelStream().filter(item -> !isInSourceClass(item) && isInTargetClass(item)).collect(Collectors.toCollection(ArrayList::new));
@@ -183,19 +185,33 @@ public class DeduplicationServices {
                                 minScoreOfRemoval.set((int) Math.floor(lowestScoreFirst));
                             }
                         });
+                        fullCompResults.entrySet().stream().filter(p -> p.getValue().get("PAIR_SCORE").getScore() <= minScoreOfRemoval.get()).forEach(entry->{
+                            adHocPairScore(entry.getValue());
+                            clearedCompResults.put(entry.getKey(),entry.getValue().get("PAIR_SCORE"));
+                        });
                         fullCompResults.entrySet().removeIf(p->p.getValue().get("PAIR_SCORE").getScore()<=minScoreOfRemoval.get());
                     }
                 }
                 //printConsoleSummary(item_A,item_B, localCompStorage);
             }
         });
-        System.out.println("::::::::::::::::::::::::::::: RETAINED ITEMS : "+fullCompResults.size()+" ::::::::::::::::::::::::::::: in "+Duration.between(start,Instant.now()).getSeconds() +" seconds");
+        Optional<Double> maxIgnoredScore = clearedCompResults.values().stream().map(ComparisonResult::getScore).max(Comparator.naturalOrder());
+        System.out.println("::::::::::::::::::::::::::::: IGNORING ITEMS WITH SCORE BELOW : "+String.valueOf(maxIgnoredScore.get()));
+        fullCompResults.entrySet().stream().filter(p -> p.getValue().get("PAIR_SCORE").getScore() <= maxIgnoredScore.get()).forEach(entry->{
+            adHocPairScore(entry.getValue());
+            clearedCompResults.put(entry.getKey(),entry.getValue().get("PAIR_SCORE"));
+        });
+        fullCompResults.entrySet().removeIf(p->p.getValue().get("PAIR_SCORE").getScore()<=maxIgnoredScore.get());
+
+
+        System.out.println("::::::::::::::::::::::::::::: RETAINED COUPLES : "+fullCompResults.size()+" ::::::::::::::::::::::::::::: in "+Duration.between(start,Instant.now()).getSeconds() +" seconds");
+        System.out.println("::::::::::::::::::::::::::::: IGNORED COUPLES : "+clearedCompResults.size()+" ::::::::::::::::::::::::::::: in "+Duration.between(start,Instant.now()).getSeconds() +" seconds");
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                ConfirmationDialog.show("Done", "RETAINED ITEMS : "+fullCompResults.size(), "OK");
+                ConfirmationDialog.show("Done", "RETAINED COUPLES : "+fullCompResults.size()+"\n"+"IGNORED COUPLES : "+clearedCompResults.size(), "OK");
                 try {
-                    CharDescriptionExportServices.exportDedupReport(fullCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,sourceCharClassLink,targetCharClassLink,topCouplesPercentage,topCouplesNumber, parent,computeItemPairs.size());
+                    CharDescriptionExportServices.exportDedupReport(fullCompResults,clearedCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,sourceCharClassLink,targetCharClassLink,topCouplesPercentage,topCouplesNumber, parent,computeItemPairs.size(),fullCompResults.size(),clearedCompResults.size());
                 } catch (SQLException | ClassNotFoundException | IOException throwables) {
                     throwables.printStackTrace();
                 }
@@ -210,7 +226,47 @@ public class DeduplicationServices {
         e.values().forEach(r->{
             score.updateAndGet(v -> v + r.getScore());
         });
-        e.put("PAIR_SCORE",new ComparisonResult(score.get()));
+        CharDescriptionRow item_a = e.values().stream().map(ComparisonResult::getItem_A).filter(Objects::nonNull).findFirst().get();
+        CharDescriptionRow item_b = e.values().stream().map(ComparisonResult::getItem_B).filter(Objects::nonNull).findFirst().get();
+        e.put("PAIR_SCORE",new ComparisonResult(score.get(), item_a, item_b));
+    }
+
+    public static void adHocPairScore(HashMap<String,ComparisonResult> entry){
+        AtomicInteger strongMatches = new AtomicInteger();
+        AtomicInteger weakMatches = new AtomicInteger();
+        AtomicInteger includedMatches = new AtomicInteger();
+        AtomicInteger alternativeMatches = new AtomicInteger();
+        AtomicInteger unknownMatches = new AtomicInteger();
+        AtomicInteger mismatches = new AtomicInteger();
+        entry.entrySet().stream().filter(se->!se.getKey().equals("PAIR_SCORE")).map(se->se.getValue()).forEach(r->{
+            switch (r.getResultType()){
+                case "STRONG_MATCH":
+                    strongMatches.addAndGet(1);
+                    break;
+                case "WEAK_MATCH":
+                    weakMatches.addAndGet(1);
+                    break;
+                case "DESCRIPTION_MATCH":
+                    includedMatches.addAndGet(1);
+                    break;
+                case "ALTERNATIVE_MATCH":
+                    alternativeMatches.addAndGet(1);
+                    break;
+                case "UNKNOWN_MATCH":
+                    unknownMatches.addAndGet(1);
+                    break;
+                case "MISMATCH":
+                    mismatches.addAndGet(1);
+                    break;
+            }
+        });
+        entry.get("PAIR_SCORE").setAdhocArray(new ArrayList<Object>());
+        entry.get("PAIR_SCORE").adhocArrayAppend(strongMatches.get());
+        entry.get("PAIR_SCORE").adhocArrayAppend(weakMatches.get());
+        entry.get("PAIR_SCORE").adhocArrayAppend(includedMatches.get());
+        entry.get("PAIR_SCORE").adhocArrayAppend(alternativeMatches.get());
+        entry.get("PAIR_SCORE").adhocArrayAppend(unknownMatches.get());
+        entry.get("PAIR_SCORE").adhocArrayAppend(mismatches.get());
     }
 
     private static DedupLaunchDialog.DedupLaunchDialogRow getCarParams(HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, ClassCaracteristic car) {
@@ -322,6 +378,7 @@ public class DeduplicationServices {
         CaracteristicValue val_B;
         String ResultType;
         Double score = 0.0;
+        private ArrayList<Object> adHocArray;
 
 
         public ComparisonResult(CharDescriptionRow item_a, CharDescriptionRow item_b, ClassCaracteristic car_a, ClassCaracteristic car_b, CaracteristicValue data_a, CaracteristicValue data_b, String match_type) {
@@ -336,8 +393,10 @@ public class DeduplicationServices {
             setScore();
         }
 
-        public ComparisonResult(Double score) {
+        public ComparisonResult(Double score, CharDescriptionRow item_a, CharDescriptionRow item_b) {
             super();
+            setItem_A(item_a);
+            setItem_B(item_b);
             setScore(score);
         }
 
@@ -413,6 +472,16 @@ public class DeduplicationServices {
                 setScore(getWeightFromWeightTableRowValue(getResultType(),weightTable.get(GlobalConstants.DEDUP_BY_CAR_NAME_INSTEAD_OF_CAR_ID?"Item Class":"CLASS_ID")));
             }
 
+        }
+
+        public void setAdhocArray(ArrayList<Object> objects) {
+            this.adHocArray = new ArrayList<Object>();
+        }
+        public void adhocArrayAppend(Object object) {
+            this.adHocArray.add(object);
+        }
+        public ArrayList<Object> getAdhocArray(){
+            return this.adHocArray;
         }
     }
 
