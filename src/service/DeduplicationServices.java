@@ -196,12 +196,17 @@ public class DeduplicationServices {
             }
         });
         Optional<Double> maxIgnoredScore = clearedCompResults.values().stream().map(ComparisonResult::getScore).max(Comparator.naturalOrder());
-        System.out.println("::::::::::::::::::::::::::::: IGNORING ITEMS WITH SCORE BELOW : "+String.valueOf(maxIgnoredScore.get()));
-        fullCompResults.entrySet().stream().filter(p -> p.getValue().get("PAIR_SCORE").getScore() <= maxIgnoredScore.get()).forEach(entry->{
-            adHocPairScore(entry.getValue());
-            clearedCompResults.put(entry.getKey(),entry.getValue().get("PAIR_SCORE"));
-        });
-        fullCompResults.entrySet().removeIf(p->p.getValue().get("PAIR_SCORE").getScore()<=maxIgnoredScore.get());
+        if(maxIgnoredScore.isPresent()){
+            System.err.println("::::::::::::::::::::::::::::: IGNORING COUPLES WITH SCORE BELOW : "+String.valueOf(maxIgnoredScore.get()));
+            fullCompResults.entrySet().stream().filter(p -> p.getValue().get("PAIR_SCORE").getScore() <= maxIgnoredScore.get()).forEach(entry->{
+                adHocPairScore(entry.getValue());
+                clearedCompResults.put(entry.getKey(),entry.getValue().get("PAIR_SCORE"));
+            });
+            fullCompResults.entrySet().removeIf(p->p.getValue().get("PAIR_SCORE").getScore()<=maxIgnoredScore.get());
+        }else{
+            System.err.println("::::::::::::::::::::::::::::: NO COUPLES TO IGNORE");
+        }
+
 
 
         System.out.println("::::::::::::::::::::::::::::: RETAINED COUPLES : "+fullCompResults.size()+" ::::::::::::::::::::::::::::: in "+Duration.between(start,Instant.now()).getSeconds() +" seconds");
