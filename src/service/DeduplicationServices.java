@@ -3,6 +3,7 @@ package service;
 import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.util.Pair;
 import model.*;
@@ -18,6 +19,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,7 +39,7 @@ public class DeduplicationServices {
     private static ConcurrentHashMap<String, HashMap<String, ComparisonResult>> fullCompResults;
     private static ConcurrentHashMap<String, ComparisonResult> clearedCompResults;
 
-    public static void scoreDuplicatesForClassesFull(ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, double GLOBAL_MISMATCH_RATIO, Double topCouplesPercentage, int topCouplesNumber, Char_description parent, ProgressBar progressBar) throws SQLException, ClassNotFoundException, IOException {
+    public static void scoreDuplicatesForClassesFull(ComboBox<ClassSegmentClusterComboRow> sourceCharClassLink, ComboBox<ClassSegmentClusterComboRow> targetCharClassLink, HashMap<String, DedupLaunchDialog.DedupLaunchDialogRow> weightTable, Integer GLOBAL_MIN_MATCHES, Integer GLOBAL_MAX_MISMATCHES, double GLOBAL_MISMATCH_RATIO, Double topCouplesPercentage, int topCouplesNumber, Char_description parent, ProgressBar progressBar, Label progressText) throws SQLException, ClassNotFoundException, IOException {
         DeduplicationServices.sourceSegmentIDS = sourceCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
         DeduplicationServices.targetSegmentIDS = targetCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
         lastprogess = 0;
@@ -107,9 +109,9 @@ public class DeduplicationServices {
                         hardStore(localCompStorage, car_B,result);
                         return;
                     }
-                    if(!itemPairIsViable(localCompStorage.values(),GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,(cars_A.size()-car_idx_A-1)*cars_B.size() + (cars_B.size()-car_idx_B))){
+                    /*if(!itemPairIsViable(localCompStorage.values(),GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,(cars_A.size()-car_idx_A-1)*cars_B.size() + (cars_B.size()-car_idx_B))){
                         return;
-                    }
+                    }*/
                     if(!(car_B.getIsNumeric().equals(car_A.getIsNumeric()))){
                         return;
                     }
@@ -169,54 +171,92 @@ public class DeduplicationServices {
                 double progress = (doneComparisons.get() * 100.0) / computeItemPairs.size();
                 if(progress-lastprogess>2){
                     lastprogess = progress;
-                    System.out.println(LocalDateTime.now().getHour()+":"+LocalDateTime.now().getMinute()+" > "+ WordUtils.Rewriter.DecimalUtils.round(progress)+"%");
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBar.setProgress(progress/100.0);
-                        }
-                    });
-                    if(fullCompResults.size()>GlobalConstants.MAX_DEDUP_PAIRS_IN_MEMORY){
+                    System.err.println(LocalDateTime.now().getHour()+":"+LocalDateTime.now().getMinute()+" > "+ WordUtils.Rewriter.DecimalUtils.round(progress)+"%");
+                    if(fullCompResults.size()>Math.min(GlobalConstants.MAX_DEDUP_PAIRS_IN_MEMORY,topCouplesNumber)){
                         AtomicInteger numberOfRemovals = new AtomicInteger(0);
-                        AtomicInteger minScoreOfRemoval = new AtomicInteger(0);
-                        fullCompResults.values().stream().map(p->p.get("PAIR_SCORE").getScore()).collect(Collectors.toCollection(ArrayList::new)).stream().sorted().forEach(lowestScoreFirst->{
-                            if(numberOfRemovals.get()+GlobalConstants.MAX_DEDUP_PAIRS_IN_MEMORY < fullCompResults.size()){
+                        AtomicInteger minScoreOfRemoval = new AtomicInteger(Integer.MIN_VALUE);
+                        fullCompResults.entrySet().stream().map(p->p.getValue().get("PAIR_SCORE").getScore()).collect(Collectors.toCollection(ArrayList::new)).stream().sorted().forEach(lowestScoreFirst->{
+                            if(numberOfRemovals.get()+Math.min(GlobalConstants.MAX_DEDUP_PAIRS_IN_MEMORY,topCouplesNumber) < fullCompResults.keySet().size()){
                                 numberOfRemovals.addAndGet(1);
                                 minScoreOfRemoval.set((int) Math.floor(lowestScoreFirst));
                             }
                         });
-                        fullCompResults.entrySet().stream().filter(p -> p.getValue().get("PAIR_SCORE").getScore() <= minScoreOfRemoval.get()).forEach(entry->{
-                            adHocPairScore(entry.getValue());
-                            clearedCompResults.put(entry.getKey(),entry.getValue().get("PAIR_SCORE"));
-                        });
+                        if(fullCompResults.size()<=topCouplesNumber){
+                            //Limited by memory items to keep only
+                            fullCompResults.entrySet().stream().filter(p -> p.getValue().get("PAIR_SCORE").getScore() <= minScoreOfRemoval.get()).forEach(entry->{
+                                adHocPairScore(entry.getValue());
+                                clearedCompResults.put(entry.getKey(),entry.getValue().get("PAIR_SCORE"));
+                            });
+                        }
+                        System.err.println("Clearing "+fullCompResults.entrySet().stream().filter(p->p.getValue().get("PAIR_SCORE").getScore()<=minScoreOfRemoval.get()).map(Map.Entry::getKey).collect(Collectors.toCollection(HashSet::new)).size()
+                                +"/"+fullCompResults.keySet().size()
+                                +" couples (score below "+String.valueOf(minScoreOfRemoval)+")");
                         fullCompResults.entrySet().removeIf(p->p.getValue().get("PAIR_SCORE").getScore()<=minScoreOfRemoval.get());
                     }
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setProgress(progress/100.0);
+                            progressText.setText("Compared "+ doneComparisons.get() +"/"+computeItemPairs.size()+"." +
+                                    "\t"+"\t"+"\t"+
+                                    "Retained top "+fullCompResults.size()+" on "+String.valueOf(fullCompResults.size()+clearedCompResults.size())+" filtred couples." +
+                                    "\t"+"\t"+"\t"+
+                                    "ETC: "+ LocalDateTime.now().plus(Duration.between(start,Instant.now()).multipliedBy((long) ((100-progress)/progress))).format(DateTimeFormatter.ofPattern("HH:mm")));
+
+                        }
+                    });
+
                 }
                 //printConsoleSummary(item_A,item_B, localCompStorage);
             }
         });
-        Optional<Double> maxIgnoredScore = clearedCompResults.values().stream().map(ComparisonResult::getScore).max(Comparator.naturalOrder());
-        if(maxIgnoredScore.isPresent()){
-            System.err.println("::::::::::::::::::::::::::::: IGNORING COUPLES WITH SCORE BELOW : "+String.valueOf(maxIgnoredScore.get()));
-            fullCompResults.entrySet().stream().filter(p -> p.getValue().get("PAIR_SCORE").getScore() <= maxIgnoredScore.get()).forEach(entry->{
+        Optional<Double> couplesLimitedScore = clearedCompResults.values().stream().map(ComparisonResult::getScore).max(Comparator.naturalOrder());
+
+        //DetailedFlat simulates final detailed sheet ordered results in order to make sure that
+        //same score couples either all appear on detailed results or none do if constrained by sheet size
+        ArrayList<Pair<String, ComparisonResult>> detailedFlat = fullCompResults.entrySet().stream().collect(Collectors.toCollection(ArrayList::new)).stream()
+                .sorted(new Comparator<Map.Entry<String, HashMap<String, ComparisonResult>>>() {
+                    @Override
+                    public int compare(Map.Entry<String, HashMap<String, ComparisonResult>> o1, Map.Entry<String, HashMap<String, ComparisonResult>> o2) {
+                        return o2.getValue().get("PAIR_SCORE").getScore().compareTo(o1.getValue().get("PAIR_SCORE").getScore());
+                    }
+                }).flatMap(m -> m.getValue().values().stream().map(l -> new Pair<String, ComparisonResult>(m.getKey(), l))).collect(Collectors.toCollection(ArrayList::new));
+
+        assert fullCompResults.values().stream().map(h -> h.values().size()).mapToInt(Integer::intValue).reduce(Integer::sum).getAsInt() == detailedFlat.size() :" Detailed Comparison results map/reduce failed";
+        Optional<Double> detailLimitedMinScore = Optional.empty();
+        if(detailedFlat.size()>GlobalConstants.EXCEL_MAX_ROW_COUNT-3){
+            Pair<String, ComparisonResult> cutOff = detailedFlat.get(GlobalConstants.EXCEL_MAX_ROW_COUNT - 3);
+            String key = cutOff.getKey();
+            HashMap<String, ComparisonResult> pair = fullCompResults.get(key);
+            detailLimitedMinScore = Optional.ofNullable(pair.get("PAIR_SCORE").getScore());
+            System.err.println("::::::::::::::::::::::::::::: EXCEL SHEET MAX SIZE. MAKING SURE TO IGNORE ALL LOWER SAME SCORE ITEMS TO FIT SHEET");
+        }
+        Optional<Double> writableMinScore = couplesLimitedScore.isPresent()
+                ? (detailLimitedMinScore.map(aDouble -> Optional.of(Math.max(couplesLimitedScore.get(), aDouble))).orElse(couplesLimitedScore))
+                :(detailLimitedMinScore);
+        //IGNORING BASED ON MEMORY MANAGEMENT OR EXCEL SHEET MANAGEMENT
+        if(writableMinScore.isPresent()){
+            System.err.println("::::::::::::::::::::::::::::: IGNORING COUPLES WITH SCORE BELOW : "+String.valueOf(writableMinScore.get()));
+            fullCompResults.entrySet().stream().filter(p -> p.getValue().get("PAIR_SCORE").getScore() <= writableMinScore.get()).forEach(entry->{
                 adHocPairScore(entry.getValue());
                 clearedCompResults.put(entry.getKey(),entry.getValue().get("PAIR_SCORE"));
             });
-            fullCompResults.entrySet().removeIf(p->p.getValue().get("PAIR_SCORE").getScore()<=maxIgnoredScore.get());
+            fullCompResults.entrySet().removeIf(p->p.getValue().get("PAIR_SCORE").getScore()<=writableMinScore.get());
         }else{
             System.err.println("::::::::::::::::::::::::::::: NO COUPLES TO IGNORE");
         }
 
 
-
-        System.out.println("::::::::::::::::::::::::::::: RETAINED COUPLES : "+fullCompResults.size()+" ::::::::::::::::::::::::::::: in "+Duration.between(start,Instant.now()).getSeconds() +" seconds");
-        System.out.println("::::::::::::::::::::::::::::: IGNORED COUPLES : "+clearedCompResults.size()+" ::::::::::::::::::::::::::::: in "+Duration.between(start,Instant.now()).getSeconds() +" seconds");
+        Duration processingTime = Duration.between(start, Instant.now());
+        System.out.println("::::::::::::::::::::::::::::: RETAINED COUPLES : "+fullCompResults.size()+" ::::::::::::::::::::::::::::: in "+processingTime.getSeconds() +" seconds");
+        System.out.println("::::::::::::::::::::::::::::: IGNORED COUPLES : "+clearedCompResults.size()+" ::::::::::::::::::::::::::::: in "+processingTime.getSeconds() +" seconds");
+        Optional<Double> finalDetailLimitedMinScore = detailLimitedMinScore;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 ConfirmationDialog.show("Done", "RETAINED COUPLES : "+fullCompResults.size()+"\n"+"IGNORED COUPLES : "+clearedCompResults.size(), "OK");
                 try {
-                    CharDescriptionExportServices.exportDedupReport(fullCompResults,clearedCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,sourceCharClassLink,targetCharClassLink,topCouplesPercentage,topCouplesNumber, parent,computeItemPairs.size(),fullCompResults.size(),clearedCompResults.size());
+                    CharDescriptionExportServices.exportDedupReport(parent, fullCompResults,clearedCompResults,weightTable,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,sourceCharClassLink,targetCharClassLink,topCouplesPercentage,topCouplesNumber, processingTime, computeItemPairs.size(),fullCompResults.size(),clearedCompResults.size(), finalDetailLimitedMinScore,couplesLimitedScore);
                 } catch (SQLException | ClassNotFoundException | IOException throwables) {
                     throwables.printStackTrace();
                 }

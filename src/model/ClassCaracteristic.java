@@ -104,6 +104,9 @@ public class ClassCaracteristic implements Serializable {
 		this.allowedValues = allowedValues;
 	}
 	public ArrayList<String> getAllowedUoms() {
+		if(allowedUoms==null){
+			return new ArrayList<String>();
+		}
 		return allowedUoms;
 	}
 	public void setAllowedUoms(ArrayList<String> allowedUoms) {

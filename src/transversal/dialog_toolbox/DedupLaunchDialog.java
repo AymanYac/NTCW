@@ -18,6 +18,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -400,7 +401,10 @@ public class DedupLaunchDialog {
             progressDialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
             progressDialog.getDialogPane().getStyleClass().add("customDialog");
             GridPane progressGrid = new GridPane();
-            progressGrid.add(new Label("Progress:"),0,0);
+            Label progressText = new Label("Filtering items for comparison...");
+            progressText.setAlignment(Pos.CENTER);
+            progressText.setTextAlignment(TextAlignment.CENTER);
+            progressGrid.add(progressText,0,0);
             ProgressBar progressBar = new ProgressBar();
             progressBar.setMinWidth(1024);
             progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
@@ -443,7 +447,7 @@ public class DedupLaunchDialog {
                     Task dedupTask = new Task<Void>() {
                         @Override
                         protected Void call() throws Exception {
-                            DeduplicationServices.scoreDuplicatesForClassesFull(sourceCharClassLink,targetCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), 1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())), finalMaxPercentage, finalMaxRows,parent,progressBar);
+                            DeduplicationServices.scoreDuplicatesForClassesFull(sourceCharClassLink,targetCharClassLink,weightTable, Integer.parseInt(minMatches.getText()), Integer.parseInt(maxMismatches.getText()), 1.0 / (Double.parseDouble(minMatchMismatchRatio.getText())), finalMaxPercentage, finalMaxRows,parent,progressBar,progressText);
                             return null;
                         }
                     };
