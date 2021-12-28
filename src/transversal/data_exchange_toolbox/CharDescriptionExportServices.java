@@ -43,8 +43,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationHMS;
-
 
 public class CharDescriptionExportServices {
 
@@ -181,7 +179,7 @@ public class CharDescriptionExportServices {
 
 
 	private static void createKnownRulesHeader(Sheet knownRulesSheet, SXSSFWorkbook wb) {
-		Row reviewHeader = createHeaderRow(wb,knownRulesSheet,new String[] {
+		Row reviewHeader = createHeaderRow(wb,knownRulesSheet, 0, new String[] {
 				"Characteristic ID",
 				"Characteristic Name",
 				"Characteristic Type",
@@ -200,11 +198,11 @@ public class CharDescriptionExportServices {
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT
-		}, 0);
+		}, new Double[]{}, 100);
 	}
 
 	private static void createReviewHeader(SXSSFWorkbook wb, Sheet reviewSheet) {
-		Row reviewHeader = createHeaderRow(wb,reviewSheet,new String[] {
+		Row reviewHeader = createHeaderRow(wb,reviewSheet, 0, new String[] {
 				"Completion Status",
 				"Client Item Number",
 				"Short description",
@@ -221,7 +219,7 @@ public class CharDescriptionExportServices {
 				IndexedColors.SEA_GREEN,
 				IndexedColors.SEA_GREEN,
 				IndexedColors.GREY_80_PERCENT
-		}, 0);
+		}, new Double[]{}, 100);
 		completeReviewHeaderRow(wb,reviewHeader,
 				CharValuesLoader.active_characteristics.values().parallelStream()
 						.map(a->a.size()).max(Integer::compare).get());
@@ -229,7 +227,7 @@ public class CharDescriptionExportServices {
 
 
 	private static void createBaseHeader(SXSSFWorkbook wb, Sheet baseSheet) {
-		createHeaderRow(wb,baseSheet,new String[] {
+		createHeaderRow(wb,baseSheet, 0, new String[] {
 				"Client Item Number",
 				"Characteristic Sequence",
 				"Characteristic ID",
@@ -260,7 +258,7 @@ public class CharDescriptionExportServices {
 				null,
 				null,
 				null,
-		}, 0);
+		}, new Double[]{}, 100);
 	}
 
 
@@ -572,7 +570,7 @@ public class CharDescriptionExportServices {
 	}
 
 	private static void createKnownValuesHeader(Sheet knownValueSheet, SXSSFWorkbook wb) {
-		createHeaderRow(wb,knownValueSheet,new String[] {
+		createHeaderRow(wb,knownValueSheet, 0, new String[] {
 				"Characteristic ID",
 				"Characteristic Name",
 				"Known value in DL",
@@ -580,10 +578,10 @@ public class CharDescriptionExportServices {
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
-				IndexedColors.GREY_80_PERCENT}, 0);
+				IndexedColors.GREY_80_PERCENT}, new Double[]{}, 100);
 	}
 	private static void createTaxoHeader(Sheet taxoSheet, SXSSFWorkbook wb){
-		createHeaderRow(wb,taxoSheet,new String[] {
+		createHeaderRow(wb,taxoSheet, 0, new String[] {
 				"Class Number",
 				"Characteristic Sequence",
 				"Characteristic ID",
@@ -597,7 +595,7 @@ public class CharDescriptionExportServices {
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
-				IndexedColors.GREY_80_PERCENT}, 0);
+				IndexedColors.GREY_80_PERCENT}, new Double[]{}, 100);
 	}
 
 	
@@ -666,15 +664,15 @@ public class CharDescriptionExportServices {
 		
 	}
 
-	private static Row createHeaderRow(SXSSFWorkbook wb, Sheet targetSheet, String[] columnTitles, IndexedColors[] columnColors, Integer headerRowOffset) {
+	private static Row createHeaderRow(SXSSFWorkbook wb, Sheet targetSheet, Integer headerRowOffset, String[] columnTitles, IndexedColors[] columnColors, Double[] columnWidths, int zoomLevel) {
 		targetSheet.createFreezePane(0,headerRowOffset+1);
 		Row headerRow = targetSheet.createRow(headerRowOffset);
-		for(int i=0;i<columnTitles.length;i++) {
-			Cell cell = headerRow.createCell(i);
-			cell.setCellValue(columnTitles[i]);
+		for(int colIdx=0;colIdx<columnTitles.length;colIdx++) {
+			Cell cell = headerRow.createCell(colIdx);
+			cell.setCellValue(columnTitles[colIdx]);
     		XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
     		 try{
-    			 style.setFillForegroundColor(columnColors[i].getIndex());
+    			 style.setFillForegroundColor(columnColors[colIdx].getIndex());
     		 }catch(Exception V) {
     			 byte[] byteColor = new byte[]{68,84,105};
     			 XSSFColor darkBlue = new XSSFColor(byteColor, null);	
@@ -686,9 +684,9 @@ public class CharDescriptionExportServices {
     		 font.setBold(true);
     		 style.setFont(font);
     		 cell.setCellStyle(style);
-    		 
+    		 targetSheet.setColumnWidth(colIdx, (int) (columnWidths.length==columnTitles.length?Math.ceil(columnWidths[colIdx])*256:Math.floor(190.0/columnTitles.length)*256));
 		}
-		
+		targetSheet.setZoom(zoomLevel);
 		
 		return headerRow;
 	}
@@ -1320,8 +1318,9 @@ public class CharDescriptionExportServices {
 		try{
 			closeExportFile(file,wb);
 		}catch (Exception V){
-			ConfirmationDialog.show("Failed", "Results not saved. Close the file before saving", "OK");
-			throw new RuntimeException();
+			ConfirmationDialog.show("Failed", "Results not saved. Close the file you wish to overwrite", "OK");
+			exportDedupReport(parent, fullCompResults, clearedCompResults, weightTable, global_min_matches, global_max_mismatches, global_mismatch_ratio, sourceCharClassLink, targetCharClassLink, topCouplesPercentage, topCouplesNumber, processingTime, comparisonsMade, retained, ignored, detailLimitedScore,  coupleLimitedScore);
+			//throw new RuntimeException();
 		}
 	}
 
@@ -1389,7 +1388,7 @@ public class CharDescriptionExportServices {
 		Row firstRow = classSheet.createRow(0);
 		firstRow.createCell(0).setCellValue("Compare items of:");
 		firstRow.createCell(3).setCellValue("Compare with items of:");
-		createHeaderRow(wb,classSheet,new String[] {
+		createHeaderRow(wb,classSheet, 1, new String[] {
 				"Class ID",
 				"Class Name",
 				"",
@@ -1400,7 +1399,7 @@ public class CharDescriptionExportServices {
 				IndexedColors.WHITE,
 				IndexedColors.DARK_BLUE,
 				IndexedColors.DARK_BLUE,
-		}, 1);
+		}, new Double[]{}, 100);
 		AtomicInteger sourceIdx = new AtomicInteger(1);
 		Comparator<Pair<ClassSegment, SimpleBooleanProperty>> classSegmentComparator = new Comparator<Pair<ClassSegment, SimpleBooleanProperty>>() {
 			@Override
@@ -1764,7 +1763,7 @@ public class CharDescriptionExportServices {
 	}
 
 	private static void createDedupItemClassHeader(SXSSFWorkbook wb, Sheet itemClassSheet){
-		Row reviewHeader = createHeaderRow(wb,itemClassSheet,new String[] {
+		Row reviewHeader = createHeaderRow(wb,itemClassSheet, 0, new String[] {
 				"Client Item Number",
 				"Short description",
 				"Long description",
@@ -1777,7 +1776,7 @@ public class CharDescriptionExportServices {
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.SEA_GREEN,
 				IndexedColors.SEA_GREEN
-		}, 0);
+		}, new Double[]{}, 100);
 	}
 
 	private static void createDedupDetailsHeader(SXSSFWorkbook wb, Sheet dedupDetailSheet) {
@@ -1802,7 +1801,7 @@ public class CharDescriptionExportServices {
 		item2Style.setFont(item2Font);
 		cell.setCellStyle(item2Style);
 
-		createHeaderRow(wb,dedupDetailSheet,new String[] {
+		createHeaderRow(wb,dedupDetailSheet, 1, new String[] {
 				"Rank",
 				"Couple ID",
 				"Client Item Number",
@@ -1863,12 +1862,12 @@ public class CharDescriptionExportServices {
 				IndexedColors.DARK_BLUE,
 				IndexedColors.RED,
 				IndexedColors.RED
-		}, 1);
+		}, new Double[]{}, 100);
 
 	}
 
 	private static void createDedupCoupleHeader(SXSSFWorkbook wb, Sheet couplesSheet) {
-		createHeaderRow(wb,couplesSheet,new String[] {
+		createHeaderRow(wb,couplesSheet, 0, new String[] {
 				"Rank",
 				"Couple ID",
 				"Client Item Number 1",
@@ -1901,7 +1900,7 @@ public class CharDescriptionExportServices {
 				IndexedColors.RED,
 				IndexedColors.RED,
 				IndexedColors.GREY_80_PERCENT
-		}, 0);
+		}, new Double[]{}, 100);
 	}
 
 	private static void createDudupParamHeader(Char_description parent, SXSSFWorkbook wb, Sheet paramSheet, Integer global_min_matches, Integer global_max_mismatches, Double global_mismatch_ratio, String sourceString, String targetString, int topCouplesNumber, Double topCouplesPercentage, Duration processingTime, int comparisonsMade, int retained, int ignored, Optional<Double> detailLimitedScore, Optional<Double> coupleLimitedScore) {
@@ -2136,7 +2135,9 @@ public class CharDescriptionExportServices {
 		cell.setCellValue(df.format(dateobj));
 		cell.setCellStyle(paramValueStyle);
 		*/
-		createHeaderRow(wb,paramSheet,new String[] {
+		Double[] columnWidths = new Double[]{10.36,16.45,16.45,16.45,8.27,11.09,11.09,17.55,17.55,17.55,17.55,17.55,17.55};
+		int zoomLevel = 90;
+		createHeaderRow(wb,paramSheet, 14, new String[] {
 				"Sequence",
 				"Characteristic ID",
 				"Characteristic name",
@@ -2163,6 +2164,6 @@ public class CharDescriptionExportServices {
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
 				IndexedColors.GREY_80_PERCENT,
-		}, 14);
+		}, columnWidths, zoomLevel);
 	}
 }

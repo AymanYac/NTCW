@@ -504,6 +504,9 @@ public class DedupLaunchDialog {
                 carWeights.put(r.getCarac().getCharacteristic_id(),r);
             }
         });
+        if(carWeights.size()==0){
+            return;
+        }
         ComplexMap2JdbcObject.DedupSettings settings = new ComplexMap2JdbcObject.DedupSettings();
         settings.setMatch(minMatches.getText());
         settings.setMismatch(maxMismatches.getText());
