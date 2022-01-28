@@ -282,6 +282,10 @@ public class CharPatternServices {
 //						Rule = [Selection]
 						parent.sendPatternRule(WordUtils.QUOTE_NON_SEP_TEXT(processedText,true)+"<DL "+corrected_text+">");
 						parent.sendSemiAutoPattern(tmp, WordUtils.QUOTE_NON_SEP_TEXT(processedText,true)+"<DL "+corrected_text+">",selectedText);
+						//	Introduced variables for translated cars rule generation
+						/*parent.sendSemiAutoPattern(tmp, WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+								WordUtils.TRIM_LEADING_SEPARATORS(processedText),true,true)+"<DL "+WordUtils.ALPHANUM_PATTERN_RULE_INREPLACE(
+								WordUtils.TRIM_LEADING_SEPARATORS(corrected_text),true,false)+">", selectedText);*/
 						System.out.println("DEFAULT Value : correction of selection");
 						return;
 					}
