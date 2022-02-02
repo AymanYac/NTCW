@@ -176,8 +176,8 @@ public class ManualRuleServices {
 		try {
 			
 			if(gr.getMain()!=null) {
-				String sd = " "+((ItemFetcherRow) row).getLong_description()+" ";
-				String ld = " "+((ItemFetcherRow) row).getShort_description()+" ";
+				String sd = " "+((ItemFetcherRow) row).getLong_description().replace("\n"," ")+" ";
+				String ld = " "+((ItemFetcherRow) row).getShort_description().replace("\n"," ")+" ";
 				List<String> sd_array = Arrays.asList(sd.split("[^\\w]+"));
 				List<String> ld_array = Arrays.asList(ld.split("[^\\w]+"));
 				List<String> main_array = Arrays.asList(gr.getMain().split("[^\\w]+"));
@@ -191,11 +191,11 @@ public class ManualRuleServices {
 			
 
 			if(compiledCompPattern!=null) {
-				Matcher matcher = compiledCompPattern.matcher(" "+((ItemFetcherRow) row).getLong_description()+" ".toUpperCase());
+				Matcher matcher = compiledCompPattern.matcher(" "+((ItemFetcherRow) row).getLong_description().replace("\n"," ")+" ".toUpperCase());
 				if(matcher.matches()) {
 					
 				}else {
-					matcher = compiledCompPattern.matcher(" "+((ItemFetcherRow) row).getShort_description()+" ".toUpperCase());
+					matcher = compiledCompPattern.matcher(" "+((ItemFetcherRow) row).getShort_description().replace("\n"," ")+" ".toUpperCase());
 					if(matcher.matches()) {
 						
 					}else {
