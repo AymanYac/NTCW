@@ -18,7 +18,7 @@
         <StackPane maxHeight="0" />
     </bottom>
     <top>
-        <fx:include source="../scenes/ribbonScenes/Toolbar_Data_Enhancement.fxml"/>
+        <fx:include source="../scenes/ribbonScenes/Tool_Header.fxml"/>
     </top>
     <center>
       <AnchorPane maxHeight="Infinity" maxWidth="Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0">
