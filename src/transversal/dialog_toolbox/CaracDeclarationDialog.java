@@ -77,7 +77,7 @@ public class CaracDeclarationDialog {
 		Dialog dialog = new Dialog<>();
 		dialog.setTitle("Listing all impacted classes");
 		dialog.setHeaderText(null);
-		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 
 		// Set the button types.
@@ -513,7 +513,7 @@ public class CaracDeclarationDialog {
 		Dialog dialog = new Dialog<>();
 		dialog.setTitle("Listing dropped characteristic insertion");
 		dialog.setHeaderText("Duplicate characteristic name within segments is not allowed. The following classes have not been changed:");
-		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 
 		// Set the button types.
@@ -734,7 +734,7 @@ public class CaracDeclarationDialog {
 		dialog = new Dialog<>();
 		dialog.setTitle("New class characteristic declaration");
 		dialog.setHeaderText(null);
-		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 		
 		// Set the button types.
@@ -881,7 +881,7 @@ public class CaracDeclarationDialog {
 		Dialog dialog = new Dialog<>();
 		dialog.setTitle("Advance characteristic search");
 		dialog.setHeaderText(null);
-		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 
 		// Set the button types.

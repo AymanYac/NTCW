@@ -808,7 +808,7 @@ public class Manual_classif {
 		tableButton.setSelected(true);
 		setBottomRegionColumnSpans(false);
 		
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/TablePane_ManualClassif.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/TablePane_ManualClassif.fxml"));
 		GridPane tableGrid = loader.load();
 		tableController = loader.getController();
 		leftAnchor.getChildren().setAll(tableGrid);
@@ -866,7 +866,7 @@ public class Manual_classif {
 			
 		}else {
 			;
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/ImagePane_ManualClassif.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/ImagePane_ManualClassif.fxml"));
 			imageGrid = loader.load();
 			rightAnchor.getChildren().setAll(imageGrid);
 			rightAnchor.setTopAnchor(imageGrid, 0.0);
@@ -885,7 +885,7 @@ public class Manual_classif {
 		taxoButton.setSelected(true);
 		setBottomRegionColumnSpans(true);
 		
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/TaxoPane_ManualClassif.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/TaxoPane_ManualClassif.fxml"));
 		AnchorPane TaxoGrid = loader.load();
 		rightAnchor.getChildren().setAll(TaxoGrid);
 		
@@ -917,7 +917,7 @@ public class Manual_classif {
 			
 		}else {
 			;
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/RulePane_ManualClassif.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/RulePane_ManualClassif.fxml"));
 			ruleGrid = loader.load();
 			rightAnchor.getChildren().setAll(ruleGrid);
 			
@@ -936,7 +936,7 @@ public class Manual_classif {
 	
 	private void load_browser_pane() throws IOException {
 		googleButton.setSelected(true);
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/Browser_ManualClassif.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/Browser_ManualClassif.fxml"));
 		loader.load();
 		browserController = loader.getController();
 		browserController.setParent(this);

@@ -212,7 +212,7 @@ public class Auto_classification_launch {
 	    try {
 		    Stage primaryStage = new Stage();
 		    
-		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Auto_classification_parameters.fxml"));
+		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Auto_classification_parameters.fxml"));
 			AnchorPane root = fxmlLoader.load();
 
 			Scene scene = new Scene(root,400,400);
@@ -387,7 +387,7 @@ public class Auto_classification_launch {
 	    	//Create new window
 		    Stage primaryStage = new Stage();
 		    //Load the progress screen's controller
-		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Auto_classification_progress.fxml"));
+		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Auto_classification_progress.fxml"));
 			AnchorPane root = fxmlLoader.load();
 			//Set the new window with the controller
 			Scene scene = new Scene(root,400,400);

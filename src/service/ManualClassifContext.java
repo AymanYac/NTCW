@@ -32,7 +32,7 @@ public class ManualClassifContext {
 	}
 
 	public void showContext(Button prop, int idx) throws IOException {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/PropositionContext.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/PropositionContext.fxml"));
 		GridPane contextGrid = loader.load();
 		PropositionContext_ManualClassif controller = loader.getController();
 		controller.setParent(this);

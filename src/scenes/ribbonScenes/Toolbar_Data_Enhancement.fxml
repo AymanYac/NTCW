@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+
+
+        <ToolBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 10px;" stylesheets="@../../styles/RibbonToolbar.css">
+            <items>
+                <Label style="-fx-text-fill: #737572;" text="Import/Export" />
+                <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+                    <children>
+                        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                            <graphic>
+                                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@../../pictures/toolbar_buttons/Import_data.png" />
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                        <Label text="Import data" GridPane.columnIndex="2" />
+                    </children>
+                </GridPane>
+                <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+                    <children>
+                        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                            <graphic>
+                                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@../../pictures/toolbar_buttons/Export.png" />
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                        <Label text="Export" GridPane.columnIndex="2" />
+                    </children>
+                </GridPane>
+                <Separator orientation="VERTICAL" prefHeight="24.0" />
+                <Label style="-fx-text-fill: #737572;" text="Values" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Reapply.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Apply_first.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Clear_value.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Change_case.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Convert_empty_values_item.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Convert_empty_values_characteristic.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Convert_empty_values_class.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+                    <children>
+                        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                            <graphic>
+                                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@../../pictures/toolbar_buttons/Open_the_item_panel.png" />
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                        <Label text="Open the item panel" GridPane.columnIndex="2" />
+                    </children>
+                </GridPane>
+                <Separator orientation="VERTICAL" prefHeight="24.0" />
+                <Label style="-fx-text-fill: #737572;" text="Search" />
+                <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+                    <children>
+                        <TextField minWidth="150" prefWidth="400.0" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
+                        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                            <graphic>
+                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@../../pictures/toolbar_buttons/Search_parameters.png" />
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </children>
+                </GridPane>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Google_search.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Google_image_search.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+                    <children>
+                        <TextField minWidth="150" prefWidth="400.0" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
+                    </children>
+                </GridPane>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Open_the_active_URL.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Clear_active_URL.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Separator orientation="VERTICAL" prefHeight="24.0" />
+                <Label style="-fx-text-fill: #737572;" text="Units of measure" />
+                <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+                    <children>
+                        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                            <graphic>
+                                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@../../pictures/toolbar_buttons/Convert.png" />
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                        <Label text="Convert" GridPane.columnIndex="2" />
+                    </children>
+                </GridPane>
+                <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+                    <children>
+                        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                            <graphic>
+                                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@../../pictures/toolbar_buttons/Declare_a_new_unit.png" />
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                        <Label text="Declare a new unit" GridPane.columnIndex="2" />
+                    </children>
+                </GridPane>
+            </items>
+        </ToolBar>

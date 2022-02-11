@@ -1,6 +1,5 @@
 package transversal.dialog_toolbox;
 
-import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -10,8 +9,6 @@ import javafx.scene.layout.GridPane;
 import model.CharDescriptionRow;
 import org.controlsfx.control.ToggleSwitch;
 
-import java.util.stream.Collectors;
-
 public class UrlBookMarkDialog {
     static boolean pageCorrectionEnded = true;
 
@@ -19,7 +16,7 @@ public class UrlBookMarkDialog {
         Dialog dialog = new Dialog<>();
         dialog.setTitle("External PDF bookmark");
         dialog.setHeaderText("Bookmark this PDF?");
-        dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+        dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("customDialog");
 
 

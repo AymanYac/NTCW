@@ -8,7 +8,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.GlobalConstants;
 import transversal.dialog_toolbox.ExceptionDialog;
-import transversal.language_toolbox.WordUtils;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -20,7 +19,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			AnchorPane root = (AnchorPane)FXMLLoader.load(getClass().getResource("/Scenes/Login_page.fxml"));
+			AnchorPane root = (AnchorPane)FXMLLoader.load(getClass().getResource("/scenes/Login_page.fxml"));
 			Scene scene = new Scene(root,400,400);
 			//scene.getStylesheets().add(getClass().getResource("/Styles/Login_page.css").toExternalForm());
 			primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION);

@@ -4,12 +4,10 @@ import controllers.paneControllers.Browser_CharClassif;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import model.GlobalConstants;
-import netscape.javascript.JSObject;
 import org.icepdf.core.util.PropertyConstants;
 import org.icepdf.core.views.DocumentViewModel;
 import org.icepdf.ri.common.SwingController;
@@ -247,7 +245,7 @@ public class PdfCapableBrowser {
         WebView webView = new WebView();
         webView.setPrefSize(500,500);
         webView.setContextMenuEnabled(false);
-        webView.getStylesheets().add(getClass().getResource("/Styles/PDFWebView.css").toExternalForm());
+        webView.getStylesheets().add(getClass().getResource("/styles/PDFWebView.css").toExternalForm());
 
         WebEngine engine = webView.getEngine();
         String url = getClass().getResource("/scripts/pdfjs/web/viewer.html").toExternalForm();

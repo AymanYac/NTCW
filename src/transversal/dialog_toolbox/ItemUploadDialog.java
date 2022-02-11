@@ -29,14 +29,14 @@ public class ItemUploadDialog {
 		dialog.setTitle("Updating project item list");
 		dialog.getDialogPane().setMinHeight(80);
 		dialog.getDialogPane().setMinWidth(640);
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 		
 		Label progressStage = new Label();
 		progressStage.setVisible(false);
 		ProgressBar progressBar = new ProgressBar();
 		progressBar.getStylesheets().clear();
-		progressBar.getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/ProgressBarDarkGreenTransparent.css").toExternalForm());
+		progressBar.getStylesheets().add(ItemUploadDialog.class.getResource("/styles/ProgressBarDarkGreenTransparent.css").toExternalForm());
 		progressBar.setMinWidth(1000);
 		progressBar.setVisible(false);
 		

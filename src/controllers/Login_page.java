@@ -10,8 +10,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import model.GlobalConstants;
 import model.UserAccount;
 import transversal.dialog_toolbox.ExceptionDialog;
@@ -80,9 +81,9 @@ public class Login_page {
 			  
 			 	//Loads next screen's controller, loading cursor
 				Stage primaryStage = new Stage();
-			    
-			    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Front_page.fxml"));
-				AnchorPane root = fxmlLoader.load();
+			    primaryStage.initStyle(StageStyle.TRANSPARENT);
+			    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Front_page.fxml"));
+				Pane root = fxmlLoader.load();
 
 			    controllers.Front_page controller = fxmlLoader.getController();
 				

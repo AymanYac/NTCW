@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Login_page">
+   <children>
+      <Region layoutX="106.0" layoutY="78.0" minHeight="400.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url(&quot;pictures/Back.png&quot;); -fx-background-size: cover;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <GridPane prefHeight="400.0" prefWidth="600.0" stylesheets="@../styles/Login_page.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="60.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="283.79998779296875" percentHeight="50.0" prefHeight="199.40000915527344" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="201.19997863769532" minHeight="10.0" percentHeight="50.0" prefHeight="200.39999084472657" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label prefHeight="247.0" prefWidth="240.0" style="-fx-translate-y: -30;" text="TECHNICAL ITEM" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+               <effect>
+                  <DropShadow color="#313131" height="20.0" offsetX="5.0" offsetY="5.0" radius="9.5" width="20.0" />
+               </effect>
+            </Label>
+            <Label prefHeight="247.0" prefWidth="240.0" style="-fx-translate-y: 0;" text="CLASSIFICATION" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+               <effect>
+                  <DropShadow color="#313131" height="20.0" offsetX="5.0" offsetY="5.0" radius="9.5" width="20.0" />
+               </effect>
+            </Label>
+            <Label prefHeight="247.0" prefWidth="240.0" style="-fx-translate-y: 30;" text="WIZARD" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+               <effect>
+                  <DropShadow color="#313131" height="20.0" offsetX="5.0" offsetY="5.0" radius="9.5" width="20.0" />
+               </effect>
+            </Label>
+            <Label fx:id="vnum" prefHeight="247.0" prefWidth="240.0" style="-fx-translate-y: 60; -fx-font-size: 14; -fx-font-weight: normal; -fx-font-style: italic;" text="v2.5" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+               <effect>
+                  <DropShadow color="#313131" height="20.0" offsetX="5.0" offsetY="5.0" radius="9.5" width="20.0" />
+               </effect>
+            </Label>
+            <GridPane prefHeight="304.0" prefWidth="700.4" stylesheets="@../styles/Login_page.css" GridPane.rowIndex="1">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" percentHeight="12.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" percentHeight="8.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" percentHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="8.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="12.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Region prefHeight="149.0" prefWidth="261.0" style="-fx-background-color: #222A35; -fx-background-radius: 10; -fx-border-color: white; -fx-border-radius: 10; -fx-border-width: 2; -fx-effect: dropshadow(gaussian,grey,10, 0, 4, 4);" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="1" GridPane.rowSpan="5">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <effect>
+                        <DropShadow blurType="GAUSSIAN" color="#282828c7" height="20.0" offsetX="5.0" offsetY="5.0" radius="9.5" width="20.0" />
+                     </effect>
+                  </Region>
+                  <Label style="-fx-font-family: Calibri; -fx-font-size: 24;" text="User name" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <Label style="-fx-font-family: Calibri; -fx-font-size: 24;" text="Password" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                  <TextField fx:id="loginText" style="-fx-border-color: white;" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                  <PasswordField fx:id="passwdText" onKeyPressed="#enter_connect" style="-fx-border-color: white;" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                  <Button mnemonicParsing="false" onAction="#connect" text="Sign-in" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+               </children>
+            </GridPane>
+            <GridPane prefHeight="304.0" prefWidth="700.4">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" percentHeight="8.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="8.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="8.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="8.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" percentHeight="8.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <AnchorPane GridPane.columnIndex="1" GridPane.columnSpan="4" GridPane.rowIndex="1" GridPane.rowSpan="4">
+                     <GridPane.margin>
+                        <Insets />
+                     </GridPane.margin>
+                     <children>
+                        <Region maxWidth="142.0" minHeight="95.0" minWidth="-Infinity" prefHeight="152.0" prefWidth="273.2" style="-fx-background-image: url(&quot;pictures/NEONEC_Logo_White.png&quot;); -fx-background-size: contain; -fx-scale-shape: true; -fx-background-repeat: no-repeat;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Region>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </GridPane>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

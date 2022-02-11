@@ -1233,7 +1233,7 @@ public class Project_parameters {
 		try {
 		    Stage primaryStage = new Stage();
 		    
-		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Project_selection.fxml"));
+		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Project_selection.fxml"));
 			AnchorPane root = fxmlLoader.load();
 
 		    controllers.Project_selection controller = fxmlLoader.getController();
@@ -2015,7 +2015,7 @@ public class Project_parameters {
 							pfl.getItems().addAll(ROLES);
 							pfl.setValue(this.prj.getLOGINS().get(text).get(1));
 							pfl.setStyle(box_template);
-							pfl.getStylesheets().add(getClass().getResource("/Styles/ComboBoxGrey.css").toExternalForm());
+							pfl.getStylesheets().add(getClass().getResource("/styles/ComboBoxGrey.css").toExternalForm());
 							pfl.setMaxHeight(28);
 							pfl.setMinHeight(28);
 							pfl.setPrefHeight(28);
@@ -2033,7 +2033,7 @@ public class Project_parameters {
 									tmp.set(1, pfl.getValue());
 									prj.getLOGINS().put(CREDENTIALS.get((login_pane.getRowIndex(lgn)-0)+","+login_pane.getColumnIndex(lgn)),tmp);
 									pfl.setStyle(box_template);
-									pfl.getStylesheets().add(getClass().getResource("/Styles/ComboBoxGrey.css").toExternalForm());
+									pfl.getStylesheets().add(getClass().getResource("/styles/ComboBoxGrey.css").toExternalForm());
 									try {
 										update_users_and_specials();
 									} catch (ClassNotFoundException | SQLException e) {
@@ -2058,7 +2058,7 @@ public class Project_parameters {
 								
 							});
 							btn.setStyle(delete_template);
-							btn.getStylesheets().add(getClass().getResource("/Styles/ButtonGrey.css").toExternalForm());
+							btn.getStylesheets().add(getClass().getResource("/styles/ButtonGrey.css").toExternalForm());
 							btn.setMaxHeight(28);
 							btn.setMinHeight(28);
 							btn.setPrefWidth(28);
@@ -2341,7 +2341,7 @@ public class Project_parameters {
 							}
 							
 		//                  Set the button's style to the corresponding css class					
-							btn.getStylesheets().add(getClass().getResource("/Styles/CloseButtonRed.css").toExternalForm());
+							btn.getStylesheets().add(getClass().getResource("/styles/CloseButtonRed.css").toExternalForm());
 							btn.setMaxHeight(20);
 							btn.setMaxWidth(20);
 		//                  Add the button to the special pane at the corresponding row and to the corresponding column +3

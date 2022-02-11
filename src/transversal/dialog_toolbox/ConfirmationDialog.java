@@ -7,7 +7,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseEvent;
 import model.GenericClassRule;
@@ -25,7 +24,7 @@ public class ConfirmationDialog {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
 		ButtonType yesButton = new ButtonType(yes);
@@ -60,7 +59,7 @@ public class ConfirmationDialog {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
 		ButtonType yesButton = new ButtonType(yes);
@@ -95,7 +94,7 @@ public class ConfirmationDialog {
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
 		ButtonType yesButton = new ButtonType(yes);
@@ -131,7 +130,7 @@ public class ConfirmationDialog {
 		}
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
 		ButtonType yesButton = new ButtonType(yes);
@@ -156,7 +155,7 @@ public class ConfirmationDialog {
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
 		ButtonType yesButton = new ButtonType(yes);
@@ -187,7 +186,7 @@ public class ConfirmationDialog {
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
 		ButtonType yesButton = new ButtonType(yes);
@@ -221,7 +220,7 @@ public class ConfirmationDialog {
 		}
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
 		ButtonType yesButton = new ButtonType(ok);
@@ -238,7 +237,7 @@ public class ConfirmationDialog {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
 		ButtonType yesButton = new ButtonType(yes);
@@ -268,7 +267,7 @@ public class ConfirmationDialog {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Confirm characteristic deletion scope");
 		alert.setHeaderText("Delete this characteristic for:");
-		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 
 		ButtonType yesButton = new ButtonType("This class only");
@@ -296,7 +295,7 @@ public class ConfirmationDialog {
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.setTitle("Confirm characteristic deletion impact");
 		alert.setHeaderText(String.valueOf(impactCount)+" value(s) attached to this characteristic will be lost!");
-		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 
 		ButtonType yesButton = new ButtonType("Proceed anyway");
@@ -321,7 +320,7 @@ public class ConfirmationDialog {
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.setTitle("Confirm action");
 		alert.setHeaderText("All empty values of the current class' items will be marked as *UNKNOWN*");
-		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 
 		ButtonType yesButton = new ButtonType("Proceed anyway");
