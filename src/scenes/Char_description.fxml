@@ -19,222 +19,240 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Char_description">
-   <children>
-      <Region layoutX="106.0" layoutY="78.0" minHeight="400.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url(&quot;pictures/Back.png&quot;); -fx-background-size: cover;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <GridPane fx:id="grid" layoutX="21.0" layoutY="68.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="2.3" />
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="2.0" />
-            <ColumnConstraints />
-            <ColumnConstraints />
-            <ColumnConstraints />
-            <ColumnConstraints />
-            <ColumnConstraints />
-            <ColumnConstraints />
-            <ColumnConstraints />
-            <ColumnConstraints />
-            <ColumnConstraints />
-            <ColumnConstraints />
-            <ColumnConstraints />
-            <ColumnConstraints />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints maxHeight="26.0" minHeight="26.0" prefHeight="26.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="26.0" minHeight="26.0" prefHeight="26.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="26.0" minHeight="26.0" prefHeight="26.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="10.0" minHeight="10.0" percentHeight="1.6" prefHeight="10.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="4000.0" minHeight="470.0" prefHeight="4000.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
-         </rowConstraints>
+<BorderPane xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Char_description">
+   <left>
+      <StackPane maxWidth="0" />
+   </left>
+   <right>
+      <StackPane maxWidth="0" />
+   </right>
+   <bottom>
+      <StackPane maxHeight="0" />
+   </bottom>
+   <top>
+      <fx:include source="../scenes/ribbonScenes/Tool_Header.fxml"/>
+   </top>
+   <center>
+      <AnchorPane maxHeight="Infinity" maxWidth="Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0">
          <children>
-            <AnchorPane fx:id="rightAnchor" style="-fx-background-color: transparent; -fx-border-color: white;" GridPane.columnIndex="7" GridPane.columnSpan="3" GridPane.rowIndex="14" />
-            <AnchorPane fx:id="leftAnchor" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white;" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="14" />
-            <TextField fx:id="classification_style" editable="false" stylesheets="@../styles/TextField.css" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-            <MenuBar fx:id="menubar" maxWidth="1.7976931348623157E308" stylesheets="@../styles/Main.css" GridPane.columnSpan="2147483647" GridPane.valignment="TOP">
-               <menus>
-                  <Menu mnemonicParsing="false" text="Home" />
-                  <Menu mnemonicParsing="false" text="Project set-up">
+            <Region layoutX="106.0" layoutY="78.0" minHeight="400.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url(&quot;pictures/Back.png&quot;); -fx-background-size: cover;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <GridPane fx:id="grid" layoutX="21.0" layoutY="68.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="2.3" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="0.8" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="18.5" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="2.0" />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints maxHeight="26.0" minHeight="26.0" prefHeight="26.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="26.0" minHeight="26.0" prefHeight="26.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="26.0" minHeight="26.0" prefHeight="26.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="10.0" minHeight="10.0" percentHeight="1.6" prefHeight="10.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="4000.0" minHeight="470.0" prefHeight="4000.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <AnchorPane fx:id="rightAnchor" style="-fx-background-color: transparent; -fx-border-color: white;" GridPane.columnIndex="7" GridPane.columnSpan="3" GridPane.rowIndex="14" />
+                  <AnchorPane fx:id="leftAnchor" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white;" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="14" />
+                  <TextField fx:id="classification_style" editable="false" stylesheets="@../styles/TextField.css" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                  <MenuBar fx:id="menubar" maxWidth="1.7976931348623157E308" stylesheets="@../styles/Main.css" GridPane.columnSpan="2147483647" GridPane.valignment="TOP">
+                     <menus>
+                        <Menu mnemonicParsing="false" text="Home" />
+                        <Menu mnemonicParsing="false" text="Project set-up">
+                           <items>
+                              <MenuItem mnemonicParsing="false" text="Select project" />
+                              <MenuItem mnemonicParsing="false" text="Create new project" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Automated classification">
+                           <items>
+                              <MenuItem mnemonicParsing="false" text="Launch  autoclassification" />
+                              <MenuItem mnemonicParsing="false" text="Advanced parameters" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Semi-manual classification">
+                           <items>
+                              <MenuItem mnemonicParsing="false" text="Sample item classification" />
+                              <MenuItem mnemonicParsing="false" text="Advanced parameters" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Classification review">
+                           <items>
+                              <MenuItem mnemonicParsing="false" text="Item list" />
+                              <MenuItem mnemonicParsing="false" text="Rule list" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Dashboards">
+                           <items>
+                              <MenuItem mnemonicParsing="false" text="Project dashboard" />
+                              <MenuItem mnemonicParsing="false" text="Team dashboard" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Help">
+                           <items>
+                              <MenuItem mnemonicParsing="false" text="Help contents" />
+                              <MenuItem mnemonicParsing="false" text="About" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Taxonomy">
+                           <items>
+                              <MenuItem mnemonicParsing="false" text="Domain 1" />
+                              <MenuItem mnemonicParsing="false" text="Domain 2" />
+                              <MenuItem mnemonicParsing="false" text="Domain 3" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Administration">
+                           <items>
+                              <MenuItem mnemonicParsing="false" text="User administration" />
+                              <MenuItem mnemonicParsing="false" text="Project administration" />
+                           </items>
+                        </Menu>
+                     </menus>
+                  </MenuBar>
+                  <MenuBar fx:id="secondaryMenuBar" stylesheets="@../styles/MenuLightBlue.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
+                     <menus>
+                        <Menu fx:id="counterTotal" mnemonicParsing="false" text="Total items classified: -" />
+                        <Menu fx:id="counterRemaining" mnemonicParsing="false" text="Items to be classified: -" />
+                        <Menu fx:id="counterDaily" mnemonicParsing="false" text="Daily personal: - | Daily team : -" />
+                        <Menu fx:id="counterSelection" mnemonicParsing="false" text="Selected items:" />
+                     </menus>
+                  </MenuBar>
+                  <ToolBar fx:id="toolBar" maxHeight="26.0" style="-fx-background-color: #F2F2F2;" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
                      <items>
-                        <MenuItem mnemonicParsing="false" text="Select project" />
-                        <MenuItem mnemonicParsing="false" text="Create new project" />
+                        <ToggleButton disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_stripes.png&quot;);" stylesheets="@../styles/ButtonTool.css">
+                           <effect>
+                              <InnerShadow blurType="GAUSSIAN" height="55.4" radius="28.0875" width="58.95" />
+                           </effect>
+                        </ToggleButton>
+                        <Button fx:id="paneToggle" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#switchPane" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_resize_columns.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                        <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_increase_font_size.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_decrease_font_size.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                        <ToggleButton disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_display_class_numbers2.png&quot;);" stylesheets="@../styles/ButtonTool.css">
+                           <effect>
+                              <InnerShadow blurType="GAUSSIAN" height="55.4" radius="28.0875" width="58.95" />
+                           </effect>
+                        </ToggleButton>
+                        <ToggleButton disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_highlight_empty_lines.png&quot;);" stylesheets="@../styles/ButtonTool.css">
+                           <effect>
+                              <InnerShadow blurType="GAUSSIAN" height="55.4" radius="28.0875" width="58.95" />
+                           </effect>
+                        </ToggleButton>
+                        <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                        <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_undo.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_redo.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                        <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#nextBlank" prefHeight="15.0" prefWidth="15.0" rotate="180.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_next_blank.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#previousBlank" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_next_blank.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#lastBlank" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_first_blank.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#firstBlank" prefHeight="15.0" prefWidth="15.0" rotate="180.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_first_blank.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                        <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_repeat_class.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_confirm_class.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_apply_class_to_rule.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Button fx:id="classDDButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#classDD" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_apply_class_down.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Separator disable="true" maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                        <Button fx:id="exportButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#export" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_export.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Separator disable="true" maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                        <TextField fx:id="search_text" maxHeight="20.0" maxWidth="400.0" minHeight="20.0" minWidth="400.0" prefHeight="20.0" prefWidth="400.0">
+                           <font>
+                              <Font name="System Bold" size="9.0" />
+                           </font></TextField>
+                        <Button fx:id="searchSettingButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#editSearchSettings" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true;" />
+                        <ToggleButton fx:id="googleButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#search_google_inplace" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_google_search.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <ToggleButton fx:id="tableButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#show_table" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_table_view.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
+                        <TextField fx:id="urlLink" maxHeight="20.0" maxWidth="400.0" minHeight="20.0" minWidth="400.0" prefHeight="20.0" prefWidth="400.0">
+                           <font>
+                              <Font name="System Bold" size="9.0" />
+                           </font></TextField>
+                        <Button fx:id="clearLinkButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#clearLink" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_delete.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true;" />
+                        <Separator maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" orientation="VERTICAL" prefHeight="15.0" prefWidth="15.0" />
+                        <ToggleButton fx:id="ruleButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#view_rules" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_rules.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <ToggleButton fx:id="imageButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#search_image" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_image_search2.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <ToggleButton fx:id="charButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#view_chars" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_eraser_inverted.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
+                        <Separator maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" orientation="VERTICAL" prefHeight="15.0" prefWidth="15.0" />
+                        <ToggleButton fx:id="conversionToggle" mnemonicParsing="false" stylesheets="@../styles/ButtonBlue.css" text="Value Conversion" />
                      </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Automated classification">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Launch  autoclassification" />
-                        <MenuItem mnemonicParsing="false" text="Advanced parameters" />
-                     </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Semi-manual classification">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Sample item classification" />
-                        <MenuItem mnemonicParsing="false" text="Advanced parameters" />
-                     </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Classification review">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Item list" />
-                        <MenuItem mnemonicParsing="false" text="Rule list" />
-                     </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Dashboards">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Project dashboard" />
-                        <MenuItem mnemonicParsing="false" text="Team dashboard" />
-                     </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Help">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Help contents" />
-                        <MenuItem mnemonicParsing="false" text="About" />
-                     </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Taxonomy">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Domain 1" />
-                        <MenuItem mnemonicParsing="false" text="Domain 2" />
-                        <MenuItem mnemonicParsing="false" text="Domain 3" />
-                     </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Administration">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="User administration" />
-                        <MenuItem mnemonicParsing="false" text="Project administration" />
-                     </items>
-                  </Menu>
-               </menus>
-            </MenuBar>
-            <MenuBar fx:id="secondaryMenuBar" stylesheets="@../styles/MenuLightBlue.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
-               <menus>
-                  <Menu fx:id="counterTotal" mnemonicParsing="false" text="Total items classified: -" />
-                  <Menu fx:id="counterRemaining" mnemonicParsing="false" text="Items to be classified: -" />
-                  <Menu fx:id="counterDaily" mnemonicParsing="false" text="Daily personal: - | Daily team : -" />
-                  <Menu fx:id="counterSelection" mnemonicParsing="false" text="Selected items:" />
-               </menus>
-            </MenuBar>
-            <ToolBar fx:id="toolBar" maxHeight="26.0" style="-fx-background-color: #F2F2F2;" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
-               <items>
-                  <ToggleButton disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_stripes.png&quot;);" stylesheets="@../styles/ButtonTool.css">
-                     <effect>
-                        <InnerShadow blurType="GAUSSIAN" height="55.4" radius="28.0875" width="58.95" />
-                     </effect>
-                  </ToggleButton>
-                  <Button fx:id="paneToggle" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#switchPane" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_resize_columns.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
-                  <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_increase_font_size.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_decrease_font_size.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
-                  <ToggleButton disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_display_class_numbers2.png&quot;);" stylesheets="@../styles/ButtonTool.css">
-                     <effect>
-                        <InnerShadow blurType="GAUSSIAN" height="55.4" radius="28.0875" width="58.95" />
-                     </effect>
-                  </ToggleButton>
-                  <ToggleButton disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_highlight_empty_lines.png&quot;);" stylesheets="@../styles/ButtonTool.css">
-                     <effect>
-                        <InnerShadow blurType="GAUSSIAN" height="55.4" radius="28.0875" width="58.95" />
-                     </effect>
-                  </ToggleButton>
-                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
-                  <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_undo.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_redo.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
-                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#nextBlank" prefHeight="15.0" prefWidth="15.0" rotate="180.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_next_blank.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#previousBlank" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_next_blank.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#lastBlank" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_first_blank.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#firstBlank" prefHeight="15.0" prefWidth="15.0" rotate="180.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_first_blank.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
-                  <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_repeat_class.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_confirm_class.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_apply_class_to_rule.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Button fx:id="classDDButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#classDD" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_apply_class_down.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Separator disable="true" maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
-                  <Button fx:id="exportButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#export" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_export.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Separator disable="true" maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
-                  <TextField fx:id="search_text" maxHeight="20.0" maxWidth="400.0" minHeight="20.0" minWidth="400.0" prefHeight="20.0" prefWidth="400.0">
-                     <font>
-                        <Font name="System Bold" size="9.0" />
-                     </font></TextField>
-                  <Button fx:id="searchSettingButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#editSearchSettings" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true;" />
-                  <ToggleButton fx:id="googleButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#search_google_inplace" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_google_search.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <ToggleButton fx:id="tableButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#show_table" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_table_view.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Separator maxHeight="15.0" minHeight="15.0" orientation="VERTICAL" prefHeight="15.0" />
-                  <TextField fx:id="urlLink" maxHeight="20.0" maxWidth="400.0" minHeight="20.0" minWidth="400.0" prefHeight="20.0" prefWidth="400.0">
-                     <font>
-                        <Font name="System Bold" size="9.0" />
-                     </font></TextField>
-                  <Button fx:id="clearLinkButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#clearLink" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_delete.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true;" />
-                  <Separator maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" orientation="VERTICAL" prefHeight="15.0" prefWidth="15.0" />
-                  <ToggleButton fx:id="ruleButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#view_rules" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_rules.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <ToggleButton fx:id="imageButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#search_image" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_image_search2.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <ToggleButton fx:id="charButton" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#view_chars" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_eraser_inverted.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" />
-                  <Separator maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" orientation="VERTICAL" prefHeight="15.0" prefWidth="15.0" />
-                  <ToggleButton fx:id="conversionToggle" mnemonicParsing="false" stylesheets="@../styles/ButtonBlue.css" text="Value Conversion" />
-               </items>
-               <padding>
-                  <Insets left="18.0" />
-               </padding>
-            </ToolBar>
-            <Label fx:id="aidLabel" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Article ID:" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Long Description" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-            <TextArea editable="false" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextArea.css" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.rowSpan="2" />
-            <TextArea editable="false" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextArea.css" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5" GridPane.rowSpan="2" />
-            <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Classification" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-            <Label fx:id="lcLabel" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="Classification suggestions" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="11" />
-            <Button fx:id="prop1" mnemonicParsing="false" onContextMenuRequested="#context1" opacity="0.5" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../styles/ButtonBlue.css" text="--" GridPane.columnIndex="1" GridPane.rowIndex="12" />
-            <Button fx:id="prop2" mnemonicParsing="false" onContextMenuRequested="#context2" opacity="0.5" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../styles/ButtonBlue.css" text="--" GridPane.columnIndex="3" GridPane.rowIndex="12" />
-            <Button fx:id="prop3" mnemonicParsing="false" onContextMenuRequested="#context3" opacity="0.5" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../styles/ButtonBlue.css" text="--" GridPane.columnIndex="5" GridPane.rowIndex="12" />
-            <Button fx:id="prop4" mnemonicParsing="false" onContextMenuRequested="#context4" opacity="0.5" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../styles/ButtonBlue.css" text="--" GridPane.columnIndex="7" GridPane.rowIndex="12" />
-            <Button fx:id="prop5" mnemonicParsing="false" onContextMenuRequested="#context5" opacity="0.5" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../styles/ButtonBlue.css" text="--" GridPane.columnIndex="9" GridPane.rowIndex="12" />
-            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
-            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
-            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
-            <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="7" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
-         	<TextArea fx:id="sd" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-            <TextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" text="Support" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-            <TextArea fx:id="ld" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶" wrapText="true" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5" />
-            <TextArea fx:id="ld_translated" prefHeight="300.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" text="Support de montage pour le type buzzer Werma 110¶Orderref.975 109 01 (support de capuchon de protection)" wrapText="true" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="6" />
-            <Label fx:id="value_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="8" />
-            <Label fx:id="rule_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Rule" visible="false" GridPane.columnIndex="9" GridPane.rowIndex="8" />
-            <Label fx:id="custom_label_21" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Note" visible="false" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
-            <TextField fx:id="value_field" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="9" />
-            <TextField fx:id="min_field" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="9" />
-            <TextField fx:id="min_field_uom" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
-            <TextField fx:id="max_field" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
-            <TextField fx:id="translated_value_field" visible="false" GridPane.columnIndex="5" GridPane.rowIndex="9" />
-            <TextField fx:id="note_field" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="9" />
-            <TextField fx:id="max_field_uom" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="9" />
-            <TextField fx:id="note_field_uom" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="7" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
-            <TextField fx:id="rule_field" visible="false" GridPane.columnIndex="9" GridPane.rowIndex="9" />
-            <Label fx:id="custom_label_11" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
-            <Label fx:id="custom_label_22" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Note" visible="false" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
-            <Label fx:id="custom_label_12" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
-            <Label fx:id="note_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="8" />
-            <Label fx:id="custom_label_value" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
-            <ComboBox fx:id="classCombo" maxWidth="1.7976931348623157E308" scaleX="0.8" scaleY="0.8" stylesheets="@../styles/ComboBoxBlue.css" GridPane.columnIndex="9" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
-            <Label fx:id="deleteValueLabel" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="⦻" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
-            <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onMouseClicked="#copyClientNumber2ClipBoard" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_add_copy.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                     <padding>
+                        <Insets left="18.0" />
+                     </padding>
+                  </ToolBar>
+                  <Label fx:id="aidLabel" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Article ID:" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Long Description" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                  <TextArea editable="false" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextArea.css" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.rowSpan="2" />
+                  <TextArea editable="false" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextArea.css" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5" GridPane.rowSpan="2" />
+                  <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Classification" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                  <Label fx:id="lcLabel" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="Classification suggestions" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="11" />
+                  <Button fx:id="prop1" mnemonicParsing="false" onContextMenuRequested="#context1" opacity="0.5" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../styles/ButtonBlue.css" text="--" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                  <Button fx:id="prop2" mnemonicParsing="false" onContextMenuRequested="#context2" opacity="0.5" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../styles/ButtonBlue.css" text="--" GridPane.columnIndex="3" GridPane.rowIndex="12" />
+                  <Button fx:id="prop3" mnemonicParsing="false" onContextMenuRequested="#context3" opacity="0.5" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../styles/ButtonBlue.css" text="--" GridPane.columnIndex="5" GridPane.rowIndex="12" />
+                  <Button fx:id="prop4" mnemonicParsing="false" onContextMenuRequested="#context4" opacity="0.5" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../styles/ButtonBlue.css" text="--" GridPane.columnIndex="7" GridPane.rowIndex="12" />
+                  <Button fx:id="prop5" mnemonicParsing="false" onContextMenuRequested="#context5" opacity="0.5" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../styles/ButtonBlue.css" text="--" GridPane.columnIndex="9" GridPane.rowIndex="12" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
+                  <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="7" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
+                  <TextArea fx:id="sd" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <TextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" text="Support" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <TextArea fx:id="ld" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶" wrapText="true" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5" />
+                  <TextArea fx:id="ld_translated" prefHeight="300.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" text="Support de montage pour le type buzzer Werma 110¶Orderref.975 109 01 (support de capuchon de protection)" wrapText="true" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="6" />
+                  <Label fx:id="value_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="8" />
+                  <Label fx:id="rule_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Rule" visible="false" GridPane.columnIndex="9" GridPane.rowIndex="8" />
+                  <Label fx:id="custom_label_21" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Note" visible="false" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
+                  <TextField fx:id="value_field" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="9" />
+                  <TextField fx:id="min_field" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="9" />
+                  <TextField fx:id="min_field_uom" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
+                  <TextField fx:id="max_field" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
+                  <TextField fx:id="translated_value_field" visible="false" GridPane.columnIndex="5" GridPane.rowIndex="9" />
+                  <TextField fx:id="note_field" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="9" />
+                  <TextField fx:id="max_field_uom" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="9" />
+                  <TextField fx:id="note_field_uom" style="-fx-scale-x: 1;" visible="false" GridPane.columnIndex="7" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
+                  <TextField fx:id="rule_field" visible="false" GridPane.columnIndex="9" GridPane.rowIndex="9" />
+                  <Label fx:id="custom_label_11" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
+                  <Label fx:id="custom_label_22" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Note" visible="false" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
+                  <Label fx:id="custom_label_12" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
+                  <Label fx:id="note_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="8" />
+                  <Label fx:id="custom_label_value" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
+                  <ComboBox fx:id="classCombo" maxWidth="1.7976931348623157E308" scaleX="0.8" scaleY="0.8" stylesheets="@../styles/ComboBoxBlue.css" GridPane.columnIndex="9" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                  <Label fx:id="deleteValueLabel" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="⦻" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
+                  <Button disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onMouseClicked="#copyClientNumber2ClipBoard" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_add_copy.png&quot;);" stylesheets="@../styles/ButtonTool.css" text="Button" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+               </children>
+            </GridPane>
          </children>
-      </GridPane>
-   </children>
-</AnchorPane>
+      </AnchorPane>
+   </center>
+</BorderPane>

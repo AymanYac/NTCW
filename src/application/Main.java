@@ -4,8 +4,9 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import model.GlobalConstants;
 import transversal.dialog_toolbox.ExceptionDialog;
 
@@ -19,10 +20,11 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			AnchorPane root = (AnchorPane)FXMLLoader.load(getClass().getResource("/scenes/Login_page.fxml"));
+			Pane root = FXMLLoader.load(getClass().getResource("/scenes/Login_page.fxml"));
 			Scene scene = new Scene(root,400,400);
 			//scene.getStylesheets().add(getClass().getResource("/Styles/Login_page.css").toExternalForm());
 			primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION);
+			primaryStage.initStyle(StageStyle.TRANSPARENT);
 			primaryStage.setScene(scene);
 			//primaryStage.setMinHeight(768);
 			//primaryStage.setMinWidth(1024);

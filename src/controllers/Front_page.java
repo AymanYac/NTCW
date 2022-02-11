@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.GlobalConstants;
@@ -212,7 +213,7 @@ public class Front_page {
 				    Stage primaryStage = new Stage();
 				    primaryStage.initStyle(StageStyle.TRANSPARENT);
 				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Char_description.fxml"));
-					AnchorPane root = fxmlLoader.load();
+					Pane root = fxmlLoader.load();
 
 					Scene scene = new Scene(root,400,400);
 					
