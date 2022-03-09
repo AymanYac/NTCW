@@ -1,0 +1,17 @@
+.check-box{
+	-fx-font-family:calibri;
+	-fx-font-weight:bold;
+	-fx-font-size:12;
+	-fx-text-fill:#445469;
+	
+}
+
+
+.check-box:determinate .box{
+	-fx-translate-x:120;
+}
+
+.check-box:determinate .text{
+	-fx-translate-x:-25;
+	-fx-text-fill:#445469;
+}

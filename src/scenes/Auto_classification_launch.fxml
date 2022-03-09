@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.StackedBarChart?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.TextFlow?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Auto_classification_launch">
+   <children>
+      <Region layoutX="106.0" layoutY="78.0" minHeight="400.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url(&quot;pictures/Back.png&quot;); -fx-background-size: cover;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <GridPane layoutX="10.0" layoutY="10.0" prefHeight="400.0" prefWidth="600.0" stylesheets="@../styles/Login_page.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="5.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="26.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="2.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="2.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="2.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="5.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <Label fx:id="classifLabel" text="Label" textAlignment="CENTER" GridPane.columnIndex="7" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="TOP" />
+            <TableView fx:id="classfication_table" prefHeight="0.0" prefWidth="200.0" stylesheets="@../styles/TableViewBlue.css" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="4" GridPane.rowSpan="2">
+               <columns>
+                  <TableColumn fx:id="Classification_projectColumn" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" text="Reference project" />
+                  <TableColumn fx:id="Classification_languageColumn" prefWidth="150.0" text="Language" />
+                  <TableColumn fx:id="Classification_taxoColumn" prefWidth="150.0" text="Classification system" />
+                  <TableColumn fx:id="Classification_cardColumn" prefWidth="150.0" text="# of classified items" />
+                  <TableColumn fx:id="Classification_checkboxColumn" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Use as referent data" />
+               </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+            <MenuBar fx:id="menubar" stylesheets="@../styles/Main.css" GridPane.columnSpan="9" GridPane.valignment="TOP">
+               <menus>
+                  <Menu mnemonicParsing="false" text="Home" />
+                  <Menu mnemonicParsing="false" text="Project set-up">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Select project" />
+                        <MenuItem mnemonicParsing="false" text="Create new project" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Automated classification">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Rule definition">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Review">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Correction">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Dashboard">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                        <MenuItem mnemonicParsing="false" text="Close" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <StackedBarChart fx:id="graph" prefHeight="262.0" prefWidth="200.0" stylesheets="@../styles/StackedBarChart.css" GridPane.columnIndex="7" GridPane.rowIndex="4" GridPane.rowSpan="6">
+              <xAxis>
+                <CategoryAxis side="BOTTOM" fx:id="xAxe" />
+              </xAxis>
+              <yAxis>
+                <NumberAxis fx:id="yAxe" side="LEFT" />
+              </yAxis>
+            </StackedBarChart>
+            <TableView fx:id="preclassfication_table" prefHeight="0.0" prefWidth="200.0" stylesheets="@../styles/TableViewBlue.css" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="9" GridPane.rowSpan="4">
+               <columns>
+                  <TableColumn fx:id="preClassification_projectColumn" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" text="Reference project" />
+                  <TableColumn fx:id="preClassification_languageColumn" prefWidth="150.0" text="Language" />
+                  <TableColumn fx:id="preClassification_taxoColumn" prefWidth="150.0" text="Classification system" />
+                  <TableColumn fx:id="preClassification_cardColumn" prefWidth="150.0" text="# of classified items" />
+                  <TableColumn fx:id="preClassification_checkboxColumn" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Use as referent data" />
+               </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+            <ComboBox fx:id="autoclass_lang_combo" prefHeight="500.0" prefWidth="500.0" stylesheets="@../styles/ChoiceBox.css" GridPane.columnIndex="5" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+            <ComboBox fx:id="preclass_taxo_combo" prefHeight="500.0" prefWidth="500.0" stylesheets="@../styles/ChoiceBox.css" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+            <ComboBox fx:id="preclass_lang_combo" prefHeight="500.0" prefWidth="500.0" stylesheets="@../styles/ChoiceBox.css" GridPane.columnIndex="5" GridPane.rowIndex="7" />
+            <Label fx:id="class_taxo_combo" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14;" text="Same classification system" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <Label prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 16; -fx-alignment: center; -fx-underline: true; -fx-background-color: #1EA185;" text="Automated classification" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2" />
+            <Label prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 16; -fx-alignment: center; -fx-underline: true; -fx-background-color: #9BBB5C;" text="Pre-classification" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <Label prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 16; -fx-underline: true;" text="Expected results" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+            <Label fx:id="estimated" onMouseClicked="#simulate" style="-fx-font-size: 16; -fx-font-style: italic;" text="Estimated time:" GridPane.columnIndex="7" GridPane.rowIndex="10" GridPane.valignment="TOP" />
+            <Button fx:id="launch_button" mnemonicParsing="false" onAction="#launch" stylesheets="@../styles/ButtonBlue.css" text="Launch" GridPane.columnIndex="7" GridPane.rowIndex="11" GridPane.valignment="BOTTOM" />
+            <Button fx:id="detailed_settings" mnemonicParsing="false" onAction="#detailed_settings" onMouseEntered="#clicking_hand" onMouseExited="#noclicking_hand" style="-fx-translate-y: 5;" stylesheets="@../styles/ButtonTransparent.css" text="Advanced settings..." GridPane.columnIndex="7" GridPane.rowIndex="12" />
+            <Label fx:id="preclassifLabel" text="Label" textAlignment="CENTER" GridPane.columnIndex="7" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="TOP" />
+            <TextFlow fx:id="classifTextFlow" prefHeight="0.0" prefWidth="118.0" textAlignment="CENTER" GridPane.columnIndex="7" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="TOP" />
+            <TextFlow fx:id="preclassifTextFlow" prefHeight="0.0" prefWidth="118.0" textAlignment="CENTER" GridPane.columnIndex="7" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="TOP" />
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

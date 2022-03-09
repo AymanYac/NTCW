@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import com.pixelduke.control.Ribbon?>
+<?import com.pixelduke.control.ribbon.RibbonTab?>
+<?import com.pixelduke.control.ribbon.RibbonGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<BorderPane id="BorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="514.0" prefWidth="410.0">
+    <top>
+        <Ribbon>
+            <tabs>
+                <RibbonTab text="Home">
+                    <ribbonGroups>
+                        <RibbonGroup title="Home">
+                            <nodes>
+                                <Button contentDisplay="TOP" text="Cancel">
+                                    <graphic>
+                                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                        <Image url="@../../pictures/toolbar_buttons/cancel.png" />
+                                        </ImageView>
+                                    </graphic>
+                                </Button>
+                                <Button contentDisplay="TOP" text="Repeat">
+                                    <graphic>
+                                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                        <Image url="@../../pictures/toolbar_buttons/repeat.png" />
+                                        </ImageView>
+                                    </graphic>
+                                </Button>
+                                <Button contentDisplay="TOP" text="Cut">
+                                    <graphic>
+                                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                            <Image url="@../../pictures/toolbar_buttons/cut.png" />
+                                        </ImageView>
+                                    </graphic>
+                                </Button>
+                                <Button contentDisplay="TOP" text="Copy">
+                                    <graphic>
+                                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                            <Image url="@../../pictures/toolbar_buttons/copy.png" />
+                                        </ImageView>
+                                    </graphic>
+                                </Button>
+                                <Button contentDisplay="TOP" text="Paste">
+                                    <graphic>
+                                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                            <Image url="@../../pictures/toolbar_buttons/paste.png" />
+                                        </ImageView>
+                                    </graphic>
+                                </Button>
+                                <Button contentDisplay="TOP" text="Copy article ID">
+                                    <graphic>
+                                        <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                            <Image url="@../../pictures/toolbar_buttons/itemIdCopy.png" />
+                                        </ImageView>
+                                    </graphic>
+                                </Button>
+                            </nodes>
+                        </RibbonGroup>
+                        <RibbonGroup title="Page">
+                        <nodes>
+                            <Button contentDisplay="TOP" text="Reload">
+                                <graphic>
+                                    <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                        <Image url="@../../pictures/toolbar_buttons/cut.png" />
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                            <Button contentDisplay="TOP" text="Refresh">
+                                <graphic>
+                                    <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                        <Image url="@../../pictures/toolbar_buttons/copy.png" />
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                            <Button contentDisplay="TOP" text="Reevaluate">
+                                <graphic>
+                                    <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                        <Image url="@../../pictures/toolbar_buttons/paste.png" />
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                            <Button contentDisplay="TOP" text="Synchronize">
+                                <graphic>
+                                    <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                        <Image url="@../../pictures/toolbar_buttons/itemIdCopy.png" />
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </nodes>
+                        </RibbonGroup>
+                    </ribbonGroups>
+                </RibbonTab>
+            </tabs>
+        </Ribbon>
+
+    </top>
+</BorderPane>

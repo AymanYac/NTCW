@@ -1,0 +1,7 @@
+.slider .thumb{
+	-fx-background-color:#445469;
+	-fx-border-color:lightgrey;
+	-fx-border-radius:10;
+}
+
+.slider .axis { -fx-tick-label-fill: white; }

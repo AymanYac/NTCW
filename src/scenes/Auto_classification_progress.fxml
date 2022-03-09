@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.TextFlow?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Auto_classification_progress">
+   <children>
+      <Region layoutX="106.0" layoutY="78.0" minHeight="400.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url(&quot;pictures/Back.png&quot;); -fx-background-size: cover;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <GridPane fx:id="grille" layoutX="10.0" layoutY="10.0" prefHeight="400.0" prefWidth="600.0" stylesheets="@../styles/Login_page.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" percentWidth="3.0" prefWidth="20.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="26.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" percentWidth="2.0" prefWidth="20.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="0.0" minWidth="0.0" percentWidth="21.0" prefWidth="0.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" percentWidth="2.0" prefWidth="20.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="80.0" percentWidth="8.0" prefWidth="150.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="80.0" percentWidth="8.0" prefWidth="150.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="0.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="180.0" percentWidth="15.0" prefWidth="500.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="0.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="180.0" percentWidth="15.0" prefWidth="500.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="30.0" percentWidth="0.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="5.0" minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="0.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <MenuBar fx:id="menubar" stylesheets="@../styles/Main.css" GridPane.columnSpan="13" GridPane.valignment="TOP">
+               <menus>
+                  <Menu mnemonicParsing="false" text="Home" />
+                  <Menu mnemonicParsing="false" text="Project set-up">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Select project" />
+                        <MenuItem mnemonicParsing="false" text="Create new project" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Automated classification">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Rule definition">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Review">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Correction">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Dashboard">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                        <MenuItem mnemonicParsing="false" text="Close" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <Label prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 16; -fx-alignment: center; -fx-underline: true; -fx-background-color: #1EA185;" text="Automated classification" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label style="-fx-font-size: 16; -fx-underline: true;" text="Reference description cleansing" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of special characters" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of abbreviations" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of mispelling" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+            <Label style="-fx-font-size: 16; -fx-underline: true;" text="Rules generation" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Identification of main keywords" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Generation of rule set" GridPane.columnIndex="1" GridPane.rowIndex="14" />
+            <Label style="-fx-font-size: 16; -fx-underline: true;" text="Target description cleansing" GridPane.columnIndex="1" GridPane.rowIndex="16" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of special characters" GridPane.columnIndex="1" GridPane.rowIndex="17" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of abbreviations" GridPane.columnIndex="1" GridPane.rowIndex="18" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of mispelling" GridPane.columnIndex="1" GridPane.rowIndex="19" />
+            <Label style="-fx-font-size: 16; -fx-underline: true;" text="Rules application" GridPane.columnIndex="1" GridPane.rowIndex="21" />
+            <ProgressBar fx:id="auto_classif_progress" maxWidth="1.7976931348623157E308" minHeight="-Infinity" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenTransparent.css" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+            <ProgressBar fx:id="reference_desc_progress" maxHeight="15.0" maxWidth="1.7976931348623157E308" prefHeight="15.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlat.css" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+            <ProgressBar fx:id="ref_char_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="8" />
+            <ProgressBar fx:id="ref_abv_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="9" />
+            <ProgressBar fx:id="ref_spell_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="10" />
+            <ProgressBar fx:id="rule_gen_progress" maxHeight="15.0" maxWidth="1.7976931348623157E308" prefHeight="15.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlat.css" GridPane.columnIndex="3" GridPane.rowIndex="12" />
+            <ProgressBar fx:id="word_gen_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="13" />
+            <ProgressBar fx:id="rule_set_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="14" />
+            <ProgressBar fx:id="target_desc_progress" maxHeight="15.0" maxWidth="1.7976931348623157E308" prefHeight="15.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlat.css" GridPane.columnIndex="3" GridPane.rowIndex="16" />
+            <ProgressBar fx:id="target_char_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="17" />
+            <ProgressBar fx:id="target_abv_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="18" />
+            <ProgressBar fx:id="target_spell_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="19" />
+            <ProgressBar fx:id="rule_app_progress" maxHeight="15.0" maxWidth="1.7976931348623157E308" prefHeight="15.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlat.css" GridPane.columnIndex="3" GridPane.rowIndex="21" />
+            <StackedBarChart fx:id="graph" prefHeight="522.0" prefWidth="200.0" stylesheets="@../styles/StackedBarChart.css" GridPane.columnIndex="9" GridPane.rowIndex="3" GridPane.rowSpan="38">
+               <xAxis>
+                  <CategoryAxis side="BOTTOM" fx:id="xAxe" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis fx:id="yAxe" side="LEFT" />
+               </yAxis>
+            </StackedBarChart>
+            <Label prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 16; -fx-alignment: center; -fx-underline: true; -fx-background-color: #9BBB5C;" text="Pre-classification" GridPane.columnIndex="1" GridPane.rowIndex="24" />
+            <Label style="-fx-font-size: 16; -fx-underline: true;" text="Reference description cleansing" GridPane.columnIndex="1" GridPane.rowIndex="28" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of special characters" GridPane.columnIndex="1" GridPane.rowIndex="29" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of abbreviations" GridPane.columnIndex="1" GridPane.rowIndex="30" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of mispelling" GridPane.columnIndex="1" GridPane.rowIndex="31" />
+            <Label style="-fx-font-size: 16; -fx-underline: true;" text="Rules generation" GridPane.columnIndex="1" GridPane.rowIndex="33" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Identification of main keywords" GridPane.columnIndex="1" GridPane.rowIndex="34" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Generation of rule set" GridPane.columnIndex="1" GridPane.rowIndex="35" />
+            <Label style="-fx-font-size: 16; -fx-underline: true;" text="Target description cleansing" GridPane.columnIndex="1" GridPane.rowIndex="37" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of special characters" GridPane.columnIndex="1" GridPane.rowIndex="38" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of abbreviations" GridPane.columnIndex="1" GridPane.rowIndex="39" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Cleansing of mispelling" GridPane.columnIndex="1" GridPane.rowIndex="40" />
+            <Label style="-fx-font-size: 16; -fx-underline: true;" text="Rules application" GridPane.columnIndex="1" GridPane.rowIndex="42" />
+            <ProgressBar fx:id="preclass_auto_classif_progress" maxWidth="1.7976931348623157E308" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenTransparent.css" GridPane.columnIndex="3" GridPane.rowIndex="24" />
+            <ProgressBar fx:id="preclass_reference_desc_progress" maxHeight="15.0" maxWidth="1.7976931348623157E308" prefHeight="15.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlat.css" GridPane.columnIndex="3" GridPane.rowIndex="28" />
+            <ProgressBar fx:id="preclass_ref_char_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="29" />
+            <ProgressBar fx:id="preclass_ref_abv_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="30" />
+            <ProgressBar fx:id="preclass_ref_spell_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="31" />
+            <ProgressBar fx:id="preclass_rule_gen_progress" maxHeight="15.0" maxWidth="1.7976931348623157E308" prefHeight="15.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlat.css" GridPane.columnIndex="3" GridPane.rowIndex="33" />
+            <ProgressBar fx:id="preclass_word_gen_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="34" />
+            <ProgressBar fx:id="preclass_rule_set_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="35" />
+            <ProgressBar fx:id="preclass_target_desc_progress" maxHeight="15.0" maxWidth="1.7976931348623157E308" prefHeight="15.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlat.css" GridPane.columnIndex="3" GridPane.rowIndex="37" />
+            <ProgressBar fx:id="preclass_target_char_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="38" />
+            <ProgressBar fx:id="preclass_target_abv_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="39" />
+            <ProgressBar fx:id="preclass_target_spell_clean_progress" maxHeight="10.0" maxWidth="1.7976931348623157E308" prefHeight="10.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlatDiscrete.css" GridPane.columnIndex="3" GridPane.rowIndex="40" />
+            <ProgressBar fx:id="preclass_rule_app_progress" maxHeight="15.0" maxWidth="1.7976931348623157E308" prefHeight="15.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlat.css" GridPane.columnIndex="3" GridPane.rowIndex="42" />
+            <Label fx:id="time11" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-background-color: #1EA185;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="3" />
+            <Label fx:id="time31" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="7" />
+            <Label fx:id="time41" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="8" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Elapsed time" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label style="-fx-font-size: 14; -fx-font-style: italic;" text="Remaining time" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label style="-fx-font-size: 12; -fx-font-style: italic;" text="Time (init. est.)" GridPane.columnIndex="7" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label fx:id="time51" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="9" />
+            <Label fx:id="time61" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="10" />
+            <Label fx:id="time71" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="12" />
+            <Label fx:id="time81" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="13" />
+            <Label fx:id="time91" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="14" />
+            <Label fx:id="time101" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="16" />
+            <Label fx:id="time111" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="17" />
+            <Label fx:id="time121" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="18" />
+            <Label fx:id="time131" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="19" />
+            <Label fx:id="time141" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="21" />
+            <Label fx:id="time151" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-background-color: #9BBB5C;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="24" />
+            <Label fx:id="time171" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="28" />
+            <Label fx:id="time181" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="29" />
+            <Label fx:id="time191" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="30" />
+            <Label fx:id="time201" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="31" />
+            <Label fx:id="time211" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="33" />
+            <Label fx:id="time221" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="34" />
+            <Label fx:id="time231" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="35" />
+            <Label fx:id="time241" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="37" />
+            <Label fx:id="time251" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="38" />
+            <Label fx:id="time261" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="39" />
+            <Label fx:id="time271" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="40" />
+            <Label fx:id="time281" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="42" />
+            <Label fx:id="time12" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-background-color: #1EA185;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="3" />
+            <Label fx:id="time32" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="7" />
+            <Label fx:id="time42" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="8" />
+            <Label fx:id="time52" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="9" />
+            <Label fx:id="time62" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="10" />
+            <Label fx:id="time72" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="12" />
+            <Label fx:id="time82" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="13" />
+            <Label fx:id="time92" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="14" />
+            <Label fx:id="time102" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="16" />
+            <Label fx:id="time112" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="17" />
+            <Label fx:id="time122" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="18" />
+            <Label fx:id="time132" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="19" />
+            <Label fx:id="time142" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="21" />
+            <Label fx:id="time152" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-background-color: #9BBB5C;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="24" />
+            <Label fx:id="time172" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="28" />
+            <Label fx:id="time182" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="29" />
+            <Label fx:id="time192" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="30" />
+            <Label fx:id="time202" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="31" />
+            <Label fx:id="time212" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="33" />
+            <Label fx:id="time222" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="34" />
+            <Label fx:id="time232" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="35" />
+            <Label fx:id="time242" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="37" />
+            <Label fx:id="time252" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="38" />
+            <Label fx:id="time262" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="39" />
+            <Label fx:id="time272" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="40" />
+            <Label fx:id="time282" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="42" />
+            <Label fx:id="time13" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-background-color: #1EA185;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+            <Label fx:id="time33" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="7" />
+            <Label fx:id="time43" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="8" />
+            <Label fx:id="time53" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="9" />
+            <Label fx:id="time63" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="10" />
+            <Label fx:id="time73" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="12" />
+            <Label fx:id="time83" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="13" />
+            <Label fx:id="time93" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="14" />
+            <Label fx:id="time103" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="16" />
+            <Label fx:id="time113" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="17" />
+            <Label fx:id="time123" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="18" />
+            <Label fx:id="time133" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="19" />
+            <Label fx:id="time143" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="21" />
+            <Label fx:id="time153" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-background-color: #9BBB5C;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="24" />
+            <Label fx:id="time173" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="28" />
+            <Label fx:id="time183" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="29" />
+            <Label fx:id="time193" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="30" />
+            <Label fx:id="time203" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="31" />
+            <Label fx:id="time213" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="33" />
+            <Label fx:id="time223" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="34" />
+            <Label fx:id="time233" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="35" />
+            <Label fx:id="time243" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="37" />
+            <Label fx:id="time253" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="38" />
+            <Label fx:id="time263" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="39" />
+            <Label fx:id="time273" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic; -fx-text-fill: #BFBFBF;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="40" />
+            <Label fx:id="time283" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="42" />
+            <StackedBarChart fx:id="actualgraph" prefHeight="522.0" prefWidth="200.0" stylesheets="@../styles/StackedBarChart.css" GridPane.columnIndex="11" GridPane.rowIndex="3" GridPane.rowSpan="38">
+               <xAxis>
+                  <CategoryAxis fx:id="actualxAxe" side="BOTTOM" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis fx:id="actualyAxe" side="LEFT" />
+               </yAxis>
+            </StackedBarChart>
+            <Label alignment="CENTER" style="-fx-font-size: 14; -fx-font-style: italic; -fx-text-fill: white;" text="Expected results" textAlignment="CENTER" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label alignment="CENTER" style="-fx-font-size: 14; -fx-font-style: italic; -fx-text-fill: white;" text="Actual results" textAlignment="CENTER" GridPane.columnIndex="11" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label style="-fx-font-size: 16; -fx-underline: true;" text="Downloading data" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <ProgressBar fx:id="download_progress" maxHeight="15.0" maxWidth="1.7976931348623157E308" prefHeight="15.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarDarkGreenFlat.css" GridPane.columnIndex="3" GridPane.rowIndex="6" />
+            <Label fx:id="time21" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="6" />
+            <Label fx:id="time22" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="6" />
+            <Label fx:id="time23" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="6" />
+            <Label style="-fx-font-size: 16; -fx-underline: true;" text="Uploading data" GridPane.columnIndex="1" GridPane.rowIndex="43" />
+            <Label fx:id="time293" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="43" />
+            <Label fx:id="time291" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="43" />
+            <Label fx:id="time292" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="43" />
+            <ProgressBar fx:id="upload_progress" maxHeight="15.0" maxWidth="1.7976931348623157E308" prefHeight="15.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlat.css" GridPane.columnIndex="3" GridPane.rowIndex="43" />
+            <Label style="-fx-font-size: 16; -fx-underline: true;" text="Downloading data" GridPane.columnIndex="1" GridPane.rowIndex="27" />
+            <ProgressBar fx:id="preclass_download_progress" maxHeight="15.0" maxWidth="1.7976931348623157E308" prefHeight="15.0" prefWidth="200.0" progress="0.0" stylesheets="@../styles/ProgressBarLightGreenFlat.css" GridPane.columnIndex="3" GridPane.rowIndex="27" />
+            <Label fx:id="time161" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="5" GridPane.rowIndex="27" />
+            <Label fx:id="time162" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="6" GridPane.rowIndex="27" />
+            <Label fx:id="time163" prefHeight="500.0" prefWidth="500.0" style="-fx-font-size: 14; -fx-alignment: center; -fx-font-weight: normal; -fx-font-style: italic;" text="0:00:00" GridPane.columnIndex="7" GridPane.rowIndex="27" />
+            <Label fx:id="static_classifLabel" text="classifLabel" textAlignment="CENTER" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.rowSpan="3" GridPane.valignment="TOP" />
+            <Label fx:id="static_preclassifLabel" text="preclassifLabel" textAlignment="CENTER" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.rowSpan="3" GridPane.valignment="TOP" />
+            <Label fx:id="dynamic_classifLabel" text="classifLabel" textAlignment="CENTER" GridPane.columnIndex="11" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.rowSpan="3" GridPane.valignment="TOP" />
+            <Label fx:id="dynamic_preclassifLabel" text="preclassifLabel" textAlignment="CENTER" GridPane.columnIndex="11" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.rowSpan="3" GridPane.valignment="TOP" />
+            <Button fx:id="download_button" mnemonicParsing="false" onAction="#save_to_file" stylesheets="@../styles/ButtonBlue.css" text="Download results" GridPane.columnIndex="11" GridPane.rowIndex="42">
+               <GridPane.margin>
+                  <Insets left="20.0" right="20.0" />
+               </GridPane.margin></Button>
+            <TextFlow fx:id="static_classifTextFlow" prefHeight="200.0" prefWidth="200.0" textAlignment="CENTER" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+            <TextFlow fx:id="static_preclassifTextFlow" prefHeight="200.0" prefWidth="200.0" textAlignment="CENTER" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

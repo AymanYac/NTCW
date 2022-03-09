@@ -1,0 +1,44 @@
+.spinner .text-field {
+	-fx-font-size:12px;
+	-fx-pref-height:18;
+}
+
+
+.spinner .increment-arrow-button{
+	-fx-background-color:#445469;
+	
+	-fx-translate-x:-6.5;
+	-fx-scale-x:0.5;
+	-fx-translate-y:3.5;
+	-fx-scale-y:2;
+}
+
+.spinner .increment-arrow-button .increment-arrow{
+	-fx-background-color:white;
+	-fx-rotate:-90;
+	-fx-scale-x:0.5;
+	-fx-scale-y:2;
+	-fx-translate-x:-0.2;
+	-fx-translate-y:0.1;
+	
+}
+
+.spinner .decrement-arrow-button{
+	-fx-background-color:#445469;
+	
+	-fx-translate-x:5.5;
+	-fx-scale-x:0.5;
+	-fx-translate-y:-4.8;
+	-fx-scale-y:2.2;
+	
+}
+
+.spinner .decrement-arrow-button .decrement-arrow{
+	-fx-background-color:white;
+	-fx-rotate:-90;
+	-fx-scale-x:0.5;
+	-fx-scale-y:2;
+	-fx-translate-x:0.2;
+	-fx-translate-y:-0.1;
+	
+}

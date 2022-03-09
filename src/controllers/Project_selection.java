@@ -84,7 +84,7 @@ public class Project_selection {
 	    try {
 		    Stage primaryStage = new Stage();
 		    
-		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Project_parameters.fxml"));
+		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Project_parameters.fxml"));
 			AnchorPane root = fxmlLoader.load();
 
 			Scene scene = new Scene(root,400,400);
@@ -131,7 +131,7 @@ public class Project_selection {
 	    try {
 		    Stage primaryStage = new Stage();
 		    
-		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Project_parameters.fxml"));
+		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Project_parameters.fxml"));
 			AnchorPane root = fxmlLoader.load();
 
 			Scene scene = new Scene(root,400,400);
@@ -306,7 +306,7 @@ public class Project_selection {
 		    try {
 			    Stage primaryStage = new Stage();
 			    
-			    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Auto_classification_launch.fxml"));
+			    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Auto_classification_launch.fxml"));
 				AnchorPane root = fxmlLoader.load();
 
 				Scene scene = new Scene(root,400,400);

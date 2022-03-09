@@ -1,0 +1,35 @@
+.text-field{
+	-fx-font-family:calibri;
+	-fx-font-size:12;
+	-fx-background-color:white;
+	-fx-background-radius:0;
+	
+	-fx-border-color:#1EA185;
+	-fx-border-radius:0;
+	
+	-fx-effect:none;
+	
+	-fx-text-fill:#1EA185;
+	-fx-font-weight:bold;	
+	-fx-effect:innershadow(gaussian, #E1E1E1, 5, 0.5, 0 , 0);
+}
+
+.text-field:disabled{
+	
+	-fx-opacity:1;
+	-fx-font-family:calibri;
+	-fx-font-size:12;
+	-fx-background-color:#A7A8A6;
+	-fx-background-radius:0;
+	
+	-fx-border-color:#1EA185;
+	-fx-border-radius:0;
+	
+	-fx-effect:none;
+	
+	-fx-text-fill:black;
+	-fx-font-weight:bold;	
+	
+	-fx-effect:innershadow(gaussian, #C5C6C4, 2, 0.5, 0 , 0);
+	-fx-blend-mode:overlay;
+}

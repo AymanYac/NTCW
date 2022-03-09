@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+
+<ToolBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 10px;" stylesheets="@../../styles/RibbonToolbar.css">
+    <items>
+        <Label style="-fx-text-fill: #737572;" text="Automatic filling" />
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Fill_from_selection.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="Fill from selection" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Apply_suggestion.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="Apply suggestion" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Clear_suggestions.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="Clear suggestions" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+        <Separator orientation="VERTICAL" prefHeight="24.0" />
+        <Label style="-fx-text-fill: #737572;" text="Rule management" />
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Open_the_rule_panel.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="Open the rule panel" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Keyword_lists.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="Keyword lists" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Import_rules.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="Import rules" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Create_rule_coreset.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="Create rule core set" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+        <Separator orientation="VERTICAL" prefHeight="24.0" />
+        <Label style="-fx-text-fill: #737572;" text="Duplicates" />
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Search_duplicates.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="Search duplicates" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+    </items>
+</ToolBar>

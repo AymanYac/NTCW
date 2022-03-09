@@ -1,0 +1,27 @@
+.scroll-pane{
+	-fx-background-color:transparent;
+}
+
+.scroll-pane .viewport{
+	-fx-background-color:transparent;
+}
+
+.scroll-pane .scroll-bar{}
+
+.scroll-pane .scroll-bar .track-background{}
+
+.scroll-pane .scroll-bar .increment-button{}
+
+.scroll-pane .scroll-ba .increment-button .increment-arrow{}
+
+.scroll-pane .scroll-bar .decrement-button{}
+
+.scroll-pane .scroll-bar .decrement-button .decrement-arrow{}
+
+.scroll-pane .scroll-bar .track{
+	-fx-translate-x:-50;
+}
+
+.scroll-pane .scroll-bar .thumb{}
+
+.scroll-pane .corner{}

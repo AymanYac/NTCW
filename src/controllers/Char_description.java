@@ -1707,7 +1707,7 @@ public class Char_description {
 		tableButton.setSelected(true);
 		setBottomRegionColumnSpans(false);
 		
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/TablePane_CharClassif.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/TablePane_CharClassif.fxml"));
 		GridPane tableGrid = loader.load();
 		tableController = loader.getController();
 		leftAnchor.getChildren().setAll(tableGrid);
@@ -1756,7 +1756,7 @@ public class Char_description {
 			
 		}else {
 			;
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/ImagePane_CharClassif.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/ImagePane_CharClassif.fxml"));
 			rightAnchorImageGrid = loader.load();
 			rightAnchor.getChildren().setAll(rightAnchorImageGrid);
 			rightAnchor.setTopAnchor(rightAnchorImageGrid, 0.0);
@@ -1779,7 +1779,7 @@ public class Char_description {
 		}
 
 		setBottomRegionColumnSpans(true);
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/RulePane_CharClassif.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/RulePane_CharClassif.fxml"));
 		rightAnchorContentGrid = loader.load();
 		rightAnchor.getChildren().setAll(rightAnchorContentGrid);
 
@@ -1802,7 +1802,7 @@ public class Char_description {
 		}
 		
 		setBottomRegionColumnSpans(true);
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/CharPane_CharClassif.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/CharPane_CharClassif.fxml"));
 		rightAnchorContentGrid = loader.load();
 		rightAnchor.getChildren().setAll(rightAnchorContentGrid);
 
@@ -1821,7 +1821,7 @@ public class Char_description {
 	private void load_browser_pane() throws IOException {
 		System.out.println("Loading browser for the first time");
 		googleButton.setSelected(true);
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Scenes/paneScenes/Browser_CharClassif.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/Browser_CharClassif.fxml"));
 		loader.load();
 		browserController = loader.getController();
 		browserController.setParent(this);

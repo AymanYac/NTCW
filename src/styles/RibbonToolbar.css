@@ -1,0 +1,28 @@
+.menu-bar{
+	-fx-background-color:#ACB9CA;
+	-fx-border-color:#ACB9CA;	
+}
+
+.borderpane{
+	-fx-background-color:#445469;
+}
+
+.tool-bar{
+    -fx-background-color: #D6DCE4;
+}
+
+.menu-item{
+	-fx-background-color:#ACB9CA;
+	-fx-padding:5 0 5 5;	
+}
+
+.label{
+	-fx-font-family:Calibri;
+	-fx-font-size:14px;
+	-fx-text-fill:#212934;
+}
+
+.button{
+	-fx-background-color:transparent;
+	-fx-border-color:transparent;
+}

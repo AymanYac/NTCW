@@ -1,0 +1,108 @@
+.combo-box{
+	-fx-text-fill:#445469;
+	-fx-font-weight:normal;
+	-fx-background-color:transparent;
+	-fx-font-family:calibri;
+	-fx-font-size:14px;
+}
+
+.combo-box .arrow-button{
+	-fx-background-color:#445469,
+	linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%),
+    linear-gradient(#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
+	-fx-border-color:#445469;
+	-fx-max-width:12px;
+}
+
+.combo-box .arrow-button{
+	-fx-background-color:#445469;
+	-fx-background-radius:1px;
+	-fx-scale-x:1;
+	-fx-scale-y:1;	
+	-fx-border-color:#445469;
+}
+
+.combo-box .arrow-button .arrow{
+	-fx-background-color:white;
+	-fx-border-color:white;
+	-fx-pref-width:5px;
+	-fx-translate-x:-1px;
+
+}
+
+.combo-box:editable .arrow-button .arrow{
+	-fx-background-color:white;
+	-fx-border-color:white;
+	-fx-pref-width:7.5px;
+	-fx-translate-x:0px;
+	
+}
+
+.combo-box .text-field{
+	-fx-font-size:14px;
+	-fx-background-color:white;
+	-fx-border-color:white;
+	-fx-font-weight:bold;
+	-fx-border-radius:1px;
+	-fx-background-radius:1px;
+	-fx-text-fill:#445469;
+	
+}
+
+.combo-box .list-cell:selected{
+	-fx-background-color:white;
+	-fx-border-color:white;
+	-fx-border-radius:1px;
+	-fx-background-radius:1px;
+	-fx-text-fill:#445469;
+
+}
+
+.combo-box .list-view{
+	-fx-background-color:white;
+	-fx-border-color:white;
+	-fx-border-radius:1px;
+	-fx-background-radius:1px;
+	/*-fx-font-size:14px;*/
+	
+}
+
+
+
+.combo-box .list-cell:selected .text{
+	-fx-font-size:14px;
+	-fx-font-weight:bold;
+	
+}
+
+
+.combo-box .list-view .virtual-flow .scroll-bar:vertical .thumb{
+	-fx-background-color:#445469,
+	linear-gradient(from 0% 0% to 100% 0%,#323E4E 0%, #323E4E 20%, #445469 100%),
+    linear-gradient(from 0% 0% to 100% 0%,#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
+	
+}
+
+.combo-box .list-view .virtual-flow .scroll-bar:vertical .increment-button{
+	-fx-background-color:#445469;
+}
+
+.combo-box .list-view .virtual-flow .scroll-bar:vertical .increment-button .increment-arrow{
+	-fx-background-color:white;
+}
+
+.combo-box .list-view .virtual-flow .scroll-bar:vertical .decrement-button{
+	-fx-background-color:#445469;
+}
+
+.combo-box .list-view .virtual-flow .scroll-bar:vertical .decrement-button .decrement-arrow{
+	-fx-background-color:white;
+}
+
+.combo-box .list-view .virtual-flow .scroll-bar:vertical .track{
+	-fx-background-color:linear-gradient(from 0% 0% to 100% 0%,#ACB9CA 0%, #D6DCE4 40%,#D6DCE4 60%, #ACB9CA 100%);
+}
+
+.combo-box .list-view .virtual-flow .scroll-bar:vertical .track-background{
+	-fx-background-color:#445469;
+}

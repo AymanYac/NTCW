@@ -1,0 +1,43 @@
+.titled-pane{
+		-fx-font-family:Calibri;
+	-fx-font-weight:Bold;
+	-fx-font-size:16px;
+	-fx-text-fill:white;
+	}
+
+.titled-pane .title{
+	-fx-background-color:#737572,
+	linear-gradient(#525351 0%, #525351 20%, #737572 100%),
+    linear-gradient(#C5C6C4 0%, #A7A8A6 5%, #737572 50%, #737572 51%, #525351 100%);
+	
+}
+
+.titled-pane:expanded .title .arrow-button .arrow{
+	-fx-background-color:white;
+	-fx-border-color:white;
+	-fx-effect:none;
+}
+
+.titled-pane:collapsed .title .arrow-button .arrow{
+	-fx-background-color:white;
+	-fx-border-color:white;
+	-fx-effect:none;
+}
+
+.titled-pane:expanded .content{
+	-fx-background-color:#E1E1E1;
+}
+
+.label{
+	-fx-font-family:Calibri;
+	-fx-font-weight:Bold;
+	-fx-font-size:18px;
+	-fx-text-fill:#737572;
+	}
+	
+.text-field{
+	-fx-font-family:Calibri;
+	-fx-font-weight:normal;
+	-fx-font-size:18px;
+	-fx-text-fill:#737572;
+}	

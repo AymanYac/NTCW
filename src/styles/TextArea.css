@@ -1,0 +1,44 @@
+.text-area{
+	-fx-font-family:calibri;
+	-fx-font-size:12;
+	-fx-background-color:#D6DCE4;
+	-fx-background-radius:0;
+	
+	-fx-border-color:#445469;
+	-fx-border-radius:0;
+	
+	-fx-effect:none;
+	
+	-fx-text-fill:#445469;
+	-fx-font-weight:bold;
+	/*-fx-wrap-text:true;*/
+	
+}
+
+.text-area .scroll-pane:fitToWidth:fitToHeight{
+	-fx-effect:none;
+	-fx-border-color:transparent;
+	-fx-background-color:transparent;
+	
+}
+
+.text-area .scroll-pane:fitToWidth:fitToHeight .viewport{
+	-fx-border-color:red;
+	-fx-effect:none;
+		
+}
+
+.text-area .scroll-pane:fitToWidth:fitToHeight .viewport .content{
+	-fx-border-color:transparent;
+	-fx-border-radius:0;
+	
+	-fx-background-color:white;
+	-fx-background-radius:0;
+	
+				
+}
+
+.text-area .scroll-pane:fitToWidth .viewport .content .text{
+	
+	
+}

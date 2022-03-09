@@ -1,0 +1,12 @@
+.button{
+	-fx-background-color:transparent;
+
+	-fx-font-family:Calibri;
+	-fx-font-weight:normal;
+	-fx-font-size:14px;
+	-fx-font-style:italic;
+	-fx-text-fill:white;
+	-fx-alignment:center-left;
+	-fx-border-color:transparent;
+	
+	}

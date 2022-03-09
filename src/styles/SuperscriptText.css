@@ -1,0 +1,8 @@
+.label{
+	-fx-font-family:Calibri;
+	-fx-font-weight:Bold;
+	-fx-font-size:12;
+	-fx-text-fill:white;
+	-fx-alignment:center;
+	/*-fx-font-position:SUPERSCRIPT;*/
+}

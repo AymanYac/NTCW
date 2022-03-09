@@ -8,7 +8,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import model.GlobalConstants;
 import model.UserAccount;
 import transversal.dialog_toolbox.ExceptionDialog;
@@ -53,7 +55,7 @@ public class Front_page {
 			    	
 				    Stage primaryStage = new Stage();
 				    
-				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Rule_definition.fxml"));
+				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Rule_definition.fxml"));
 					AnchorPane root = fxmlLoader.load();
 
 					Scene scene = new Scene(root,400,400);
@@ -95,7 +97,7 @@ public class Front_page {
 			    	
 				    Stage primaryStage = new Stage();
 				    
-				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Manual_classif.fxml"));
+				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Manual_classif.fxml"));
 					AnchorPane root = fxmlLoader.load();
 
 					Scene scene = new Scene(root,400,400);
@@ -164,7 +166,7 @@ public class Front_page {
 				    	
 					    Stage primaryStage = new Stage();
 					    
-					    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Auto_classification_launch.fxml"));
+					    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Auto_classification_launch.fxml"));
 						AnchorPane root = fxmlLoader.load();
 
 						Scene scene = new Scene(root,400,400);
@@ -209,9 +211,9 @@ public class Front_page {
 			    try {
 			    	
 				    Stage primaryStage = new Stage();
-				    
-				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Char_description.fxml"));
-					AnchorPane root = fxmlLoader.load();
+				    primaryStage.initStyle(StageStyle.TRANSPARENT);
+				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Char_description.fxml"));
+					Pane root = fxmlLoader.load();
 
 					Scene scene = new Scene(root,400,400);
 					
@@ -255,7 +257,7 @@ public class Front_page {
 			;
 		    Stage primaryStage = new Stage();
 		    
-		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Project_selection.fxml"));
+		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Project_selection.fxml"));
 			AnchorPane root = fxmlLoader.load();
 
 		    controllers.Project_selection controller = fxmlLoader.getController();

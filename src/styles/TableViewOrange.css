@@ -1,0 +1,87 @@
+.label{
+	-fx-font-family:Calibri;
+	-fx-font-weight:bold;
+	-fx-font-size:14px;
+	-fx-text-fill:white;
+	-fx-padding:5 0 0.0 0;
+	}
+	
+.table-view{
+	-fx-background-color:#F2F2F2;
+	-fx-background-size:0 0;
+	-fx-border-color:transparent;
+}
+
+
+.table-view .placeholder .label{
+	-fx-font-family:Calibri;
+	-fx-font-weight:bold;
+	-fx-font-size:16px;
+	-fx-text-fill:#F8C47C;
+}
+
+.table-view:row-selection:constrained-resize .column-header-background{
+	-fx-background-color:#F29B26,
+	linear-gradient(#C7770C 0%, #C7770C 20%, #F29B26 100%),
+    linear-gradient(#FAD7A7 0%, #F8C47C 5%, #F29B26 50%, #F29B26 51%, #C7770C 100%);
+}
+
+.table-row-cell:filled:even{
+	-fx-background-color:#FAD7A7;
+	-fx-border-color:transparent;	
+}
+
+.table-row-cell:filled:odd{
+	-fx-background-color:#FDEBD2;
+	-fx-border-color:transparent;	
+}
+.table-row-cell:filled:selected .table-cell {
+    -fx-background-color: #F29B26;
+}
+.table-row-cell:filled:selected .table-cell .text {
+       -fx-fill: white ;
+       -fx-font-weight: bold;
+
+}
+
+.table-view:row-selection .column-header-background .nested-column-header .table-column .label{
+		-fx-background-color:transparent;
+		-fx-border-color:transparent;
+}
+
+.table-view:row-selection .column-header-background .filler{
+	-fx-background-color:#F29B26,
+	linear-gradient(#C7770C 0%, #C7770C 20%, #F29B26 100%),
+    linear-gradient(#FAD7A7 0%, #F8C47C 5%, #F29B26 50%, #F29B26 51%, #C7770C 100%);
+}
+
+.table-view:row-selection:constrained-resize .column-resize-line{
+	-fx-background-color:red;
+}
+
+.table-view:row-selection .column-header-background .nested-column-header{
+	-fx-background-color:red;
+}
+
+.table-view:row-selection .column-header-background .nested-column-header .table-column{
+	-fx-background-color:#F29B26,
+	linear-gradient(#C7770C 0%, #C7770C 20%, #F29B26 100%),
+    linear-gradient(#FAD7A7 0%, #F8C47C 5%, #F29B26 50%, #F29B26 51%, #C7770C 100%);
+    -fx-border-color:transparent;
+}
+
+
+.table-column{
+	-fx-border-color:transparent;
+	-fx-alignment: CENTER;
+}
+
+.table-view .arrow {  
+   -fx-mark-color: white ;  
+} 
+
+
+#firstco{
+	-fx-border-color:transparent;
+	-fx-alignment: CENTER-LEFT;
+}

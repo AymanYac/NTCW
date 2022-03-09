@@ -1,0 +1,30 @@
+.button{
+	-fx-alignment:center-left;
+	-fx-padding:0 0 0 0;
+	-fx-label-padding:0 0 0 50;
+	
+	-fx-font-family:Calibri;
+	-fx-font-weight:Bold;
+	-fx-font-size:2.2em;
+	-fx-text-fill:white;
+	
+	-fx-pref-width:500em;
+	
+	-fx-border-radius:5;
+	-fx-background-radius:5;
+	-fx-background-color:#BFBFBF;
+	-fx-border-width:2;
+	-fx-border-color:white;
+	
+	-fx-background-repeat:no-repeat;
+	-fx-background-position:98%; 
+	-fx-background-size:2.4em;
+}
+
+.label{
+	-fx-font-family:Calibri;
+	-fx-font-weight:Bold;
+	-fx-font-size:32;
+	-fx-text-fill:white;
+	-fx-alignment:center;
+}

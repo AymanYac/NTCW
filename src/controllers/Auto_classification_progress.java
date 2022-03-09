@@ -427,7 +427,7 @@ public class Auto_classification_progress {
 				 	//Loads next screen's controller, loading cursor
 					Stage primaryStage = new Stage();
 				    
-				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Front_page.fxml"));
+				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Front_page.fxml"));
 					AnchorPane root = fxmlLoader.load();
 
 				    controllers.Front_page controller = fxmlLoader.getController();
@@ -486,7 +486,7 @@ public class Auto_classification_progress {
 					;
 				    Stage primaryStage = new Stage();
 				    
-				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Project_selection.fxml"));
+				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Project_selection.fxml"));
 					AnchorPane root = fxmlLoader.load();
 
 				    controllers.Project_selection controller = fxmlLoader.getController();
@@ -543,7 +543,7 @@ public class Auto_classification_progress {
 					
 				    Stage primaryStage = new Stage();
 				    
-				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Project_parameters.fxml"));
+				    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Project_parameters.fxml"));
 					AnchorPane root = fxmlLoader.load();
 
 					Scene scene = new Scene(root,400,400);
@@ -621,7 +621,7 @@ public class Auto_classification_progress {
 					    	
 						    Stage primaryStage = new Stage();
 						    
-						    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Auto_classification_launch.fxml"));
+						    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Auto_classification_launch.fxml"));
 							AnchorPane root = fxmlLoader.load();
 
 							Scene scene = new Scene(root,400,400);

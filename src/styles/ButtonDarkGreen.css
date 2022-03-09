@@ -1,0 +1,19 @@
+.button{
+	-fx-background-color:#1EA185,
+	linear-gradient(#167862 0%, #167862 20%, #1EA185 100%),
+    linear-gradient(#94EBD8 0%, #5EE1C4 5%, #1EA185 50%, #1EA185 51%, #167862 100%);
+
+	-fx-font-family:Calibri;
+	-fx-font-weight:Bold;
+	-fx-font-size:16px;
+	-fx-text-fill:white;
+	
+	-fx-border-color:white;
+	-fx-border-width:2px;
+	
+	-fx-background-radius:5px;
+	-fx-border-radius:5px;
+	
+	-fx-background-insets:1px;
+	
+	}

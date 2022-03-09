@@ -1,0 +1,44 @@
+.button{
+	
+	-fx-background-color: #F2F2F2;
+	-fx-background-radius: 0;
+	-fx-background-size:15;
+	-fx-background-repeat:none;
+	-fx-background-size: cover;
+	
+	-fx-border-color:transparent;
+	-fx-border-radius:0;
+	
+	-fx-effect:none;
+	}	
+
+.toggle-button{
+	
+	-fx-background-color: #F2F2F2;
+	-fx-background-radius: 0;
+	-fx-background-size:15;
+	-fx-background-repeat:none;
+	-fx-background-size: cover;
+	
+	
+	-fx-border-color:transparent;
+	-fx-border-radius:0;
+	
+	-fx-effect:none;
+	}	
+	
+.toggle-button:selected{
+	
+	-fx-background-color: #F2F2F2;
+	-fx-background-radius: 0;
+	-fx-background-size:15;
+	-fx-background-repeat:none;
+	-fx-background-size: cover;
+	
+	
+	-fx-border-color:transparent;
+	-fx-border-radius:0;
+	
+	-fx-effect:innershadow(gaussian, rgba( 0, 0, 0, 0.2 ), 4, 0, 4, 4);
+	}
+	

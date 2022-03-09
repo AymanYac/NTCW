@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+
+<ToolBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 10px;" stylesheets="@../../styles/RibbonToolbar.css">
+    <items>
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Project_settings.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="Project settings" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/User_preferences.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="User preferences" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Manage_users.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="Manage users" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+            <children>
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Network.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
+                <Label text="Network" GridPane.columnIndex="2" />
+            </children>
+        </GridPane>
+    </items>
+</ToolBar>

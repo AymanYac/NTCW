@@ -1,0 +1,25 @@
+.progress-bar:determinate{}
+
+.progress-bar:determinate .track{
+	-fx-background-color:transparent;
+	-fx-background-radius:2;
+	-fx-border-color:white;
+	-fx-border-style:dotted
+}
+.progress-bar:determinate .bar{
+	-fx-background-color:#9BBB5C;
+    -fx-background-radius:2;
+}
+
+.progress-bar:indeterminate{}
+
+.progress-bar:indeterminate .track{
+	-fx-background-color:transparent;
+	-fx-background-radius:2;
+	-fx-border-color:white;
+	-fx-border-style:dotted
+}
+.progress-bar:indeterminate .bar{
+	-fx-background-color:#9BBB5C;
+    -fx-background-radius:2;
+}

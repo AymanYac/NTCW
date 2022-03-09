@@ -1,0 +1,184 @@
+.stacked-bar-chart:vertical .chart-title{
+	-fx-background-color:transparent;
+	-fx-border-color:transparent;
+}
+	
+.stacked-bar-chart:vertical .chart-title .text{
+	-fx-font-family:Calibri;
+	-fx-font-weight:Bold;
+	-fx-font-size:16px;
+	-fx-text-fill:white;
+}
+
+
+.stacked-bar-chart:vertical .chart-content{}
+
+.stacked-bar-chart:vertical .chart-content .chart-plot-background{
+	-fx-background-color:transparent;
+	-fx-border-color:transparent;	
+}
+
+.stacked-bar-chart:vertical .chart-content .chart-alternative-column-fill{
+	-fx-background-color:#445469;
+	-fx-border-color:white;	
+}
+
+.stacked-bar-chart:vertical .chart-content .chart-alternative-row-fill{
+	-fx-background-color:#445469;
+	-fx-border-color:white;	
+}
+
+.stacked-bar-chart:vertical .chart-content .chart-vertical-grid-lines{
+	-fx-stroke:transparent;
+	-fx-stroke-width:1;
+		
+}
+
+.stacked-bar-chart:vertical .chart-content .chart-horizontal-grid-lines{
+	-fx-stroke-width:1;
+	-fx-stroke:white;
+}
+
+.stacked-bar-chart:vertical .chart-content .chart-vertical-zero-line{}
+
+.stacked-bar-chart:vertical .chart-content .chart-horizontal-zero-line{}
+
+.stacked-bar-chart:vertical .chart-content .plot-content{
+	-fx-scale-x:0.50;
+}
+
+.stacked-bar-chart:vertical .chart-content .plot-content .default-color0{
+	-fx-background-color:#1EA185;
+	-fx-border-color:transparent;
+}
+
+.stacked-bar-chart:vertical .chart-content .plot-content .default-color1{
+	-fx-background-color:#9BBB5C;
+	-fx-border-color:transparent;
+}
+
+.stacked-bar-chart:vertical .chart-content .plot-content .default-color2{
+	-fx-background-color:#F29B26;
+	-fx-border-color:transparent;
+}
+
+.stacked-bar-chart:vertical .chart-content .plot-content .default-color3{
+	-fx-background-color:#BD392F;
+	-fx-border-color:transparent;
+}
+
+.stacked-bar-chart:vertical .chart-content .plot-content .default-color4{
+	-fx-background-color:#445469;
+	-fx-border-color:transparent;
+}
+
+.stacked-bar-chart:vertical .chart-content .plot-content .default-color5{
+	-fx-background-color:#737572;
+	-fx-border-color:transparent;
+}
+
+.stacked-bar-chart:vertical .chart-content .plot-content .default-color6{
+	-fx-background-color:#BFBFBF;
+	-fx-border-color:transparent;
+}
+
+.stacked-bar-chart:vertical .chart-legend{
+	-fx-background-color:transparent;
+	-fx-border-color:transparent;
+}
+
+.stacked-bar-chart:vertical .chart-legend .chart-legend-item{
+	-fx-border-color:white;
+	-fx-text-fill:white;
+	-fx-font-size:12px;
+	-fx-font-family:Calibri;
+	-fx-font-style:normal;
+	-fx-font-weight:normal;
+	
+}
+
+.stacked-bar-chart:vertical .chart-legend .chart-legend-item .default-color0{
+	-fx-background-color:#1EA185;
+}
+
+.stacked-bar-chart:vertical .chart-legend .chart-legend-item .default-color1{
+	-fx-background-color:#9BBB5C;	
+}
+
+.stacked-bar-chart:vertical .chart-legend .chart-legend-item .default-color2{
+	-fx-background-color:#F29B26;
+}
+
+.stacked-bar-chart:vertical .chart-legend .chart-legend-item .default-color3{
+	-fx-background-color:#BD392F;
+}
+
+.stacked-bar-chart:vertical .chart-legend .chart-legend-item .default-color4{
+	-fx-background-color:#445469;
+}
+
+.stacked-bar-chart:vertical .chart-legend .chart-legend-item .default-color5{
+	-fx-background-color:#737572;
+}
+
+.stacked-bar-chart:vertical .chart-legend .chart-legend-item .default-color6{
+	-fx-background-color:#BFBFBF;
+}
+
+.axis:bottom{
+	-fx-tick-label-fill:white;
+	-fx-tick-label-font-size:12px;
+	-fx-tick-label-font-family:Calibri;
+	-fx-tick-label-font-style:normal;
+	-fx-tick-label-font-weight:bold;
+	-fx-border-color:transparent;
+	-fx-max-height:0.0;
+}
+
+.axis:bottom .axis-label{
+	-fx-text-fill:white;
+	-fx-font-size:12px;
+	-fx-font-family:Calibri;
+	-fx-font-style:normal;
+	-fx-font-weight:normal;
+	
+	-fx-tick-labels-visible:false;
+	-fx-tick-mark-visible:false;
+}
+
+.axis:bottom .axis-label .text{}
+
+.axis:bottom .axis-tick-mark{
+	-fx-stroke:transparent;
+}
+
+.axis:left{
+	-fx-tick-label-fill:white;
+	-fx-tick-label-font-size:12px;
+	-fx-tick-label-font-family:Calibri;
+	-fx-tick-label-font-style:normal;
+	-fx-tick-label-font-weight:bold;
+	
+	-fx-border-color:transparent;
+}
+
+.axis:left .axis-label{
+	-fx-text-fill:white;
+	-fx-font-size:12px;
+	-fx-font-family:Calibri;
+	-fx-font-style:normal;
+	-fx-font-weight:normal;
+	
+	-fx-tick-labels-visible:false;
+	-fx-tick-mark-visible:false;	
+}
+
+.axis:left .axis-label .text{}
+
+.axis:left .axis-tick-mark{
+	-fx-stroke:transparent;	
+}
+
+.axis:left .axis-minor-tick-mark{
+	-fx-stroke:transparent;	
+}

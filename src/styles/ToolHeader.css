@@ -1,0 +1,75 @@
+#top {
+    -fx-background-color: #445469;
+}
+
+#neonecIcon{
+    -fx-background-image:url("../pictures/Neonec-white-Logo-only.png");
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+}
+
+#neonecTitle{
+    -fx-font-weight: bold;
+    -fx-font-size: 12pt;
+    -fx-text-background-color: white;
+}
+
+#winClose {
+    -fx-cursor:hand;
+}
+
+#winClose{
+    -fx-background-image:url("../pictures/winClose.png");
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+}
+
+#winClose:hover {
+    -fx-background-image:url("../pictures/winCloseHover.png");
+    -fx-background-size: cover, auto;
+}
+
+#winClose:pressed {
+    -fx-background-image:url("../pictures/winClose.png");
+    -fx-background-size: cover, auto;
+}
+
+#winMaximize {
+    -fx-cursor:hand;
+}
+
+#winMaximize{
+    -fx-background-image:url("../pictures/winMaximize.png");
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+}
+
+#winMaximize:hover {
+    -fx-background-image:url("../pictures/winMaximizeHover.png");
+    -fx-background-size: cover, auto;
+}
+
+#winMaximize:pressed {
+    -fx-background-image:url("../pictures/winMaximize.png");
+    -fx-background-size: cover, auto;
+}
+
+#winMinimize {
+    -fx-cursor:hand;
+}
+
+#winMinimize{
+    -fx-background-image:url("../pictures/winMinimize.png");
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+}
+
+#winMinimize:hover {
+    -fx-background-image:url("../pictures/winMinimizeHover.png");
+    -fx-background-size: cover, auto;
+}
+
+#winMinimize:pressed {
+    -fx-background-image:url("../pictures/winMinimize.png");
+    -fx-background-size: cover, auto;
+}

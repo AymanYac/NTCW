@@ -1,0 +1,56 @@
+.scroll-pane{
+	-fx-background-color:transparent;
+}
+
+.scroll-pane .viewport{
+	-fx-background-color:transparent;
+}
+
+.scroll-pane .scroll-bar{}
+
+.scroll-pane .scroll-bar .track-background{
+		-fx-background-color:#9BBB5C;
+}
+
+.scroll-pane .scroll-bar .increment-button{
+		-fx-background-color:#9BBB5C;
+}
+
+.scroll-pane .scroll-bar .increment-button .increment-arrow{
+	-fx-background-color:white;
+}
+
+.scroll-pane .scroll-bar .decrement-button{
+		-fx-background-color:#9BBB5C;
+}
+
+.scroll-pane .scroll-bar .decrement-button .decrement-arrow{
+	-fx-background-color:white;
+}
+
+.scroll-pane .scroll-bar:vertical .track{
+	
+	-fx-background-color:linear-gradient(from 0% 0% to 100% 0%,#D7E3BD 0%, #EBF1DE 40%,#EBF1DE 60%, #D7E3BD 100%);
+}
+
+.scroll-pane .scroll-bar:horizontal .track{
+	
+	-fx-background-color:linear-gradient(from 0% 0% to 0% 100%,#D7E3BD 0%, #EBF1DE 40%,#EBF1DE 60%, #D7E3BD 100%);
+}
+
+
+.scroll-pane .scroll-bar:vertical .thumb{
+	-fx-background-color:#9BBB5C,
+	linear-gradient(from 0% 0% to 100% 0%,#77933E 0%, #77933E 20%, #9BBB5C 100%),
+    linear-gradient(from 0% 0% to 100% 0%,#D7E3BD 0%, #C2D69C 5%, #9BBB5C 50%, #9BBB5C 51%, #77933E 100%);
+	
+}
+
+.scroll-pane .scroll-bar:horizontal .thumb{
+	-fx-background-color:#9BBB5C,
+	linear-gradient(from 0% 0% to 0% 100%,#77933E 0%, #77933E 20%, #9BBB5C 100%),
+    linear-gradient(from 0% 0% to 0% 100%,#D7E3BD 0%, #C2D69C 5%, #9BBB5C 50%, #9BBB5C 51%, #77933E 100%);
+	
+}
+
+.scroll-pane .corner{}

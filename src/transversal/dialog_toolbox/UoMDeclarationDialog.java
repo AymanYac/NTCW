@@ -42,7 +42,7 @@ public class UoMDeclarationDialog {
 		Dialog<UnitOfMeasure> dialog = new Dialog<>();
 		dialog.setTitle("New unit of measure declaration");
 		dialog.setHeaderText("Defining a new unit of measure");
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 
 		// Set the button types.
@@ -105,7 +105,7 @@ public class UoMDeclarationDialog {
 		Dialog<UnitOfMeasure> dialog = new Dialog<>();
 		dialog.setTitle("New unit of measure declaration");
 		dialog.setHeaderText("Defining a new unit of measure");
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 		
 		// Set the button types.
@@ -167,7 +167,7 @@ public class UoMDeclarationDialog {
 		Dialog<UnitOfMeasure> dialog = new Dialog<>();
 		dialog.setTitle("New unit of measure declaration");
 		dialog.setHeaderText("Defining a new unit of measure");
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		dialog.getDialogPane().getStyleClass().add("customDialog");
 		
 		// Set the button types.

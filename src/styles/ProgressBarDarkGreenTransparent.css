@@ -1,0 +1,14 @@
+.progress-bar:determinate{}
+
+.progress-bar:determinate .track{
+	-fx-background-color:transparent;
+	-fx-background-radius:2;
+	-fx-border-color:white;
+	-fx-border-style:dotted
+}
+.progress-bar:determinate .bar{
+	-fx-background-color:#1EA185,
+	linear-gradient(#167862 0%, #167862 20%, #1EA185 100%),
+    linear-gradient(#94EBD8 0%, #5EE1C4 5%, #1EA185 50%, #1EA185 51%, #167862 100%);
+    -fx-background-radius:2;
+}

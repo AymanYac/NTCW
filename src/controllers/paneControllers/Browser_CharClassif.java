@@ -26,13 +26,8 @@ import javafx.util.Pair;
 import model.GlobalConstants;
 import org.icepdf.core.pobjects.Destination;
 import org.icepdf.core.pobjects.graphics.text.LineText;
-import org.icepdf.core.util.PropertyConstants;
 import org.icepdf.core.views.DocumentViewController;
-import org.icepdf.core.views.DocumentViewModel;
 import org.icepdf.ri.common.SwingController;
-import org.icepdf.ri.common.SwingViewBuilder;
-import org.icepdf.ri.common.views.DocumentViewControllerImpl;
-import org.icepdf.ri.util.PropertiesManager;
 import org.json.simple.parser.ParseException;
 import service.CharPatternServices;
 import service.CharValuesLoader;
@@ -43,14 +38,11 @@ import transversal.pdf_toolbox.PdfCapableBrowser;
 
 import javax.swing.*;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.util.ResourceBundle;
 import java.util.Vector;
 
 
@@ -502,7 +494,7 @@ public class Browser_CharClassif {
 		headerBar.setMaxHeight(GridPane.USE_COMPUTED_SIZE);
 		headerBar.setPrefWidth(GridPane.USE_COMPUTED_SIZE);
 		Button close = new Button("X");
-		close.getStylesheets().add(Browser_CharClassif.class.getResource("/Styles/CloseButtonRed.css").toExternalForm());
+		close.getStylesheets().add(Browser_CharClassif.class.getResource("/styles/CloseButtonRed.css").toExternalForm());
 		close.setAlignment(Pos.CENTER_RIGHT);
 		close.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
@@ -528,7 +520,7 @@ public class Browser_CharClassif {
 
 
 		headerBar.getItems().setAll(title,verticalSpace,close);
-		headerBar.getStylesheets().add(Browser_CharClassif.class.getResource("/Styles/Main.css").toExternalForm());
+		headerBar.getStylesheets().add(Browser_CharClassif.class.getResource("/styles/Main.css").toExternalForm());
 		GridPane.setValignment(headerBar, VPos.TOP);
 		secondaryLayout.add(headerBar,0,0);
 

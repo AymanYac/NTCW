@@ -35,7 +35,6 @@ import javafx.scene.text.*;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Window;
-import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import model.*;
@@ -45,7 +44,6 @@ import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.generic.Tools;
 
 import java.awt.*;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -96,7 +94,7 @@ public class DedupLaunchDialog {
         Dialog dialog = new Dialog<>();
         dialog.setTitle("Listing all impacted classes");
         dialog.setHeaderText(null);
-        dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+        dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("customDialog");
 
         // Set the button types.
@@ -398,7 +396,7 @@ public class DedupLaunchDialog {
             }
             //dialog.close();
             Dialog<Object> progressDialog = new Dialog<>();
-            progressDialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+            progressDialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
             progressDialog.getDialogPane().getStyleClass().add("customDialog");
             GridPane progressGrid = new GridPane();
             Label progressText = new Label("Filtering items for comparison...");
@@ -617,7 +615,7 @@ public class DedupLaunchDialog {
         });
         dialog.setTitle("Item deduplication settings");
         dialog.setHeaderText(null);
-        dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+        dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("customDialog");
 
         // Set the button types.

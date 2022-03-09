@@ -1413,7 +1413,7 @@ public class Auto_classification_parameters {
 	    try {
 		    Stage primaryStage = new Stage();
 		    
-		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/Scenes/Auto_classification_launch.fxml"));
+		    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/scenes/Auto_classification_launch.fxml"));
 			AnchorPane root = fxmlLoader.load();
 
 			Scene scene = new Scene(root,400,400);
