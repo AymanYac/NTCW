@@ -24,7 +24,8 @@ public class GenericCharRule {
 	public static String SPECIAL_CLASS = "°\"";
 
 	//public static final String NUM_CLASS = "-?(?:[0-9]{1,3}(?:[. ,]+[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?";
-	public static final String NUM_CLASS_POSITIVE = "(?:[0-9]{1,3}(?:[[ ]?.,]?[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?";
+	//public static final String NUM_CLASS_POSITIVE = "(?:[0-9]{1,3}(?:[[ ]?.,]?[0-9]{3,3})*|[0-9]+)(?:[.,][0-9]+)?";
+	public static final String NUM_CLASS_POSITIVE = "(?:[0-9]+|(?:[0-9]{1,3}(?:[[ ]?.,]?[0-9]{3,3})*))(?:[.,][0-9]+)?";
 	public static final String NUM_CLASS = "-?"+GenericCharRule.NUM_CLASS_POSITIVE;
 
 	private String ruleSyntax;
