@@ -7,59 +7,80 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 
 <ToolBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 10px;" stylesheets="@../../styles/RibbonToolbar.css">
     <items>
-        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
             <children>
-                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../pictures/toolbar_buttons/Project_settings.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
-                <Label text="Project settings" GridPane.columnIndex="2" />
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Label text="Project settings" GridPane.columnIndex="3" />
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="4" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="5">
+
+                </Region>
             </children>
         </GridPane>
-        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
             <children>
-                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../pictures/toolbar_buttons/User_preferences.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
-                <Label text="User preferences" GridPane.columnIndex="2" />
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Label text="User preferences" GridPane.columnIndex="3" />
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="4" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="5">
+
+                </Region>
             </children>
         </GridPane>
-        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
             <children>
-                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../pictures/toolbar_buttons/Manage_users.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
-                <Label text="Manage users" GridPane.columnIndex="2" />
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Label text="Manage users" GridPane.columnIndex="3" />
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="4" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="5">
+
+                </Region>
             </children>
         </GridPane>
-        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
             <children>
-                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../pictures/toolbar_buttons/Network.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
-                <Label text="Network" GridPane.columnIndex="2" />
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Label text="Network" GridPane.columnIndex="3" />
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="4" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="5">
+
+                </Region>
             </children>
         </GridPane>
     </items>

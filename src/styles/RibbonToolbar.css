@@ -26,3 +26,12 @@
 	-fx-background-color:transparent;
 	-fx-border-color:transparent;
 }
+.button:hover {
+    -fx-background-color:#1EA185;
+ 	-fx-border-color:#1EA185;
+ }
+
+.bg-grey-style :hover{
+    -fx-background-color: rgba(115, 117, 114, .2);
+    -fx-cursor:hand;
+}

@@ -8,166 +8,283 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 
 <ToolBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 10px;" stylesheets="@../../styles/RibbonToolbar.css">
     <items>
         <Label style="-fx-text-fill: #737572;" text="Display" />
-        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
             <children>
-                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../pictures/toolbar_buttons/Resize_columns.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
-                <Label text="Resize columns" GridPane.columnIndex="2" />
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Label text="Resize columns" GridPane.columnIndex="3" />
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="4" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="5">
+
+                </Region>
             </children>
         </GridPane>
-        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
             <children>
-                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../pictures/toolbar_buttons/Display_default_columns.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
-                <Label text="Display default columns" GridPane.columnIndex="2" />
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Label text="Display default columns" GridPane.columnIndex="3" />
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="4" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="5">
+
+                </Region>
             </children>
         </GridPane>
-        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
-            <graphic>
-                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <Image url="@../../pictures/toolbar_buttons/Increase_font_size.png" />
-                </ImageView>
-            </graphic>
-        </Button>
-        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
-            <graphic>
-                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <Image url="@../../pictures/toolbar_buttons/Decrease_font_size.png" />
-                </ImageView>
-            </graphic>
-        </Button>
-        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
-            <graphic>
-                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <Image url="@../../pictures/toolbar_buttons/Wrap_text.png" />
-                </ImageView>
-            </graphic>
-        </Button>
+        <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
+            <children>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Increase_font_size.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="3">
+
+                </Region>
+            </children>
+        </GridPane>
+        <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
+            <children>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Decrease_font_size.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="3">
+
+                </Region>
+            </children>
+        </GridPane>
+        <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
+            <children>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Wrap_text.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="3">
+
+                </Region>
+            </children>
+        </GridPane>
         <Separator orientation="VERTICAL" prefHeight="24.0" />
         <Label style="-fx-text-fill: #737572;" text="Navigation" />
-        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
-            <graphic>
-                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <Image url="@../../pictures/toolbar_buttons/Previous_empty_row.png" />
-                </ImageView>
-            </graphic>
-        </Button>
-        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
-            <graphic>
-                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <Image url="@../../pictures/toolbar_buttons/Next_empty_row.png" />
-                </ImageView>
-            </graphic>
-        </Button>
-        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
-            <graphic>
-                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <Image url="@../../pictures/toolbar_buttons/First_row.png" />
-                </ImageView>
-            </graphic>
-        </Button>
-        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
-            <graphic>
-                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <Image url="@../../pictures/toolbar_buttons/Last_row.png" />
-                </ImageView>
-            </graphic>
-        </Button>
-        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
-            <graphic>
-                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <Image url="@../../pictures/toolbar_buttons/Previous_column.png" />
-                </ImageView>
-            </graphic>
-        </Button>
-        <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false" styleClass="..\styles\ButtonTool.css">
-            <graphic>
-                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                    <Image url="@../../pictures/toolbar_buttons/Next_column.png" />
-                </ImageView>
-            </graphic>
-        </Button>
+        <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
+            <children>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Previous_empty_row.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="3">
+
+                </Region>
+            </children>
+        </GridPane>
+        <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
+            <children>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Next_empty_row.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="3">
+
+                </Region>
+            </children>
+        </GridPane>
+        <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
+            <children>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/First_row.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="3">
+
+                </Region>
+            </children>
+        </GridPane>
+        <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
+            <children>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Last_row.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="3">
+
+                </Region>
+            </children>
+        </GridPane>
+        <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
+            <children>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Previous_column.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="3">
+
+                </Region>
+            </children>
+        </GridPane>
+        <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
+            <children>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../pictures/toolbar_buttons/Next_column.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="3">
+
+                </Region>
+            </children>
+        </GridPane>
         <Separator orientation="VERTICAL" prefHeight="24.0" />
         <Label style="-fx-text-fill: #737572;" text="Panels" />
-        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
             <children>
-                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../pictures/toolbar_buttons/Navigator.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
-                <Label text="Navigator" GridPane.columnIndex="2" />
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Label text="Navigator" GridPane.columnIndex="3" />
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="4" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="5">
+
+                </Region>
             </children>
         </GridPane>
-        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
             <children>
-                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../pictures/toolbar_buttons/Image_search.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
-                <Label text="Image search" GridPane.columnIndex="2" />
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Label text="Image search" GridPane.columnIndex="3" />
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="4" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="5">
+
+                </Region>
             </children>
         </GridPane>
-        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
             <children>
-                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../pictures/toolbar_buttons/Rule_panel.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
-                <Label text="Rule panel" GridPane.columnIndex="2" />
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Label text="Rule panel" GridPane.columnIndex="3" />
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="4" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="5">
+
+                </Region>
             </children>
         </GridPane>
-        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
             <children>
-                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../pictures/toolbar_buttons/Item_panel.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
-                <Label text="Item panel" GridPane.columnIndex="2" />
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Label text="Item panel" GridPane.columnIndex="3" />
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="4" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="5">
+
+                </Region>
             </children>
         </GridPane>
-        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0">
+        <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
             <children>
-                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" prefWidth="24.0" mnemonicParsing="false">
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="0" />
+                <Button maxHeight="24.0" maxWidth="24.0" minHeight="24.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../pictures/toolbar_buttons/Close_all_panels.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="1" />
-                <Label text="Close all panels" GridPane.columnIndex="2" />
+                <HBox maxHeight="8.0" maxWidth="8.0" minHeight="8.0" minWidth="8.0" GridPane.columnIndex="2" />
+                <Label text="Close all panels" GridPane.columnIndex="3" />
+                <HBox maxHeight="35.0" maxWidth="8.0" minHeight="35.0" minWidth="8.0" GridPane.columnIndex="4" />
+                <Region GridPane.columnIndex="0" GridPane.columnSpan="5">
+
+                </Region>
             </children>
         </GridPane>
     </items>
