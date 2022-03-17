@@ -504,10 +504,10 @@ public class RulePane_CharClassif {
             new Thread(()->{
                 parent.tableController.ReevaluateItems(CharPatternServices.unApplyRule(oldRule,caracCombo.getValue(),parent.account));
                 try{
-                    oldRule.dropGenericCharRule();
                     CharPatternServices.suppressGenericRuleInDB(parent.account.getActive_project(),oldRule.getCharRuleId(),true);
+                    oldRule.dropGenericCharRule();
                 }catch (Exception V){
-
+                    V.printStackTrace(System.err);
                 }
                 Platform.runLater(new Runnable() {
                     @Override
@@ -528,9 +528,9 @@ public class RulePane_CharClassif {
             if (ruleView.getSelectionModel().getSelectedItem() != null) {
                 GenericCharRule oldRule = ruleView.getSelectionModel().getSelectedItem().getGenericCharRule();
                 items2Reevaluate.addAll(CharPatternServices.unApplyRule(oldRule, caracCombo.getValue(), parent.account));
-                oldRule.dropGenericCharRule();
                 try {
                     CharPatternServices.suppressGenericRuleInDB( parent.account.getActive_project(), oldRule.getCharRuleId(), true);
+                    oldRule.dropGenericCharRule();
                 } catch (Exception throwables) {
                     throwables.printStackTrace();
                 }
