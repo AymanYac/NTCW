@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+
+<?import javafx.scene.control.Button?>
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0"/>
+    </padding>
+    <top>
+        <Label text="Item data field display" prefHeight="30" translateX="20"/>
+    </top>
+    <left>
+        <HBox prefWidth="0" />
+    </left>
+    <center>
+        <BorderPane>
+            <top>
+                <Label text="Available data fields" prefHeight="30" translateX="20"/>
+            </top>
+            <center>
+                <TableView/>
+            </center>
+            <left>
+                <HBox prefWidth="0"/>
+            </left>
+            <right>
+                <HBox prefWidth="10"/>
+            </right>
+            <bottom>
+                <HBox prefHeight="0"/>
+            </bottom>
+        </BorderPane>
+    </center>
+    <right>
+        <BorderPane>
+            <top>
+                <Label text="Concatenated elements" prefHeight="30" translateX="20"/>
+            </top>
+            <center>
+                <TableView prefWidth="300"/>
+            </center>
+            <left>
+                <HBox prefWidth="10"/>
+            </left>
+            <right>
+                <HBox prefWidth="0"/>
+            </right>
+            <bottom>
+                <HBox prefHeight="0"/>
+            </bottom>
+        </BorderPane>
+    </right>
+    <bottom>
+        <BorderPane>
+            <top>
+                <BorderPane prefHeight="50">
+                    <top>
+                        <HBox prefHeight="10"/>
+                    </top>
+                    <left>
+                        <Label text="Description preview" prefHeight="30" translateX="20"/>
+                    </left>
+                    <right>
+                        <BorderPane prefHeight="30">
+                            <top>
+                                <HBox prefHeight="0"/>
+                            </top>
+                            <center>
+                                <HBox prefWidth="15"/>
+                            </center>
+                            <bottom>
+                                <HBox prefHeight="0"/>
+                            </bottom>
+                            <left>
+                                <Button prefWidth="30"/>
+                            </left>
+                            <right>
+                                <Button prefWidth="30"/>
+                            </right>
+                        </BorderPane>
+                    </right>
+                    <bottom>
+                        <HBox prefHeight="0"/>
+                    </bottom>
+                </BorderPane>
+            </top>
+            <center>
+
+            </center>
+            <left>
+                <HBox prefWidth="0"/>
+            </left>
+            <right>
+                <HBox prefWidth="0"/>
+            </right>
+            <bottom>
+                <HBox prefHeight="0"/>
+            </bottom>
+        </BorderPane>
+    </bottom>
+</BorderPane>
