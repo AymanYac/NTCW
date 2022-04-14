@@ -1,21 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.Label?>
-
 <?import javafx.scene.control.Button?>
-<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
-    <padding>
-        <Insets bottom="10.0" left="10.0" right="10.0"/>
-    </padding>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+<?import model.TableColumn?>
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:id="mainBorderPane" fx:controller="scenes.paneScenes.testController" stylesheets="@../../styles/DescPane.css">
     <top>
-        <Label text="Item data field display" prefHeight="30" translateX="20"/>
+        <BorderPane fx:id="titleBar">
+            <top>
+                <HBox prefHeight="0"/>
+            </top>
+            <left>
+                <HBox prefWidth="0"/>
+            </left>
+            <center>
+                <Label text="Item data field display" prefHeight="30" translateX="20"/>
+            </center>
+            <right>
+                <HBox prefWidth="0"/>
+            </right>
+            <bottom>
+                <HBox prefHeight="0"/>
+            </bottom>
+        </BorderPane>
     </top>
     <left>
-        <HBox prefWidth="0" />
+        <HBox prefWidth="10" />
     </left>
     <center>
         <BorderPane>
@@ -23,7 +39,13 @@
                 <Label text="Available data fields" prefHeight="30" translateX="20"/>
             </top>
             <center>
-                <TableView/>
+                <TableView fx:id="fieldTable" stylesheets="@../../styles/TableViewDescription.css">
+                    <columns>
+                        <TableColumn style="-fx-alignment: LEFT;" prefWidth="85.0" text="Field name" fx:id="field" percentageWidth="0.15"/>
+                        <TableColumn style="-fx-alignment: LEFT;" prefWidth="-1" text="Examples" fx:id="example" percentageWidth="0.75"/>
+                        <TableColumn style="-fx-alignment: CENTER;" prefWidth="45.0" text="Add" fx:id="add" percentageWidth="0.1"/>
+                    </columns>
+                </TableView>
             </center>
             <left>
                 <HBox prefWidth="0"/>
@@ -42,13 +64,29 @@
                 <Label text="Concatenated elements" prefHeight="30" translateX="20"/>
             </top>
             <center>
-                <TableView prefWidth="300"/>
+                <TableView fx:id="elementTable" prefWidth="950">
+                    <columns>
+                        <TableColumn prefWidth="25.0"  fx:id="position" percentageWidth="0.05"/>
+                        <TableColumn prefWidth="-1"  fx:id="fieldName" percentageWidth="0.20"/>
+                        <TableColumn prefWidth="25.0" text="Auto- &#10;translate"  fx:id="translate" percentageWidth="0.05"/>
+                        <TableColumn prefWidth="25.0" text="Line &#10;Break"  fx:id="linebreak" percentageWidth="0.05"/>
+                        <TableColumn prefWidth="25.0" text="Bold"  fx:id="bold" percentageWidth="0.05"/>
+                        <TableColumn prefWidth="25.0" text="Italic"  fx:id="italic" percentageWidth="0.05" />
+                        <TableColumn fx:id="leftATableColumn" prefWidth="25.0" percentageWidth="0.05"/>
+                        <TableColumn fx:id="rightATableColumn" prefWidth="25.0" percentageWidth="0.05" />
+                        <TableColumn prefWidth="55.0" text="Prefix"  fx:id="prefix" percentageWidth="0.15"/>
+                        <TableColumn prefWidth="55.0" text="Suffix"  fx:id="suffix" percentageWidth="0.15"/>
+                        <TableColumn prefWidth="25.0"  fx:id="up" percentageWidth="0.05" />
+                        <TableColumn prefWidth="25.0"  fx:id="down" percentageWidth="0.05" />
+                        <TableColumn prefWidth="25.0"  fx:id="clear" percentageWidth="0.05" />
+                    </columns>
+                </TableView>
             </center>
             <left>
                 <HBox prefWidth="10"/>
             </left>
             <right>
-                <HBox prefWidth="0"/>
+                <HBox prefWidth="10"/>
             </right>
             <bottom>
                 <HBox prefHeight="0"/>
@@ -62,44 +100,59 @@
                     <top>
                         <HBox prefHeight="10"/>
                     </top>
+                    <bottom>
+                        <HBox prefHeight="10"/>
+                    </bottom>
                     <left>
-                        <Label text="Description preview" prefHeight="30" translateX="20"/>
+                        <HBox prefWidth="0"/>
                     </left>
+                    <center>
+                        <Label text="Description preview" prefHeight="30" translateX="20" BorderPane.alignment="CENTER_LEFT"/>
+                    </center>
                     <right>
                         <BorderPane prefHeight="30">
                             <top>
                                 <HBox prefHeight="0"/>
                             </top>
-                            <center>
-                                <HBox prefWidth="15"/>
-                            </center>
                             <bottom>
                                 <HBox prefHeight="0"/>
                             </bottom>
                             <left>
-                                <Button prefWidth="30"/>
+                                <Button prefWidth="30" prefHeight="30" translateX="-10">
+                                    <graphic>
+                                        <ImageView fitHeight="30" fitWidth="30" pickOnBounds="true" preserveRatio="true">
+                                            <Image url="@../../pictures/toolbar_buttons/Decrease_font_size.png" />
+                                        </ImageView>
+                                    </graphic>
+                                </Button>
                             </left>
+                            <center>
+                                <HBox prefWidth="5"/>
+                            </center>
                             <right>
-                                <Button prefWidth="30"/>
+                                <Button prefWidth="30" prefHeight="30"  translateX="-10">
+                                    <graphic>
+                                        <ImageView fitHeight="30" fitWidth="30" pickOnBounds="true" preserveRatio="true">
+                                            <Image url="@../../pictures/toolbar_buttons/Increase_font_size.png" />
+                                        </ImageView>
+                                    </graphic>
+                                </Button>
                             </right>
                         </BorderPane>
                     </right>
-                    <bottom>
-                        <HBox prefHeight="0"/>
-                    </bottom>
                 </BorderPane>
             </top>
             <center>
-
+                <TextArea prefHeight="120"/>
             </center>
             <left>
-                <HBox prefWidth="0"/>
+                <HBox prefWidth="10"/>
             </left>
             <right>
-                <HBox prefWidth="0"/>
+                <HBox prefWidth="10"/>
             </right>
             <bottom>
-                <HBox prefHeight="0"/>
+                <HBox prefHeight="10"/>
             </bottom>
         </BorderPane>
     </bottom>

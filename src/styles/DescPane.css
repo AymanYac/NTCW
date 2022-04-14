@@ -1,0 +1,98 @@
+
+#leftATableColumn > .label {
+    -fx-background-image: url("../pictures/descPane_buttons/leftA.png");
+    -fx-background-size: 25 25;
+    -fx-background-repeat: no-repeat no-repeat;
+    -fx-background-position: center center;
+}
+
+#rightATableColumn > .label {
+    -fx-background-image: url("../pictures/descPane_buttons/rightA.png");
+    -fx-background-size: 25 25;
+    -fx-background-repeat: no-repeat no-repeat;
+    -fx-background-position: center center;
+}
+
+#elementTable {
+    -fx-background-color: #445469;
+    -fx-border-width: 0;
+}
+
+#elementTable .column-header,
+#elementTable .column-header-background {
+    -fx-background-color: #445469;
+    -fx-border-width: 0;
+}
+
+#elementTable .column-header {
+    -fx-border-width: 0 0 0 0;
+    -fx-border-color: #445469;
+}
+
+#elementTable .column-header .label {
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+}
+
+
+#elementTable .table-row-cell {
+    -fx-background-color: #445469;
+}
+
+#elementTable .table-row-cell .text {
+       -fx-fill: white ;
+       -fx-font-size: 14px;
+}
+
+#elementTable .table-cell {
+    -fx-border-color: #445469;
+    -fx-border-width: 0 0 0 10;
+    -fx-padding: 5 3 15 3;
+}
+
+.label{
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+#mainBorderPane{
+	-fx-background-color:#445469;
+}
+
+#titleBar{
+	-fx-background-color:#D6DCE4;
+    -fx-text-fill:#445469;
+}
+
+.addButton {
+    -fx-background-image: url("../pictures/descPane_buttons/addButton.png");
+    -fx-background-insets: 10,10;
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}
+.upButton {
+    -fx-background-image: url("../pictures/descPane_buttons/uparrow.png");
+    -fx-background-insets: 10,10;
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}
+.downButton {
+    -fx-background-image: url("../pictures/descPane_buttons/downarrow.png");
+    -fx-background-insets: 10,10;
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}
+.clearButton {
+    -fx-background-image: url("../pictures/descPane_buttons/xarrow.png");
+    -fx-background-insets: 10,10;
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}
