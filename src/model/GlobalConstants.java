@@ -86,7 +86,10 @@ public class GlobalConstants {
 	
 	public static final Integer RULE_DISPLAY_FONT_SIZE = 12;
 	public static final Integer CHAR_DISPLAY_FONT_SIZE = 12;
-	
+
+	public static final Paint DESC_NEONEC_GREEN = Color.color(30.0/256,161.0/256,133.0/256);
+	public static final Paint DESC_NEONEC_GREY = Color.color(191.0/256,191.0/256,191.0/256);
+
 	public static final Paint RULE_DISPLAY_SYNTAX_COLOR = Color.WHITE;
 	public static final Paint RULE_DISPLAY_MAIN_COLOR = Color.WHITE;
 	public static final Paint RULE_DISPLAY_COMP_COLOR = Color.WHITE;

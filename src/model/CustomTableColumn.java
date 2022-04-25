@@ -6,20 +6,20 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableView;
 
-public class TableColumn<S, T> extends javafx.scene.control.TableColumn<S, T> {
+public class CustomTableColumn<S, T> extends javafx.scene.control.TableColumn<S, T> {
 
     private final DoubleProperty percentageWidth = new SimpleDoubleProperty(1);
 
-    public TableColumn() {
+    public CustomTableColumn() {
         tableViewProperty().addListener(new ChangeListener<TableView<S>>() {
 
             @Override
             public void changed(ObservableValue<? extends TableView<S>> ov, TableView<S> t, TableView<S> t1) {
-                if(TableColumn.this.prefWidthProperty().isBound()) {
-                    TableColumn.this.prefWidthProperty().unbind();
+                if(CustomTableColumn.this.prefWidthProperty().isBound()) {
+                    CustomTableColumn.this.prefWidthProperty().unbind();
                 }
 
-                TableColumn.this.prefWidthProperty().bind(t1.widthProperty().multiply(percentageWidth));
+                CustomTableColumn.this.prefWidthProperty().bind(t1.widthProperty().multiply(percentageWidth));
             }
         });
     }

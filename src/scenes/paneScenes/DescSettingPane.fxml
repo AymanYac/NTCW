@@ -5,11 +5,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+<?import model.CustomTableColumn?>
 
-<?import model.TableColumn?>
+<?import javafx.scene.text.TextFlow?>
 <BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:id="mainBorderPane" fx:controller="scenes.paneScenes.testController" stylesheets="@../../styles/DescPane.css">
     <top>
         <BorderPane fx:id="titleBar">
@@ -17,11 +17,8 @@
                 <HBox prefHeight="0"/>
             </top>
             <left>
-                <HBox prefWidth="0"/>
+                <Label fx:id="windowTitle" text="Item data field display" prefHeight="25" translateX="20"/>
             </left>
-            <center>
-                <Label text="Item data field display" prefHeight="30" translateX="20"/>
-            </center>
             <right>
                 <HBox prefWidth="0"/>
             </right>
@@ -41,9 +38,9 @@
             <center>
                 <TableView fx:id="fieldTable" stylesheets="@../../styles/TableViewDescription.css">
                     <columns>
-                        <TableColumn style="-fx-alignment: LEFT;" prefWidth="85.0" text="Field name" fx:id="field" percentageWidth="0.15"/>
-                        <TableColumn style="-fx-alignment: LEFT;" prefWidth="-1" text="Examples" fx:id="example" percentageWidth="0.75"/>
-                        <TableColumn style="-fx-alignment: CENTER;" prefWidth="45.0" text="Add" fx:id="add" percentageWidth="0.1"/>
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: LEFT;" text="Field name" fx:id="field" percentageWidth="0.14"/>
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: LEFT;" text="Examples" fx:id="example" percentageWidth="0.78"/>
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: CENTER;" text="Add" fx:id="add" percentageWidth="0.06"/>
                     </columns>
                 </TableView>
             </center>
@@ -66,19 +63,19 @@
             <center>
                 <TableView fx:id="elementTable" prefWidth="950">
                     <columns>
-                        <TableColumn prefWidth="25.0"  fx:id="position" percentageWidth="0.05"/>
-                        <TableColumn prefWidth="-1"  fx:id="fieldName" percentageWidth="0.20"/>
-                        <TableColumn prefWidth="25.0" text="Auto- &#10;translate"  fx:id="translate" percentageWidth="0.05"/>
-                        <TableColumn prefWidth="25.0" text="Line &#10;Break"  fx:id="linebreak" percentageWidth="0.05"/>
-                        <TableColumn prefWidth="25.0" text="Bold"  fx:id="bold" percentageWidth="0.05"/>
-                        <TableColumn prefWidth="25.0" text="Italic"  fx:id="italic" percentageWidth="0.05" />
-                        <TableColumn fx:id="leftATableColumn" prefWidth="25.0" percentageWidth="0.05"/>
-                        <TableColumn fx:id="rightATableColumn" prefWidth="25.0" percentageWidth="0.05" />
-                        <TableColumn prefWidth="55.0" text="Prefix"  fx:id="prefix" percentageWidth="0.15"/>
-                        <TableColumn prefWidth="55.0" text="Suffix"  fx:id="suffix" percentageWidth="0.15"/>
-                        <TableColumn prefWidth="25.0"  fx:id="up" percentageWidth="0.05" />
-                        <TableColumn prefWidth="25.0"  fx:id="down" percentageWidth="0.05" />
-                        <TableColumn prefWidth="25.0"  fx:id="clear" percentageWidth="0.05" />
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" fx:id="position" percentageWidth="0.035"/>
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-LEFT;" fx:id="fieldName" percentageWidth="0.16"/>
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" text="Auto-&#10;translate" fx:id="translate" percentageWidth="0.06"/>
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" text="Line&#10;Break" fx:id="linebreak" percentageWidth="0.06"/>
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" text="Bold" fx:id="bold" percentageWidth="0.06"/>
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" text="Italic" fx:id="italic" percentageWidth="0.06" />
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" fx:id="leftATableColumn" percentageWidth="0.06"/>
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" fx:id="rightATableColumn" percentageWidth="0.06" />
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" text="Prefix" fx:id="prefix" percentageWidth="0.16"/>
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" text="Suffix" fx:id="suffix" percentageWidth="0.16"/>
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" fx:id="up" percentageWidth="0.04" />
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" fx:id="down" percentageWidth="0.04" />
+                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-CENTER;" fx:id="clear" percentageWidth="0.04" />
                     </columns>
                 </TableView>
             </center>
@@ -143,7 +140,23 @@
                 </BorderPane>
             </top>
             <center>
-                <TextArea prefHeight="120"/>
+                <BorderPane fx:id="previewPane">
+                    <top>
+                        <HBox prefHeight="0"/>
+                    </top>
+                    <left>
+                        <HBox prefWidth="10"/>
+                    </left>
+                    <center>
+                        <TextFlow fx:id="previewArea" prefHeight="120"/>
+                    </center>
+                    <right>
+                        <HBox prefWidth="10"/>
+                    </right>
+                    <bottom>
+                        <HBox prefHeight="0"/>
+                    </bottom>
+                </BorderPane>
             </center>
             <left>
                 <HBox prefWidth="10"/>

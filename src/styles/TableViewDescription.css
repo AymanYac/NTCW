@@ -93,17 +93,17 @@
 }
 
 .table-view:cell-selection .column-header-background .nested-column-header .table-column .label{
-		-fx-background-color:red;
+		-fx-background-color:transparent;
 		-fx-border-color:transparent;
 }
 
 
 .table-view:row-selection:constrained-resize .column-resize-line{
-	-fx-background-color:red;
+	-fx-background-color:transparent;
 }
 
 .table-view:row-selection .column-header-background .nested-column-header{
-	-fx-background-color:red;
+	-fx-background-color:transparent;
 }
 
 .table-view:row-selection .column-header-background .nested-column-header .table-column{

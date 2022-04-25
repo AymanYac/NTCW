@@ -1,9 +1,11 @@
 package scenes.paneScenes;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
@@ -11,8 +13,11 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.*;
 import javafx.util.Callback;
+import model.GlobalConstants;
 
 import java.util.ArrayList;
 
@@ -34,15 +39,12 @@ public class testController {
     @FXML public TableColumn field;
     @FXML public TableColumn example;
     @FXML public TableColumn add;
+    @FXML TextFlow previewArea;
 
-    @FXML
-    BorderPane mainBorderPane;
-    @FXML
-    BorderPane titleBar;
-    @FXML
-    TableView<fieldDS> fieldTable;
-    @FXML
-    TableView<elemDS> elementTable;
+    @FXML BorderPane mainBorderPane;
+    @FXML BorderPane titleBar;
+    @FXML TableView<fieldDS> fieldTable;
+    @FXML TableView<elemDS> elementTable;
 
     double r = 10;
 
@@ -60,7 +62,7 @@ public class testController {
             @Override
             public void onChanged(Change<? extends elemDS> c) {
                 elementTable.getItems().forEach(item->item.position.set(elementTable.getItems().indexOf(item)));
-                
+                refresh_preview();
             }
         });
         //elementTable.getItems().setAll(elems);
@@ -83,6 +85,26 @@ public class testController {
         fields.add(new fieldDS("SSR","AETNA GROUP 0001354366"));
         fields.add(new fieldDS("Données de base","Type de composant : Mecanique | Fabriquant impose : oui | Ref 0001354366"));
         fieldTable.getItems().setAll(fields);
+    }
+
+    private void refresh_preview() {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                previewArea.getChildren().clear();
+                elementTable.getItems().forEach(elem->{
+                    Text txt = new Text(
+                            (elem.prefix.get()!=null?elem.prefix.get():"")+
+                                    fieldTable.getItems().stream().filter(field->field.getFieldName().equals(elem.fieldName)).findFirst().get().getValue()+
+                                    (elem.suffix.get()!=null?elem.suffix.get():"")+
+                                    (elem.linebreak.get()?"\n":" ")
+                    );
+                    txt.setFill(elem.leftATableColumn.getValue()?GlobalConstants.DESC_NEONEC_GREEN:elem.rightATableColumn.getValue()?GlobalConstants.DESC_NEONEC_GREY: Color.BLACK);
+                    txt.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,elem.bold.get()?FontWeight.BOLD:FontWeight.THIN,elem.italic.get()?FontPosture.ITALIC:FontPosture.REGULAR,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
+                    previewArea.getChildren().add(txt);
+                });
+            }
+        });
     }
 
     private void setFieldsColumns() {
@@ -140,6 +162,12 @@ public class testController {
         translate.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        refresh_preview();
+                    }
+                });
                 cb.selectedProperty().bindBidirectional(r.getValue().translate);
                 return new ReadOnlyObjectWrapper(cb);
             }
@@ -147,6 +175,12 @@ public class testController {
         linebreak.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        refresh_preview();
+                    }
+                });
                 cb.selectedProperty().bindBidirectional(r.getValue().linebreak);
                 return new ReadOnlyObjectWrapper(cb);
             }
@@ -154,6 +188,12 @@ public class testController {
         bold.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        refresh_preview();
+                    }
+                });
                 cb.selectedProperty().bindBidirectional(r.getValue().bold);
                 return new ReadOnlyObjectWrapper(cb);
             }
@@ -161,6 +201,12 @@ public class testController {
         italic.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        refresh_preview();
+                    }
+                });
                 cb.selectedProperty().bindBidirectional(r.getValue().italic);
                 return new ReadOnlyObjectWrapper(cb);
             }
@@ -168,6 +214,15 @@ public class testController {
         leftATableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        if(newValue){
+                            r.getValue().rightATableColumn.set(false);
+                        }
+                        refresh_preview();
+                    }
+                });
                 cb.selectedProperty().bindBidirectional(r.getValue().leftATableColumn);
                 return new ReadOnlyObjectWrapper(cb);
             }
@@ -175,6 +230,15 @@ public class testController {
         rightATableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        if(newValue){
+                            r.getValue().leftATableColumn.set(false);
+                        }
+                        refresh_preview();
+                    }
+                });
                 cb.selectedProperty().bindBidirectional(r.getValue().rightATableColumn);
                 return new ReadOnlyObjectWrapper(cb);
             }

@@ -4,6 +4,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 //import org.scenicview.ScenicView;
 
 import java.net.URL;
@@ -24,6 +25,7 @@ public class test extends Application {
 //       new JMetro(JMetro.Style.LIGHT).applyTheme(scene);
 
         primaryStage.setMaximized(true);
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
