@@ -137,7 +137,7 @@ public class ImportItemRow {
 									}else {
 										
 										//The uom can not be corrected
-										rejectedRows.add(new Pair<Row,String>(current_row,UnitOfMeasure.RunTimeUOMS.get(tmpUom).toString()+" can not be converted to "+String.join(",", knownTemplate.getAllowedUoms().stream().map(uid->UnitOfMeasure.RunTimeUOMS.get(uid).getUom_name()).collect(Collectors.toList()))));
+										rejectedRows.add(new Pair<Row,String>(current_row,UnitOfMeasure.RunTimeUOMS.get(tmpUom.getUom_id()).toString()+" can not be converted to "+ knownTemplate.getAllowedUoms().stream().map(uid->UnitOfMeasure.RunTimeUOMS.get(uid).getUom_name()).collect(Collectors.joining(","))));
 										valueParseHasFailed=true;
 										return null;
 									}
