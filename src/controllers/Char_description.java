@@ -1718,7 +1718,6 @@ public class Char_description {
 		
 		tableController.setParent(this);
 		tableController.setUserAccount(account);
-
 		tableController.setUserLanguageGcode(user_language_gcode);
 		/*
 		if(GlobalConstants.MANUAL_FETCH_ALL) {

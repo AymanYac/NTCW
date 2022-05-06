@@ -111,3 +111,12 @@
 .table-row-cell:selected .table-cell {
     -fx-background-color: #1EA185;
     }
+
+.table-view:row-selection .column-header-background .show-hide-columns-button{
+	-fx-max-width:  0;
+	-fx-min-width:  0;
+	-fx-pref-width:  0;
+	-fx-padding:  0 0 0 0;
+	-fx-background-insets:  0 0 0 0;
+	visibility: false;
+}

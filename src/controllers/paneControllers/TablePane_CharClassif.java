@@ -1,14 +1,21 @@
 package controllers.paneControllers;
 
 import com.google.gson.reflect.TypeToken;
+import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableColumnHeader;
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
+import com.sun.javafx.scene.control.skin.TableViewSkin;
 import controllers.Char_description;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -17,11 +24,15 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+import javafx.stage.Popup;
 import javafx.util.Callback;
 import model.*;
 import org.json.simple.parser.ParseException;
@@ -29,6 +40,7 @@ import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.data_exchange_toolbox.QueryFormater;
+import transversal.dialog_toolbox.CaracDeclarationDialog;
 import transversal.dialog_toolbox.FxUtilTest;
 import service.ExternalSearchServices;
 import transversal.generic.Tools;
@@ -388,17 +400,20 @@ public class TablePane_CharClassif {
 				Parent.refresh_ui_display();
 			}
 		});
-
 		ContextMenu customMenu = new ContextMenu();
 		customMenu.getItems().add(addCustomValue);
-		tableGrid.setContextMenu(customMenu);
-		/*// only display context menu for non-empty rows:
-					row.contextMenuProperty().bind(
-							Bindings.when(row.emptyProperty().and(row.getItem().hasDataInCurrentClassForCurrentCarac(selected_col)))
-									.then(rowMenu)
-									.otherwise((ContextMenu)null));
-					return row;
-				});*/
+		// only display context menu for non-empty rows:
+		tableGrid.setRowFactory(new Callback<TableView<CharDescriptionRow>, TableRow<CharDescriptionRow>>() {
+			@Override
+			public TableRow<CharDescriptionRow> call(TableView<CharDescriptionRow> tableView) {
+				TableRow<CharDescriptionRow> row = new TableRow<CharDescriptionRow>();
+				row.contextMenuProperty().bind(
+						Bindings.when(row.emptyProperty())
+								.then((ContextMenu)null)
+								.otherwise(customMenu));
+				return row;
+			}
+		});
 	}
 	
 	public void fireManualClassChange(String result,boolean jumpNext) throws ClassNotFoundException, SQLException {
@@ -788,7 +803,8 @@ public class TablePane_CharClassif {
 		}
 		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
 		List<String> char_headers = CharValuesLoader.returnSortedCopyOfClassCharacteristic(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
-		for( Object col:this.tableGrid.getColumns()) {
+		for( TableColumn col:this.tableGrid.getColumns()) {
+			col.setId(null);
 			int idx = char_headers.indexOf(((TableColumn)col).getText());
 			if(idx!=selected_col ) {
 				if(collapsedViewColumns.contains(((TableColumn)col).getText())) {
@@ -830,7 +846,7 @@ public class TablePane_CharClassif {
 					this.defaultColumnStyle = ((TableColumn)col).getStyle();
 					((TableColumn)col).setStyle(defaultColumnStyle+"-fx-background-color: #AAAAAA;");
 				}*/
-				
+				col.setId("active-column");
 				((TableColumn)col).setVisible(true);
 				
 			}
@@ -914,7 +930,7 @@ public class TablePane_CharClassif {
 						}
 					});
 				}
-                tmp.setResizable(false);
+                tmp.setResizable(true);
                 tmp.setVisible(false);
                 this.tableGrid.getColumns().add(tmp);
                 
@@ -929,7 +945,7 @@ public class TablePane_CharClassif {
               });
             this.tableGrid.getColumns().add(classNameColumn);
             classNameColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.085));;
-            classNameColumn.setResizable(false);
+            classNameColumn.setResizable(true);
             classNameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
             
             
@@ -957,7 +973,7 @@ public class TablePane_CharClassif {
               });
             this.tableGrid.getColumns().add(descriptionColumn);
             descriptionColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.4));;
-            descriptionColumn.setResizable(false);
+            descriptionColumn.setResizable(true);
             descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
 
             CharValuesLoader.returnSortedCopyOfClassCharacteristic(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().forEach(characteristic->{
@@ -986,7 +1002,7 @@ public class TablePane_CharClassif {
 				});
 				col.setVisible(false);
 				col.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
-				col.setResizable(false);
+				col.setResizable(true);
 
 				this.tableGrid.getColumns().add(col);
 			});
@@ -1007,7 +1023,7 @@ public class TablePane_CharClassif {
                 }
              });
             linkColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
-            linkColumn.setResizable(false);
+            linkColumn.setResizable(true);
             this.tableGrid.getColumns().add(linkColumn);
             
         	Parent.classification.setEditable(true);
@@ -1019,13 +1035,13 @@ public class TablePane_CharClassif {
         	TableColumn CaracNameColumn = new TableColumn<>("Caracteristic name");
         	CaracNameColumn.setCellValueFactory(new PropertyValueFactory<>("Short_desc"));
         	CaracNameColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.3));;
-        	CaracNameColumn.setResizable(false);
+        	CaracNameColumn.setResizable(true);
             this.tableGrid.getColumns().add(CaracNameColumn);
             
             TableColumn CaracValueColumn = new TableColumn<>("Caracteristic value");
             CaracValueColumn.setCellValueFactory(new PropertyValueFactory<>("Long_desc"));
             CaracValueColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.3));;
-            CaracValueColumn.setResizable(false);
+            CaracValueColumn.setResizable(true);
             this.tableGrid.getColumns().add(CaracValueColumn);
             
             
@@ -1046,7 +1062,7 @@ public class TablePane_CharClassif {
          });
         
         sourceColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
-        sourceColumn.setResizable(false);
+        sourceColumn.setResizable(true);
         this.tableGrid.getColumns().add(sourceColumn);
         
         TableColumn ruleColumn = new TableColumn<>("Rule");
@@ -1071,7 +1087,7 @@ public class TablePane_CharClassif {
          });
         
         ruleColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
-        ruleColumn.setResizable(false);
+        ruleColumn.setResizable(true);
         this.tableGrid.getColumns().add(ruleColumn);
         
         TableColumn authorColumn = new TableColumn<>("Author");
@@ -1088,17 +1104,22 @@ public class TablePane_CharClassif {
          });
         
         authorColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
-        authorColumn.setResizable(false);
+        authorColumn.setResizable(true);
         this.tableGrid.getColumns().add(authorColumn);
         
         TableColumn articleColumn = new TableColumn<>("Article ID");
         articleColumn.setCellValueFactory(new PropertyValueFactory<>("client_item_number"));
         articleColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
-        articleColumn.setResizable(false);
+        articleColumn.setResizable(true);
         this.tableGrid.getColumns().add(articleColumn);
 
 		this.tableGrid.getItems().addAll(this.itemArray);
-        //this.tableGrid.refresh();
+        Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				setHeaderClickListeners();
+			}
+		});
 
 		tableGrid.getSortOrder().addListener((ListChangeListener)(c -> {
 			if(allowOverWriteAccountPreference){
@@ -1171,6 +1192,108 @@ public class TablePane_CharClassif {
 		    }
 		 });
 	}
+
+	private void setHeaderClickListeners() {
+		// Step 1: Get the table header row.
+		TableHeaderRow headerRow = null;
+		for (Node n : ((TableViewSkin<?>) tableGrid.getSkin()).getChildren()) {
+			if (n instanceof TableHeaderRow) {
+				headerRow = (TableHeaderRow) n;
+			}
+		}
+		if (headerRow == null) {
+			return;
+		}
+
+		// Step 2: Get the list of the header columns.
+		NestedTableColumnHeader ntch = (NestedTableColumnHeader) headerRow.getChildren().get(1);
+		ObservableList<TableColumnHeader> headers = ntch.getColumnHeaders();
+
+		// Step 3: Add click listener to the header columns.
+		for (int i = 0; i < headers.size(); i++) {
+			TableColumnHeader header = headers.get(i);
+			final int index = i;
+			header.setOnMouseClicked(mouseEvent -> {
+
+				// Optional:
+				// Get the TableColumnBase (which is the object responsible
+				// for displaying the content of the column.)
+				TableColumnBase column = header.getTableColumn();
+
+				// Step 4: Handle double mouse click event.
+				if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+					System.out.println("Header cell " + index + " clicked! " + column.getText());
+					final Popup popup = new Popup();
+					popup.setAutoHide(true);
+					final Label ligne0 = new Label("Hide Column");
+					final Label ligne1 = new Label("Default table display");
+					final Label ligne2 = new Label("Display additional column...");
+
+					ligne0.setOnMouseClicked(new EventHandler<MouseEvent>() {
+						@Override
+						public void handle(MouseEvent event) {
+							popup.hide();
+						}
+					});
+					while(selected_col<0){
+						selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
+					}
+					ligne0.setDisable(index+1==Math.floorMod(selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size()));
+
+					ligne1.setOnMouseClicked(new EventHandler<MouseEvent>() {
+						@Override
+						public void handle(MouseEvent event) {
+							popup.hide();
+						}
+					});
+					ligne2.setOnMouseClicked(new EventHandler<MouseEvent>() {
+						@Override
+						public void handle(MouseEvent event) {
+							popup.hide();
+						}
+					});
+
+					setStyle(ligne0);
+					setStyle(ligne1);
+					setStyle(ligne2);
+
+
+					GridPane contentGrid = new GridPane();
+					contentGrid.add(ligne0, 0, 0);
+					contentGrid.add(ligne1, 0, 1);
+					contentGrid.add(ligne2, 0, 2);
+					contentGrid.setHgrow(ligne0, Priority.ALWAYS);
+					ligne0.setMaxWidth(Integer.MAX_VALUE);
+					contentGrid.setHgrow(ligne1, Priority.ALWAYS);
+					ligne1.setMaxWidth(Integer.MAX_VALUE);
+					contentGrid.setHgrow(ligne2, Priority.ALWAYS);
+					ligne2.setMaxWidth(Integer.MAX_VALUE);
+					contentGrid.setGridLinesVisible(true);
+
+					popup.getContent().clear();
+					popup.getContent().add(contentGrid);
+
+					popup.show(header, mouseEvent.getScreenX() + 10, mouseEvent.getScreenY());
+				}
+			});
+		}
+	}
+
+			private void setStyle(Node ligne) {
+				final String HOVERED_BUTTON_STYLE = "-fx-background-color:#212934; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#ACB9CA;";
+				final String STANDARD_BUTTON_STYLE="-fx-background-color:#ACB9CA; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#212934;";
+				ligne.styleProperty().bind(
+						Bindings
+								.when(ligne.hoverProperty())
+								.then(
+										new SimpleStringProperty(HOVERED_BUTTON_STYLE)
+								)
+								.otherwise(
+										new SimpleStringProperty(STANDARD_BUTTON_STYLE)
+								)
+				);
+			}
+
 	public void setCollapsedViewColumns(String[] strings) {
 		this.collapsedViewColumns = new ArrayList<String>();
 		for(String elem:strings) {
