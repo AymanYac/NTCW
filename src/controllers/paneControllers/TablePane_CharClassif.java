@@ -1,5 +1,6 @@
 package controllers.paneControllers;
 
+import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
@@ -101,11 +102,6 @@ public class TablePane_CharClassif {
 	private boolean traverseGridFocus;
 
 
-
-	private static ArrayList<String> collapsedViewColumns;
-
-
-
 	@SuppressWarnings("rawtypes")
 	public TableViewExtra tvX;
 
@@ -114,6 +110,9 @@ public class TablePane_CharClassif {
 	private List<String> classItems;
 	private boolean allowOverWriteAccountPreference = true;
 	private boolean autoScrollToSelection=true;
+	private ArrayList<String> hiddenColumns = new ArrayList<String>();
+	private HashMap<String,Double> collapsedColumns = new HashMap<>();
+	private HashMap<String,Double> visibleColumns = new HashMap<>();
 
 	public void restoreLastSessionLayout() {
 		try{
@@ -802,8 +801,18 @@ public class TablePane_CharClassif {
 			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
 		}
 		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
+		ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(selected_col);
 		List<String> char_headers = CharValuesLoader.returnSortedCopyOfClassCharacteristic(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
 		for( TableColumn col:this.tableGrid.getColumns()) {
+			col.setId(null);
+			if(hiddenColumns.contains(col.getText()) || (collapsedView && !collapsedColumns.containsKey(col.getText())) ){
+				col.setVisible(false);
+			}else{
+				col.setVisible(true);
+				col.prefWidthProperty().bind(tableGrid.widthProperty().multiply(
+						collapsedView?(collapsedColumns.get(col.getText())):visibleColumns.get(col.getText())));
+			}
+			/*
 			col.setId(null);
 			int idx = char_headers.indexOf(((TableColumn)col).getText());
 			if(idx!=selected_col ) {
@@ -840,16 +849,12 @@ public class TablePane_CharClassif {
 				((TableColumn)col).setVisible(false);
 			}else {
 				//this an active characteristic
-				/*if(this.defaultColumnStyle!=null) {
-					((TableColumn)col).setStyle(defaultColumnStyle+"-fx-background-color: #AAAAAA;");
-				}else {
-					this.defaultColumnStyle = ((TableColumn)col).getStyle();
-					((TableColumn)col).setStyle(defaultColumnStyle+"-fx-background-color: #AAAAAA;");
-				}*/
 				col.setId("active-column");
 				((TableColumn)col).setVisible(true);
-				
 			}
+
+			 */
+
 		}
 		
 		
@@ -878,134 +883,120 @@ public class TablePane_CharClassif {
         this.tableGrid.getColumns().clear();
         
         if(!defaultValueCharClassActive) {
-        	
-        	for(String colname : this.collapsedViewColumns) {
-            	TableColumn tmp = new TableColumn<>(colname);
-            	tmp.setCellValueFactory(new PropertyValueFactory<>(colname.replace(" ", "")));
-            	if(colname.equals("Completion Status")){
-            		tmp.setComparator(new Comparator() {
+			for(String colname:collapsedColumns.keySet()){
+				TableColumn tmp = new TableColumn<>(colname);
+				if(colname.equals("Completion Status")) {
+					tmp.setComparator(new Comparator() {
 						@Override
 						public int compare(Object o1, Object o2) {
 							ObservableList<Node> children1 = ((StackPane) o1).getChildren();
-							AtomicInteger ret1= new AtomicInteger();
+							AtomicInteger ret1 = new AtomicInteger();
 							ret1.set(0);
-							children1.forEach(node->{
-								if(node instanceof Circle){
+							children1.forEach(node -> {
+								if (node instanceof Circle) {
 									Paint fill = ((Circle) node).getFill();
-									if(fill.toString().contains("bd392")){
+									if (fill.toString().contains("bd392")) {
 										//empty=
 										ret1.addAndGet(-100);
-									}else{
+									} else {
 										//full
 										ret1.addAndGet(+100);
 									}
-								}else if(node instanceof Text){
-									if(((Text) node).getText().contains("*")){
+								} else if (node instanceof Text) {
+									if (((Text) node).getText().contains("*")) {
 										//has unknown
 										ret1.addAndGet(-10);
-									};
+									}
+									;
 								}
 							});
 							ObservableList<Node> children2 = ((StackPane) o2).getChildren();
-							AtomicInteger ret2= new AtomicInteger();
+							AtomicInteger ret2 = new AtomicInteger();
 							ret2.set(0);
-							children2.forEach(node->{
-								if(node instanceof Circle){
+							children2.forEach(node -> {
+								if (node instanceof Circle) {
 									Paint fill = ((Circle) node).getFill();
-									if(fill.toString().contains("bd392")){
+									if (fill.toString().contains("bd392")) {
 										//empty=
 										ret2.addAndGet(-100);
-									}else{
+									} else {
 										//full
 										ret2.addAndGet(+100);
 									}
-								}else if(node instanceof Text){
-									if(((Text) node).getText().contains("*")){
+								} else if (node instanceof Text) {
+									if (((Text) node).getText().contains("*")) {
 										//has unknown
 										ret2.addAndGet(-10);
-									};
+									}
+									;
 								}
 							});
-							return Integer.compare(ret1.get(),ret2.get());
+							return Integer.compare(ret1.get(), ret2.get());
 						}
 					});
-				}
-                tmp.setResizable(true);
-                tmp.setVisible(false);
-                this.tableGrid.getColumns().add(tmp);
-                
-            }
-            
-            TableColumn classNameColumn = new TableColumn<>("Class Name");
-            classNameColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
-                 public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                     
-                     return new ReadOnlyObjectWrapper(r.getValue().getClass_segment_string().split("&&&")[1]);
-                 }
-              });
-            this.tableGrid.getColumns().add(classNameColumn);
-            classNameColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.085));;
-            classNameColumn.setResizable(true);
-            classNameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
-            
-            
-            
-            
-            
-            
-            
-            TableColumn descriptionColumn = new TableColumn<>("Description");
-            descriptionColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
-                 public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-					 try{
-						 if (r.getValue().getLong_desc() != null && r.getValue().getLong_desc().length() > 0) {
-							 return new ReadOnlyObjectWrapper(r.getValue().getLong_desc());
-						 }
-						 try {
-							 return new ReadOnlyObjectWrapper(r.getValue().getShort_desc());
-						 } catch (Exception V) {
-							 return new ReadOnlyObjectWrapper("");
-						 }
-					 }catch (Exception V){
-					 	return new ReadOnlyObjectWrapper<>("**** BUG ****");
-					 }
-                 }
-              });
-            this.tableGrid.getColumns().add(descriptionColumn);
-            descriptionColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.4));;
-            descriptionColumn.setResizable(true);
-            descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
-
-            CharValuesLoader.returnSortedCopyOfClassCharacteristic(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().forEach(characteristic->{
-				TableColumn col = new TableColumn<>(characteristic.getCharacteristic_name());
-				col.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
-					public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-						try{
-							CaracteristicValue val = r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(characteristic.getCharacteristic_id());
-							String dsp = null;
-							try{
-								dsp = val.getDisplayValue(Parent);
-							}catch (Exception V){
-
-							}
-							if(dsp!=null && dsp.length()>0){
-								return new ReadOnlyObjectWrapper(dsp);
-							}else if (r.getValue().getRulePropositions(characteristic.getCharacteristic_id()).size()>0){
-								return new ReadOnlyObjectWrapper<>("*PENDING*");
-							}
-							return new ReadOnlyObjectWrapper("");
-						}catch(Exception V) {
-							//Object has null data at daataIndex
-							return new ReadOnlyObjectWrapper("");
+				}else if(colname.equals("Class Name")){
+					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+							return new ReadOnlyObjectWrapper(r.getValue().getClass_segment_string().split("&&&")[1]);
+							/*
+							classNameColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.085));;
+							classNameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
+							 */
 						}
-					}
-				});
-				col.setVisible(false);
-				col.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
-				col.setResizable(true);
+					});
+				}else if(colname.equals("Description")){
+					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+							try{
+								if (r.getValue().getLong_desc() != null && r.getValue().getLong_desc().length() > 0) {
+									return new ReadOnlyObjectWrapper(r.getValue().getLong_desc());
+								}
+								try {
+									return new ReadOnlyObjectWrapper(r.getValue().getShort_desc());
+								} catch (Exception V) {
+									return new ReadOnlyObjectWrapper("");
+								}
+							}catch (Exception V){
+								return new ReadOnlyObjectWrapper<>("**** BUG ****");
+							}
+						}
+						/*descriptionColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.4));;
+						descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");*/
+					});
+				}else if(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().map(ClassCaracteristic::getCharacteristic_name).collect(Collectors.toCollection(ArrayList::new)).contains(colname)){
+					ClassCaracteristic characteristic = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().filter(classCaracteristic -> classCaracteristic.getCharacteristic_name().equals(colname)).findFirst().get();
+					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+							try{
+								CaracteristicValue val = r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(characteristic.getCharacteristic_id());
+								String dsp = null;
+								try{
+									dsp = val.getDisplayValue(Parent);
+								}catch (Exception V){
 
-				this.tableGrid.getColumns().add(col);
-			});
+								}
+								if(dsp!=null && dsp.length()>0){
+									return new ReadOnlyObjectWrapper(dsp);
+								}else if (r.getValue().getRulePropositions(characteristic.getCharacteristic_id()).size()>0){
+									return new ReadOnlyObjectWrapper<>("*PENDING*");
+								}
+								return new ReadOnlyObjectWrapper("");
+							}catch(Exception V) {
+								//Object has null data at daataIndex
+								return new ReadOnlyObjectWrapper("");
+							}
+							/*
+							col.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
+							 */
+						}
+					});
+				}else{
+					tmp.setCellValueFactory(new PropertyValueFactory<>(colname.replace(" ", "")));
+				}
+				tmp.setResizable(true);
+				tmp.setVisible(false);
+				this.tableGrid.getColumns().add(tmp);
+			}
         	TableColumn linkColumn = new TableColumn<>("Link");
             //linkColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
             linkColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
@@ -1295,10 +1286,7 @@ public class TablePane_CharClassif {
 			}
 
 	public void setCollapsedViewColumns(String[] strings) {
-		this.collapsedViewColumns = new ArrayList<String>();
-		for(String elem:strings) {
-			this.collapsedViewColumns.add(elem);
-		}
+		this.collapsedColumns.put("Completion Status",0.085);
 	}
 	
 	
