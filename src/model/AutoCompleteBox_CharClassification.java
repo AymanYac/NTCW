@@ -190,7 +190,7 @@ public class AutoCompleteBox_CharClassification extends TextField
 			}else {
 				//parent_controller.tableController.skipClassification();
 			}
-			parent_controller.tableController.tableGrid.requestFocus();
+			parent_controller.tableController.charDescriptionTable.requestFocus();
 		}
 	else if (this.account.PRESSED_KEYBOARD.get(KeyCode.ESCAPE)) {
 			parent_controller.value_field.requestFocus();
@@ -270,12 +270,12 @@ protected void send_classification_to_parent(String result)  {
 		
 		//setText(result);
 		entriesPopup.hide();
-		parent_controller.tableController.tableGrid.requestFocus();
+		parent_controller.tableController.charDescriptionTable.requestFocus();
 	}else {
 		
 		
 		parent_controller.classification.setText("");
-		parent_controller.tableController.tableGrid.getSelectionModel().clearAndSelect(1+ (int) Collections.max(parent_controller.tableController.tableGrid.getSelectionModel().getSelectedIndices()));
+		parent_controller.tableController.charDescriptionTable.getSelectionModel().clearAndSelect(1+ (int) Collections.max(parent_controller.tableController.charDescriptionTable.getSelectionModel().getSelectedIndices()));
 	
 	}
 	

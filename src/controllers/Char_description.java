@@ -279,7 +279,7 @@ public class Char_description {
 					conversionToggle.setText("Value conversion: Yes");
 				}
 				refresh_ui_display();
-				tableController.tableGrid.refresh();
+				tableController.charDescriptionTable.refresh();
 			}
 			
 		});
@@ -436,7 +436,7 @@ public class Char_description {
 			int active_char_index = Math.floorMod(tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
 			String activeClass = FxUtilTest.getComboBoxValue(classCombo).getClassSegment();
 			ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(activeClass).get(active_char_index);
-			CharDescriptionRow firstSelectedRow = tableController.tableGrid.getItems().get(Collections.min(tableController.tableGrid.getSelectionModel().getSelectedIndices()));
+			CharDescriptionRow firstSelectedRow = tableController.charDescriptionTable.getItems().get(Collections.min(tableController.charDescriptionTable.getSelectionModel().getSelectedIndices()));
 			CaracteristicValue activeData = firstSelectedRow.getData(activeClass).get(activeChar.getCharacteristic_id());
 			if(activeData!=null){
 				lastInputValue=activeData;
@@ -483,9 +483,9 @@ public class Char_description {
 			
 			if((!this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) && account.PRESSED_KEYBOARD.get(KeyCode.DOWN)) {
 				if(this.account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)){
-					tableController.tableGrid.getSelectionModel().select(tableController.tableGrid.getSelectionModel().getSelectedIndex()+1);
+					tableController.charDescriptionTable.getSelectionModel().select(tableController.charDescriptionTable.getSelectionModel().getSelectedIndex()+1);
 				}else{
-					tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()+1);
+					tableController.charDescriptionTable.getSelectionModel().clearAndSelect(tableController.charDescriptionTable.getSelectionModel().getSelectedIndex()+1);
 				}
 				Platform.runLater(new Runnable() {
 					@Override
@@ -497,9 +497,9 @@ public class Char_description {
 			}
 			if((!this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) && account.PRESSED_KEYBOARD.get(KeyCode.UP)) {
 				if(this.account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)){
-					tableController.tableGrid.getSelectionModel().select(tableController.tableGrid.getSelectionModel().getSelectedIndex()-1);
+					tableController.charDescriptionTable.getSelectionModel().select(tableController.charDescriptionTable.getSelectionModel().getSelectedIndex()-1);
 				}else{
-					tableController.tableGrid.getSelectionModel().clearAndSelect(tableController.tableGrid.getSelectionModel().getSelectedIndex()-1);
+					tableController.charDescriptionTable.getSelectionModel().clearAndSelect(tableController.charDescriptionTable.getSelectionModel().getSelectedIndex()-1);
 				}
 				Platform.runLater(new Runnable() {
 					@Override
@@ -511,12 +511,12 @@ public class Char_description {
 				
 			}
 			if (this.account.PRESSED_KEYBOARD.get(KeyCode.PAGE_DOWN)) {
-				tableController.tableGrid.requestFocus();
+				tableController.charDescriptionTable.requestFocus();
 				duplicateKeyEvent(KeyCode.PAGE_DOWN);
 				//parent_controller.fireClassScroll(rowIndex+1,KeyCode.DOWN);
 			}
 			else if (this.account.PRESSED_KEYBOARD.get(KeyCode.PAGE_UP)) {
-				tableController.tableGrid.requestFocus();
+				tableController.charDescriptionTable.requestFocus();
 				duplicateKeyEvent(KeyCode.PAGE_UP);
 				//parent_controller.fireClassScroll(rowIndex-1,KeyCode.UP);
 			}
@@ -562,7 +562,7 @@ public class Char_description {
 		}else {
 			//Skip to next item
 			try{
-				int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
+				int idx = tableController.charDescriptionTable.getSelectionModel().getSelectedIndex();
 				if(TranslationProcessResult!=null) {
 					if(FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 						CharValuesLoader.updateDefaultCharValue(idx,this);
@@ -582,7 +582,7 @@ public class Char_description {
 	private Boolean CheckForTranslationValidity() {
 		ClassCaracteristic active_char;
 		if(FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
-			active_char = CharItemFetcher.defaultCharValues.get(tableController.tableGrid.getSelectionModel().getSelectedIndex()).getKey();
+			active_char = CharItemFetcher.defaultCharValues.get(tableController.charDescriptionTable.getSelectionModel().getSelectedIndex()).getKey();
 			 
 		}else {
 			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
@@ -691,12 +691,12 @@ public class Char_description {
 		
 		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
-			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
+			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
 			try{
 				proposer.clearPropButtons();
 				String selectedText=proposer.getUserSelectedText();
 				CharPatternServices.scanSelectionForPatternDetection(this,
-						CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
+						CharValuesLoader.active_characteristics.get(tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
 								.get(active_char_index),selectedText);
 			}catch (Exception V){
 				V.printStackTrace(System.err);
@@ -796,9 +796,9 @@ public class Char_description {
 			String selectedText = proposer.getUserSelectedText();
 			if(selectedText.length()>0){
 				draftingRule=true;
-				int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
+				int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
 				CharPatternServices.scanSelectionForPatternDetection(this,
-						CharValuesLoader.active_characteristics.get(tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
+						CharValuesLoader.active_characteristics.get(tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
 								.get(active_char_index),selectedText);
 				draftingRule=false;
 			}
@@ -889,11 +889,11 @@ public class Char_description {
 		}
 
 		if(this.account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && this.account.PRESSED_KEYBOARD.get(KeyCode.U)){
-			ArrayList<Boolean> unknownCardinality = tableController.tableGrid.getSelectionModel().getSelectedItems().stream().map(CharDescriptionRow::hasClearValue).collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ArrayList::new));
+			ArrayList<Boolean> unknownCardinality = tableController.charDescriptionTable.getSelectionModel().getSelectedItems().stream().map(CharDescriptionRow::hasClearValue).collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ArrayList::new));
 			if(unknownCardinality.size()==1){
-				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.switchUnknownValues(account,null));
+				tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(r->r.switchUnknownValues(account,null));
 			}else{
-				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account,null));
+				tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account,null));
 			}
 			if(!charButton.isSelected()){
 				tableController.jumpNext();
@@ -901,7 +901,7 @@ public class Char_description {
 				//tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
 			}
 			refresh_ui_display();
-			tableController.tableGrid.refresh();
+			tableController.charDescriptionTable.refresh();
 			CharDescriptionExportServices.flushItemDataToDBThreaded(account, null);
 		}
 
@@ -927,7 +927,7 @@ public class Char_description {
 	public void linkUrlToItem(String URL) {
 		if(!FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			HashMap<String, CaracteristicValue> map = new HashMap<String, CaracteristicValue>();
-			tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(row->{
+			tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(row->{
 				String itemClass = row.getClass_segment_string().split("&&&")[0];
 				int	selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(itemClass).size());
 				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col);
@@ -960,13 +960,13 @@ public class Char_description {
 
 
 	private Node validateDataFields() throws SQLException {
-		CharDescriptionRow row = tableController.tableGrid.getSelectionModel().getSelectedItem();
+		CharDescriptionRow row = tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
 		String selectedRowClass = row.getClass_segment_string().split("&&&")[0];
 		ClassCaracteristic active_char;
 		int active_char_index;
 		if(FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			active_char_index = 0;
-			active_char = CharItemFetcher.defaultCharValues.get(tableController.tableGrid.getSelectionModel().getSelectedIndex()).getKey();
+			active_char = CharItemFetcher.defaultCharValues.get(tableController.charDescriptionTable.getSelectionModel().getSelectedIndex()).getKey();
 			 
 		}else {
 			active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(selectedRowClass).size());
@@ -1340,11 +1340,11 @@ public class Char_description {
 		}
 		
 		try {
-			tableController.tableGrid.setVisible(true);
+			tableController.charDescriptionTable.setVisible(true);
 		}catch(Exception V) {
 			
 		}
-		tableController.tableGrid.requestFocus();
+		tableController.charDescriptionTable.requestFocus();
 	}
 	
 	public void setUserAccount(UserAccount account) throws IOException, ClassNotFoundException, SQLException, InterruptedException {
@@ -1503,7 +1503,7 @@ public class Char_description {
 			public void handle(ActionEvent t) {
 				CharItemFetcher.allRowItems.parallelStream().forEach(CharDescriptionRow::reEvaluateCharRules);
 				refresh_ui_display();
-				tableController.tableGrid.refresh();
+				tableController.charDescriptionTable.refresh();
 				CharDescriptionExportServices.flushItemDataToDBThreaded(account, null);
 			}
 		});
@@ -1511,18 +1511,18 @@ public class Char_description {
 		MenuItem clear_unknowns = new MenuItem("Clear UNKNOWN values (selected items)                         Ctrl+U");
 		clear_unknowns.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(charDescriptionRow -> charDescriptionRow.clearUnknownValues(null));
+				tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(charDescriptionRow -> charDescriptionRow.clearUnknownValues(null));
 				refresh_ui_display();
-				tableController.tableGrid.refresh();
+				tableController.charDescriptionTable.refresh();
 				CharDescriptionExportServices.flushItemDataToDBThreaded(account, null);
 			}
 		});
 		MenuItem mark_as_known = new MenuItem("Mark blank values as UNKNOWN (selected items)         Ctrl+U");
 		mark_as_known.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account, null));
+				tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account, null));
 				refresh_ui_display();
-				tableController.tableGrid.refresh();
+				tableController.charDescriptionTable.refresh();
 				CharDescriptionExportServices.flushItemDataToDBThreaded(account, null);
 			}
 		});
@@ -1535,7 +1535,7 @@ public class Char_description {
 				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(activeClass).get(selected_col);
 				CharItemFetcher.allRowItems.forEach(r->r.clearUnknownValues(active_char.getCharacteristic_id()));
 				refresh_ui_display();
-				tableController.tableGrid.refresh();
+				tableController.charDescriptionTable.refresh();
 				CharDescriptionExportServices.flushItemDataToDBThreaded(account, null);
 			}
 		});
@@ -1547,7 +1547,7 @@ public class Char_description {
 				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(activeClass).get(selected_col);
 				CharItemFetcher.allRowItems.forEach(r->r.markUnknownClearValues(account,active_char.getCharacteristic_id()));
 				refresh_ui_display();
-				tableController.tableGrid.refresh();
+				tableController.charDescriptionTable.refresh();
 				CharDescriptionExportServices.flushItemDataToDBThreaded(account, null);
 			}
 		});
@@ -1555,9 +1555,9 @@ public class Char_description {
 		MenuItem clear_unknowns_class = new MenuItem("Clear UNKNOWN values (active class)");
 		clear_unknowns_class.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				tableController.tableGrid.getItems().forEach(charDescriptionRow -> charDescriptionRow.clearUnknownValues(null));
+				tableController.charDescriptionTable.getItems().forEach(charDescriptionRow -> charDescriptionRow.clearUnknownValues(null));
 				refresh_ui_display();
-				tableController.tableGrid.refresh();
+				tableController.charDescriptionTable.refresh();
 				CharDescriptionExportServices.flushItemDataToDBThreaded(account, null);
 			}
 		});
@@ -1567,9 +1567,9 @@ public class Char_description {
 				if(!ConfirmationDialog.WarningClearingUnknownValues()){
 					return;
 				}
-				tableController.tableGrid.getItems().forEach(r->r.markUnknownClearValues(account, null));
+				tableController.charDescriptionTable.getItems().forEach(r->r.markUnknownClearValues(account, null));
 				refresh_ui_display();
-				tableController.tableGrid.refresh();
+				tableController.charDescriptionTable.refresh();
 				CharDescriptionExportServices.flushItemDataToDBThreaded(account, null);
 			}
 		});
@@ -1726,7 +1726,7 @@ public class Char_description {
 			tableController.fillTable_DYNAMIC((List<ItemFetcherRow>) ftc.currentList_DYNAMIC);
 		}*/
 		//tableController.setCollapsedViewColumns(new String[] {"Completion Status","Question Status"});
-		tableController.setCollapsedViewColumns(new String[] {"Completion Status"});
+		tableController.setColumns();
 		TablePane_CharClassif.loadLastSessionLayout();
 		tableController.refresh_table_with_segment(account.getUser_desc_class(classCombo.getItems().get(1).getClassSegment()));
 		tableController.restoreLastSessionLayout();
@@ -1949,7 +1949,7 @@ public class Char_description {
 		if(this.ruleButton.isSelected() && !draftingRule) {
 			this.rulePaneController.load_description_patterns();
 		}
-		CharDescriptionRow row = (CharDescriptionRow) this.tableController.tableGrid.getSelectionModel().getSelectedItem();
+		CharDescriptionRow row = (CharDescriptionRow) this.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
 		if(row!=null) {
 			
 		}else {
@@ -1974,7 +1974,7 @@ public class Char_description {
 				}
 
 			}else {
-				active_char = CharItemFetcher.defaultCharValues.get(tableController.tableGrid.getSelectionModel().getSelectedIndex()).getKey();
+				active_char = CharItemFetcher.defaultCharValues.get(tableController.charDescriptionTable.getSelectionModel().getSelectedIndex()).getKey();
 				
 			}
 			String itemClass = row.getClass_segment_string().split("&&&")[0];
@@ -2316,7 +2316,7 @@ public class Char_description {
 							CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id());
 
 						});*/
-		tableController.tableGrid.getSelectionModel().getSelectedItems().parallelStream().forEach(r->{
+		tableController.charDescriptionTable.getSelectionModel().getSelectedItems().parallelStream().forEach(r->{
 			CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getClassSegment(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id(),map.get(r.getItem_id()));
 			CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id());
 		});
@@ -2325,7 +2325,7 @@ public class Char_description {
 			//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index),true);
 		});
 		refresh_ui_display();
-		tableController.tableGrid.refresh();
+		tableController.charDescriptionTable.refresh();
 
 	}
 	public void assignValueOnSelectedItems(CaracteristicValue value) {
@@ -2339,16 +2339,16 @@ public class Char_description {
 							CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id());
 							
 						});*/
-		tableController.tableGrid.getSelectionModel().getSelectedItems().parallelStream().forEach(r->{
+		tableController.charDescriptionTable.getSelectionModel().getSelectedItems().parallelStream().forEach(r->{
 			CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getClassSegment(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id(),value.shallowCopy(account));
 			CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id());
 		});
-		tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::reEvaluateCharRules);
+		tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::reEvaluateCharRules);
 		TranslationServices.beAwareOfNewValue(value, CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index));
 		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index),true);
 		
 		refresh_ui_display();
-		tableController.tableGrid.refresh();
+		tableController.charDescriptionTable.refresh();
 		
 	}
 	public void sendSemiAutoPattern(CaracteristicValue pattern_value, String ruleString, String selectedText) {
@@ -2378,8 +2378,8 @@ public class Char_description {
 		ruleString = WordUtils.correctDescriptionRuleSyntax(ruleString);
 
 		if(draftingRule){
-			CharDescriptionRow activeRow = tableController.tableGrid.getSelectionModel().getSelectedItem();
-			String activeClass = tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
+			CharDescriptionRow activeRow = tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
+			String activeClass = tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
 			int activeCharIndex = tableController.selected_col;
 			ArrayList<ClassCaracteristic> activeChars = CharValuesLoader.active_characteristics.get(activeClass);
 			ClassCaracteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
@@ -2400,11 +2400,11 @@ public class Char_description {
 			if(!proposer.selectionFromBrowser){
 				tmp.setSource(DataInputMethods.SEMI_CHAR_DESC);
 				assignValueOnSelectedItems(tmp);
-				CharDescriptionRow targetItem = tableController.tableGrid.getSelectionModel().getSelectedItem();
+				CharDescriptionRow targetItem = tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
 				try{
 					if (!charButton.isSelected()) {
-						int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
-						tableController.tableGrid.getSelectionModel().clearAndSelect(idx + 1);
+						int idx = tableController.charDescriptionTable.getSelectionModel().getSelectedIndex();
+						tableController.charDescriptionTable.getSelectionModel().clearAndSelect(idx + 1);
 					}
 				}catch (Exception V){
 

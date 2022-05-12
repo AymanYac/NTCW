@@ -337,7 +337,7 @@ public class Browser_CharClassif {
 
 	public void switch_pane_hide_browser(boolean bool) {
 		toolBar.setVisible(!bool);
-		parent.tableController.tableGrid.setVisible(bool);
+		parent.tableController.charDescriptionTable.setVisible(bool);
 	}
 
 	private void loadLastPaneLayout() throws ParseException, IOException, URISyntaxException {
@@ -569,12 +569,12 @@ public class Browser_CharClassif {
 						System.out.println("CTRL+ENTER");
 						((Stage)parent.charButton.getScene().getWindow()).toFront();
 						parent.value_field.requestFocus();
-						int active_char_index = Math.floorMod(parent.tableController.selected_col, CharValuesLoader.active_characteristics.get(parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
+						int active_char_index = Math.floorMod(parent.tableController.selected_col, CharValuesLoader.active_characteristics.get(parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
 						try{
 							parent.proposer.clearPropButtons();
 							String selectedText=parent.proposer.getUserSelectedText();
 							CharPatternServices.scanSelectionForPatternDetection(parent,
-									CharValuesLoader.active_characteristics.get(parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
+									CharValuesLoader.active_characteristics.get(parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0])
 											.get(active_char_index),selectedText);
 						}catch (Exception V){
 							V.printStackTrace(System.err);
@@ -584,7 +584,7 @@ public class Browser_CharClassif {
 			}
 		});
 		secondaryStage.show();
-		parent.tableController.tableGrid.setVisible(true);
+		parent.tableController.charDescriptionTable.setVisible(true);
 	}
 	public void setParent(Char_description char_description) {
 		this.parent=char_description;

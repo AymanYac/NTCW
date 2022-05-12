@@ -2687,7 +2687,7 @@ public class CharPatternServices {
 		System.out.println("Applying rule "+newRule.getRuleSyntax()+" > "+newRule.getRegexMarker());
 		try{
 
-			CharDescriptionRow row = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+			CharDescriptionRow row = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
 			String itemClass = row.getClass_segment_string().split("&&&")[0];
 			Pattern regexPattern = Pattern.compile(newRule.getRegexMarker(),Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 			ArrayList<String> targetClasses = CharValuesLoader.active_characteristics.entrySet().stream()
@@ -2719,7 +2719,7 @@ public class CharPatternServices {
 				@Override
 				public void run() {
 					parent.refresh_ui_display();
-					parent.tableController.tableGrid.refresh();
+					parent.tableController.charDescriptionTable.refresh();
 				}
 			});
 		}catch (Exception V){

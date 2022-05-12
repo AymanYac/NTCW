@@ -194,7 +194,7 @@ public class RulePane_CharClassif {
                     if(oldResult!=null){
                         CharRuleResult oldResultCopy = oldResult.shallowCopy(newValue,parent.account);
                         oldResultCopy.setStatus("Draft");
-                        parent.tableController.tableGrid.getSelectionModel().getSelectedItem().addRuleResult2Row(oldResultCopy);
+                        parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem().addRuleResult2Row(oldResultCopy);
                     }
                 }
                 if(newValue!=null){
@@ -438,7 +438,7 @@ public class RulePane_CharClassif {
                 .multiply(20 / 100.0));
         statusColumn.setResizable(false);
 
-        sourceItem = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+        sourceItem = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
         sourceSegment = sourceItem.getClass_segment_string().split("&&&")[0];
         sourceColumnIdx =  parent.tableController.selected_col% CharValuesLoader.active_characteristics.get(sourceSegment).size();
         sourceCarac = CharValuesLoader.active_characteristics.get(sourceSegment).get(sourceColumnIdx);
@@ -473,7 +473,7 @@ public class RulePane_CharClassif {
     }
     @FXML public void addRuleButtonAction() throws SQLException, ClassNotFoundException {
         if(ruleView.getSelectionModel().getSelectedItem()!=null && ruleView.getSelectionModel().getSelectedItem().isDraft()){
-            parent.tableController.tableGrid.getSelectionModel().getSelectedItem().dropRuleResultFromRow(ruleView.getSelectionModel().getSelectedItem());
+            parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem().dropRuleResultFromRow(ruleView.getSelectionModel().getSelectedItem());
         }
         GenericCharRule newRule = new GenericCharRule(loadRuleFromPane(true), caracCombo.getValue());
         newRule.setRegexMarker();
@@ -492,7 +492,7 @@ public class RulePane_CharClassif {
                     @Override
                     public void run() {
                         parent.refresh_ui_display();
-                        parent.tableController.tableGrid.refresh();
+                        parent.tableController.charDescriptionTable.refresh();
                     }
                 });
             }).start();
@@ -513,13 +513,13 @@ public class RulePane_CharClassif {
                     @Override
                     public void run() {
                         parent.refresh_ui_display();
-                        parent.tableController.tableGrid.refresh();
+                        parent.tableController.charDescriptionTable.refresh();
                     }
                 });
             }).start();
         }
         parent.refresh_ui_display();
-        parent.tableController.tableGrid.refresh();
+        parent.tableController.charDescriptionTable.refresh();
     }
     @FXML public void saveRuleButtonAction() throws SQLException, ClassNotFoundException {
         new Thread(()-> {
@@ -552,7 +552,7 @@ public class RulePane_CharClassif {
                 @Override
                 public void run() {
                     parent.refresh_ui_display();
-                    parent.tableController.tableGrid.refresh();
+                    parent.tableController.charDescriptionTable.refresh();
                 }
             });
         }).start();

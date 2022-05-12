@@ -45,7 +45,7 @@ public class CharPane_CharClassif {
 	public void load_item_chars() {
 		this.paneRows.clear();
 		try {
-			this.selected_row = (CharDescriptionRow) parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+			this.selected_row = (CharDescriptionRow) parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
 		}catch(Exception V) {
 			
 		}
@@ -107,7 +107,7 @@ public class CharPane_CharClassif {
 					}
 					if(dsp!=null && dsp.length()>0){
 						return new ReadOnlyObjectWrapper(dsp);
-					}else if (parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getRulePropositions(r.getValue().getCarac().getCharacteristic_id()).size()>0){
+					}else if (parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getRulePropositions(r.getValue().getCarac().getCharacteristic_id()).size()>0){
 						return new ReadOnlyObjectWrapper<>("*PENDING*");
 					}
 					return null;

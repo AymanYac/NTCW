@@ -61,7 +61,7 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
                                     popup.hide();
                                     try {
                                         HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(parent.account);
-                                        ClassSegment currentItemSegment = sid2Segment.get(parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]);
+                                        ClassSegment currentItemSegment = sid2Segment.get(parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]);
                                         CaracDeclarationDialog.CaracDeclarationPopUp(parent.account,currentItemSegment,null ,parent,((CharPaneRow)table.getItems().get(result.getIndex())).getChar_sequence());
                                         parent.tableController.refresh_table_preserve_sort_order();
                                     } catch (SQLException | ClassNotFoundException throwables) {
@@ -75,7 +75,7 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
                                 public void handle(MouseEvent event) {
                                     popup.hide();
                                     try {
-                                        CaracDeclarationDialog.CaracEditionPopUp(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.account,parent.tableController.tableGrid,parent);
+                                        CaracDeclarationDialog.CaracEditionPopUp(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.account,parent.tableController.charDescriptionTable,parent);
                                         parent.tableController.refresh_table_preserve_sort_order();
                                     } catch (SQLException | ClassNotFoundException throwables) {
                                         throwables.printStackTrace();
@@ -87,7 +87,7 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
                                 public void handle(MouseEvent event) {
                                     popup.hide();
                                     try {
-                                        CaracDeclarationDialog.CaracDeletion(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0],parent.account);
+                                        CaracDeclarationDialog.CaracDeletion(((CharPaneRow)table.getItems().get(result.getIndex())).getCarac(),parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0],parent.account);
                                         parent.tableController.refresh_table_preserve_sort_order();
                                     } catch (SQLException | ClassNotFoundException throwables) {
                                         throwables.printStackTrace();

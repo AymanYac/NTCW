@@ -97,7 +97,7 @@ public class ExternalSearchServices {
 
 
     private static void storeSearchSourceData(Char_description parent) {
-        sourceItem = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+        sourceItem = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
         sourceSegment = sourceItem.getClass_segment_string().split("&&&")[0];
         dataLanguageCode = parent.data_language_gcode.toUpperCase();
         userLanguageCode = parent.user_language_gcode.toUpperCase();
@@ -685,7 +685,7 @@ public class ExternalSearchServices {
         String segmentID = FxUtilTest.getComboBoxValue(parent.classCombo).getClassSegment();
         int active_char_index = Math.floorMod(parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(segmentID).size());
         ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(segmentID).get(active_char_index);
-        CharDescriptionRow item = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+        CharDescriptionRow item = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
         try {
             return item.getData(segmentID).get(activeChar.getCharacteristic_id()).getUrl();
         }catch (Exception V){

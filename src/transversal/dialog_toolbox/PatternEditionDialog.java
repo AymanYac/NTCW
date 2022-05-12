@@ -64,7 +64,7 @@ public class PatternEditionDialog {
 
 
     private static void storeSourceData(Char_description parent) {
-        sourceItem = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
+        sourceItem = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
         sourceSegment = sourceItem.getClass_segment_string().split("&&&")[0];
         sourceColumnIdx =  parent.tableController.selected_col%CharValuesLoader.active_characteristics.get(sourceSegment).size();
         sourceCarac = CharValuesLoader.active_characteristics.get(sourceSegment).get(sourceColumnIdx);

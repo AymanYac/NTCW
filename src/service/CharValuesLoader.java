@@ -208,7 +208,7 @@ public class CharValuesLoader {
 		row.getData(GlobalConstants.DEFAULT_CHARS_CLASS).put(GlobalConstants.DEFAULT_CHARS_CLASS,tmp);
 		row.setLong_desc(tmp.getDisplayValue(parent));
 		parent.refresh_ui_display();
-		parent.tableController.tableGrid.refresh();
+		parent.tableController.charDescriptionTable.refresh();
 
 		ArrayList<CaracteristicValue> tmpArray = new ArrayList<CaracteristicValue>();
 		tmpArray.add(tmp);

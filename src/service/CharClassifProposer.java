@@ -28,6 +28,10 @@ public class CharClassifProposer {
 		CharClassifProposer.parent = parent;
 	}
 
+	public static String getCustomDescription(CharDescriptionRow row, String descField) {
+		return row.getLong_desc();
+	}
+
 	public void clearPropButtons() {
 		buttonToData.clear();
 		lastestActiveSAIndex=-1;
@@ -46,8 +50,8 @@ public class CharClassifProposer {
 	addSemiAutoProposition(String buttonText, CaracteristicValue preparedValue, String preparedRule,
 			ClassCaracteristic active_char,String selectedText) {
 		if(parent.draftingRule){
-			CharDescriptionRow activeRow = parent.tableController.tableGrid.getSelectionModel().getSelectedItem();
-			String activeClass = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
+			CharDescriptionRow activeRow = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
+			String activeClass = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
 			int activeCharIndex = parent.tableController.selected_col;
 			ArrayList<ClassCaracteristic> activeChars = CharValuesLoader.active_characteristics.get(activeClass);
 			ClassCaracteristic activeChar = activeChars.get(activeCharIndex%activeChars.size());
@@ -143,14 +147,14 @@ public class CharClassifProposer {
 					clearPropButtons();
 					if(!parent.charButton.isSelected()){
 						try {
-							int idx = parent.tableController.tableGrid.getSelectionModel().getSelectedIndex();
-							parent.tableController.tableGrid.getSelectionModel().clearAndSelect(idx + 1);
+							int idx = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedIndex();
+							parent.tableController.charDescriptionTable.getSelectionModel().clearAndSelect(idx + 1);
 						}catch (Exception V){
 
 						}
 					}
 					parent.refresh_ui_display();
-					parent.tableController.tableGrid.refresh();
+					parent.tableController.charDescriptionTable.refresh();
 				});
 				lastestActiveCRIndex+=1;
 			});	
@@ -173,16 +177,16 @@ public class CharClassifProposer {
 					btn.setText(copy.getDisplayValue(parent));
 					btn.setOpacity(1.0);
 					btn.setOnAction((event) -> {
-						parent.tableController.tableGrid.getSelectionModel().getSelectedItems().forEach(row->{
+						parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(row->{
 							CharValuesLoader.updateRuntimeDataForItem(row,row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id(),copy.shallowCopy(parent.account));
 							CharDescriptionExportServices.addItemCharDataToPush(row, row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id());
 						});
 						if(!parent.charButton.isSelected()){
-							int idx = parent.tableController.tableGrid.getSelectionModel().getSelectedIndex();
+							int idx = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedIndex();
 							parent.tableController.jumpNext();
 							//parent.tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
 						}
-						parent.tableController.tableGrid.refresh();
+						parent.tableController.charDescriptionTable.refresh();
 						CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account, null);
 					});
 					ContextMenu cm = new ContextMenu();

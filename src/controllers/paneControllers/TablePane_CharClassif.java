@@ -1,6 +1,5 @@
 package controllers.paneControllers;
 
-import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
 import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
 import com.sun.javafx.scene.control.skin.TableColumnHeader;
@@ -16,7 +15,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -41,7 +39,6 @@ import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.data_exchange_toolbox.QueryFormater;
-import transversal.dialog_toolbox.CaracDeclarationDialog;
 import transversal.dialog_toolbox.FxUtilTest;
 import service.ExternalSearchServices;
 import transversal.generic.Tools;
@@ -62,7 +59,7 @@ import java.util.stream.Collectors;
 public class TablePane_CharClassif {
 
 
-	@FXML public TableView<CharDescriptionRow> tableGrid;
+	@FXML public TableView<CharDescriptionRow> charDescriptionTable;
 	
 	
 	
@@ -139,11 +136,11 @@ public class TablePane_CharClassif {
 	private void applySortOrder(ArrayList<String> SortColumns, ArrayList<String> SortDirs) {
 		if(SortColumns!=null && SortDirs!=null){
 			allowOverWriteAccountPreference = false;
-			tableGrid.getSortOrder().clear();
+			charDescriptionTable.getSortOrder().clear();
 			for (int ix = 0; ix < SortColumns.size(); ix++) {
-				for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getColumns()) {
+				for (TableColumn<CharDescriptionRow, ?> c : charDescriptionTable.getColumns()) {
 					if (c.getText().equals(SortColumns.get(ix))) {
-						tableGrid.getSortOrder().add(c);
+						charDescriptionTable.getSortOrder().add(c);
 						c.setSortType(TableColumn.SortType.valueOf(SortDirs.get(ix)));
 					}
 				}
@@ -223,7 +220,7 @@ public class TablePane_CharClassif {
 		Parent.CHANGING_CLASS=false;
 		ExternalSearchServices.refreshUrlAfterElemChange(Parent);
 		if(GlobalConstants.ALLOW_DESC_SEARCH_BAR_CUSTOMIZATION){
-			CharDescriptionRow sourceItem = tableGrid.getSelectionModel().getSelectedItem();
+			CharDescriptionRow sourceItem = charDescriptionTable.getSelectionModel().getSelectedItem();
 			String sourceSegment = sourceItem.getClass_segment_string().split("&&&")[0];
 			ArrayList<ArrayList<String>> settings = account.getSearchSettings(sourceSegment);
 			Parent.search_text.setText(ExternalSearchServices.evaluateSearchSentence(settings,sourceItem,sourceSegment));
@@ -346,14 +343,14 @@ public class TablePane_CharClassif {
 	}
 
 	private void scrollToSelectedItem(CharDescriptionRow tmp, int offset) {
-		int target = tableGrid.getItems().indexOf(tmp);
+		int target = charDescriptionTable.getItems().indexOf(tmp);
 		if(tvX.getFirstVisibleIndex()>target-offset || tvX.getLastVisibleIndex()<target-offset){
 			tvX.scrollToIndex(Math.max(target-offset,0));
 			return;
 		}
 		if (offset==1 && tvX.getLastVisibleIndex()<target){
 			System.out.println("Scroll advance");
-			tableGrid.scrollTo(Math.max(target-offset,0));
+			charDescriptionTable.scrollTo(Math.max(target-offset,0));
 		}
 
 	}
@@ -390,7 +387,7 @@ public class TablePane_CharClassif {
 
 			@Override
 			public void handle(ActionEvent event) {
-				CharDescriptionRow row = tableGrid.getSelectionModel().getSelectedItem();
+				CharDescriptionRow row = charDescriptionTable.getSelectionModel().getSelectedItem();
 				int activeCol = Math.floorMod(selected_col, CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
 				String itemClass = row.getClass_segment_string().split("&&&")[0];
 				String activeCharId = CharValuesLoader.active_characteristics.get(itemClass).get(activeCol).getCharacteristic_id();
@@ -402,7 +399,7 @@ public class TablePane_CharClassif {
 		ContextMenu customMenu = new ContextMenu();
 		customMenu.getItems().add(addCustomValue);
 		// only display context menu for non-empty rows:
-		tableGrid.setRowFactory(new Callback<TableView<CharDescriptionRow>, TableRow<CharDescriptionRow>>() {
+		charDescriptionTable.setRowFactory(new Callback<TableView<CharDescriptionRow>, TableRow<CharDescriptionRow>>() {
 			@Override
 			public TableRow<CharDescriptionRow> call(TableView<CharDescriptionRow> tableView) {
 				TableRow<CharDescriptionRow> row = new TableRow<CharDescriptionRow>();
@@ -419,8 +416,8 @@ public class TablePane_CharClassif {
 		
 		List<CharDescriptionRow> databaseSyncList = new ArrayList<CharDescriptionRow>();
 		HashMap<CharDescriptionRow,String> itemPreviousClasses = new HashMap<CharDescriptionRow,String>();
-		for( Integer idx: (List<Integer>) tableGrid.getSelectionModel().getSelectedIndices()) {
-			CharDescriptionRow item = ((TableView<CharDescriptionRow>) this.tableGrid).getItems().get(idx);
+		for( Integer idx: (List<Integer>) charDescriptionTable.getSelectionModel().getSelectedIndices()) {
+			CharDescriptionRow item = ((TableView<CharDescriptionRow>) this.charDescriptionTable).getItems().get(idx);
 			itemPreviousClasses.put(item, item.getClass_segment_string());
 			
 			try{
@@ -441,7 +438,7 @@ public class TablePane_CharClassif {
 			}
 			
 			//Add items to the list to be pushed in the database
-			databaseSyncList.add(((TableView<CharDescriptionRow>) this.tableGrid).getItems().get(idx));
+			databaseSyncList.add(((TableView<CharDescriptionRow>) this.charDescriptionTable).getItems().get(idx));
 			
 		}
 		
@@ -456,7 +453,7 @@ public class TablePane_CharClassif {
 			
 		}
 		
-		tableGrid.refresh();
+		charDescriptionTable.refresh();
 		Tools.CharDescriptionRow2ClassEvent(databaseSyncList,account,DataInputMethods.MANUAL);
 		CharPatternServices.applyNewClassRules(databaseSyncList,Parent);
 		
@@ -527,10 +524,10 @@ public class TablePane_CharClassif {
 	}
 	public void jumpNext() {
 		
-		int currentIdx = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
+		int currentIdx = (int) Collections.max(charDescriptionTable.getSelectionModel().getSelectedIndices());
 		autoScrollToSelection=false;
-		tableGrid.getSelectionModel().clearAndSelect(1+ currentIdx);
-		scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem(), 1);
+		charDescriptionTable.getSelectionModel().clearAndSelect(1+ currentIdx);
+		scrollToSelectedItem(charDescriptionTable.getSelectionModel().getSelectedItem(), 1);
 		autoScrollToSelection=true;
 	}
 
@@ -556,7 +553,7 @@ public class TablePane_CharClassif {
 		account.setUser_desc_class(active_class);
 		Tools.set_desc_class(account);
 		if(!active_class.equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
-			tableGrid.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			charDescriptionTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			Parent.charButton.setDisable(false);
 
 			this.classItems = getActiveItemsID(active_class);
@@ -578,10 +575,10 @@ public class TablePane_CharClassif {
 			selectLastDescribedItem();
 			this.selected_col = -1;
 			nextChar();
-			tvX = new TableViewExtra(tableGrid);
-			tableGrid.refresh();
+			tvX = new TableViewExtra(charDescriptionTable);
+			charDescriptionTable.refresh();
 		}else {
-			tableGrid.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+			charDescriptionTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 			try {
 				Parent.charPaneController.PaneClose();
 			}catch(Exception V) {
@@ -608,18 +605,18 @@ public class TablePane_CharClassif {
 	private void selectLastDescribedItem() {
 		if(GlobalConstants.DESCRIPTION_RESTORE_PERSISTED_ITEM) {
 			try{
-				Optional<CharDescriptionRow> toSelect = tableGrid.getItems().parallelStream().filter(i -> i.getItem_id().equals(account.getActiveItem())).findAny();
+				Optional<CharDescriptionRow> toSelect = charDescriptionTable.getItems().parallelStream().filter(i -> i.getItem_id().equals(account.getActiveItem())).findAny();
 				if (toSelect.isPresent()) {
-					tableGrid.getSelectionModel().clearSelection();
-					tableGrid.getSelectionModel().select(toSelect.get());
+					charDescriptionTable.getSelectionModel().clearSelection();
+					charDescriptionTable.getSelectionModel().select(toSelect.get());
 				} else {
-					tableGrid.getSelectionModel().clearAndSelect(0);
+					charDescriptionTable.getSelectionModel().clearAndSelect(0);
 				}
 			}catch (Exception V){
-				tableGrid.getSelectionModel().clearAndSelect(0);
+				charDescriptionTable.getSelectionModel().clearAndSelect(0);
 			}
 		}else{
-			Optional<LocalDateTime> latestDescriptionTimeInClass = tableGrid.getItems().stream().map(
+			Optional<LocalDateTime> latestDescriptionTimeInClass = charDescriptionTable.getItems().stream().map(
 					r -> r.getData().values().stream().flatMap(a -> a.values().stream()).filter(v -> v != null && v.getDisplayValue(Parent).length() > 0).map(v -> v.getDescriptionTime()).filter(t -> t != null).max(new Comparator<LocalDateTime>() {
 						@Override
 						public int compare(LocalDateTime o1, LocalDateTime o2) {
@@ -628,16 +625,16 @@ public class TablePane_CharClassif {
 					})
 			).filter(m -> m.isPresent()).map(m -> m.get()).findAny();
 			if (latestDescriptionTimeInClass.isPresent()) {
-				Optional<CharDescriptionRow> latestEditedItem = tableGrid.getItems().stream().filter(
+				Optional<CharDescriptionRow> latestEditedItem = charDescriptionTable.getItems().stream().filter(
 						r -> r.getData().values().stream().flatMap(a -> a.values().stream())
 								.filter(v -> v != null && v.getDescriptionTime().isEqual(latestDescriptionTimeInClass.get())).findAny().isPresent()).findAny();
 				if (latestEditedItem.isPresent()) {
-					tableGrid.getSelectionModel().clearSelection();
-					tableGrid.getSelectionModel().select(latestEditedItem.get());
-					tableGrid.scrollTo(tableGrid.getSelectionModel().getSelectedIndex());
+					charDescriptionTable.getSelectionModel().clearSelection();
+					charDescriptionTable.getSelectionModel().select(latestEditedItem.get());
+					charDescriptionTable.scrollTo(charDescriptionTable.getSelectionModel().getSelectedIndex());
 				}
 			} else {
-				tableGrid.getSelectionModel().clearAndSelect(0);
+				charDescriptionTable.getSelectionModel().clearAndSelect(0);
 			}
 		}
 
@@ -803,13 +800,13 @@ public class TablePane_CharClassif {
 		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
 		ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(selected_col);
 		List<String> char_headers = CharValuesLoader.returnSortedCopyOfClassCharacteristic(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
-		for( TableColumn col:this.tableGrid.getColumns()) {
-			col.setId(null);
+		for( TableColumn col:this.charDescriptionTable.getColumns()) {
+			col.setId(col.getId()!=null && col.getId().equals(activeChar.getCharacteristic_id())?"active-column":null);
 			if(hiddenColumns.contains(col.getText()) || (collapsedView && !collapsedColumns.containsKey(col.getText())) ){
 				col.setVisible(false);
 			}else{
 				col.setVisible(true);
-				col.prefWidthProperty().bind(tableGrid.widthProperty().multiply(
+				col.prefWidthProperty().bind(charDescriptionTable.widthProperty().multiply(
 						collapsedView?(collapsedColumns.get(col.getText())):visibleColumns.get(col.getText())));
 			}
 			/*
@@ -879,12 +876,19 @@ public class TablePane_CharClassif {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void fillTable(boolean defaultValueCharClassActive) {
-		this.tableGrid.getItems().clear();
-        this.tableGrid.getColumns().clear();
+		this.charDescriptionTable.getItems().clear();
+        this.charDescriptionTable.getColumns().clear();
         
         if(!defaultValueCharClassActive) {
-			for(String colname:collapsedColumns.keySet()){
+			HashSet<String> colnames = new HashSet<String>();
+			colnames.addAll(visibleColumns.keySet());
+			colnames.addAll(collapsedColumns.keySet());
+			colnames.addAll(hiddenColumns);
+			colnames.forEach(colname->{
 				TableColumn tmp = new TableColumn<>(colname);
+				Optional<ClassCaracteristic> charMatch = CharValuesLoader.active_characteristics.values().parallelStream()
+						.flatMap(Collection::stream)
+						.filter(c -> c.getCharacteristic_id().equals(colname)).findAny();
 				if(colname.equals("Completion Status")) {
 					tmp.setComparator(new Comparator() {
 						@Override
@@ -934,7 +938,7 @@ public class TablePane_CharClassif {
 							return Integer.compare(ret1.get(), ret2.get());
 						}
 					});
-				}else if(colname.equals("Class Name")){
+				}else if (colname.equals("Class Name")){
 					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
 							return new ReadOnlyObjectWrapper(r.getValue().getClass_segment_string().split("&&&")[1]);
@@ -944,46 +948,36 @@ public class TablePane_CharClassif {
 							 */
 						}
 					});
-				}else if(colname.equals("Description")){
+				}else if (colname.startsWith("Short Description") || colname.startsWith("Long Description")){
 					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-							try{
-								if (r.getValue().getLong_desc() != null && r.getValue().getLong_desc().length() > 0) {
-									return new ReadOnlyObjectWrapper(r.getValue().getLong_desc());
-								}
-								try {
-									return new ReadOnlyObjectWrapper(r.getValue().getShort_desc());
-								} catch (Exception V) {
-									return new ReadOnlyObjectWrapper("");
-								}
-							}catch (Exception V){
-								return new ReadOnlyObjectWrapper<>("**** BUG ****");
-							}
+							return new ReadOnlyObjectWrapper<>(CharClassifProposer.getCustomDescription(r.getValue(),colname));
 						}
 						/*descriptionColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.4));;
 						descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");*/
 					});
-				}else if(CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().map(ClassCaracteristic::getCharacteristic_name).collect(Collectors.toCollection(ArrayList::new)).contains(colname)){
-					ClassCaracteristic characteristic = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().filter(classCaracteristic -> classCaracteristic.getCharacteristic_name().equals(colname)).findFirst().get();
+				}else if(charMatch.isPresent()){
+					tmp.setId(charMatch.get().getCharacteristic_id());
+					tmp.setText(charMatch.get().getCharacteristic_name());
 					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-							try{
-								CaracteristicValue val = r.getValue().getData(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(characteristic.getCharacteristic_id());
+							CaracteristicValue val = r.getValue().getData(r.getValue().getClass_segment_string().split("&&&")[0]).get(charMatch.get().getCharacteristic_id());
+							if(val!=null){
 								String dsp = null;
-								try{
-									dsp = val.getDisplayValue(Parent);
-								}catch (Exception V){
-
-								}
+								dsp = val.getDisplayValue(Parent);
 								if(dsp!=null && dsp.length()>0){
 									return new ReadOnlyObjectWrapper(dsp);
-								}else if (r.getValue().getRulePropositions(characteristic.getCharacteristic_id()).size()>0){
+								}else if (r.getValue().getRulePropositions(colname).size()>0){
 									return new ReadOnlyObjectWrapper<>("*PENDING*");
+								}else{
+									return new ReadOnlyObjectWrapper("");
 								}
+							}else if(CharValuesLoader.active_characteristics.get(r.getValue().getClass_segment_string().split("&&&")[0]).stream().anyMatch(loopchar->loopchar.getCharacteristic_id().equals(charMatch.get().getCharacteristic_id()))){
+								//item has empty value
 								return new ReadOnlyObjectWrapper("");
-							}catch(Exception V) {
-								//Object has null data at daataIndex
-								return new ReadOnlyObjectWrapper("");
+							}else{
+								//charMatch not applicable
+								return new ReadOnlyObjectWrapper("N/A");
 							}
 							/*
 							col.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
@@ -995,8 +989,8 @@ public class TablePane_CharClassif {
 				}
 				tmp.setResizable(true);
 				tmp.setVisible(false);
-				this.tableGrid.getColumns().add(tmp);
-			}
+				this.charDescriptionTable.getColumns().add(tmp);
+			});
         	TableColumn linkColumn = new TableColumn<>("Link");
             //linkColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
             linkColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
@@ -1013,9 +1007,9 @@ public class TablePane_CharClassif {
                     }
                 }
              });
-            linkColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
+            linkColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
             linkColumn.setResizable(true);
-            this.tableGrid.getColumns().add(linkColumn);
+            this.charDescriptionTable.getColumns().add(linkColumn);
             
         	Parent.classification.setEditable(true);
         	Parent.classification.setDisable(false);
@@ -1025,15 +1019,15 @@ public class TablePane_CharClassif {
         	
         	TableColumn CaracNameColumn = new TableColumn<>("Caracteristic name");
         	CaracNameColumn.setCellValueFactory(new PropertyValueFactory<>("Short_desc"));
-        	CaracNameColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.3));;
+        	CaracNameColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.3));;
         	CaracNameColumn.setResizable(true);
-            this.tableGrid.getColumns().add(CaracNameColumn);
+            this.charDescriptionTable.getColumns().add(CaracNameColumn);
             
             TableColumn CaracValueColumn = new TableColumn<>("Caracteristic value");
             CaracValueColumn.setCellValueFactory(new PropertyValueFactory<>("Long_desc"));
-            CaracValueColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.3));;
+            CaracValueColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.3));;
             CaracValueColumn.setResizable(true);
-            this.tableGrid.getColumns().add(CaracValueColumn);
+            this.charDescriptionTable.getColumns().add(CaracValueColumn);
             
             
         }
@@ -1052,9 +1046,9 @@ public class TablePane_CharClassif {
             }
          });
         
-        sourceColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
+        sourceColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
         sourceColumn.setResizable(true);
-        this.tableGrid.getColumns().add(sourceColumn);
+        this.charDescriptionTable.getColumns().add(sourceColumn);
         
         TableColumn ruleColumn = new TableColumn<>("Rule");
         //ruleColumn.setCellValueFactory(new PropertyValueFactory<>("rule_id"));
@@ -1077,9 +1071,9 @@ public class TablePane_CharClassif {
             }
          });
         
-        ruleColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
+        ruleColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
         ruleColumn.setResizable(true);
-        this.tableGrid.getColumns().add(ruleColumn);
+        this.charDescriptionTable.getColumns().add(ruleColumn);
         
         TableColumn authorColumn = new TableColumn<>("Author");
         //authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
@@ -1094,17 +1088,17 @@ public class TablePane_CharClassif {
             }
          });
         
-        authorColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
+        authorColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
         authorColumn.setResizable(true);
-        this.tableGrid.getColumns().add(authorColumn);
+        this.charDescriptionTable.getColumns().add(authorColumn);
         
         TableColumn articleColumn = new TableColumn<>("Article ID");
         articleColumn.setCellValueFactory(new PropertyValueFactory<>("client_item_number"));
-        articleColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.1));;
+        articleColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
         articleColumn.setResizable(true);
-        this.tableGrid.getColumns().add(articleColumn);
+        this.charDescriptionTable.getColumns().add(articleColumn);
 
-		this.tableGrid.getItems().addAll(this.itemArray);
+		this.charDescriptionTable.getItems().addAll(this.itemArray);
         Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -1112,15 +1106,15 @@ public class TablePane_CharClassif {
 			}
 		});
 
-		tableGrid.getSortOrder().addListener((ListChangeListener)(c -> {
+		charDescriptionTable.getSortOrder().addListener((ListChangeListener)(c -> {
 			if(allowOverWriteAccountPreference){
 				saveSortOrder();
 			}
-			tableGrid.scrollTo(tableGrid.getSelectionModel().getSelectedIndex());
-			tableGrid.refresh();
+			charDescriptionTable.scrollTo(charDescriptionTable.getSelectionModel().getSelectedIndex());
+			charDescriptionTable.refresh();
 		}));
 
-		tableGrid.setOnKeyPressed(new EventHandler<KeyEvent>() 
+		charDescriptionTable.setOnKeyPressed(new EventHandler<KeyEvent>()
         {
             public void handle(final KeyEvent keyEvent) 
             {
@@ -1128,7 +1122,7 @@ public class TablePane_CharClassif {
             }
         });
          
-		tableGrid.setOnKeyReleased(new EventHandler<KeyEvent>() 
+		charDescriptionTable.setOnKeyReleased(new EventHandler<KeyEvent>()
         {
             public void handle(final KeyEvent keyEvent) 
             {
@@ -1141,7 +1135,7 @@ public class TablePane_CharClassif {
 
 		
 		
-		tableGrid.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+		charDescriptionTable.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
 		    if(newValue && traverseGridFocus) {
 		    	;
 		    	traverseGridFocus=false;
@@ -1157,14 +1151,14 @@ public class TablePane_CharClassif {
 		    	Parent.classification.selectAll();
 		    }
 		});
-		tableGrid.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+		charDescriptionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
 		    if (newSelection != null ) {
 		    	
 		    	Parent.counterSelection.setVisible(true);
-		    	Parent.counterSelection.setText("Selected items: "+String.valueOf( tableGrid.getSelectionModel().getSelectedIndices().size()) );
+		    	Parent.counterSelection.setText("Selected items: "+String.valueOf( charDescriptionTable.getSelectionModel().getSelectedIndices().size()) );
 		    	
-		    	int max_selected = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
-		    	CharDescriptionRow tmp = (CharDescriptionRow) tableGrid.getItems().get(max_selected);
+		    	int max_selected = (int) Collections.max(charDescriptionTable.getSelectionModel().getSelectedIndices());
+		    	CharDescriptionRow tmp = (CharDescriptionRow) charDescriptionTable.getItems().get(max_selected);
 		    	
 		    	
 		    	Parent.aidLabel.setText("Article ID: "+tmp.getClient_item_number());
@@ -1187,7 +1181,7 @@ public class TablePane_CharClassif {
 	private void setHeaderClickListeners() {
 		// Step 1: Get the table header row.
 		TableHeaderRow headerRow = null;
-		for (Node n : ((TableViewSkin<?>) tableGrid.getSkin()).getChildren()) {
+		for (Node n : ((TableViewSkin<?>) charDescriptionTable.getSkin()).getChildren()) {
 			if (n instanceof TableHeaderRow) {
 				headerRow = (TableHeaderRow) n;
 			}
@@ -1285,14 +1279,18 @@ public class TablePane_CharClassif {
 				);
 			}
 
-	public void setCollapsedViewColumns(String[] strings) {
+	public void setColumns() {
+		restaureDefaultColumns();
+	}
+
+	private void restaureDefaultColumns() {
 		this.collapsedColumns.put("Completion Status",0.085);
 	}
-	
-	
+
+
 	private void selectFirstItem() {
 		//Temporary : select first item
-		this.tableGrid.getSelectionModel().select(0);
+		this.charDescriptionTable.getSelectionModel().select(0);
 	}
 
 	public void fireScrollNBUp(Boolean shiftDown) {
@@ -1300,9 +1298,9 @@ public class TablePane_CharClassif {
 			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
 			String activeClass = FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment();
 			ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(activeClass).get(active_char_index);
-			int min = (int) Collections.min(tableGrid.getSelectionModel().getSelectedIndices());
-			CharDescriptionRow thisItem = ((CharDescriptionRow) tableGrid.getItems().get(min));
-			CharDescriptionRow previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
+			int min = (int) Collections.min(charDescriptionTable.getSelectionModel().getSelectedIndices());
+			CharDescriptionRow thisItem = ((CharDescriptionRow) charDescriptionTable.getItems().get(min));
+			CharDescriptionRow previousItem = ((CharDescriptionRow) charDescriptionTable.getItems().get(min-1));
 			String data_this = "";
 			String data_previous="";
 			try{
@@ -1317,7 +1315,7 @@ public class TablePane_CharClassif {
 			if(data_this.length()>0  && data_previous.length()>0) {
 				while(data_previous.length()>0) {
 					min-=1;
-					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
+					previousItem = ((CharDescriptionRow) charDescriptionTable.getItems().get(min-1));
 					data_previous="";
 					try{
 						data_previous = previousItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
@@ -1325,15 +1323,15 @@ public class TablePane_CharClassif {
 					}
 				}
 				if(shiftDown){
-					tableGrid.getSelectionModel().selectRange(Math.max(0,min),(int) Collections.min(tableGrid.getSelectionModel().getSelectedIndices()));
+					charDescriptionTable.getSelectionModel().selectRange(Math.max(0,min),(int) Collections.min(charDescriptionTable.getSelectionModel().getSelectedIndices()));
 				}else{
-					tableGrid.getSelectionModel().clearAndSelect(Math.max(0,min));
+					charDescriptionTable.getSelectionModel().clearAndSelect(Math.max(0,min));
 				}
-				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem(), 0);
+				scrollToSelectedItem(charDescriptionTable.getSelectionModel().getSelectedItem(), 0);
 			}else {
 				while(! ( data_previous.length()>0 ) ) {
 					min-=1;
-					previousItem = ((CharDescriptionRow) tableGrid.getItems().get(min-1));
+					previousItem = ((CharDescriptionRow) charDescriptionTable.getItems().get(min-1));
 					data_previous="";
 					try{
 						data_previous = previousItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
@@ -1341,11 +1339,11 @@ public class TablePane_CharClassif {
 					}
 				}
 				if(shiftDown){
-					tableGrid.getSelectionModel().selectRange(Math.max(0,min),(int) Collections.min(tableGrid.getSelectionModel().getSelectedIndices()));
+					charDescriptionTable.getSelectionModel().selectRange(Math.max(0,min),(int) Collections.min(charDescriptionTable.getSelectionModel().getSelectedIndices()));
 				}else{
-					tableGrid.getSelectionModel().clearAndSelect(Math.max(0,min-1));
+					charDescriptionTable.getSelectionModel().clearAndSelect(Math.max(0,min-1));
 				}
-				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem(), 0);
+				scrollToSelectedItem(charDescriptionTable.getSelectionModel().getSelectedItem(), 0);
 
 			}
 		}catch(Exception V) {
@@ -1358,9 +1356,9 @@ public class TablePane_CharClassif {
 			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
 			String activeClass = FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment();
 			ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(activeClass).get(active_char_index);
-			int max = (int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices());
-			CharDescriptionRow thisItem = ((CharDescriptionRow) tableGrid.getItems().get(max));
-			CharDescriptionRow nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
+			int max = (int) Collections.max(charDescriptionTable.getSelectionModel().getSelectedIndices());
+			CharDescriptionRow thisItem = ((CharDescriptionRow) charDescriptionTable.getItems().get(max));
+			CharDescriptionRow nextItem = ((CharDescriptionRow) charDescriptionTable.getItems().get(max+1));
 			String data_this = "";
 			String data_next="";
 			try{
@@ -1375,7 +1373,7 @@ public class TablePane_CharClassif {
 			if(data_this.length()>0  && data_next.length()>0) {
 				while(data_next.length()>0) {
 					max+=1;
-					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
+					nextItem = ((CharDescriptionRow) charDescriptionTable.getItems().get(max+1));
 					data_next="";
 					try{
 						data_next = nextItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
@@ -1383,15 +1381,15 @@ public class TablePane_CharClassif {
 					}
 				}
 				if(shiftDown){
-					tableGrid.getSelectionModel().selectRange((int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices()),Math.min(tableGrid.getItems().size(),max+1));
+					charDescriptionTable.getSelectionModel().selectRange((int) Collections.max(charDescriptionTable.getSelectionModel().getSelectedIndices()),Math.min(charDescriptionTable.getItems().size(),max+1));
 				}else{
-					tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max));
+					charDescriptionTable.getSelectionModel().clearAndSelect(Math.min(charDescriptionTable.getItems().size(),max));
 				}
-				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem(), 0);
+				scrollToSelectedItem(charDescriptionTable.getSelectionModel().getSelectedItem(), 0);
 			}else {
 				while(! ( data_next.length()>0 ) ) {
 					max+=1;
-					nextItem = ((CharDescriptionRow) tableGrid.getItems().get(max+1));
+					nextItem = ((CharDescriptionRow) charDescriptionTable.getItems().get(max+1));
 					data_next="";
 					try{
 						data_next = nextItem.getData(activeClass).get(activeChar.getCharacteristic_id()).getRawDisplay();
@@ -1399,11 +1397,11 @@ public class TablePane_CharClassif {
 					}
 				}
 				if(shiftDown){
-					tableGrid.getSelectionModel().selectRange((int) Collections.max(tableGrid.getSelectionModel().getSelectedIndices()),Math.min(tableGrid.getItems().size(),max+1));
+					charDescriptionTable.getSelectionModel().selectRange((int) Collections.max(charDescriptionTable.getSelectionModel().getSelectedIndices()),Math.min(charDescriptionTable.getItems().size(),max+1));
 				}else{
-					tableGrid.getSelectionModel().clearAndSelect(Math.min(tableGrid.getItems().size(),max+1));
+					charDescriptionTable.getSelectionModel().clearAndSelect(Math.min(charDescriptionTable.getItems().size(),max+1));
 				}
-				scrollToSelectedItem(tableGrid.getSelectionModel().getSelectedItem(), 0);
+				scrollToSelectedItem(charDescriptionTable.getSelectionModel().getSelectedItem(), 0);
 
 			}
 		}catch(Exception V) {
@@ -1414,16 +1412,16 @@ public class TablePane_CharClassif {
 		allowOverWriteAccountPreference = false;
 		account.getDescriptionSortColumns().clear();
 		account.getDescriptionSortDirs().clear();
-		for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getSortOrder()) {
+		for (TableColumn<CharDescriptionRow, ?> c : charDescriptionTable.getSortOrder()) {
 
 			account.getDescriptionSortColumns().add(c.getText());
 			account.getDescriptionSortDirs().add(c.getSortType().toString());
 		}
-		CharDescriptionRow SI = tableGrid.getSelectionModel().getSelectedItem();
+		CharDescriptionRow SI = charDescriptionTable.getSelectionModel().getSelectedItem();
 		int SC = new Integer(selected_col);
 		refresh_table_with_segment(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment());
 
-		if(account.getDescriptionSortColumns().stream().filter(tc->!tableGrid.getColumns().stream().map(c->c.getText()).collect(Collectors.toList()).contains(tc)).findAny().isPresent()){
+		if(account.getDescriptionSortColumns().stream().filter(tc->!charDescriptionTable.getColumns().stream().map(c->c.getText()).collect(Collectors.toList()).contains(tc)).findAny().isPresent()){
 			//At least a sorting column is no longer available, do not restore order
 		}else{
 			//Restore order
@@ -1433,8 +1431,8 @@ public class TablePane_CharClassif {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				tableGrid.getSelectionModel().clearSelection();
-				tableGrid.getSelectionModel().select(SI);
+				charDescriptionTable.getSelectionModel().clearSelection();
+				charDescriptionTable.getSelectionModel().select(SI);
 				selected_col = SC-1;
 				nextChar();
 			}
@@ -1448,7 +1446,7 @@ public class TablePane_CharClassif {
 		account.getDescriptionSortDirs().clear();
 		Parent.DescriptionSortDirs.put(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment(), new ArrayList<String>());
 
-		for (TableColumn<CharDescriptionRow, ?> c : tableGrid.getSortOrder()) {
+		for (TableColumn<CharDescriptionRow, ?> c : charDescriptionTable.getSortOrder()) {
 			account.getDescriptionSortColumns().add(c.getText());
 			Parent.DescriptionSortColumns.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).add(c.getText());
 			account.getDescriptionSortDirs().add(c.getSortType().toString());

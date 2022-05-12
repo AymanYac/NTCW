@@ -64,7 +64,7 @@ public class TranslationServices {
 
 	public static ArrayList<CharValueTextSuggestion> getTextEntriesForActiveCharOnLanguages(Char_description parent, boolean isDataField) {
 		
-		String active_class = parent.tableController.tableGrid.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
+		String active_class = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0];
 		int active_idx = parent.tableController.selected_col;
 		active_idx%=CharValuesLoader.active_characteristics.get(active_class).size();
 		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(active_class).get(active_idx);
