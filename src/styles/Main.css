@@ -3,6 +3,11 @@
 	-fx-border-color:#445469;	
 }
 
+.menu-item{
+	-fx-background-color:#8497B0;
+	-fx-padding:5 0 5 5;
+}
+
 .menu-item:focused {
 	-fx-background: #1EA185;
     -fx-background-color: #1EA185;
@@ -26,10 +31,6 @@
 	-fx-background-color:#445469;
 }
 
-.menu-item{
-	-fx-background-color:#8497B0;
-	-fx-padding:5 0 5 5;	
-}
 
 .label{
 	-fx-font-family:Calibri;

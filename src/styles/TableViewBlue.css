@@ -101,3 +101,34 @@
   -fx-background-insets: 0px, 2px;
 
 }
+
+.menu{
+    -fx-background-color:#445469;
+}
+.menu-bar{
+	-fx-background-color:#445469;
+	-fx-border-color:#445469;
+}
+
+.menu-item{
+	-fx-background-color:#8497B0;
+	-fx-padding: 5 0 5 5;
+}
+
+.menu-item:focused {
+	-fx-background: #1EA185;
+    -fx-background-color: #1EA185;
+    -fx-border-color:#1EA185;
+}
+
+.menu-bar .container .menu:hover{
+    -fx-background-color: #1EA185;
+}
+
+.menu-bar .container .menu:pressed{
+    -fx-background-color: #1EA185;
+}
+
+.menu-bar .container .menu:showing{
+    -fx-background-color: #1EA185;
+}

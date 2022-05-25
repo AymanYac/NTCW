@@ -10,6 +10,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -110,6 +111,7 @@ public class TablePane_CharClassif {
 	private ArrayList<String> hiddenColumns = new ArrayList<String>();
 	private HashMap<String,Double> collapsedColumns = new HashMap<>();
 	private HashMap<String,Double> visibleColumns = new HashMap<>();
+	private boolean alreadyListeningWidthChange = false;
 
 	public void restoreLastSessionLayout() {
 		try{
@@ -541,10 +543,8 @@ public class TablePane_CharClassif {
 		
 	}
 	
-	public void collapseGrid(boolean visibleRight, GridPane parentGrid) {
-		selectChartAtIndex(this.selected_col,visibleRight);
-		
-		
+	public void redimensionGrid() {
+		selectChartAtIndex(this.selected_col);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -568,9 +568,9 @@ public class TablePane_CharClassif {
 			//Not needed any more loadAllClassCharWithKnownValues calls loadAllKnownValuesAssociated2Items
 			//assignValuesToItemsByClass_V2(active_class,FxUtilTest.getComboBoxValue(Parent.classCombo).getclassName(),classItems);
 
-
+			setColumns();
 			restorePreviousLayout();
-			
+
 			fillTable(false);
 			selectLastDescribedItem();
 			this.selected_col = -1;
@@ -781,80 +781,55 @@ public class TablePane_CharClassif {
 			return;
 		}
 		selected_col+=1;
-		selectChartAtIndex(selected_col,Parent.charButton.isSelected()||Parent.ruleButton.isSelected());
+		selectChartAtIndex(selected_col);
 	}
 	public void previousChar() {
 		if(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			return;
 		}
 		this.selected_col-=1;
-		selectChartAtIndex(selected_col,Parent.charButton.isSelected()||Parent.ruleButton.isSelected());
+		selectChartAtIndex(selected_col);
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void selectChartAtIndex(int i, boolean collapsedView) {
+	private void selectChartAtIndex(int i) {
+		clearActiveColumnId();
 		Parent.lastInputValue = null;
 		while(selected_col<0){
 			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
 		}
 		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
 		ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(selected_col);
-		List<String> char_headers = CharValuesLoader.returnSortedCopyOfClassCharacteristic(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).stream().map(c->c.getCharacteristic_name()).collect(Collectors.toList());
 		for( TableColumn col:this.charDescriptionTable.getColumns()) {
-			col.setId(col.getId()!=null && col.getId().equals(activeChar.getCharacteristic_id())?"active-column":null);
-			if(hiddenColumns.contains(col.getText()) || (collapsedView && !collapsedColumns.containsKey(col.getText())) ){
-				col.setVisible(false);
-			}else{
-				col.setVisible(true);
-				col.prefWidthProperty().bind(charDescriptionTable.widthProperty().multiply(
-						collapsedView?(collapsedColumns.get(col.getText())):visibleColumns.get(col.getText())));
-			}
-			/*
-			col.setId(null);
-			int idx = char_headers.indexOf(((TableColumn)col).getText());
-			if(idx!=selected_col ) {
-				if(collapsedViewColumns.contains(((TableColumn)col).getText())) {
-					//Hide/Show collapse only columns
-					((TableColumn)col).setVisible(collapsedView || Arrays.asList(GlobalConstants.COLLAPSED_COLOMNS_TO_KEEP_VISIBLE).contains(((TableColumn)col).getText()));
-					if(collapsedView){
-						((TableColumn)col).prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(GlobalConstants.COLLAPSED_COLOMNS_VISIBLE_WIDTH_MULTIPLIER/(this.collapsedViewColumns.size())));
-					}else{
-						if(Arrays.asList(GlobalConstants.COLLAPSED_COLOMNS_TO_KEEP_VISIBLE).contains(((TableColumn)col).getText())){
-							((TableColumn)col).prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(GlobalConstants.COLLAPSED_COLOMNS_TO_KEEP_VISIBLE_WIDTH_MULTIPLIER));
-						}
-					}
-					continue;
+			col.setVisible(
+					( (!hiddenColumns.contains(col.getText()) && !hiddenColumns.contains(col.getId())) || (col.getId()!=null && col.getId().equals(activeChar.getCharacteristic_id())))
+				&&	(!Parent.visibleRight.get() || collapsedColumns.containsKey(col.getText()) || collapsedColumns.containsKey(col.getId()))
+			);
+			if(col.isVisible()){
+				try{
+					col.prefWidthProperty().bind(charDescriptionTable.widthProperty().multiply(
+							((Parent.visibleRight.get() ? collapsedColumns : visibleColumns).get(col.getText()))));
+				}catch (Exception V){
+					col.prefWidthProperty().bind(charDescriptionTable.widthProperty().multiply(
+							((Parent.visibleRight.get() ? collapsedColumns : visibleColumns).get(col.getId()))));
 				}
-				
-				if(idx==-1) {
-					//keep full view columns visible if not in collapsed views , hide otherwise
-					//Unless column is description column
-					if(((TableColumn)col).getText().equals("Description")) {
-						int no_VisibleCollapsed = GlobalConstants.COLLAPSED_COLOMNS_TO_KEEP_VISIBLE.length;
-						double widthMutliplierVisibleCollapsed=0;
-						if(no_VisibleCollapsed>0){
-							widthMutliplierVisibleCollapsed = GlobalConstants.COLLAPSED_COLOMNS_TO_KEEP_VISIBLE_WIDTH_MULTIPLIER / no_VisibleCollapsed;
-						}
-						((TableColumn)col).prefWidthProperty().bind(tableGrid.widthProperty().multiply(collapsedView?0.68:0.3-(no_VisibleCollapsed*widthMutliplierVisibleCollapsed)));;
-						((TableColumn)col).setVisible(true);
-						continue;
-					}
-					((TableColumn)col).setVisible(!collapsedView);
-					continue;
-				}
-				//This a non active characteristic
-				((TableColumn)col).setVisible(false);
-			}else {
-				//this an active characteristic
-				col.setId("active-column");
-				((TableColumn)col).setVisible(true);
 			}
-
-			 */
-
+			col.setId(col.getId()!=null && col.getId().equals(activeChar.getCharacteristic_id())?"active-column":col.getId());
 		}
-		
-		
+		Double visibleWidth = charDescriptionTable.getColumns().stream().filter(TableColumnBase::isVisible).filter(col -> col.getWidth() > 0).mapToDouble(col -> col.getWidth()).sum();
+		if(visibleWidth<0.98*charDescriptionTable.getWidth()){
+			System.out.println("Fixing");
+			Optional<TableColumn<CharDescriptionRow, ?>> activeCol = charDescriptionTable.getColumns().stream().filter(col -> col.getId()!=null && col.getId().equals("active-column")).findFirst();
+			if(activeCol.isPresent()){
+				activeCol.get().prefWidthProperty().unbind();
+				activeCol.get().prefWidthProperty().set(activeCol.get().getWidth()+(charDescriptionTable.getWidth()*0.98-(visibleWidth)));
+			}
+		}else{
+			System.out.print("No column underflow: "+visibleWidth);
+			System.out.print(">=");
+			System.out.println(charDescriptionTable.getWidth()*0.98);
+		}
+
 		if(Parent.valueAutoComplete!=null) {
 			Parent.valueAutoComplete.refresh_entries(true);
 		}else {
@@ -868,17 +843,35 @@ public class TablePane_CharClassif {
 			Parent.valueAutoComplete.setSibling(Parent.translationAutoComplete);
 			Parent.translationAutoComplete.setSibling(Parent.valueAutoComplete);
 		}
-		
-		
+
 		ExternalSearchServices.refreshUrlAfterCaracChange(Parent);
 		Parent.refresh_ui_display();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				//setSkinHeaderClickListeners();
+				setObjectHeaderClickListeners();
+				charDescriptionTable.getColumns().forEach(tmp->{
+					if(alreadyListeningWidthChange){
+						return;
+					}
+					tmp.widthProperty().addListener(new ChangeListener<Number>() {
+						@Override
+						public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+							//(Parent.visibleRight.get()?collapsedColumns:visibleColumns).put(tmp.getId() != null ? tmp.getId() : tmp.getText(),newValue.doubleValue()/charDescriptionTable.getWidth());
+						}
+					});
+				});
+				alreadyListeningWidthChange=true;
+			}
+		});
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void fillTable(boolean defaultValueCharClassActive) {
 		this.charDescriptionTable.getItems().clear();
         this.charDescriptionTable.getColumns().clear();
-        
+		this.charDescriptionTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         if(!defaultValueCharClassActive) {
 			HashSet<String> colnames = new HashSet<String>();
 			colnames.addAll(visibleColumns.keySet());
@@ -890,6 +883,7 @@ public class TablePane_CharClassif {
 						.flatMap(Collection::stream)
 						.filter(c -> c.getCharacteristic_id().equals(colname)).findAny();
 				if(colname.equals("Completion Status")) {
+					tmp.setCellValueFactory(new PropertyValueFactory<>("CompletionStatus"));
 					tmp.setComparator(new Comparator() {
 						@Override
 						public int compare(Object o1, Object o2) {
@@ -956,6 +950,63 @@ public class TablePane_CharClassif {
 						/*descriptionColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.4));;
 						descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");*/
 					});
+				}else if(colname.equals("Link")){
+					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+							try{
+								String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
+								return new ReadOnlyObjectWrapper(
+										WordUtils.shortUrlDisplay(
+												r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getUrl()
+										)
+								);
+							}catch(Exception V) {
+								return new ReadOnlyObjectWrapper("");
+							}
+						}
+					});
+				}else if(colname.equals("Source")){
+					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+							try{String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
+								return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getSource());
+							}catch(Exception V) {
+								return new ReadOnlyObjectWrapper("");
+							}
+						}
+					});
+				}else if(colname.equals("Rule")){
+					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+							try{
+								String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
+								String activeCharId = CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id();
+								CaracteristicValue activeData = r.getValue().getData(itemClass).get(activeCharId);
+								if(activeData.getSource().equals(DataInputMethods.AUTO_CHAR_DESC)){
+									return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result -> result.getStatus()!=null && result.getStatus().equals("Applied")).findAny().get().getMatchedBlock());
+								}
+								if(activeData.getSource().equals(DataInputMethods.SEMI_CHAR_DESC)){
+									return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result->result.getGenericCharRule()!=null).filter(result -> result.getGenericCharRule().getRuleSyntax()!=null && result.getGenericCharRule().getRuleSyntax().equals(activeData.getRule_id())).findAny().get().getMatchedBlock());
+								}
+								return new ReadOnlyObjectWrapper(activeData.getRule_id());
+							}catch(Exception V) {
+								return new ReadOnlyObjectWrapper("");
+							}
+						}
+					});
+				}else if(colname.equals("Author")){
+					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+							try{
+								String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
+								return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getAuthorName());
+							}catch(Exception V) {
+								return new ReadOnlyObjectWrapper("");
+							}
+						}
+					});
+				}else if(colname.equals("Article ID")){
+					tmp.setCellValueFactory(new PropertyValueFactory<>("client_item_number"));
 				}else if(charMatch.isPresent()){
 					tmp.setId(charMatch.get().getCharacteristic_id());
 					tmp.setText(charMatch.get().getCharacteristic_name());
@@ -991,26 +1042,6 @@ public class TablePane_CharClassif {
 				tmp.setVisible(false);
 				this.charDescriptionTable.getColumns().add(tmp);
 			});
-        	TableColumn linkColumn = new TableColumn<>("Link");
-            //linkColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
-            linkColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
-                public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                    try{
-						String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
-                    	return new ReadOnlyObjectWrapper(
-                    			WordUtils.shortUrlDisplay(
-                    			r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getUrl()
-								)
-						);
-                    }catch(Exception V) {
-                   	 return new ReadOnlyObjectWrapper("");
-                    }
-                }
-             });
-            linkColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
-            linkColumn.setResizable(true);
-            this.charDescriptionTable.getColumns().add(linkColumn);
-            
         	Parent.classification.setEditable(true);
         	Parent.classification.setDisable(false);
         }else {
@@ -1020,91 +1051,83 @@ public class TablePane_CharClassif {
         	TableColumn CaracNameColumn = new TableColumn<>("Caracteristic name");
         	CaracNameColumn.setCellValueFactory(new PropertyValueFactory<>("Short_desc"));
         	CaracNameColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.3));;
-        	CaracNameColumn.setResizable(true);
+        	CaracNameColumn.setResizable(false);
             this.charDescriptionTable.getColumns().add(CaracNameColumn);
             
             TableColumn CaracValueColumn = new TableColumn<>("Caracteristic value");
             CaracValueColumn.setCellValueFactory(new PropertyValueFactory<>("Long_desc"));
             CaracValueColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.3));;
-            CaracValueColumn.setResizable(true);
+            CaracValueColumn.setResizable(false);
             this.charDescriptionTable.getColumns().add(CaracValueColumn);
-            
+
+			TableColumn sourceColumn = new TableColumn<>("Source");
+			//sourceColumn.setCellValueFactory(new PropertyValueFactory<>("source"));
+			sourceColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+				public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+					try{String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
+						return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getSource());
+					}catch(Exception V) {
+						return new ReadOnlyObjectWrapper("");
+					}
+				}
+			});
+
+			sourceColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
+			sourceColumn.setResizable(false);
+			this.charDescriptionTable.getColumns().add(sourceColumn);
+
+			TableColumn ruleColumn = new TableColumn<>("Rule");
+			//ruleColumn.setCellValueFactory(new PropertyValueFactory<>("rule_id"));
+			ruleColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+				public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+					try{
+						String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
+						String activeCharId = CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id();
+						CaracteristicValue activeData = r.getValue().getData(itemClass).get(activeCharId);
+						if(activeData.getSource().equals(DataInputMethods.AUTO_CHAR_DESC)){
+							return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result -> result.getStatus()!=null && result.getStatus().equals("Applied")).findAny().get().getMatchedBlock());
+						}
+						if(activeData.getSource().equals(DataInputMethods.SEMI_CHAR_DESC)){
+							return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result->result.getGenericCharRule()!=null).filter(result -> result.getGenericCharRule().getRuleSyntax()!=null && result.getGenericCharRule().getRuleSyntax().equals(activeData.getRule_id())).findAny().get().getMatchedBlock());
+						}
+						return new ReadOnlyObjectWrapper(activeData.getRule_id());
+					}catch(Exception V) {
+						return new ReadOnlyObjectWrapper("");
+					}
+				}
+			});
+
+			ruleColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
+			ruleColumn.setResizable(false);
+			this.charDescriptionTable.getColumns().add(ruleColumn);
+
+			TableColumn authorColumn = new TableColumn<>("Author");
+			//authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
+			authorColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
+				public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
+					try{
+						String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
+						return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getAuthorName());
+					}catch(Exception V) {
+						return new ReadOnlyObjectWrapper("");
+					}
+				}
+			});
+
+			authorColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
+			authorColumn.setResizable(false);
+			this.charDescriptionTable.getColumns().add(authorColumn);
+
+			TableColumn articleColumn = new TableColumn<>("Article ID");
+			articleColumn.setCellValueFactory(new PropertyValueFactory<>("client_item_number"));
+			articleColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
+			articleColumn.setResizable(false);
+			this.charDescriptionTable.getColumns().add(articleColumn);
             
         }
-        
-        
-        
-        TableColumn sourceColumn = new TableColumn<>("Source");
-        //sourceColumn.setCellValueFactory(new PropertyValueFactory<>("source"));
-        sourceColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
-            public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                try{String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
-					return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getSource());
-                }catch(Exception V) {
-               	 return new ReadOnlyObjectWrapper("");
-                }
-            }
-         });
-        
-        sourceColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
-        sourceColumn.setResizable(true);
-        this.charDescriptionTable.getColumns().add(sourceColumn);
-        
-        TableColumn ruleColumn = new TableColumn<>("Rule");
-        //ruleColumn.setCellValueFactory(new PropertyValueFactory<>("rule_id"));
-        ruleColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
-            public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                try{
-                	String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
-					String activeCharId = CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id();
-					CaracteristicValue activeData = r.getValue().getData(itemClass).get(activeCharId);
-					if(activeData.getSource().equals(DataInputMethods.AUTO_CHAR_DESC)){
-						return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result -> result.getStatus()!=null && result.getStatus().equals("Applied")).findAny().get().getMatchedBlock());
-					}
-					if(activeData.getSource().equals(DataInputMethods.SEMI_CHAR_DESC)){
-						return new ReadOnlyObjectWrapper(r.getValue().getRuleResults().get(activeCharId).stream().filter(result->result.getGenericCharRule()!=null).filter(result -> result.getGenericCharRule().getRuleSyntax()!=null && result.getGenericCharRule().getRuleSyntax().equals(activeData.getRule_id())).findAny().get().getMatchedBlock());
-					}
-					return new ReadOnlyObjectWrapper(activeData.getRule_id());
-                }catch(Exception V) {
-               	 return new ReadOnlyObjectWrapper("");
-                }
-            }
-         });
-        
-        ruleColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
-        ruleColumn.setResizable(true);
-        this.charDescriptionTable.getColumns().add(ruleColumn);
-        
-        TableColumn authorColumn = new TableColumn<>("Author");
-        //authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
-        authorColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
-            public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-                try{
-					String itemClass = r.getValue().getClass_segment_string().split("&&&")[0];
-					return new ReadOnlyObjectWrapper(r.getValue().getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(WordUtils.modColIndex(selected_col,CharValuesLoader.active_characteristics.get(itemClass))).getCharacteristic_id()).getAuthorName());
-                }catch(Exception V) {
-               	 return new ReadOnlyObjectWrapper("");
-                }
-            }
-         });
-        
-        authorColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
-        authorColumn.setResizable(true);
-        this.charDescriptionTable.getColumns().add(authorColumn);
-        
-        TableColumn articleColumn = new TableColumn<>("Article ID");
-        articleColumn.setCellValueFactory(new PropertyValueFactory<>("client_item_number"));
-        articleColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
-        articleColumn.setResizable(true);
-        this.charDescriptionTable.getColumns().add(articleColumn);
 
 		this.charDescriptionTable.getItems().addAll(this.itemArray);
-        Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				setHeaderClickListeners();
-			}
-		});
+
 
 		charDescriptionTable.getSortOrder().addListener((ListChangeListener)(c -> {
 			if(allowOverWriteAccountPreference){
@@ -1178,7 +1201,117 @@ public class TablePane_CharClassif {
 		 });
 	}
 
-	private void setHeaderClickListeners() {
+	private void setObjectHeaderClickListeners(){
+		charDescriptionTable.getColumns().forEach(column->{
+			final ContextMenu popup = new ContextMenu();
+			popup.setAutoHide(true);
+			final MenuItem ligne0 = new MenuItem("Hide Column");
+			final MenuItem ligne1 = new MenuItem("Default table display");
+			final Menu ligne2 = new Menu("Display additional column...");
+
+			ligne0.setDisable(column.getId()!=null && column.getId().equals("active-column"));
+			ligne0.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					if(column.getId()!=null && column.getId().equals("active-column")){
+						ClassCaracteristic missingID = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream()
+								.filter(loopCar -> loopCar.getCharacteristic_name().equals(column.getText()) && !charDescriptionTable.getColumns().stream().map(TableColumn::getId).collect(Collectors.toCollection(ArrayList::new))
+										.contains(loopCar.getCharacteristic_id())).findAny().get();
+						column.setId(missingID.getCharacteristic_id());
+					}
+					if(Parent.visibleRight.get()){
+						Double widthGained = collapsedColumns.get(column.getId() != null ? column.getId() : column.getText());
+						collapsedColumns.remove(column.getId() != null ? column.getId() : column.getText());
+						distributeWidthMargin(widthGained,collapsedColumns, null);
+					}else{
+						Double widthGained = visibleColumns.get(column.getId() != null ? column.getId() : column.getText());
+						visibleColumns.remove(column.getId() != null ? column.getId() : column.getText());
+						distributeWidthMargin(widthGained,visibleColumns, null);
+						hiddenColumns.add(column.getId() != null ? column.getId() : column.getText());
+					}
+					redimensionGrid();
+					popup.hide();
+				}
+			});
+			ligne1.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					restaureDefaultColumns();
+					redimensionGrid();
+					popup.hide();
+				}
+			});
+
+			hiddenColumns.forEach(hiddenField->{
+				Optional<ClassCaracteristic> charMatch = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream().filter(car -> car.getCharacteristic_id().equals(hiddenField)).findAny();
+				MenuItem elem = new MenuItem(charMatch.isPresent()?charMatch.get().getCharacteristic_name():hiddenField);
+				elem.setOnAction((event)->{
+					if(column.getId()!=null && column.getId().equals("active-column")){
+						ClassCaracteristic missingID = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream()
+								.filter(loopCar -> loopCar.getCharacteristic_name().equals(column.getText()) && !charDescriptionTable.getColumns().stream().map(TableColumn::getId).collect(Collectors.toCollection(ArrayList::new))
+										.contains(loopCar.getCharacteristic_id())).findAny().get();
+						column.setId(missingID.getCharacteristic_id());
+					}
+					hiddenColumns.add(column.getId()!=null?column.getId():column.getText());
+
+					if(Parent.visibleRight.get()){
+						collapsedColumns.put(hiddenField,collapsedColumns.get(column.getId())!=null?collapsedColumns.get(column.getId()):collapsedColumns.get(column.getText()));
+						distributeWidthMargin(-collapsedColumns.get(hiddenField),collapsedColumns, column.getId()!=null?column.getId():column.getText());
+					}
+					visibleColumns.put(hiddenField,visibleColumns.get(column.getId())!=null?visibleColumns.get(column.getId()):visibleColumns.get(column.getText()));
+					distributeWidthMargin(-visibleColumns.get(hiddenField),visibleColumns, column.getId()!=null?column.getId():column.getText());
+
+					if(hiddenColumns.contains(column.getText())){
+						hiddenColumns.remove(column.getText());
+					}else{
+						hiddenColumns.remove(column.getId());
+					}
+					hiddenColumns.remove(hiddenField);
+					redimensionGrid();
+				});
+				ligne2.getItems().add(elem);
+			});
+
+
+			popup.getItems().add(ligne0);
+			popup.getItems().add(ligne1);
+			popup.getItems().add(ligne2);
+
+			column.setContextMenu(popup);
+
+		});
+	}
+
+	private void distributeWidthMargin(Double delta, HashMap<String, Double> targetList, String exception) {
+		while(selected_col<0){
+			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
+		}
+		selected_col = Math.floorMod(selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
+		String activeCharID = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(selected_col).getCharacteristic_id();
+		Double denom = targetList.entrySet().stream().filter(e->(!hiddenColumns.contains(e.getKey()) || activeCharID.equals(e.getKey()))).map(Entry::getValue).mapToDouble(Double::doubleValue).sum();
+		targetList.entrySet().stream().filter(entry->exception == null || !entry.getKey().equals(exception)).forEach(entry->{
+			try{
+				targetList.put(entry.getKey(),entry.getValue().doubleValue()*(1+delta/denom));
+			}catch (Exception V){
+
+			}
+		});
+	}
+
+	private void clearActiveColumnId() {
+		try{
+			charDescriptionTable.getColumns().stream().filter(loopCol -> loopCol.getId()!=null && loopCol.getId().equals("active-column")).findAny().ifPresent(activecol -> {
+				ClassCaracteristic missingID = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream()
+						.filter(loopCar -> loopCar.getCharacteristic_name().equals(activecol.getText()) && !charDescriptionTable.getColumns().stream().map(TableColumn::getId).collect(Collectors.toCollection(ArrayList::new))
+								.contains(loopCar.getCharacteristic_id())).findAny().get();
+				activecol.setId(missingID.getCharacteristic_id());
+			});
+		}catch (Exception V){
+			//no problem, intitiating screen
+		}
+	}
+
+	private void setSkinHeaderClickListeners() {
 		// Step 1: Get the table header row.
 		TableHeaderRow headerRow = null;
 		for (Node n : ((TableViewSkin<?>) charDescriptionTable.getSkin()).getChildren()) {
@@ -1197,9 +1330,9 @@ public class TablePane_CharClassif {
 		// Step 3: Add click listener to the header columns.
 		for (int i = 0; i < headers.size(); i++) {
 			TableColumnHeader header = headers.get(i);
+			System.out.println("Setting header for column "+header.getTableColumn().getText());
 			final int index = i;
 			header.setOnMouseClicked(mouseEvent -> {
-
 				// Optional:
 				// Get the TableColumnBase (which is the object responsible
 				// for displaying the content of the column.)
@@ -1218,12 +1351,14 @@ public class TablePane_CharClassif {
 						@Override
 						public void handle(MouseEvent event) {
 							popup.hide();
+							if(Parent.visibleRight.get()){
+
+							}else{
+
+							}
 						}
 					});
-					while(selected_col<0){
-						selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
-					}
-					ligne0.setDisable(index+1==Math.floorMod(selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size()));
+					ligne0.setDisable(column.getId()!=null && column.getId().equals("active-column"));
 
 					ligne1.setOnMouseClicked(new EventHandler<MouseEvent>() {
 						@Override
@@ -1238,9 +1373,9 @@ public class TablePane_CharClassif {
 						}
 					});
 
-					setStyle(ligne0);
-					setStyle(ligne1);
-					setStyle(ligne2);
+					setPopupLigneStyle(ligne0);
+					setPopupLigneStyle(ligne1);
+					setPopupLigneStyle(ligne2);
 
 
 					GridPane contentGrid = new GridPane();
@@ -1264,7 +1399,7 @@ public class TablePane_CharClassif {
 		}
 	}
 
-			private void setStyle(Node ligne) {
+			private void setPopupLigneStyle(Node ligne) {
 				final String HOVERED_BUTTON_STYLE = "-fx-background-color:#212934; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#ACB9CA;";
 				final String STANDARD_BUTTON_STYLE="-fx-background-color:#ACB9CA; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#212934;";
 				ligne.styleProperty().bind(
@@ -1280,11 +1415,30 @@ public class TablePane_CharClassif {
 			}
 
 	public void setColumns() {
+		hiddenColumns.clear();
+		collapsedColumns.clear();
+		visibleColumns.clear();
 		restaureDefaultColumns();
 	}
 
 	private void restaureDefaultColumns() {
-		this.collapsedColumns.put("Completion Status",0.085);
+		this.visibleColumns.put("Completion Status",0.085);
+		this.visibleColumns.put("Class Name",0.085);
+		this.visibleColumns.put("Long Description 1",0.215);
+		this.visibleColumns.put("Link",0.1);
+		this.visibleColumns.put("Source",0.1);
+		this.visibleColumns.put("Rule",0.1);
+		this.visibleColumns.put("Author",0.1);
+		this.visibleColumns.put("Article ID",0.1);
+
+		this.collapsedColumns.put("Completion Status",0.2);
+		this.collapsedColumns.put("Long Description 1",0.675);
+
+		CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).forEach(carac->{
+			this.visibleColumns.put(carac.getCharacteristic_id(),0.1);
+			this.collapsedColumns.put(carac.getCharacteristic_id(),0.1);
+			this.hiddenColumns.add(carac.getCharacteristic_id());
+		});
 	}
 
 

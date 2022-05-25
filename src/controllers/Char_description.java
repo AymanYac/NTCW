@@ -2,6 +2,7 @@ package controllers;
 
 import controllers.paneControllers.*;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -48,7 +49,7 @@ public class Char_description {
 
 	public boolean CHANGING_CLASS = false;
     public TextField urlLink;
-
+	public SimpleBooleanProperty visibleRight = new SimpleBooleanProperty();
 
 
 	@FXML MenuBar menubar;
@@ -227,7 +228,7 @@ public class Char_description {
 		toolBarButtonListener();
 		initializePropButtons();
 
-		
+
 	}
 	
 	
@@ -283,6 +284,7 @@ public class Char_description {
 			}
 			
 		});
+		visibleRight.bind(charButton.selectedProperty().or(ruleButton.selectedProperty()).or(imageButton.selectedProperty()));
 
 	}
 
@@ -1390,7 +1392,7 @@ public class Char_description {
 		
 		
 		load_table_pane();
-		tableController.collapseGrid(false,grid);
+		tableController.redimensionGrid();
 		listen_for_keyboard_events();
 		//load_image_pane();
 		//load_rule_pane();
@@ -1726,7 +1728,6 @@ public class Char_description {
 			tableController.fillTable_DYNAMIC((List<ItemFetcherRow>) ftc.currentList_DYNAMIC);
 		}*/
 		//tableController.setCollapsedViewColumns(new String[] {"Completion Status","Question Status"});
-		tableController.setColumns();
 		TablePane_CharClassif.loadLastSessionLayout();
 		tableController.refresh_table_with_segment(account.getUser_desc_class(classCombo.getItems().get(1).getClassSegment()));
 		tableController.restoreLastSessionLayout();
@@ -1851,7 +1852,7 @@ public class Char_description {
 			grid.setColumnSpan(leftAnchor, 9);
 		}
 		try{
-			tableController.collapseGrid(visibleRight,grid);
+			tableController.redimensionGrid();
 		}catch(Exception V) {
 			//V.printStackTrace(System.err);
 		}
