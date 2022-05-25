@@ -175,8 +175,9 @@ public class DeduplicationServices {
                     if(fullCompResults.size()>Math.min(GlobalConstants.MAX_DEDUP_PAIRS_IN_MEMORY,topCouplesNumber)){
                         AtomicInteger numberOfRemovals = new AtomicInteger(0);
                         AtomicInteger minScoreOfRemoval = new AtomicInteger(Integer.MIN_VALUE);
-                        fullCompResults.entrySet().stream().map(p->p.getValue().get("PAIR_SCORE").getScore()).collect(Collectors.toCollection(ArrayList::new)).stream().sorted().forEach(lowestScoreFirst->{
-                            if(numberOfRemovals.get()+Math.min(GlobalConstants.MAX_DEDUP_PAIRS_IN_MEMORY,topCouplesNumber) < fullCompResults.keySet().size()){
+                        ArrayList<Double> sortedScores = fullCompResults.entrySet().stream().map(p -> p.getValue().get("PAIR_SCORE").getScore()).sorted().collect(Collectors.toCollection(ArrayList::new));
+                        sortedScores.forEach(lowestScoreFirst->{
+                            if(numberOfRemovals.get()+Math.min(GlobalConstants.MAX_DEDUP_PAIRS_IN_MEMORY,topCouplesNumber) < sortedScores.size()){
                                 numberOfRemovals.addAndGet(1);
                                 minScoreOfRemoval.set((int) Math.floor(lowestScoreFirst));
                             }
