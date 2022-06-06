@@ -89,7 +89,9 @@ public class Unidecode implements Serializable {
     public String decodeAndTrim(String str) {
         return decode(str).trim();
     }
-    
+    public String decodeTrimLowerCase(String str){
+        return decodeAndTrim(str).toLowerCase();
+    }
     
     public String decode(String str) {
         if (str == null) {

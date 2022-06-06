@@ -22,7 +22,7 @@ import model.GlobalConstants;
 import java.util.ArrayList;
 
 
-public class testController {
+public class DescPaneController {
     @FXML public TableColumn clear;
     @FXML public TableColumn down;
     @FXML public TableColumn up;
@@ -131,7 +131,7 @@ public class testController {
                         elementTable.refresh();
                     }
                 });
-                btn.getStylesheets().add(testController.class.getResource("/Styles/DescPane.css").toExternalForm());
+                btn.getStylesheets().add(DescPaneController.class.getResource("/Styles/DescPane.css").toExternalForm());
                 btn.getStyleClass().add("addButton");
                 btn.setPrefSize(20,20);
                 btn.setShape(new Circle(r));
@@ -269,7 +269,7 @@ public class testController {
                     }
                 });
                 btn.visibleProperty().bind(b.getValue().position.greaterThan(0));
-                btn.getStylesheets().add(testController.class.getResource("/Styles/DescPane.css").toExternalForm());
+                btn.getStylesheets().add(DescPaneController.class.getResource("/Styles/DescPane.css").toExternalForm());
                 btn.getStyleClass().add("upButton");
                 btn.setPrefSize(20,20);
                 btn.setShape(new Circle(r));
@@ -290,7 +290,7 @@ public class testController {
                     }
                 });
                 btn.visibleProperty().bind(b.getValue().position.lessThan(elementTable.getItems().size()-1));
-                btn.getStylesheets().add(testController.class.getResource("/Styles/DescPane.css").toExternalForm());
+                btn.getStylesheets().add(DescPaneController.class.getResource("/Styles/DescPane.css").toExternalForm());
                 btn.getStyleClass().add("downButton");
                 btn.setPrefSize(20,20);
                 btn.setShape(new Circle(r));
@@ -309,7 +309,7 @@ public class testController {
                         elementTable.refresh();
                     }
                 });
-                btn.getStylesheets().add(testController.class.getResource("/Styles/DescPane.css").toExternalForm());
+                btn.getStylesheets().add(DescPaneController.class.getResource("/Styles/DescPane.css").toExternalForm());
                 btn.getStyleClass().add("clearButton");
                 btn.setPrefSize(20,20);
                 btn.setShape(new Circle(r));
