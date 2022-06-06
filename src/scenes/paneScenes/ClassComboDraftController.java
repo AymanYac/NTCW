@@ -1,14 +1,18 @@
 package scenes.paneScenes;
 
 import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
+import impl.org.controlsfx.skin.AutoCompletePopup;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import model.ClassSegment;
@@ -29,6 +33,8 @@ public class ClassComboDraftController {
 
     @FXML ComboBox<ClassSegment> field = new ComboBox<>();
     private ClassSegment latestValue;
+    private ListView autoCompleteView;
+    private ListView comboListView;
 
     @FXML void initialize(){
         try {
@@ -41,15 +47,20 @@ public class ClassComboDraftController {
                 public Collection<ClassSegment> call(AutoCompletionBinding.ISuggestionRequest param) {
                     String input = param.getUserText();
                     Unidecode unidec = Unidecode.toAscii();
-                    return elemList.stream().filter(elem->unidec.decodeTrimLowerCase(elem.toString()).contains(unidec.decodeTrimLowerCase(input)))
+                    ArrayList<ClassSegment> ret = elemList.stream().filter(elem -> unidec.decodeTrimLowerCase(elem.toString()).contains(unidec.decodeTrimLowerCase(input)))
                             .sorted(new Comparator<ClassSegment>() {
                                 @Override
                                 public int compare(ClassSegment o1, ClassSegment o2) {
                                     return o1.toString().compareTo(o2.toString())
-                                            +(o1.toString().startsWith(input)?-100:0)
-                                            +(o2.toString().startsWith(input)?+100:0);
+                                            + (o1.toString().startsWith(input) ? -100 : 0)
+                                            + (o2.toString().startsWith(input) ? +100 : 0);
                                 }
                             }).collect(Collectors.toCollection(ArrayList::new));
+                    if(ret.size()<2){
+                        return null;
+                    }else{
+                        return ret;
+                    }
                 }
             };
             AutoCompletionBinding<ClassSegment> completion = TextFields.bindAutoCompletion(field.getEditor(), suggestionProvider);
@@ -76,20 +87,81 @@ public class ClassComboDraftController {
                 public void changed(ObservableValue<? extends ClassSegment> observable, ClassSegment oldValue, ClassSegment newValue) {
                     if(newValue!=null){
                         System.out.println("new value "+newValue.getClassName());
-                        ListView<ClassSegment> lv = ((ComboBoxListViewSkin) field.getSkin()).getListView();
-                        lv.getFocusModel().focus(field.getItems().indexOf(newValue));
-                        lv.scrollTo(newValue);
+                        comboListView = ((ComboBoxListViewSkin) field.getSkin()).getListView();
+                        comboListView.getFocusModel().focus(field.getItems().indexOf(newValue));
+                        comboListView.scrollTo(newValue);
                         latestValue=newValue;
                     }
                 }
             });
+            field.setOnShown(e->{
+                ComboBoxListViewSkin<?> skin = (ComboBoxListViewSkin<?>) field.getSkin();
+                ListView<?> list = (ListView<?>) skin.getPopupContent();
+                list.addEventFilter( KeyEvent.KEY_PRESSED, keyEvent -> {
+                    if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.A ) {
+                        field.getEditor().selectAll();
+                    }
+                });
+                field.setOnShown(null);
+            });
             completion.prefWidthProperty().bind(((TextField)completion.getCompletionTarget()).widthProperty());
             completion.setHideOnEscape(true);
-            
+            completion.getAutoCompletionPopup().addEventFilter(KeyEvent.ANY,event -> {
+                if(event.getCode().equals(KeyCode.UP)){
+                    final AutoCompletePopup source = (AutoCompletePopup) event.getSource();
+                    ListView node = (ListView) (source.getSkin().getNode());
+                    if(node.getSelectionModel().isSelected(0)){
+                        node.getSelectionModel().clearAndSelect(node.getItems().size()-1);
+                        node.scrollTo(node.getItems().size()-1);
+                        event.consume();
+                    }
+                }else if(event.getCode().equals(KeyCode.DOWN)) {
+                    final AutoCompletePopup source = (AutoCompletePopup) event.getSource();
+                    ListView node = (ListView) (source.getSkin().getNode());
+                    if (node.getSelectionModel().isSelected(node.getItems().size() - 1)) {
+                        node.getSelectionModel().clearAndSelect(0);
+                        node.scrollTo(0);
+                        event.consume();
+                    }
+                }else if(event.getCode().equals(KeyCode.A) && event.isControlDown()){
+                    field.getEditor().selectAll();
+                    event.consume();
+                }
+            });
+            completion.getAutoCompletionPopup().setOnShowing(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent event) {
+                    final AutoCompletePopup source = (AutoCompletePopup) event.getSource();
+                    autoCompleteView = (ListView) (source.getSkin().getNode());
+                    autoCompleteView.setCellFactory(lv -> {
+                        ListCell<?> cell = new ListCell<Object>() {
+                            @Override
+                            public void updateItem(Object item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setText(null);
+                                } else {
+                                    setText(item.toString());
+                                }
+                            }
+                        };
+                        cell.hoverProperty().addListener((obs, wasHovered, isNowHovered) -> {
+                            if (isNowHovered && ! cell.isEmpty()) {
+                                autoCompleteView.getSelectionModel().clearAndSelect(cell.getIndex());
+                            } else {
+                                //offHover
+                            }
+                        });
+
+                        return cell ;
+                    });
+                }
+            });
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
+
 
     private void loadClasses() throws SQLException, ClassNotFoundException {
         Connection conn = Tools.spawn_connection_from_pool();

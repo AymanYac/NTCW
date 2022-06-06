@@ -193,15 +193,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/javafx-controls-11.0.2-linux.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/javafx-graphics-11.0.2-linux.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -571,15 +562,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/controlsfx-8.40.11.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/icepdf-core-4.3.3.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -637,6 +619,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/fxribbon-1.2.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/controlsfx-8.40.18.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
