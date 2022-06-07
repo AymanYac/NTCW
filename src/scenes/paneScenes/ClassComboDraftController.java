@@ -4,12 +4,12 @@ import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 import impl.org.controlsfx.skin.AutoCompletePopup;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
@@ -35,6 +35,7 @@ public class ClassComboDraftController {
     private ClassSegment latestValue;
     private ListView autoCompleteView;
     private ListView comboListView;
+    private boolean droppingDown = false;
 
     @FXML void initialize(){
         try {
@@ -64,6 +65,7 @@ public class ClassComboDraftController {
                 }
             };
             AutoCompletionBinding<ClassSegment> completion = TextFields.bindAutoCompletion(field.getEditor(), suggestionProvider);
+            completion.setDelay(0);
             field.setConverter(new StringConverter<ClassSegment>() {
                 @Override
                 public String toString(ClassSegment object) {
@@ -102,9 +104,18 @@ public class ClassComboDraftController {
                         field.getEditor().selectAll();
                     }
                 });
-                field.setOnShown(null);
+                //list.setVisible(false);
+                Event.fireEvent(list,new KeyEvent(KeyEvent.KEY_PRESSED,null,null,KeyCode.ESCAPE,false,false,false,false));
+                droppingDown=true;
+                completion.setUserInput("");
+                field.setOnShown(e2->{
+                    //list.setVisible(false);
+                    Event.fireEvent(list,new KeyEvent(KeyEvent.KEY_PRESSED,null,null,KeyCode.ESCAPE,false,false,false,false));
+                    droppingDown=true;
+                    completion.setUserInput("");
+                });
             });
-            completion.prefWidthProperty().bind(((TextField)completion.getCompletionTarget()).widthProperty());
+            //completion.prefWidthProperty().bind(((TextField)completion.getCompletionTarget()).widthProperty());
             completion.setHideOnEscape(true);
             completion.getAutoCompletionPopup().addEventFilter(KeyEvent.ANY,event -> {
                 if(event.getCode().equals(KeyCode.UP)){
@@ -156,6 +167,14 @@ public class ClassComboDraftController {
                         return cell ;
                     });
                 }
+            });
+            completion.getAutoCompletionPopup().setOnShown(e->{
+                if(field.getValue()!=null && droppingDown){
+                    droppingDown=false;
+                    autoCompleteView.getSelectionModel().clearSelection();
+                    autoCompleteView.getSelectionModel().select(field.getValue());
+                }
+                autoCompleteView.scrollTo(autoCompleteView.getSelectionModel().getSelectedIndex());
             });
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
