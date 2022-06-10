@@ -2,6 +2,7 @@ package scenes.paneScenes;
 
 import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 import impl.org.controlsfx.skin.AutoCompletePopup;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
@@ -42,7 +43,6 @@ public class ClassComboDraftController {
             loadClasses();
             field.getItems().addAll(elemList);
             field.setEditable(true);
-
             Callback<AutoCompletionBinding.ISuggestionRequest, Collection<ClassSegment>> suggestionProvider = new Callback<AutoCompletionBinding.ISuggestionRequest, Collection<ClassSegment>>() {
                 @Override
                 public Collection<ClassSegment> call(AutoCompletionBinding.ISuggestionRequest param) {
@@ -115,6 +115,15 @@ public class ClassComboDraftController {
                     completion.setUserInput("");
                 });
             });
+            field.addEventFilter(KeyEvent.KEY_PRESSED,event -> {
+                if(event.isControlDown() || event.isShiftDown()){
+                    return;
+                }
+                if(event.getCode().equals(KeyCode.DOWN) || event.getCode().equals(KeyCode.UP)){
+                    droppingDown=true;
+                    completion.setUserInput("");
+                }
+            });
             //completion.prefWidthProperty().bind(((TextField)completion.getCompletionTarget()).widthProperty());
             completion.setHideOnEscape(true);
             completion.getAutoCompletionPopup().addEventFilter(KeyEvent.ANY,event -> {
@@ -154,6 +163,9 @@ public class ClassComboDraftController {
                                 } else {
                                     setText(item.toString());
                                 }
+                                setOnMouseClicked(event->{
+                                    field.setValue((ClassSegment) item);
+                                });
                             }
                         };
                         cell.hoverProperty().addListener((obs, wasHovered, isNowHovered) -> {
@@ -169,12 +181,18 @@ public class ClassComboDraftController {
                 }
             });
             completion.getAutoCompletionPopup().setOnShown(e->{
-                if(field.getValue()!=null && droppingDown){
-                    droppingDown=false;
-                    autoCompleteView.getSelectionModel().clearSelection();
-                    autoCompleteView.getSelectionModel().select(field.getValue());
-                }
-                autoCompleteView.scrollTo(autoCompleteView.getSelectionModel().getSelectedIndex());
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(field.getValue()!=null && droppingDown){
+                            droppingDown=false;
+                            autoCompleteView.getSelectionModel().clearSelection();
+                            autoCompleteView.getSelectionModel().select(field.getValue());
+                        }
+                        autoCompleteView.scrollTo(autoCompleteView.getSelectionModel().getSelectedIndex());
+                    }
+                });
+
             });
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
