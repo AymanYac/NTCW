@@ -4,6 +4,8 @@ import model.GlobalConstants;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.util.Random;
 
 /**
@@ -237,4 +239,10 @@ public class PixelUtils {
 		return (a1 << 24) | (r1 << 16) | (g1 << 8) | b1;
 	}
 
+    public static BufferedImage BufferedImageDeepCopy(BufferedImage bi) {
+		ColorModel cm = bi.getColorModel();
+		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+		WritableRaster raster = bi.copyData(null);
+		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    }
 }

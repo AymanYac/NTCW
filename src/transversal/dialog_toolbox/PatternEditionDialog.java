@@ -38,7 +38,7 @@ public class PatternEditionDialog {
         dialog = new Dialog<>();
         dialog.setTitle("Description pattern edition");
         dialog.setHeaderText(null);
-        dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+        dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("customDialog");
 
         // Set the button types.
@@ -87,7 +87,7 @@ public class PatternEditionDialog {
         caracBlocksContainer.setContent(caracBlocks);
         caracBlocksContainer.setMinViewportHeight(256);
         caracBlocksContainer.setMinViewportWidth(256);
-        caracBlocksContainer.getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/ScrollPaneTransparent.css").toExternalForm());
+        caracBlocksContainer.getStylesheets().add(CaracEditionDialog.class.getResource("/styles/ScrollPaneTransparent.css").toExternalForm());
         caracBlocksContainer.setFitToWidth(true);
         contentGrid.add(caracBlocksContainer,0,1);
         GridPane.setColumnSpan(caracBlocksContainer,GridPane.REMAINING);
@@ -301,7 +301,7 @@ public class PatternEditionDialog {
         ColumnConstraints bc3 = new ColumnConstraints();
         bc3.setPercentWidth(10);
         caracBlocks.getColumnConstraints().setAll(cc0,cc1,cc2,cc3);
-        caracBlocks.getStylesheets().add(CaracDeclarationDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+        caracBlocks.getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 
 
     }

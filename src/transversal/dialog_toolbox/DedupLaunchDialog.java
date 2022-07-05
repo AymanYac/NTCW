@@ -94,7 +94,7 @@ public class DedupLaunchDialog {
         Dialog dialog = new Dialog<>();
         dialog.setTitle("Listing all impacted classes");
         dialog.setHeaderText(null);
-        dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
+        dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("customDialog");
 
         // Set the button types.
@@ -396,7 +396,7 @@ public class DedupLaunchDialog {
             }
             //dialog.close();
             Dialog<Object> progressDialog = new Dialog<>();
-            progressDialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
+            progressDialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
             progressDialog.getDialogPane().getStyleClass().add("customDialog");
             GridPane progressGrid = new GridPane();
             Label progressText = new Label("Filtering items for comparison...");
@@ -615,7 +615,7 @@ public class DedupLaunchDialog {
         });
         dialog.setTitle("Item deduplication settings");
         dialog.setHeaderText(null);
-        dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
+        dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("customDialog");
 
         // Set the button types.

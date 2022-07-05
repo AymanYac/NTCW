@@ -16,7 +16,7 @@ import javafx.util.Callback;
 import model.*;
 import service.CharValuesLoader;
 import service.TableViewExtra;
-import transversal.dialog_toolbox.CaracDeclarationDialog;
+import transversal.dialog_toolbox.CaracEditionDialog;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -223,7 +223,7 @@ public class CharPane_CharClassif {
 	}
 	
 	@FXML public void add_carac() throws SQLException, ClassNotFoundException {
-		CaracDeclarationDialog.CaracDeclarationPopUp(parent.account, Tools.get_project_segments(parent.account).get(selected_row.getClass_segment_string().split("&&&")[0]), null,parent,null);
+		CaracEditionDialog.CaracDeclarationPopUp(parent.account, Tools.get_project_segments(parent.account).get(selected_row.getClass_segment_string().split("&&&")[0]), null,parent,null);
 		parent.tableController.refresh_table_preserve_sort_order();
 	}
 

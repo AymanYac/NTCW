@@ -16,7 +16,7 @@ public class DescriptionExportExcelSheets {
         Dialog<ArrayList<Boolean>> dialog = new Dialog<>();
         dialog.setTitle("Exporting item description data");
         dialog.setHeaderText("Please choose export sheets");
-        dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+        dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("customDialog");
 
         // Set the button types.

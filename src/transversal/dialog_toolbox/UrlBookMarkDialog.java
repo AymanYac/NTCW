@@ -19,7 +19,7 @@ public class UrlBookMarkDialog {
         Dialog dialog = new Dialog<>();
         dialog.setTitle("External PDF bookmark");
         dialog.setHeaderText("Bookmark this PDF?");
-        dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/Styles/DialogPane.css").toExternalForm());
+        dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("customDialog");
 
 

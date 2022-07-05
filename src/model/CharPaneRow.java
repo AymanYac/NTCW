@@ -1,7 +1,6 @@
 package model;
 
 import controllers.Char_description;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
@@ -14,10 +13,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 import javafx.scene.text.TextFlow;
-import javafx.util.Pair;
 import service.CharValuesLoader;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
-import transversal.dialog_toolbox.CaracDeclarationDialog;
 import transversal.generic.Tools;
 
 import java.sql.SQLException;

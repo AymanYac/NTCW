@@ -5,10 +5,13 @@ import controllers.Project_parameters;
 import controllers.Project_selection;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Alert;
+import javafx.geometry.HPos;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.UserAccount;
@@ -291,10 +294,57 @@ public class ConfirmationDialog {
 		}
     }
 
-	public static boolean showCaracDeleteImpactConfirmation(int impactCount) {
+	public static String showCaracValueEdition(String title, String oldValue){
+		Alert alert = new Alert(AlertType.NONE);
+		alert.setTitle(title);
+		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
+		alert.getDialogPane().getStyleClass().add("customDialog");
+
+		GridPane content = new GridPane();
+		ColumnConstraints c1 = new ColumnConstraints();
+		c1.setPercentWidth(45);
+		ColumnConstraints c2 = new ColumnConstraints();
+		c2.setPercentWidth(10);
+		ColumnConstraints c3 = new ColumnConstraints();
+		c3.setPercentWidth(45);
+		content.getColumnConstraints().addAll(c1,c2,c3);
+
+		content.add(new Label("Current value:"),0,0);
+		content.add(new Label("New value:"),2,0);
+		TextField ancien = new TextField(oldValue);
+		ancien.setDisable(true);
+		ancien.setEditable(false);
+		TextField nouveau = new TextField();
+		content.add(ancien,0,1);
+		content.add(nouveau,2,1);
+		Button btn = new Button();
+		btn.setId("arrowButton");
+		content.add(btn,1,1);
+		GridPane.setHalignment(btn, HPos.CENTER);
+
+		alert.getDialogPane().setContent(content);
+
+		ButtonType yesButton = new ButtonType("Apply");
+		ButtonType noButton = new ButtonType("Cancel");
+		alert.getButtonTypes().setAll(yesButton, noButton);
+		((Button)alert.getDialogPane().lookupButton(yesButton)).disableProperty().bind(nouveau.textProperty().isEmpty());
+
+		Optional<ButtonType> option = alert.showAndWait();
+		if(option.isPresent()){
+			if (option.get() == yesButton) {
+				return nouveau.getText();
+			} else {
+				return null;
+			}
+		}else{
+			return null;
+		}
+	}
+
+	public static boolean showCaracOrValueDeleteImpactConfirmation(String warningText) {
 		Alert alert = new Alert(AlertType.WARNING);
-		alert.setTitle("Confirm characteristic deletion impact");
-		alert.setHeaderText(String.valueOf(impactCount)+" value(s) attached to this characteristic will be lost!");
+		alert.setTitle("Confirm deletion impact");
+		alert.setHeaderText(warningText);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 

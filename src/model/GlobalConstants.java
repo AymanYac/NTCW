@@ -64,9 +64,10 @@ public class GlobalConstants {
     public static final boolean ITEM_CHAR_DATA_TO_BE_COPIED_FROM_SAME_CARS_ONLY_WHEN_RECLASSIFIYING = true;
 	public static final boolean CHAR_DESC_PATTERN_SPAN_SUPERRULES_ACCROS_CHARS = false;
 	public static final boolean PROMOTE_SUGGESTION_TO_APPLIED_OLD_SCHEMA = false;
+    public static final boolean IMAGE_SEARCH_THUMBNAIL = true;
 
 
-	public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
+    public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS = 5;
 	public static boolean USE_TAXOIMPORT_NEW_SCHEMA = true;
 	

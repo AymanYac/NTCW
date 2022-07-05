@@ -15,7 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import model.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
-import transversal.dialog_toolbox.CaracDeclarationDialog;
+import transversal.dialog_toolbox.CaracEditionDialog;
 import transversal.dialog_toolbox.FxUtilTest;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
@@ -50,7 +50,7 @@ public class ExternalSearchServices {
         dialog = new Dialog<>();
         dialog.setTitle("Custom search text");
         dialog.setHeaderText(null);
-        dialog.getDialogPane().getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
+        dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("customDialog");
 
         // Set the button types.
@@ -249,7 +249,7 @@ public class ExternalSearchServices {
         elemBlocksScroll.setContent(elemBlocks);
         elemBlocksScroll.setMinViewportHeight(256);
         elemBlocksScroll.setMinViewportWidth(256);
-        elemBlocksScroll.getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/ScrollPaneTransparent.css").toExternalForm());
+        elemBlocksScroll.getStylesheets().add(CaracEditionDialog.class.getResource("/styles/ScrollPaneTransparent.css").toExternalForm());
         elemBlocksScroll.setFitToWidth(true);
         contentGrid.add(elemBlocksScroll,0,1);
         GridPane.setColumnSpan(elemBlocksScroll,GridPane.REMAINING);
@@ -578,7 +578,7 @@ public class ExternalSearchServices {
         contentGrid.setMinWidth(240);
 
         elemBlocks.getColumnConstraints().setAll(cc0,cc1,cc2,cc3);
-        elemBlocks.getStylesheets().add(CaracDeclarationDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
+        elemBlocks.getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
         previewLabel.setStyle("-fx-fill: #8496AE;-fx-font-style: italic");
     }
 

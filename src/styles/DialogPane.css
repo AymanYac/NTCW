@@ -176,6 +176,19 @@
 
 }
 
+#arrowButton{
+    -fx-background-image:url("../pictures/editValueArrow.png");
+    -fx-background-color:transparent,
+    -fx-border-color:transparent;
+    -fx-border-width:0px;
+    -fx-background-radius:0px;
+    -fx-border-radius:0px;
+    -fx-background-insets:5px,5px,5px,5px;
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+    -fx-font-size:12px;
+}
+
 .button{
 	-fx-background-color:#445469,
 	linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%),

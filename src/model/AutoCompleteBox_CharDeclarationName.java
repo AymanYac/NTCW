@@ -12,7 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
-import transversal.dialog_toolbox.CaracDeclarationDialog;
+import transversal.dialog_toolbox.CaracEditionDialog;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -174,7 +174,7 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 			incompleteProperty.setValue(true);
 			this.selectedEntry = editingCarac;
 			entriesPopup.hide();
-			CaracDeclarationDialog.skipToNextField(this);
+			CaracEditionDialog.skipToNextField(this);
 			incompleteProperty.setValue(false);
 			return;
 		}
@@ -191,7 +191,7 @@ public class AutoCompleteBox_CharDeclarationName extends TextField{
 			incompleteProperty.setValue(true);
 			entriesPopup.hide();
 		}
-		CaracDeclarationDialog.skipToNextField(this);
+		CaracEditionDialog.skipToNextField(this);
 	}
 
 

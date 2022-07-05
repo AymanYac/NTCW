@@ -22,7 +22,7 @@ public class Main extends Application {
 		try {
 			Pane root = FXMLLoader.load(getClass().getResource("/scenes/Login_page.fxml"));
 			Scene scene = new Scene(root,400,400);
-			//scene.getStylesheets().add(getClass().getResource("/Styles/Login_page.css").toExternalForm());
+			//scene.getStylesheets().add(getClass().getResource("/styles/Login_page.css").toExternalForm());
 			primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION);
 			primaryStage.initStyle(StageStyle.TRANSPARENT);
 			primaryStage.setScene(scene);

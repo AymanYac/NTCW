@@ -1,0 +1,242 @@
+.customDialog{
+	-fx-background-color:#445469;
+	-fx-background-size:0 0;
+	-fx-border-color:transparent;
+}
+
+.customDialog:header .header-panel {
+  -fx-background-color:#445469;
+}
+
+.customDialog:header .header-panel .label{
+	-fx-background-color:#445469;
+	-fx-font-family:Calibri;
+	-fx-font-weight:bold;
+	-fx-font-size:16px;
+	-fx-text-fill:white;
+	-fx-padding:5 0 0.0 0;
+}
+.button{
+	-fx-background-color:#445469,
+	linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%),
+    linear-gradient(#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
+
+	-fx-font-family:Calibri;
+	-fx-font-weight:Bold;
+	-fx-font-size:16px;
+	-fx-text-fill:white;
+
+	-fx-border-color:white;
+	-fx-border-width:2px;
+
+	-fx-background-radius:5px;
+	-fx-border-radius:5px;
+
+	-fx-background-insets:1px;
+
+	}
+
+.button:focused{
+	-fx-background-color:#445469,
+	linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%),
+    linear-gradient(#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
+
+	-fx-font-family:Calibri;
+	-fx-font-weight:Bold;
+	-fx-font-size:16px;
+	-fx-text-fill:white;
+
+	-fx-border-color:#9BBB5C;
+	-fx-border-width:2px;
+
+	-fx-background-radius:5px;
+	-fx-border-radius:5px;
+
+	-fx-background-insets:1px;
+
+	}
+
+#dropButton{
+    -fx-background-image:url("../pictures/dropValueNoHover.png");
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+    -fx-background-color:transparent,
+    -fx-border-color:transparent;
+    -fx-border-width:0px;
+    -fx-background-radius:0px;
+    -fx-border-radius:0px;
+    -fx-background-insets:30px;
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+    -fx-font-size:8px;
+}
+
+#dropButton:hover {
+    -fx-background-image:url("../pictures/dropValueHover.png");
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+    -fx-border-color:transparent;
+    -fx-border-width:0px;
+    -fx-background-radius:0px;
+    -fx-border-radius:0px;
+    -fx-background-insets:30px;
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+    -fx-font-size:8px;
+}
+
+#editButton{
+    -fx-background-image:url("../pictures/editValueNoHover.png");
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+    -fx-border-color:transparent;
+    -fx-border-width:0px;
+    -fx-background-radius:0px;
+    -fx-border-radius:0px;
+    -fx-background-insets:30px;
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+    -fx-font-size:8px;
+}
+
+#editButton:hover {
+    -fx-background-image:url("../pictures/editValueHover.png");
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+    -fx-border-color:transparent;
+    -fx-border-width:0px;
+    -fx-background-radius:0px;
+    -fx-border-radius:0px;
+    -fx-background-insets:30px;
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: cover, auto;
+    -fx-font-size:8px;
+}
+
+.label{
+	-fx-font-family:Calibri;
+	-fx-font-weight:bold;
+	-fx-font-size:8px;
+	-fx-text-fill:white;
+	-fx-padding:5 0 0.0 0;
+
+	}
+
+#valueTable{
+	-fx-background-color:white;
+	-fx-border-color:transparent;
+
+}
+
+
+
+#valueTable:row-selection .virtual-flow .clipped-container .sheet .table-row-cell:even{
+	-fx-background-color:transparent;
+	-fx-border-color:transparent;
+}
+
+#valueTable:row-selection .virtual-flow .clipped-container .sheet .table-row-cell:odd{
+	-fx-background-color:transparent;
+	-fx-border-color:transparent;
+	-fx-text-fill:white;
+}
+.noheader .column-header-background {
+    -fx-max-height: 0;
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+}
+#valueTable:row-selection .column-header-background .nested-column-header .table-column .label{
+		-fx-background-color:transparent;
+		-fx-border-color:transparent;
+		-fx-text-fill:white;
+}
+
+#valueTable .column-header .label{
+    -fx-alignment:CENTER_LEFT;
+}
+
+#valueTable:row-selection .column-header-background .nested-column-header{
+	-fx-background-color:transparent;
+}
+
+#valueTable:row-selection .column-header-background .nested-column-header .table-column{
+	-fx-background-color:transparent;
+}
+
+#valueTable:row-selection .virtual-flow .clipped-container .sheet .table-row-cell:odd .table-column:odd .text{
+	-fx-border-color:transparent;
+}
+
+.table-column{
+	-fx-border-color:transparent;
+	-fx-font-size:10px;
+	-fx-text-fill:black;
+}
+
+#valueTable .column-header-background .filler{
+	-fx-background-color:transparent;
+}
+
+#valueTable .column-header-background {
+	-fx-background-color:transparent;
+}
+
+
+#valueTable .scroll-bar .track-background{
+		-fx-background-color:#445469;
+}
+
+#valueTable .scroll-bar .increment-button{
+		-fx-background-color:#445469;
+}
+
+#valueTable .scroll-bar .increment-button .increment-arrow{
+
+	-fx-background-color:white;
+}
+
+#valueTable .scroll-bar .decrement-button{
+		-fx-background-color:#445469;
+}
+
+#valueTable .scroll-bar .decrement-button .decrement-arrow{
+	-fx-background-color:white;
+}
+
+#valueTable .scroll-bar:vertical .track{
+
+	-fx-background-color:linear-gradient(from 0% 0% to 100% 0%,#ACB9CA 0%, #D6DCE4 40%,#D6DCE4 60%, #ACB9CA 100%);
+}
+
+#valueTable .scroll-bar:horizontal .track{
+
+	-fx-background-color:linear-gradient(from 0% 0% to 0% 100%,#ACB9CA 0%, #D6DCE4 40%,#D6DCE4 60%, #ACB9CA 100%);
+}
+
+
+#valueTable .scroll-bar:vertical .thumb{
+	-fx-background-color:#445469,
+	linear-gradient(from 0% 0% to 100% 0%,#323E4E 0%, #323E4E 20%, #445469 100%),
+    linear-gradient(from 0% 0% to 100% 0%,#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
+
+}
+
+#valueTable .scroll-bar:horizontal .thumb{
+	-fx-background-color:#445469,
+	linear-gradient(from 0% 0% to 0% 100%,#323E4E 0%, #323E4E 20%, #445469 100%),
+    linear-gradient(from 0% 0% to 0% 100%,#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
+
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-background-color: #1EA185;
+    }
+
+#valueTable:row-selection .column-header-background .show-hide-columns-button{
+	-fx-max-width:  0;
+	-fx-min-width:  0;
+	-fx-pref-width:  0;
+	-fx-padding:  0 0 0 0;
+	-fx-background-insets:  0 0 0 0;
+	visibility: false;
+}
