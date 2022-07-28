@@ -74,7 +74,7 @@
             <Button fx:id="new_project" mnemonicParsing="false" onAction="#create_new_project" prefHeight="30.0" stylesheets="@../styles/ButtonBlue.css" text="Create new project" GridPane.columnIndex="6" GridPane.rowIndex="3" />
             <TableView fx:id="projectlist" onMouseClicked="#project_click" prefHeight="0.0" prefWidth="200.0" stylesheets="@../styles/TableViewBlue.css" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="1" GridPane.rowSpan="2">
               <columns>
-                <TableColumn id="firstco" fx:id="colonne1" prefWidth="49.5" text="Select an active project" />
+                <TableColumn id="leftAlignCol" fx:id="colonne1" prefWidth="49.5" text="Select an active project" />
                 <TableColumn fx:id="colonne2" minWidth="30.0" prefWidth="90.0" text="Active" />
                   <TableColumn fx:id="colonne3" prefWidth="132.5" text="Language" />
                   <TableColumn fx:id="colonne4" prefWidth="35.5" text="# of items" />

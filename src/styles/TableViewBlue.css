@@ -81,9 +81,17 @@
 } 
 
 
-#firstco{
+#leftAlignCol{
 	-fx-border-color:transparent;
 	-fx-alignment: CENTER-LEFT;
+}
+#rightAlignCol{
+	-fx-border-color:transparent;
+	-fx-alignment: CENTER-RIGHT;
+}
+#centerAlignCol{
+	-fx-border-color:transparent;
+	-fx-alignment: CENTER;
 }
 
 
@@ -131,4 +139,16 @@
 
 .menu-bar .container .menu:showing{
     -fx-background-color: #1EA185;
+}
+
+#classPaneCharClassifTable *.increment-button,
+#classPaneCharClassifTable *.decrement-button,
+#classPaneCharClassifTable *.increment-arrow,
+#classPaneCharClassifTable *.decrement-arrow
+{
+    -fx-padding: 0;
+    -fx-shape: "";
+}
+#behaviourBox {
+  -fx-alignment: CENTER;
 }

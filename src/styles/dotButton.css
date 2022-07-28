@@ -1,0 +1,11 @@
+#dotButton{
+    -fx-background-image:url("../pictures/dotButton2.png");
+    -fx-background-repeat:no-repeat;
+    -fx-background-size: contain, contain;
+    -fx-border-color:transparent;
+    -fx-border-width:0px;
+    -fx-background-radius:0px;
+    -fx-border-radius:0px;
+    -fx-background-insets:30px;
+    -fx-font-size:8px;
+}

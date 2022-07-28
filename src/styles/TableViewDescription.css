@@ -124,7 +124,7 @@
 } 
 
 
-#firstco{
+#leftAlignCol{
 	-fx-border-color:transparent;
 	-fx-alignment: CENTER-LEFT;
 }

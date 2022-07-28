@@ -1,5 +1,6 @@
 package transversal.generic;
 
+import javafx.scene.input.MouseEvent;
 import model.GlobalConstants;
 
 import java.awt.*;
@@ -245,4 +246,14 @@ public class PixelUtils {
 		WritableRaster raster = bi.copyData(null);
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
+
+    public static boolean mouse_event_in_bounds(MouseEvent target, double x, double width, double y, double height) {
+		return position_in_bounds(target.getScreenX(),target.getSceneY(),x,width,y,height);
+    }
+	public static boolean position_in_bounds(double targetX,double targetY, double x, double width, double y, double height) {
+		return targetX>=x
+				&& targetX<=x+width
+				&& targetY>=y
+				&& targetY<=y+height;
+	}
 }

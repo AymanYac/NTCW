@@ -146,6 +146,7 @@ public class Char_description {
 	public ArrayList<String> CNAME_CID;
 	public CharPane_CharClassif charPaneController;
 	public RulePane_CharClassif rulePaneController;
+	public ClassPane_CharClassif classPaneController;
 
 	public CharClassifProposer proposer;
 
@@ -396,6 +397,9 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.R)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.R, pressed);
 		}
+		if(keyEvent.getCode().equals(KeyCode.T)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.T, pressed);
+		}
 		if(keyEvent.getCode().equals(KeyCode.P)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.P, pressed);
 		}
@@ -636,6 +640,9 @@ public class Char_description {
 		if(keyEvent.getCode().equals(KeyCode.R)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.R, pressed);
 		}
+		if(keyEvent.getCode().equals(KeyCode.T)) {
+			account.PRESSED_KEYBOARD.put(KeyCode.T, pressed);
+		}
 		if(keyEvent.getCode().equals(KeyCode.P)) {
 			account.PRESSED_KEYBOARD.put(KeyCode.P, pressed);
 		}
@@ -793,6 +800,9 @@ public class Char_description {
 				ruleButton.setSelected(false);
 				load_char_pane();
 			}
+		}
+		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.T)){
+			load_class_pane();
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.R)) {
 			String selectedText = proposer.getUserSelectedText();
@@ -1771,7 +1781,22 @@ public class Char_description {
 		
 		
 	}
+	@SuppressWarnings("static-access")
+	public void load_class_pane() throws IOException {
+		setBottomRegionColumnSpans(true);
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/ClassPane_CharClassif.fxml"));
+		rightAnchorContentGrid = loader.load();
+		rightAnchor.getChildren().setAll(rightAnchorContentGrid);
 
+		rightAnchor.setTopAnchor(rightAnchorContentGrid, 0.0);
+		rightAnchor.setBottomAnchor(rightAnchorContentGrid, 0.0);
+		rightAnchor.setLeftAnchor(rightAnchorContentGrid, 0.0);
+		rightAnchor.setRightAnchor(rightAnchorContentGrid, 0.0);
+
+		classPaneController = loader.getController();
+		classPaneController.setParent(this);
+		refresh_ui_display();
+	}
 	@SuppressWarnings("static-access")
 	public void load_rule_pane() throws IOException, ClassNotFoundException, SQLException {
 		if(!ruleButton.isSelected()) {

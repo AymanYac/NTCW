@@ -1,0 +1,37 @@
+
+.rating > .container{
+	 -fx-spacing: 0px;
+	 -fx-padding : 5px;
+}
+.rating > .container > .button {
+  -fx-min-width : 0;
+  -fx-min-height: 0;
+  -fx-background-image: url("../pictures/unselected-star.png");
+  -fx-background-color: transparent;
+  -fx-background-repeat: no-repeat no-repeat;
+  -fx-background-size: contain;
+  -fx-background-position: center center;
+}
+.rating > .container > .button.strong {
+  -fx-background-image: url("../pictures/selected-star.png");
+}
+
+.fieldbutton {
+	-fx-font-family: Colibri;
+	-fx-background-color:  #D6DCE4;
+	-fx-border-color: #323E4E;
+	-fx-border-width: 2px;
+	-fx-border-insets:  -1px;
+	-fx-background-insets:  0px;
+	-fx-pref-width:  300px;
+}
+
+.fieldbutton:selected {
+	-fx-background-color:  #323E4E;
+	-fx-text-fill:  white;
+}
+
+#behaviourBox {
+  -fx-alignment: CENTER;
+  -fx-padding : 5px;
+}
