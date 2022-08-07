@@ -126,7 +126,7 @@ public class TablePane_CharClassif {
 			@Override
 			public void run() {
 				try{
-					applySortOrder(Parent.DescriptionSortColumns.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()),Parent.DescriptionSortDirs.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()));
+					applySortOrder(Parent.DescriptionSortColumns.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()),Parent.DescriptionSortDirs.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()));
 				}catch(Exception V) {
 					V.printStackTrace(System.err);
 				}
@@ -150,7 +150,7 @@ public class TablePane_CharClassif {
 
 			try{
 				selected_col = CharValuesLoader.active_characteristics.get(
-						FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment())
+						FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId())
 						.stream().map(c->c.getCharacteristic_id())
 						.collect(Collectors.toCollection(ArrayList::new))
 						.indexOf(account.getActiveChar())-1;
@@ -777,14 +777,14 @@ public class TablePane_CharClassif {
 	*/
 	
 	public void nextChar() {
-		if(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+		if(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			return;
 		}
 		selected_col+=1;
 		selectChartAtIndex(selected_col);
 	}
 	public void previousChar() {
-		if(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+		if(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			return;
 		}
 		this.selected_col-=1;
@@ -796,10 +796,10 @@ public class TablePane_CharClassif {
 		clearActiveColumnId();
 		Parent.lastInputValue = null;
 		while(selected_col<0){
-			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
+			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).size();
 		}
-		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
-		ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(selected_col);
+		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).size());
+		ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).get(selected_col);
 		for( TableColumn col:this.charDescriptionTable.getColumns()) {
 			col.setVisible(
 					( (!hiddenColumns.contains(col.getText()) && !hiddenColumns.contains(col.getId())) || (col.getId()!=null && col.getId().equals(activeChar.getCharacteristic_id())))
@@ -1214,7 +1214,7 @@ public class TablePane_CharClassif {
 				@Override
 				public void handle(ActionEvent event) {
 					if(column.getId()!=null && column.getId().equals("active-column")){
-						ClassCaracteristic missingID = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream()
+						ClassCaracteristic missingID = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getSegmentId()).stream()
 								.filter(loopCar -> loopCar.getCharacteristic_name().equals(column.getText()) && !charDescriptionTable.getColumns().stream().map(TableColumn::getId).collect(Collectors.toCollection(ArrayList::new))
 										.contains(loopCar.getCharacteristic_id())).findAny().get();
 						column.setId(missingID.getCharacteristic_id());
@@ -1243,11 +1243,11 @@ public class TablePane_CharClassif {
 			});
 
 			hiddenColumns.forEach(hiddenField->{
-				Optional<ClassCaracteristic> charMatch = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream().filter(car -> car.getCharacteristic_id().equals(hiddenField)).findAny();
+				Optional<ClassCaracteristic> charMatch = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getSegmentId()).stream().filter(car -> car.getCharacteristic_id().equals(hiddenField)).findAny();
 				MenuItem elem = new MenuItem(charMatch.isPresent()?charMatch.get().getCharacteristic_name():hiddenField);
 				elem.setOnAction((event)->{
 					if(column.getId()!=null && column.getId().equals("active-column")){
-						ClassCaracteristic missingID = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream()
+						ClassCaracteristic missingID = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getSegmentId()).stream()
 								.filter(loopCar -> loopCar.getCharacteristic_name().equals(column.getText()) && !charDescriptionTable.getColumns().stream().map(TableColumn::getId).collect(Collectors.toCollection(ArrayList::new))
 										.contains(loopCar.getCharacteristic_id())).findAny().get();
 						column.setId(missingID.getCharacteristic_id());
@@ -1284,10 +1284,10 @@ public class TablePane_CharClassif {
 
 	private void distributeWidthMargin(Double delta, HashMap<String, Double> targetList, String exception) {
 		while(selected_col<0){
-			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size();
+			selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).size();
 		}
-		selected_col = Math.floorMod(selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
-		String activeCharID = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).get(selected_col).getCharacteristic_id();
+		selected_col = Math.floorMod(selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).size());
+		String activeCharID = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).get(selected_col).getCharacteristic_id();
 		Double denom = targetList.entrySet().stream().filter(e->(!hiddenColumns.contains(e.getKey()) || activeCharID.equals(e.getKey()))).map(Entry::getValue).mapToDouble(Double::doubleValue).sum();
 		targetList.entrySet().stream().filter(entry->exception == null || !entry.getKey().equals(exception)).forEach(entry->{
 			try{
@@ -1301,7 +1301,7 @@ public class TablePane_CharClassif {
 	private void clearActiveColumnId() {
 		try{
 			charDescriptionTable.getColumns().stream().filter(loopCol -> loopCol.getId()!=null && loopCol.getId().equals("active-column")).findAny().ifPresent(activecol -> {
-				ClassCaracteristic missingID = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).stream()
+				ClassCaracteristic missingID = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getSegmentId()).stream()
 						.filter(loopCar -> loopCar.getCharacteristic_name().equals(activecol.getText()) && !charDescriptionTable.getColumns().stream().map(TableColumn::getId).collect(Collectors.toCollection(ArrayList::new))
 								.contains(loopCar.getCharacteristic_id())).findAny().get();
 				activecol.setId(missingID.getCharacteristic_id());
@@ -1434,7 +1434,7 @@ public class TablePane_CharClassif {
 		this.collapsedColumns.put("Completion Status",0.2);
 		this.collapsedColumns.put("Long Description 1",0.675);
 
-		CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getClassSegment()).forEach(carac->{
+		CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getSegmentId()).forEach(carac->{
 			this.visibleColumns.put(carac.getCharacteristic_id(),0.1);
 			this.collapsedColumns.put(carac.getCharacteristic_id(),0.1);
 			this.hiddenColumns.add(carac.getCharacteristic_id());
@@ -1449,8 +1449,8 @@ public class TablePane_CharClassif {
 
 	public void fireScrollNBUp(Boolean shiftDown) {
 		try {
-			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
-			String activeClass = FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment();
+			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).size());
+			String activeClass = FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId();
 			ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(activeClass).get(active_char_index);
 			int min = (int) Collections.min(charDescriptionTable.getSelectionModel().getSelectedIndices());
 			CharDescriptionRow thisItem = ((CharDescriptionRow) charDescriptionTable.getItems().get(min));
@@ -1507,8 +1507,8 @@ public class TablePane_CharClassif {
 
 	public void fireScrollNBDown(Boolean shiftDown) {
 		try {
-			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).size());
-			String activeClass = FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment();
+			int active_char_index = Math.floorMod(Parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).size());
+			String activeClass = FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId();
 			ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(activeClass).get(active_char_index);
 			int max = (int) Collections.max(charDescriptionTable.getSelectionModel().getSelectedIndices());
 			CharDescriptionRow thisItem = ((CharDescriptionRow) charDescriptionTable.getItems().get(max));
@@ -1573,7 +1573,7 @@ public class TablePane_CharClassif {
 		}
 		CharDescriptionRow SI = charDescriptionTable.getSelectionModel().getSelectedItem();
 		int SC = new Integer(selected_col);
-		refresh_table_with_segment(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment());
+		refresh_table_with_segment(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId());
 
 		if(account.getDescriptionSortColumns().stream().filter(tc->!charDescriptionTable.getColumns().stream().map(c->c.getText()).collect(Collectors.toList()).contains(tc)).findAny().isPresent()){
 			//At least a sorting column is no longer available, do not restore order
@@ -1596,15 +1596,15 @@ public class TablePane_CharClassif {
 
 	private void saveSortOrder() {
 		account.getDescriptionSortColumns().clear();
-		Parent.DescriptionSortColumns.put(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment(), new ArrayList<String>());
+		Parent.DescriptionSortColumns.put(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId(), new ArrayList<String>());
 		account.getDescriptionSortDirs().clear();
-		Parent.DescriptionSortDirs.put(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment(), new ArrayList<String>());
+		Parent.DescriptionSortDirs.put(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId(), new ArrayList<String>());
 
 		for (TableColumn<CharDescriptionRow, ?> c : charDescriptionTable.getSortOrder()) {
 			account.getDescriptionSortColumns().add(c.getText());
-			Parent.DescriptionSortColumns.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).add(c.getText());
+			Parent.DescriptionSortColumns.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).add(c.getText());
 			account.getDescriptionSortDirs().add(c.getSortType().toString());
-			Parent.DescriptionSortDirs.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getClassSegment()).add(c.getSortType().toString());
+			Parent.DescriptionSortDirs.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).add(c.getSortType().toString());
 		}
 
 

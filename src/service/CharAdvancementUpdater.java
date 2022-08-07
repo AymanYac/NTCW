@@ -66,7 +66,7 @@ public class CharAdvancementUpdater {
 			rs.close();
 
 			try{
-				if (GlobalConstants.DESCRIPTION_RESTORE_PERSISTED_ITEM && !FxUtilTest.getComboBoxValue(parent.classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+				if (GlobalConstants.DESCRIPTION_RESTORE_PERSISTED_ITEM && !FxUtilTest.getComboBoxValue(parent.classCombo).getSegmentId().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 					CharDescriptionRow row = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
 					int selected_col = Math.floorMod(parent.tableController.selected_col, CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
 					ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).get(selected_col);

@@ -1947,10 +1947,10 @@ public class CharDescriptionExportServices {
 					cell.setCellValue(GlobalConstants.TOOL_VERSION);
 					break;
 				case 6:
-					cell.setCellValue(FxUtilTest.getComboBoxValue(parent.classCombo).getClassCode());
+					cell.setCellValue(FxUtilTest.getComboBoxValue(parent.classCombo).getClassNumber());
 					break;
 				case 7:
-					cell.setCellValue(FxUtilTest.getComboBoxValue(parent.classCombo).getclassName());
+					cell.setCellValue(FxUtilTest.getComboBoxValue(parent.classCombo).getClassName());
 					break;
 			}
 		});

@@ -682,7 +682,7 @@ public class ExternalSearchServices {
     }
 
     private static String get_lien_article_carac() {
-        String segmentID = FxUtilTest.getComboBoxValue(parent.classCombo).getClassSegment();
+        String segmentID = FxUtilTest.getComboBoxValue(parent.classCombo).getSegmentId();
         int active_char_index = Math.floorMod(parent.tableController.selected_col,CharValuesLoader.active_characteristics.get(segmentID).size());
         ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(segmentID).get(active_char_index);
         CharDescriptionRow item = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();

@@ -30,9 +30,8 @@ import java.util.stream.Collectors;
 
 public class ClassComboDraftController {
     private ArrayList<ClassSegment> elemList = new ArrayList<ClassSegment>();
+    @FXML ComboBox<ClassSegment> classCombo = new ComboBox<>();
     private AutoCompletionBinding<ClassSegment> binding;
-
-    @FXML ComboBox<ClassSegment> field = new ComboBox<>();
     private ClassSegment latestValue;
     private ListView autoCompleteView;
     private ListView comboListView;
@@ -41,8 +40,8 @@ public class ClassComboDraftController {
     @FXML void initialize(){
         try {
             loadClasses();
-            field.getItems().addAll(elemList);
-            field.setEditable(true);
+            classCombo.getItems().addAll(elemList);
+            classCombo.setEditable(true);
             Callback<AutoCompletionBinding.ISuggestionRequest, Collection<ClassSegment>> suggestionProvider = new Callback<AutoCompletionBinding.ISuggestionRequest, Collection<ClassSegment>>() {
                 @Override
                 public Collection<ClassSegment> call(AutoCompletionBinding.ISuggestionRequest param) {
@@ -64,9 +63,9 @@ public class ClassComboDraftController {
                     }
                 }
             };
-            AutoCompletionBinding<ClassSegment> completion = TextFields.bindAutoCompletion(field.getEditor(), suggestionProvider);
+            AutoCompletionBinding<ClassSegment> completion = TextFields.bindAutoCompletion(classCombo.getEditor(), suggestionProvider);
             completion.setDelay(0);
-            field.setConverter(new StringConverter<ClassSegment>() {
+            classCombo.setConverter(new StringConverter<ClassSegment>() {
                 @Override
                 public String toString(ClassSegment object) {
                     if (object == null){
@@ -77,45 +76,44 @@ public class ClassComboDraftController {
                 }
                 @Override
                 public ClassSegment fromString(String string) {
-                    return field.getItems().stream().filter(classe ->
+                    return classCombo.getItems().stream().filter(classe ->
                             classe.getClassName().equalsIgnoreCase(string)||
                             classe.toString().equalsIgnoreCase(string)||
                             classe.getClassNumber().equalsIgnoreCase(string)||
                             classe.getSegmentId().equalsIgnoreCase(string)).findFirst().orElse(latestValue);
                 }
             });
-            field.valueProperty().addListener(new ChangeListener<ClassSegment>() {
+            classCombo.valueProperty().addListener(new ChangeListener<ClassSegment>() {
                 @Override
                 public void changed(ObservableValue<? extends ClassSegment> observable, ClassSegment oldValue, ClassSegment newValue) {
                     if(newValue!=null){
-                        System.out.println("new value "+newValue.getClassName());
-                        comboListView = ((ComboBoxListViewSkin) field.getSkin()).getListView();
-                        comboListView.getFocusModel().focus(field.getItems().indexOf(newValue));
+                        comboListView = ((ComboBoxListViewSkin) classCombo.getSkin()).getListView();
+                        comboListView.getFocusModel().focus(classCombo.getItems().indexOf(newValue));
                         comboListView.scrollTo(newValue);
                         latestValue=newValue;
                     }
                 }
             });
-            field.setOnShown(e->{
-                ComboBoxListViewSkin<?> skin = (ComboBoxListViewSkin<?>) field.getSkin();
+            classCombo.setOnShown(e->{
+                ComboBoxListViewSkin<?> skin = (ComboBoxListViewSkin<?>) classCombo.getSkin();
                 ListView<?> list = (ListView<?>) skin.getPopupContent();
                 list.addEventFilter( KeyEvent.KEY_PRESSED, keyEvent -> {
                     if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.A ) {
-                        field.getEditor().selectAll();
+                        classCombo.getEditor().selectAll();
                     }
                 });
                 //list.setVisible(false);
                 Event.fireEvent(list,new KeyEvent(KeyEvent.KEY_PRESSED,null,null,KeyCode.ESCAPE,false,false,false,false));
                 droppingDown=true;
                 completion.setUserInput("");
-                field.setOnShown(e2->{
+                classCombo.setOnShown(e2->{
                     //list.setVisible(false);
                     Event.fireEvent(list,new KeyEvent(KeyEvent.KEY_PRESSED,null,null,KeyCode.ESCAPE,false,false,false,false));
                     droppingDown=true;
                     completion.setUserInput("");
                 });
             });
-            field.addEventFilter(KeyEvent.KEY_PRESSED,event -> {
+            classCombo.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                 if(event.isControlDown() || event.isShiftDown()){
                     return;
                 }
@@ -144,7 +142,7 @@ public class ClassComboDraftController {
                         event.consume();
                     }
                 }else if(event.getCode().equals(KeyCode.A) && event.isControlDown()){
-                    field.getEditor().selectAll();
+                    classCombo.getEditor().selectAll();
                     event.consume();
                 }
             });
@@ -153,6 +151,7 @@ public class ClassComboDraftController {
                 public void handle(WindowEvent event) {
                     final AutoCompletePopup source = (AutoCompletePopup) event.getSource();
                     autoCompleteView = (ListView) (source.getSkin().getNode());
+                    autoCompleteView.getStylesheets().add(ClassComboDraftController.class.getResource("/styles/ComboBoxBlue.css").toExternalForm());
                     autoCompleteView.setCellFactory(lv -> {
                         ListCell<?> cell = new ListCell<Object>() {
                             @Override
@@ -164,7 +163,7 @@ public class ClassComboDraftController {
                                     setText(item.toString());
                                 }
                                 setOnMouseClicked(event->{
-                                    field.setValue((ClassSegment) item);
+                                    classCombo.setValue((ClassSegment) item);
                                 });
                             }
                         };
@@ -184,10 +183,10 @@ public class ClassComboDraftController {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        if(field.getValue()!=null && droppingDown){
+                        if(classCombo.getValue()!=null && droppingDown){
                             droppingDown=false;
                             autoCompleteView.getSelectionModel().clearSelection();
-                            autoCompleteView.getSelectionModel().select(field.getValue());
+                            autoCompleteView.getSelectionModel().select(classCombo.getValue());
                         }
                         autoCompleteView.scrollTo(autoCompleteView.getSelectionModel().getSelectedIndex());
                     }

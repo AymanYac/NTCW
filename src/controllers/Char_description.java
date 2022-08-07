@@ -1,6 +1,8 @@
 package controllers;
 
+import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 import controllers.paneControllers.*;
+import impl.org.controlsfx.skin.AutoCompletePopup;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -25,11 +27,16 @@ import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextFlow;
+import javafx.stage.WindowEvent;
+import javafx.util.Callback;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import model.*;
 import org.apache.commons.lang3.StringUtils;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 import org.json.simple.parser.ParseException;
+import scenes.paneScenes.ClassComboDraftController;
 import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.*;
@@ -50,6 +57,17 @@ public class Char_description {
 	public boolean CHANGING_CLASS = false;
     public TextField urlLink;
 	public SimpleBooleanProperty visibleRight = new SimpleBooleanProperty();
+    public Menu projectMenu;
+	public Menu homeMenu;
+	public Menu dataMenu;
+	public Menu automationMenu;
+	public Menu navigationMenu;
+	public Menu settingMenu;
+	public ToolBar homeToolbar;
+	public ToolBar dataToolbar;
+	public ToolBar automationToolbar;
+	public ToolBar navigationToolbar;
+	public ToolBar settingToolbar;
 
 
 	@FXML MenuBar menubar;
@@ -58,9 +76,14 @@ public class Char_description {
 	@FXML public Menu counterRemaining;
 	@FXML public Menu counterDaily;
 	@FXML public Menu counterSelection;
-	@FXML public ComboBox<CharDescClassComboRow> classCombo;
+	@FXML public ComboBox<ClassSegment> classCombo;
+	private ClassSegment latestClassComboValue;
+	private ListView classComboAutoCompleteView;
+	private ListView classComboListView;
+	private boolean droppingDown = false;
+
 	@FXML GridPane grid;
-	
+
 	@FXML public AnchorPane leftAnchor;
 	@FXML public AnchorPane rightAnchor;
 	@FXML public Label aidLabel;
@@ -71,7 +94,7 @@ public class Char_description {
 	public AutoCompleteBox_CharClassification classification;
 	@FXML public TextField classification_style;
 	@FXML public TextField search_text;
-	
+
 	@FXML ToolBar toolBar;
 	@FXML Button paneToggle;
 	@FXML Button classDDButton;
@@ -90,7 +113,7 @@ public class Char_description {
 	@FXML Button prop3;
 	@FXML Button prop4;
 	@FXML Button prop5;
-	
+
 	@FXML public TextField max_field_uom;
 	@FXML public TextField max_field;
 	@FXML public TextField min_field_uom;
@@ -112,8 +135,8 @@ public class Char_description {
 	@FXML Label value_label;
 	@FXML Label note_label;
 	@FXML Label custom_label_value;
-	
-	
+
+
 	public UserAccount account;
 	public HashMap<String,ArrayList<String>> DescriptionSortColumns = new HashMap<String,ArrayList<String>>();
 	public HashMap<String,ArrayList<String>> DescriptionSortDirs = new HashMap<String,ArrayList<String>>();
@@ -124,7 +147,7 @@ public class Char_description {
 	public String user_language;
 	public String data_language;
 
-	
+
 	public TablePane_CharClassif tableController;
 
 
@@ -132,9 +155,9 @@ public class Char_description {
 
 	private GridPane rightAnchorImageGrid;
 	private GridPane rightAnchorContentGrid;
-	
+
 	public ArrayList<Button> propButtons;
-	
+
 
 
 	public String lastRightPane="";
@@ -170,10 +193,10 @@ public class Char_description {
 	@FXML void previousBlank() {
 		}
 	@FXML void firstBlank() {
-	
+
 	}
 	@FXML void lastBlank() {
-	
+
 	}
 
 	@SuppressWarnings("static-access")
@@ -185,13 +208,13 @@ public class Char_description {
 			setBottomRegionColumnSpans(true);
 		}
 	}
-	
+
 	@FXML void classDD() {
 	}
-	
+
 	@SuppressWarnings({ "resource", "unused" })
 	@FXML void export() throws SQLException, ClassNotFoundException {
-		
+
 		try {
 			Optional<ArrayList<Boolean>> choice = DescriptionExportExcelSheets.choicePopUp();
 			if(choice.isPresent()){
@@ -202,7 +225,7 @@ public class Char_description {
 			e.printStackTrace(System.err);
     		ConfirmationDialog.show("File saving failed", "Results could not be saved.\nMake sure you have the rights to create files in this folder and that the file is not open by another application", "OK");
 		}
-		
+
 	}
 	@FXML void copyClientNumber2ClipBoard(){
 		final Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -225,15 +248,102 @@ public class Char_description {
 		sd_translated.setText("");
 		ld.setText("");
 		ld_translated.setText("");
-		
+
+		initRibbon();
 		toolBarButtonListener();
 		initializePropButtons();
 
 
 	}
-	
-	
-	
+
+	private void initRibbon() {
+		grid.lookupAll("ToolBar").forEach(tb->{
+			tb.setVisible(false);
+		});
+		homeToolbar.setVisible(true);
+		grid.lookupAll("#menuHeader").forEach(lt->{
+			lt.getStyleClass().remove("activeMenu");
+		});
+		homeMenu.getStyleClass().add("activeMenu");
+
+		Label homeLabel = new Label("Home");
+		homeMenu.setGraphic(homeLabel);
+		homeLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				grid.lookupAll("ToolBar").forEach(tb->{
+					tb.setVisible(false);
+				});
+				homeToolbar.setVisible(true);
+				grid.lookupAll("#menuHeader").forEach(lt->{
+					lt.getStyleClass().remove("activeMenu");
+				});
+				homeMenu.getStyleClass().add("activeMenu");
+			}
+		});
+		Label dataLabel = new Label("Data Enhancement");
+		dataMenu.setGraphic(dataLabel);
+		dataLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				grid.lookupAll("ToolBar").forEach(tb->{
+					tb.setVisible(false);
+				});
+				dataToolbar.setVisible(true);
+				grid.lookupAll("#menuHeader").forEach(lt->{
+					lt.getStyleClass().remove("activeMenu");
+				});
+				dataMenu.getStyleClass().add("activeMenu");
+			}
+		});
+		Label automationLabel = new Label("Automation");
+		automationMenu.setGraphic(automationLabel);
+		automationLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				grid.lookupAll("ToolBar").forEach(tb->{
+					tb.setVisible(false);
+				});
+				automationToolbar.setVisible(true);
+				grid.lookupAll("#menuHeader").forEach(lt->{
+					lt.getStyleClass().remove("activeMenu");
+				});
+				automationMenu.getStyleClass().add("activeMenu");
+			}
+		});
+		Label navigationLabel = new Label("Display & Navigation");
+		navigationMenu.setGraphic(navigationLabel);
+		navigationLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				grid.lookupAll("ToolBar").forEach(tb->{
+					tb.setVisible(false);
+				});
+				navigationToolbar.setVisible(true);
+				grid.lookupAll("#menuHeader").forEach(lt->{
+					lt.getStyleClass().remove("activeMenu");
+				});
+				navigationMenu.getStyleClass().add("activeMenu");
+			}
+		});
+		Label settingLabel = new Label("Settings");
+		settingMenu.setGraphic(settingLabel);
+		settingLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				grid.lookupAll("ToolBar").forEach(tb->{
+					tb.setVisible(false);
+				});
+				settingToolbar.setVisible(true);
+				grid.lookupAll("#menuHeader").forEach(lt->{
+					lt.getStyleClass().remove("activeMenu");
+				});
+				settingMenu.getStyleClass().add("activeMenu");
+			}
+		});
+	}
+
+
 	private void initializePropButtons() {
 		propButtons = new ArrayList<Button> (GlobalConstants.NUMBER_OF_MANUAL_PROPOSITIONS_OLD);
 		propButtons.add(prop1);
@@ -299,8 +409,8 @@ public class Char_description {
 			@Override
 			public void handle(MouseEvent event) {
 				CaracteristicValue val = new CaracteristicValue();
-				int active_char_index = Math.floorMod(tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
-				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment())
+				int active_char_index = Math.floorMod(tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).size());
+				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId())
 						.get(active_char_index);
 				val.setParentChar(active_char);
 				assignValueOnSelectedItems(val);
@@ -439,8 +549,8 @@ public class Char_description {
 		}
 
 		if(keyEvent.isControlDown() && keyEvent.getCode().equals(KeyCode.D)){
-			int active_char_index = Math.floorMod(tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
-			String activeClass = FxUtilTest.getComboBoxValue(classCombo).getClassSegment();
+			int active_char_index = Math.floorMod(tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).size());
+			String activeClass = FxUtilTest.getComboBoxValue(classCombo).getSegmentId();
 			ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(activeClass).get(active_char_index);
 			CharDescriptionRow firstSelectedRow = tableController.charDescriptionTable.getItems().get(Collections.min(tableController.charDescriptionTable.getSelectionModel().getSelectedIndices()));
 			CaracteristicValue activeData = firstSelectedRow.getData(activeClass).get(activeChar.getCharacteristic_id());
@@ -570,7 +680,7 @@ public class Char_description {
 			try{
 				int idx = tableController.charDescriptionTable.getSelectionModel().getSelectedIndex();
 				if(TranslationProcessResult!=null) {
-					if(FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+					if(FxUtilTest.getComboBoxValue(classCombo).getSegmentId().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 						CharValuesLoader.updateDefaultCharValue(idx,this);
 					}else {
 						CharValuesLoader.storeItemDatafromScreen(idx,this);
@@ -587,12 +697,12 @@ public class Char_description {
 	}
 	private Boolean CheckForTranslationValidity() {
 		ClassCaracteristic active_char;
-		if(FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+		if(FxUtilTest.getComboBoxValue(classCombo).getSegmentId().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			active_char = CharItemFetcher.defaultCharValues.get(tableController.charDescriptionTable.getSelectionModel().getSelectedIndex()).getKey();
 			 
 		}else {
-			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
-			active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment())
+			int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).size());
+			active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId())
 					.get(active_char_index);
 		}
 		
@@ -937,7 +1047,7 @@ public class Char_description {
 	}
 
 	public void linkUrlToItem(String URL) {
-		if(!FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+		if(!FxUtilTest.getComboBoxValue(classCombo).getSegmentId().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			HashMap<String, CaracteristicValue> map = new HashMap<String, CaracteristicValue>();
 			tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(row->{
 				String itemClass = row.getClass_segment_string().split("&&&")[0];
@@ -976,7 +1086,7 @@ public class Char_description {
 		String selectedRowClass = row.getClass_segment_string().split("&&&")[0];
 		ClassCaracteristic active_char;
 		int active_char_index;
-		if(FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+		if(FxUtilTest.getComboBoxValue(classCombo).getSegmentId().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			active_char_index = 0;
 			active_char = CharItemFetcher.defaultCharValues.get(tableController.charDescriptionTable.getSelectionModel().getSelectedIndex()).getKey();
 			 
@@ -1376,7 +1486,7 @@ public class Char_description {
 		
 		Tools.decorate_menubar(menubar,account);
 		decorate_menubar_with_desc_specific_menus();
-		decorate_class_combobox(true);
+		decorate_class_combobox();
 		
 		
 		
@@ -1542,7 +1652,7 @@ public class Char_description {
 		MenuItem clear_unknowns_active_char = new MenuItem("Clear UNKNOWN values (active characteristic)");
 		clear_unknowns_active_char.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				String activeClass = FxUtilTest.getComboBoxValue(classCombo).getClassSegment();
+				String activeClass = FxUtilTest.getComboBoxValue(classCombo).getSegmentId();
 				int selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(activeClass).size());
 				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(activeClass).get(selected_col);
 				CharItemFetcher.allRowItems.forEach(r->r.clearUnknownValues(active_char.getCharacteristic_id()));
@@ -1554,7 +1664,7 @@ public class Char_description {
 		MenuItem mark_as_known_active_char = new MenuItem("Mark blank values as UNKNOWN (active characteristic)");
 		mark_as_known_active_char.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				String activeClass = FxUtilTest.getComboBoxValue(classCombo).getClassSegment();
+				String activeClass = FxUtilTest.getComboBoxValue(classCombo).getSegmentId();
 				int selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(activeClass).size());
 				ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(activeClass).get(selected_col);
 				CharItemFetcher.allRowItems.forEach(r->r.markUnknownClearValues(account,active_char.getCharacteristic_id()));
@@ -1589,7 +1699,7 @@ public class Char_description {
 		launchDedup.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
 				try {
-					DedupLaunchDialog.Settings(Tools.get_project_segments(parent.account).get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()),tableController.Parent);
+					DedupLaunchDialog.Settings(Tools.get_project_segments(parent.account).get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()),tableController.Parent);
 				} catch (SQLException | ClassNotFoundException throwables) {
 					throwables.printStackTrace();
 				}
@@ -1600,10 +1710,39 @@ public class Char_description {
 	}
 
 
-	private void decorate_class_combobox(boolean allowRefreshActiveClass) {
+	private void decorate_class_combobox() throws SQLException, ClassNotFoundException {
+
+		//CONTENT
 		classCombo.getItems().clear();
-		Unidecode unidecode = Unidecode.toAscii();
-		FxUtilTest.autoCompleteComboBoxPlus(classCombo, (typedText, itemToCompare) -> StringUtils.startsWithIgnoreCase(itemToCompare.getClassCode(),typedText) || unidecode.decodeAndTrim(itemToCompare.getclassName()).toLowerCase().contains(unidecode.decodeAndTrim(typedText).toLowerCase()));
+
+		if(account.getUser_desc_classes()!=null) {
+			for(String entry:account.getUser_desc_classes()) {
+				for(String elem:CNAME_CID) {
+					if (elem.startsWith(entry)) {
+						ClassSegment tmp = new ClassSegment();
+						tmp.setSegmentGranularity(Tools.get_project_granularity("ua2ff22e2317c48e8993e295a471b73b9"));
+						tmp.setSegmentId(elem.split("&&&")[0]);
+						tmp.setLevelName(tmp.getSegmentGranularity()-1,elem.split("&&&")[1]);
+						tmp.setLevelNumber(tmp.getSegmentGranularity()-1,elem.split("&&&")[2]);
+						classCombo.getItems().add(tmp);
+						if(elem.split("&&&")[0].equals(account.getUser_desc_class())) {
+							classCombo.getSelectionModel().select(tmp);
+							classCombo.setValue(tmp);
+						}
+					}
+				}
+				
+				
+			}
+		}
+
+		classCombo.getItems().sort(new Comparator<ClassSegment>() {
+			@Override
+			public int compare(ClassSegment o1, ClassSegment o2) {
+				return o1.getClassNumber().compareTo(o2.getClassNumber());
+			}
+		});
+		//Behavior
 		classCombo.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -1618,100 +1757,165 @@ public class Char_description {
 			}
 		});
 
-		classCombo.setConverter(new StringConverter<CharDescClassComboRow>() {
-
+		classCombo.setEditable(true);
+		Callback<AutoCompletionBinding.ISuggestionRequest, Collection<ClassSegment>> suggestionProvider = new Callback<AutoCompletionBinding.ISuggestionRequest, Collection<ClassSegment>>() {
 			@Override
-			public String toString(CharDescClassComboRow object) {
-				if (object == null) return null;
-				return object.toString();
-			}
-
-			@Override
-			public CharDescClassComboRow fromString(String string) {
-				Optional<CharDescClassComboRow> match = classCombo.getItems().stream().filter(e -> e.toString().equals(string)).findAny();
-				if(match.isPresent()){
-
-					return match.get();
-				}
-
-				return classCombo.getItems().get(0);
-			}
-		});
-		if(account.getUser_desc_classes()!=null) {
-			for(String entry:account.getUser_desc_classes()) {
-				for(String elem:CNAME_CID) {
-					if (elem.startsWith(entry)) {
-						CharDescClassComboRow tmp = new CharDescClassComboRow(elem.split("&&&")[0],elem.split("&&&")[1],elem.split("&&&")[2]);
-						classCombo.getItems().add(tmp);
-						if(allowRefreshActiveClass && elem.split("&&&")[0].equals(account.getUser_desc_class())) {
-							classCombo.getSelectionModel().select(tmp);
-							classCombo.setValue(tmp);
-						}
-					}
-				}
-				
-				
-			}
-		}else {
-			
-		}
-		
-		CharDescClassComboRow tmp = new CharDescClassComboRow(GlobalConstants.DEFAULT_CHARS_CLASS,GlobalConstants.DEFAULT_CHARS_CLASS,GlobalConstants.DEFAULT_CHARS_CLASS);
-		classCombo.getItems().add(tmp);
-		
-		classCombo.getItems().sort(new Comparator<CharDescClassComboRow>(){
-
-			@Override
-			public int compare(CharDescClassComboRow o1, CharDescClassComboRow o2) {
-				// TODO Auto-generated method stub
-				return o1.getClassCode().compareTo( o2.getClassCode());
-			}
-			
-		});
-		classCombo.setOnHidden(new EventHandler<Event>() {
-			@Override
-			public void handle(Event event) {
-				CharDescClassComboRow newValue = FxUtilTest.getComboBoxValue(classCombo);
-				decorate_class_combobox(false);
-				classCombo.setValue(newValue);
-				//tableController.refresh_table_with_segment(newValue.getClassSegment());
-				KeyEvent press = new KeyEvent(classCombo, classCombo, KeyEvent.KEY_RELEASED, "", "", KeyCode.ENTER, false, false, false, false);
-				classCombo.getEditor().fireEvent(press);
-			}
-		});
-		classCombo.setOnKeyReleased(new EventHandler<KeyEvent>() {
-			@Override
-			public void handle(KeyEvent event) {
-				if(event.getCode().equals(KeyCode.ENTER)){
-					CharDescClassComboRow comboValue = FxUtilTest.getComboBoxValue(classCombo);
-					if(comboValue!=null){
-						try {
-							tableController.refresh_table_with_segment(FxUtilTest.getComboBoxValue(classCombo).getClassSegment());
-						} catch (ClassNotFoundException | SQLException e) {
-							e.printStackTrace();
-						}
-					}
+			public Collection<ClassSegment> call(AutoCompletionBinding.ISuggestionRequest param) {
+				String input = param.getUserText();
+				Unidecode unidec = Unidecode.toAscii();
+				ArrayList<ClassSegment> ret = classCombo.getItems().stream().filter(elem -> unidec.decodeTrimLowerCase(elem.toString()).contains(unidec.decodeTrimLowerCase(input)))
+						.sorted(new Comparator<ClassSegment>() {
+							@Override
+							public int compare(ClassSegment o1, ClassSegment o2) {
+								return o1.toString().compareTo(o2.toString())
+										+ (o1.toString().startsWith(input) ? -100 : 0)
+										+ (o2.toString().startsWith(input) ? +100 : 0);
+							}
+						}).collect(Collectors.toCollection(ArrayList::new));
+				if(ret.size()<2){
+					return null;
+				}else{
+					return ret;
 				}
 			}
-		});
-		/*classCombo.valueProperty().addListener(new ChangeListener<CharDescClassComboRow>() {
+		};
+		AutoCompletionBinding<ClassSegment> completion = TextFields.bindAutoCompletion(classCombo.getEditor(), suggestionProvider);
+		completion.setDelay(0);
+		classCombo.setConverter(new StringConverter<ClassSegment>() {
 			@Override
-			public void changed(ObservableValue<? extends CharDescClassComboRow> observable, CharDescClassComboRow oldValue, CharDescClassComboRow newValue) {
-				if(classCombo.isShowing()){
-					return;
+			public String toString(ClassSegment object) {
+				if (object == null){
+					return null;
+				} else {
+					return object.toString();
 				}
+			}
+			@Override
+			public ClassSegment fromString(String string) {
+				return classCombo.getItems().stream().filter(classe ->
+						classe.getClassName().equalsIgnoreCase(string)||
+								classe.toString().equalsIgnoreCase(string)||
+								classe.getClassNumber().equalsIgnoreCase(string)||
+								classe.getSegmentId().equalsIgnoreCase(string)).findFirst().orElse(latestClassComboValue);
+			}
+		});
+		classCombo.valueProperty().addListener(new ChangeListener<ClassSegment>() {
+			@Override
+			public void changed(ObservableValue<? extends ClassSegment> observable, ClassSegment oldValue, ClassSegment newValue) {
 				if(newValue!=null){
+					classComboListView = ((ComboBoxListViewSkin) classCombo.getSkin()).getListView();
+					classComboListView.getFocusModel().focus(classCombo.getItems().indexOf(newValue));
+					classComboListView.scrollTo(newValue);
+					latestClassComboValue =newValue;
 					try {
-						tableController.refresh_table_with_segment(FxUtilTest.getComboBoxValue(classCombo).getClassSegment());
-					} catch (ClassNotFoundException | SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						tableController.refresh_table_with_segment(newValue.getSegmentId());
+					} catch (ClassNotFoundException | SQLException e) {
+						e.printStackTrace();
 					}
 				}
 			}
-		});*/
+		});
+		classCombo.setOnShown(e->{
+			ComboBoxListViewSkin<?> skin = (ComboBoxListViewSkin<?>) classCombo.getSkin();
+			ListView<?> list = (ListView<?>) skin.getPopupContent();
+			list.addEventFilter( KeyEvent.KEY_PRESSED, keyEvent -> {
+				if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.A ) {
+					classCombo.getEditor().selectAll();
+				}
+			});
+			//list.setVisible(false);
+			javafx.event.Event.fireEvent(list,new KeyEvent(KeyEvent.KEY_PRESSED,null,null,KeyCode.ESCAPE,false,false,false,false));
+			droppingDown=true;
+			completion.setUserInput("");
+			classCombo.setOnShown(e2->{
+				//list.setVisible(false);
+				Event.fireEvent(list,new KeyEvent(KeyEvent.KEY_PRESSED,null,null,KeyCode.ESCAPE,false,false,false,false));
+				droppingDown=true;
+				completion.setUserInput("");
+			});
+		});
+		classCombo.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+			if(event.isControlDown() || event.isShiftDown()){
+				return;
+			}
+			if(event.getCode().equals(KeyCode.DOWN) || event.getCode().equals(KeyCode.UP)){
+				droppingDown=true;
+				completion.setUserInput("");
+			}
+		});
+		completion.prefWidthProperty().bind(classCombo.getEditor().widthProperty());
+		completion.setHideOnEscape(true);
+		completion.getAutoCompletionPopup().addEventFilter(KeyEvent.ANY,event -> {
+			if(event.getCode().equals(KeyCode.UP)){
+				final AutoCompletePopup source = (AutoCompletePopup) event.getSource();
+				ListView node = (ListView) (source.getSkin().getNode());
+				if(node.getSelectionModel().isSelected(0)){
+					node.getSelectionModel().clearAndSelect(node.getItems().size()-1);
+					node.scrollTo(node.getItems().size()-1);
+					event.consume();
+				}
+			}else if(event.getCode().equals(KeyCode.DOWN)) {
+				final AutoCompletePopup source = (AutoCompletePopup) event.getSource();
+				ListView node = (ListView) (source.getSkin().getNode());
+				if (node.getSelectionModel().isSelected(node.getItems().size() - 1)) {
+					node.getSelectionModel().clearAndSelect(0);
+					node.scrollTo(0);
+					event.consume();
+				}
+			}else if(event.getCode().equals(KeyCode.A) && event.isControlDown()){
+				classCombo.getEditor().selectAll();
+				event.consume();
+			}
+		});
+		completion.getAutoCompletionPopup().setOnShowing(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent event) {
+				final AutoCompletePopup source = (AutoCompletePopup) event.getSource();
+				classComboAutoCompleteView = (ListView) (source.getSkin().getNode());
+				classComboAutoCompleteView.getStylesheets().add(ClassComboDraftController.class.getResource("/styles/ComboBoxBlue.css").toExternalForm());
+				classComboAutoCompleteView.setCellFactory(lv -> {
+					ListCell<?> cell = new ListCell<Object>() {
+						@Override
+						public void updateItem(Object item, boolean empty) {
+							super.updateItem(item, empty);
+							if (empty) {
+								setText(null);
+							} else {
+								setText(item.toString());
+							}
+							setOnMouseClicked(event->{
+								classCombo.setValue((ClassSegment) item);
+							});
+						}
+					};
+					cell.hoverProperty().addListener((obs, wasHovered, isNowHovered) -> {
+						if (isNowHovered && ! cell.isEmpty()) {
+							classComboAutoCompleteView.getSelectionModel().clearAndSelect(cell.getIndex());
+						} else {
+							//offHover
+						}
+					});
 
-		
+					return cell ;
+				});
+			}
+		});
+		completion.getAutoCompletionPopup().setOnShown(e->{
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					if(classCombo.getValue()!=null && droppingDown){
+						droppingDown=false;
+						classComboAutoCompleteView.getSelectionModel().clearSelection();
+						classComboAutoCompleteView.getSelectionModel().select(classCombo.getValue());
+					}
+					classComboAutoCompleteView.scrollTo(classComboAutoCompleteView.getSelectionModel().getSelectedIndex());
+				}
+			});
+
+		});
+
+
 	}
 	@SuppressWarnings("static-access")
 	private void load_table_pane() throws IOException, ClassNotFoundException, SQLException {
@@ -1739,7 +1943,7 @@ public class Char_description {
 		}*/
 		//tableController.setCollapsedViewColumns(new String[] {"Completion Status","Question Status"});
 		TablePane_CharClassif.loadLastSessionLayout();
-		tableController.refresh_table_with_segment(account.getUser_desc_class(classCombo.getItems().get(1).getClassSegment()));
+		tableController.refresh_table_with_segment(account.getUser_desc_class(classCombo.getItems().get(1).getSegmentId()));
 		tableController.restoreLastSessionLayout();
 		System.gc();
 
@@ -1985,7 +2189,7 @@ public class Char_description {
 			
 			ClassCaracteristic active_char = null;
 			int selected_col = 0;
-			if(!FxUtilTest.getComboBoxValue(classCombo).getClassSegment().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
+			if(!FxUtilTest.getComboBoxValue(classCombo).getSegmentId().equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 				selected_col = Math.floorMod(tableController.selected_col, CharValuesLoader.active_characteristics.get(row.getClass_segment_string().split("&&&")[0]).size());
 				String itemSegementID = row.getClass_segment_string().split("&&&")[0];
 				active_char = CharValuesLoader.active_characteristics.get(itemSegementID).get(selected_col);
@@ -2334,21 +2538,21 @@ public class Char_description {
 	public void assignValueOnSelectedItems(HashMap<String,CaracteristicValue> map) {
 
 		//uiDirectValueRefresh(pattern_value);
-		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
+		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).size());
 		/*List<String> targetItemsIDs = tableController.tableGrid.getSelectionModel().getSelectedItems().stream().map(i->i.getItem_id()).collect(Collectors.toList());
 		CharItemFetcher.allRowItems.parallelStream().filter(e->targetItemsIDs.contains(e.getItem_id()))
 						.forEach(r->{
-							CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getClassSegment(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id(),value);
-							CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id());
+							CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getSegmentId(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index).getCharacteristic_id(),value);
+							CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getSegmentId(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index).getCharacteristic_id());
 
 						});*/
 		tableController.charDescriptionTable.getSelectionModel().getSelectedItems().parallelStream().forEach(r->{
-			CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getClassSegment(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id(),map.get(r.getItem_id()));
-			CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id());
+			CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getSegmentId(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index).getCharacteristic_id(),map.get(r.getItem_id()));
+			CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getSegmentId(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index).getCharacteristic_id());
 		});
 		new HashSet<>(map.values()).forEach(value->{
-			TranslationServices.beAwareOfNewValue(value, CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index));
-			//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index),true);
+			TranslationServices.beAwareOfNewValue(value, CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index));
+			//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index),true);
 		});
 		refresh_ui_display();
 		tableController.charDescriptionTable.refresh();
@@ -2357,21 +2561,21 @@ public class Char_description {
 	public void assignValueOnSelectedItems(CaracteristicValue value) {
 
 		//uiDirectValueRefresh(pattern_value);
-		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
+		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).size());
 		/*List<String> targetItemsIDs = tableController.tableGrid.getSelectionModel().getSelectedItems().stream().map(i->i.getItem_id()).collect(Collectors.toList());
 		CharItemFetcher.allRowItems.parallelStream().filter(e->targetItemsIDs.contains(e.getItem_id()))
 						.forEach(r->{
-							CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getClassSegment(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id(),value);
-							CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id());
+							CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getSegmentId(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index).getCharacteristic_id(),value);
+							CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getSegmentId(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index).getCharacteristic_id());
 							
 						});*/
 		tableController.charDescriptionTable.getSelectionModel().getSelectedItems().parallelStream().forEach(r->{
-			CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getClassSegment(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id(),value.shallowCopy(account));
-			CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getClassSegment(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index).getCharacteristic_id());
+			CharValuesLoader.updateRuntimeDataForItem(r,FxUtilTest.getComboBoxValue(classCombo).getSegmentId(),CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index).getCharacteristic_id(),value.shallowCopy(account));
+			CharDescriptionExportServices.addItemCharDataToPush(r, FxUtilTest.getComboBoxValue(classCombo).getSegmentId(), CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index).getCharacteristic_id());
 		});
 		tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(CharDescriptionRow::reEvaluateCharRules);
-		TranslationServices.beAwareOfNewValue(value, CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index));
-		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).get(active_char_index),true);
+		TranslationServices.beAwareOfNewValue(value, CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index));
+		//TranslationServices.addThisValueToTheCharKnownSets(pattern_value, tableController.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).get(active_char_index),true);
 		
 		refresh_ui_display();
 		tableController.charDescriptionTable.refresh();
@@ -2382,8 +2586,8 @@ public class Char_description {
 		pattern_value.setSource(DataInputMethods.SEMI_CHAR_DESC);
 		pattern_value.setAuthor(account.getUser_id());
 		
-		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
-		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment())
+		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).size());
+		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId())
 		.get(active_char_index);
 		
 		if(active_char.getIsNumeric()) {
@@ -2469,8 +2673,8 @@ public class Char_description {
 	
 	@SuppressWarnings("unused")
 	private void uiDirectValueRefresh(CaracteristicValue pattern_value) {
-		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment()).size());
-		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getClassSegment())
+		int active_char_index = Math.floorMod(this.tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).size());
+		ClassCaracteristic active_char = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId())
 		.get(active_char_index);
 		
 		if(active_char.getIsNumeric()) {

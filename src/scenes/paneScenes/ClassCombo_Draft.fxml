@@ -14,7 +14,7 @@
         <HBox prefWidth="20"/>
     </left>
     <center>
-        <ComboBox fx:id="field" prefWidth="200"/>
+        <ComboBox fx:id="classCombo" stylesheets="@../../styles/ComboBoxBlue.css" prefWidth="200"/>
     </center>
     <right>
         <HBox prefWidth="20"/>
