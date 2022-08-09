@@ -42,6 +42,7 @@ import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.dialog_toolbox.FxUtilTest;
 import service.ExternalSearchServices;
+import transversal.generic.TextUtils;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -265,8 +266,8 @@ public class TablePane_CharClassif {
 						@Override
 						public void run() {
 
-							Parent.sd_translated.setText(translated_sd+"\n\n\n\n\n");
-							Parent.ld_translated.setText(translated_ld+"\n\n\n\n\n");
+							TextUtils.renderDescription(Parent.sd_translated,tmp,Parent.helperAreaLeft.widthProperty());
+							TextUtils.renderDescription(Parent.ld_translated,tmp,Parent.helperAreaRight.widthProperty());
 
 						}
 
@@ -311,9 +312,10 @@ public class TablePane_CharClassif {
 
 				@Override
 				public void run() {
-					
-					Parent.sd_translated.setText(translated_sd+"\n\n\n\n\n");
-					Parent.ld_translated.setText(translated_ld+"\n\n\n\n\n");
+					if(GlobalConstants.ENABLE_TRANSLATION){
+						Parent.sd_translated.getChildren().add(new TextField(translated_sd+"\n\n\n\n\n"));
+						Parent.ld_translated.getChildren().add(new TextField(translated_ld+"\n\n\n\n\n"));
+					}
 					
 				}
 				
@@ -1185,8 +1187,8 @@ public class TablePane_CharClassif {
 		    	
 		    	
 		    	Parent.aidLabel.setText("Article ID: "+tmp.getClient_item_number());
-		    	Parent.sd.setText(tmp.getShort_desc()+"\n\n\n\n\n");
-		    	Parent.ld.setText(tmp.getLong_desc()+"\n\n\n\n\n");
+				TextUtils.renderDescription(Parent.sd,tmp, Parent.helperAreaRight.widthProperty());
+				TextUtils.renderDescription(Parent.ld,tmp, Parent.helperAreaRight.widthProperty());
 		    	item_selection_routine(tmp);
 		    	Parent.value_field.requestFocus();
 		    	Parent.hideAutoCompletePopups();
