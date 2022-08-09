@@ -68,6 +68,8 @@ public class Char_description {
 	public ToolBar automationToolbar;
 	public ToolBar navigationToolbar;
 	public ToolBar settingToolbar;
+	public TextArea helperAreaLeft;
+	public TextArea helperAreaRight;
 
 
 	@FXML MenuBar menubar;
@@ -87,10 +89,10 @@ public class Char_description {
 	@FXML public AnchorPane leftAnchor;
 	@FXML public AnchorPane rightAnchor;
 	@FXML public Label aidLabel;
-	@FXML public TextArea sd;
-	@FXML public TextArea sd_translated;
-	@FXML public TextArea ld;
-	@FXML public TextArea ld_translated;
+	@FXML public TextFlow sd;
+	@FXML public TextFlow sd_translated;
+	@FXML public TextFlow ld;
+	@FXML public TextFlow ld_translated;
 	public AutoCompleteBox_CharClassification classification;
 	@FXML public TextField classification_style;
 	@FXML public TextField search_text;
@@ -244,10 +246,18 @@ public class Char_description {
 				copyClientNumber2ClipBoard();
 			}
 		});
-		sd.setText("");
-		sd_translated.setText("");
-		ld.setText("");
-		ld_translated.setText("");
+		
+		grid.lookupAll("TextFlow").forEach(tf->{
+			if(tf instanceof TextFlow){
+				((TextFlow) tf).getChildren().clear();
+				System.out.println(GridPane.getColumnIndex(tf));
+				if(GridPane.getColumnIndex(tf)==1){
+					((TextFlow) tf).prefWidthProperty().bind(helperAreaLeft.widthProperty());
+				}else{
+					((TextFlow) tf).prefWidthProperty().bind(helperAreaRight.widthProperty());
+				}
+			}
+		});
 
 		initRibbon();
 		toolBarButtonListener();
@@ -1557,50 +1567,28 @@ public class Char_description {
 			}
 		});
 		
-		sd.selectedTextProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if(newValue.length()>0){
-					sd_translated.deselect();
-					ld.deselect();
-					ld_translated.deselect();
-					deselectBrowsers();
+		grid.lookupAll("TextFlow").forEach(TF->{
+			TF.lookupAll("TextField").forEach(tf->{
+				if(tf instanceof TextField){
+					((TextField) tf).selectedTextProperty().addListener(new ChangeListener<String>() {
+						@Override
+						public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+							if(newValue.length()>0){
+								grid.lookupAll("TextFlow").forEach(TFLOOP-> {
+									TFLOOP.lookupAll("TextField").stream().filter(tfloop->tfloop!=tf).forEach(tfloop -> {
+										if(tfloop instanceof TextField){
+											((TextField) tfloop).deselect();
+										}
+									});
+								});
+								deselectBrowsers();
+							}
+						}
+					});
 				}
-			}
+			});
 		});
-		ld.selectedTextProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if(newValue.length()>0){
-					sd_translated.deselect();
-					sd.deselect();
-					ld_translated.deselect();
-					deselectBrowsers();
-				}
-			}
-		});
-		sd_translated.selectedTextProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if(newValue.length()>0){
-					sd.deselect();
-					ld.deselect();
-					ld_translated.deselect();
-					deselectBrowsers();
-				}
-			}
-		});
-		ld_translated.selectedTextProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if(newValue.length()>0){
-					sd_translated.deselect();
-					sd.deselect();
-					ld.deselect();
-					deselectBrowsers();
-				}
-			}
-		});
+
 	}
 
 	private void deselectBrowsers() {

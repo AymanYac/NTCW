@@ -11,10 +11,10 @@
     -fx-font-weight: bold;
 }
 .greenText{
-    -fx-fill: #1EA185;
+    -fx-text-fill: #1EA185;
 }
 .greyText{
-    -fx-fill: #737572;
+    -fx-text-fill: #737572;
 }
 .italicText{
     -fx-font-style: italic;

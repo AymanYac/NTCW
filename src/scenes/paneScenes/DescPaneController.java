@@ -19,6 +19,9 @@ import javafx.scene.text.*;
 import javafx.util.Callback;
 import model.GlobalConstants;
 import org.fxmisc.richtext.StyleClassedTextArea;
+import model.DescriptionDisplayElement;
+import model.DescriptionDataElement;
+import transversal.generic.TextUtils;
 
 import java.util.ArrayList;
 import java.util.stream.IntStream;
@@ -45,24 +48,24 @@ public class DescPaneController {
 
     @FXML BorderPane mainBorderPane;
     @FXML BorderPane titleBar;
-    @FXML TableView<fieldDS> fieldTable;
-    @FXML TableView<elemDS> elementTable;
+    @FXML TableView<DescriptionDataElement> fieldTable;
+    @FXML TableView<DescriptionDisplayElement> elementTable;
 
     double r = 10;
 
     @FXML void initialize(){
 
         setElemsColumns();
-        ArrayList<elemDS> elems = new ArrayList<>();
-        elems.add(new elemDS("Description FR"));
-        elems.add(new elemDS("Description IT"));
-        elems.add(new elemDS("Description EN"));
-        elems.add(new elemDS("PO FR"));
-        elems.add(new elemDS("PO IT"));
-        elems.add(new elemDS("PO EN"));
-        elementTable.getItems().addListener(new ListChangeListener<elemDS>() {
+        ArrayList<DescriptionDisplayElement> elems = new ArrayList<>();
+        elems.add(new DescriptionDisplayElement("Description FR"));
+        elems.add(new DescriptionDisplayElement("Description IT"));
+        elems.add(new DescriptionDisplayElement("Description EN"));
+        elems.add(new DescriptionDisplayElement("PO FR"));
+        elems.add(new DescriptionDisplayElement("PO IT"));
+        elems.add(new DescriptionDisplayElement("PO EN"));
+        elementTable.getItems().addListener(new ListChangeListener<DescriptionDisplayElement>() {
             @Override
-            public void onChanged(Change<? extends elemDS> c) {
+            public void onChanged(Change<? extends DescriptionDisplayElement> c) {
                 elementTable.getItems().forEach(item->item.position.set(elementTable.getItems().indexOf(item)));
                 refresh_preview();
             }
@@ -70,22 +73,22 @@ public class DescPaneController {
         //elementTable.getItems().setAll(elems);
 
         setFieldsColumns();
-        ArrayList<fieldDS> fields = new ArrayList<>();
-        fields.add(new fieldDS("Article ID","00000180199"));
-        fields.add(new fieldDS("INTERNAL NUMBER","ABRA0001"));
-        fields.add(new fieldDS("Description FR","TRANSFORMATEUR TRIPHASE 18 KVA"));
-        fields.add(new fieldDS("Description IT","TRASFORMATORE TRIFASE 18 KVA"));
-        fields.add(new fieldDS("Description EN","THREE PHASE TRANSFORMER 18 KVA"));
-        fields.add(new fieldDS("PO FR","TRANSFO. MONOPHASE NORME EN60742 SIMPLE ECRAN SECONDAIRE"));
-        fields.add(new fieldDS("PO IT","TR.2500VA V.230-400/110-0-110|Completo di schermo elettrostatico"));
-        fields.add(new fieldDS("PO EN","TRANSFO. SINGLE-PHASE EN60742 SEC.230V 250V A PRIM.380"));
-        fields.add(new fieldDS("PLM Concatenation","Tension = 400 V | Type du raccordement = Vis | Hauteur d'encombrement = 2M"));
-        fields.add(new fieldDS("PLM Manufacturer info","SIEMENS 3SB3400-3S"));
-        fields.add(new fieldDS("Vendor information","SIEMENS SAS : 3SB3400-3S\n"));
-        fields.add(new fieldDS("Material group","Repuestos mantenimiento"));
-        fields.add(new fieldDS("Sourcing Family","Ceco almacén efectos y repuestos"));
-        fields.add(new fieldDS("SSR","AETNA GROUP 0001354366"));
-        fields.add(new fieldDS("Données de base","Type de composant : Mecanique | Fabriquant impose : oui | Ref 0001354366"));
+        ArrayList<DescriptionDataElement> fields = new ArrayList<>();
+        fields.add(new DescriptionDataElement("Article ID","00000180199"));
+        fields.add(new DescriptionDataElement("INTERNAL NUMBER","ABRA0001"));
+        fields.add(new DescriptionDataElement("Description FR","TRANSFORMATEUR TRIPHASE 18 KVA"));
+        fields.add(new DescriptionDataElement("Description IT","TRASFORMATORE TRIFASE 18 KVA"));
+        fields.add(new DescriptionDataElement("Description EN","THREE PHASE TRANSFORMER 18 KVA"));
+        fields.add(new DescriptionDataElement("PO FR","TRANSFO. MONOPHASE NORME EN60742 SIMPLE ECRAN SECONDAIRE"));
+        fields.add(new DescriptionDataElement("PO IT","TR.2500VA V.230-400/110-0-110|Completo di schermo elettrostatico"));
+        fields.add(new DescriptionDataElement("PO EN","TRANSFO. SINGLE-PHASE EN60742 SEC.230V 250V A PRIM.380"));
+        fields.add(new DescriptionDataElement("PLM Concatenation","Tension = 400 V | Type du raccordement = Vis | Hauteur d'encombrement = 2M"));
+        fields.add(new DescriptionDataElement("PLM Manufacturer info","SIEMENS 3SB3400-3S"));
+        fields.add(new DescriptionDataElement("Vendor information","SIEMENS SAS : 3SB3400-3S\n"));
+        fields.add(new DescriptionDataElement("Material group","Repuestos mantenimiento"));
+        fields.add(new DescriptionDataElement("Sourcing Family","Ceco almacén efectos y repuestos"));
+        fields.add(new DescriptionDataElement("SSR","AETNA GROUP 0001354366"));
+        fields.add(new DescriptionDataElement("Données de base","Type de composant : Mecanique | Fabriquant impose : oui | Ref 0001354366"));
         fieldTable.getItems().setAll(fields);
     }
 
@@ -129,26 +132,26 @@ public class DescPaneController {
     }
 
     private void setFieldsColumns() {
-        field.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<fieldDS, String>, ObservableValue<String>>() {
+        field.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDataElement, String>, ObservableValue<String>>() {
             @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<fieldDS, String> param) {
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<DescriptionDataElement, String> param) {
                 return new ReadOnlyObjectWrapper(param.getValue().getFieldName());
             }
         });
-        example.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<fieldDS, String>, ObservableValue<String>>() {
+        example.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDataElement, String>, ObservableValue<String>>() {
             @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<fieldDS, String> param) {
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<DescriptionDataElement, String> param) {
                 return new ReadOnlyObjectWrapper(param.getValue().getValue());
             }
         });
-        add.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<fieldDS, String>, ObservableValue<String>>() {
+        add.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDataElement, String>, ObservableValue<String>>() {
             @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<fieldDS, String> param) {
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<DescriptionDataElement, String> param) {
                 Button btn = new Button();
                 btn.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
-                        elementTable.getItems().add(new elemDS(param.getValue().getFieldName()));
+                        elementTable.getItems().add(new DescriptionDisplayElement(param.getValue().getFieldName()));
                         elementTable.refresh();
                     }
                 });
@@ -168,20 +171,20 @@ public class DescPaneController {
 
 
 
-        position.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, String>, ObservableValue<String>>() {
+        position.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, String>, ObservableValue<String>>() {
             @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<elemDS, String> param) {
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, String> param) {
                 return new ReadOnlyObjectWrapper(String.valueOf(elementTable.getItems().indexOf(param.getValue())+1));
             }
         });
-        fieldName.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, String>, ObservableValue<String>>() {
+        fieldName.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, String>, ObservableValue<String>>() {
               @Override
-              public ObservableValue<String> call(TableColumn.CellDataFeatures<elemDS, String> param) {
+              public ObservableValue<String> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, String> param) {
                   return new ReadOnlyObjectWrapper(param.getValue().fieldName);
               }
           });
-        translate.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
-            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
+        translate.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
+            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
@@ -193,8 +196,8 @@ public class DescPaneController {
                 return new ReadOnlyObjectWrapper(cb);
             }
         });
-        linebreak.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
-            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
+        linebreak.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
+            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
@@ -206,8 +209,8 @@ public class DescPaneController {
                 return new ReadOnlyObjectWrapper(cb);
             }
         });
-        bold.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
-            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
+        bold.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
+            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
@@ -219,8 +222,8 @@ public class DescPaneController {
                 return new ReadOnlyObjectWrapper(cb);
             }
         });
-        italic.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
-            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
+        italic.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
+            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
@@ -232,8 +235,8 @@ public class DescPaneController {
                 return new ReadOnlyObjectWrapper(cb);
             }
         });
-        leftATableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
-            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
+        leftATableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
+            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
@@ -248,8 +251,8 @@ public class DescPaneController {
                 return new ReadOnlyObjectWrapper(cb);
             }
         });
-        rightATableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
-            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
+        rightATableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
+            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
@@ -264,22 +267,22 @@ public class DescPaneController {
                 return new ReadOnlyObjectWrapper(cb);
             }
         });
-        prefix.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
-            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
+        prefix.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
+            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 TextField tf = new TextField();
                 tf.textProperty().bindBidirectional(r.getValue().prefix);
                 return new ReadOnlyObjectWrapper(tf);
             }
         });
-        suffix.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, CheckBox>, ObservableValue<CheckBox>>() {
-            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<elemDS, CheckBox> r) {
+        suffix.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
+            public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 TextField tf = new TextField();
                 tf.textProperty().bindBidirectional(r.getValue().suffix);
                 return new ReadOnlyObjectWrapper(tf);
             }
         });
-        up.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, Button>, ObservableValue<Button>>() {
-            public ObservableValue<Button> call(TableColumn.CellDataFeatures<elemDS, Button> b) {
+        up.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, Button>, ObservableValue<Button>>() {
+            public ObservableValue<Button> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, Button> b) {
                 Button btn = new Button();
                 btn.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
@@ -299,8 +302,8 @@ public class DescPaneController {
                 return new ReadOnlyObjectWrapper(btn);
             }
         });
-        down.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, Button>, ObservableValue<Button>>() {
-            public ObservableValue<Button> call(TableColumn.CellDataFeatures<elemDS, Button> b) {
+        down.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, Button>, ObservableValue<Button>>() {
+            public ObservableValue<Button> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, Button> b) {
                 Button btn = new Button();
                 btn.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
@@ -320,8 +323,8 @@ public class DescPaneController {
                 return new ReadOnlyObjectWrapper(btn);
             }
         });
-        clear.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<elemDS, Button>, ObservableValue<Button>>() {
-            public ObservableValue<Button> call(TableColumn.CellDataFeatures<elemDS, Button> b) {
+        clear.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, Button>, ObservableValue<Button>>() {
+            public ObservableValue<Button> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, Button> b) {
                 Button btn = new Button();
                 btn.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
@@ -341,48 +344,4 @@ public class DescPaneController {
         });
     }
 
-    private class elemDS {
-        SimpleIntegerProperty position = new SimpleIntegerProperty();
-        String fieldName;
-        SimpleBooleanProperty translate = new SimpleBooleanProperty(false);
-        SimpleBooleanProperty linebreak = new SimpleBooleanProperty(false);
-        SimpleBooleanProperty bold = new SimpleBooleanProperty(false);
-        SimpleBooleanProperty italic = new SimpleBooleanProperty(false);
-        SimpleBooleanProperty leftATableColumn = new SimpleBooleanProperty(false);
-        SimpleBooleanProperty rightATableColumn = new SimpleBooleanProperty(false);
-        SimpleStringProperty prefix = new SimpleStringProperty();
-        SimpleStringProperty suffix = new SimpleStringProperty();
-
-        public elemDS(String fieldName, boolean translate, boolean lineBreak, boolean bold, boolean italic, boolean green, boolean white, String prefix, String suffix) {
-            this.fieldName = fieldName;
-            this.translate.set(translate);
-            this.linebreak.set(lineBreak);
-            this.bold.set(bold);
-            this.italic.set(italic);
-            this.leftATableColumn.set(green);
-            this.rightATableColumn.set(white);
-            this.prefix.set(prefix);
-            this.suffix.set(suffix);
-        }
-
-        public elemDS(String fieldName) {
-            this.fieldName = fieldName;
-        }
-    }
-
-    private class fieldDS {
-        private String fieldName;
-        private String value;
-
-        public fieldDS(String fieldName, String fieldValue) {
-            this.fieldName = fieldName;
-            this.value = fieldValue;
-        }
-        public String getFieldName() {
-            return fieldName;
-        }
-        public String getValue() {
-            return value;
-        }
-    }
 }

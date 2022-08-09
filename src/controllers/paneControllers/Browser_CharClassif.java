@@ -33,6 +33,7 @@ import service.CharPatternServices;
 import service.CharValuesLoader;
 import service.ExternalSearchServices;
 import service.DocumentSearchTask;
+import transversal.generic.TextUtils;
 import transversal.generic.Tools;
 import transversal.pdf_toolbox.PdfCapableBrowser;
 
@@ -134,13 +135,13 @@ public class Browser_CharClassif {
 
 		String selected_text = "";
 		if(checkMethodSelect) {
-			selected_text = parent.ld.getSelectedText();
+			selected_text = TextUtils.getSelectedText(parent.ld);
 			if(selected_text.length()==0) {
-				selected_text = parent.ld_translated.getSelectedText();
+				selected_text = TextUtils.getSelectedText(parent.ld_translated);
 				if(selected_text.length()==0) {
-					selected_text=parent.sd.getSelectedText();
+					selected_text = TextUtils.getSelectedText(parent.sd);
 					if(selected_text.length()==0) {
-						selected_text=parent.sd_translated.getSelectedText();
+						selected_text = TextUtils.getSelectedText(parent.sd_translated);
 					}
 				}
 			}

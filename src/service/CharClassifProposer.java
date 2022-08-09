@@ -9,6 +9,7 @@ import javafx.util.Pair;
 import model.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.UoMDeclarationDialog;
+import transversal.generic.TextUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -229,13 +230,13 @@ public class CharClassifProposer {
 	public String getUserSelectedText() {
 		selectionFromBrowser = false;
 		String selectedText = "";
-		selectedText = parent.ld.getSelectedText();
+		selectedText = TextUtils.getSelectedText(parent.ld);
 		if(selectedText.length()==0) {
-			selectedText = parent.ld_translated.getSelectedText();
+			selectedText = TextUtils.getSelectedText(parent.ld_translated);
 			if(selectedText.length()==0) {
-				selectedText=parent.sd.getSelectedText();
+				selectedText = TextUtils.getSelectedText(parent.sd);
 				if(selectedText.length()==0) {
-					selectedText=parent.sd_translated.getSelectedText();
+					selectedText = TextUtils.getSelectedText(parent.sd_translated);
 				}
 			}
 		}
