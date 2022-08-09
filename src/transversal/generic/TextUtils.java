@@ -1,7 +1,10 @@
 package transversal.generic;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextArea;
 import model.CharDescriptionRow;
 import model.DescriptionDisplayElement;
@@ -10,12 +13,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import model.GlobalConstants;
 import model.DescriptionDataElement;
+import org.fxmisc.richtext.StyleClassedTextArea;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TextUtils {
 
@@ -54,82 +59,54 @@ public class TextUtils {
     }
 
 
-    public static String getSelectedText(TextFlow ld) {
-        AtomicReference<String> ret = new AtomicReference<>("");
-        ld.lookupAll("TextField").forEach(tf->{
-            if(tf instanceof TextField){
-                ret.set(ret + ((TextField) tf).getSelectedText());
-            }
-        });
-        return ret.get();
+    public static String getSelectedText(StyleClassedTextArea ld) {
+        return ld.getSelectedText();
     }
 
 
-    public static void renderDescription(TextFlow previewArea, CharDescriptionRow tmp, ReadOnlyDoubleProperty readOnlyDoubleProperty) {
+    public static void renderDescription(StyleClassedTextArea previewArea, CharDescriptionRow tmp, ReadOnlyDoubleProperty readOnlyDoubleProperty) {
         renderDescription(previewArea,
                 DescriptionDisplayElement.randomDisplayElements(tmp.getDescriptionDataFields().stream().map(e->e.getFieldName()).collect(Collectors.toCollection(ArrayList::new))),
                 tmp.getDescriptionDataFields(),readOnlyDoubleProperty);
     }
-    public static void renderDescription(TextFlow previewArea, List<DescriptionDisplayElement> items, List<DescriptionDataElement> fieldTableItems, ReadOnlyDoubleProperty readOnlyDoubleProperty) {
-        previewArea.getChildren().clear();
+    public static void renderDescription(StyleClassedTextArea previewArea, List<DescriptionDisplayElement> items, List<DescriptionDataElement> fieldTableItems, ReadOnlyDoubleProperty readOnlyDoubleProperty) {
+        previewArea.clear();
+        StringBuilder sb = new StringBuilder();
+        ArrayList<Integer> zones = new ArrayList<>();
+        ArrayList<ArrayList<String>> styles= new ArrayList<>();
         items.forEach(elem->{
-            Text txt = new Text(
-                    (elem.prefix.get()!=null?elem.prefix.get():"")+
-                            fieldTableItems.stream().filter(field->field.getFieldName().equals(elem.fieldName)).findFirst().get().getValue()+
-                            (elem.suffix.get()!=null?elem.suffix.get():"")+
-                            (elem.linebreak.get()?"\n":" ")
-            );
-            txt.setFill(elem.leftATableColumn.getValue()? GlobalConstants.DESC_NEONEC_GREEN:elem.rightATableColumn.getValue()?GlobalConstants.DESC_NEONEC_GREY: Color.BLACK);
-            txt.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,elem.bold.get()? FontWeight.BOLD:FontWeight.THIN,elem.italic.get()?FontPosture.ITALIC:FontPosture.REGULAR,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
-            TextArea tmp = new TextArea();
-            tmp.setId(Tools.generate_uuid());
-            areaRowCountMap.put(tmp.getId(),new SimpleIntegerProperty(20));
-            /*tmp.textProperty().addListener(new ChangeListener<String>() {
-                @Override
-                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                    tmp.setPrefWidth(TextUtils.computeTextWidth(tmp.getFont(),tmp.getText(), 0.0D) + 10);
-                }
-            });
-            tmp.fontProperty().addListener(new ChangeListener<Font>() {
-                @Override
-                public void changed(ObservableValue<? extends Font> observable, Font oldValue, Font newValue) {
-                    tmp.setPrefWidth(TextUtils.computeTextWidth(tmp.getFont(),tmp.getText(), 0.0D) + 10);
-                }
-            });*/
-
-
-            tmp.setText((elem.prefix.get()!=null?elem.prefix.get():"")+
+            sb.append((elem.prefix.get()!=null?elem.prefix.get():"")+
                     fieldTableItems.stream().filter(field->field.getFieldName().equals(elem.fieldName)).findFirst().get().getValue()+
-                    (elem.suffix.get()!=null?elem.suffix.get():""));
-            tmp.getStyleClass().clear();
-            tmp.getStyleClass().add("basicText");
+                    (elem.suffix.get()!=null?elem.suffix.get():"")+
+                    (elem.linebreak.get()?"\n":" "));
+            zones.add(sb.length());
+            ArrayList<String> tmp = new ArrayList<String>();
+            tmp.add("basicText");
             if(elem.leftATableColumn.getValue()){
-                tmp.getStyleClass().add("greenText");
+                tmp.add("greenText");
             }
             if(elem.rightATableColumn.getValue()){
-                tmp.getStyleClass().add("greyText");
+                tmp.add("greyText");
             }
             if(elem.bold.get()){
-                tmp.getStyleClass().add("boldText");
+                tmp.add("boldText");
             }
             if(elem.italic.get()){
-                tmp.getStyleClass().add("italicText");
+                tmp.add("italicText");
             }
-
-            int rowHeight = (int) tmp.getFont().getSize();
-            tmp.prefHeightProperty().bindBidirectional(areaRowCountMap.get(tmp.getId()));
-            tmp.minHeightProperty().bindBidirectional(areaRowCountMap.get(tmp.getId()));
-            tmp.scrollTopProperty().addListener((ov, oldVal, newVal) -> {
-                if(newVal.intValue() > rowHeight){
-                    areaRowCountMap.get(tmp.getId()).set(areaRowCountMap.get(tmp.getId()).get() + newVal.intValue());
-                }
-            });
-            tmp.prefWidthProperty().bind(readOnlyDoubleProperty);
-
-            previewArea.getChildren().add(tmp);
-            /*if(elem.linebreak.get()){
-                previewArea.getChildren().add(new Text("\n"));
-            }*/
+            styles.add(tmp);
+        });
+        previewArea.insertText(0,sb.toString());
+        IntStream.range(0,zones.size()).forEach(idx->{
+            previewArea.setStyle(idx>0?zones.get(idx-1):0,idx<zones.size()-1?zones.get(idx):sb.length(),styles.get(idx));
+        });
+        previewArea.setWrapText(true);
+        previewArea.prefWidthProperty().bind(readOnlyDoubleProperty);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                previewArea.scrollYToPixel(0.0);
+            }
         });
     }
 }

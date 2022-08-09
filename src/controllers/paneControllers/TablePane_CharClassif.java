@@ -313,8 +313,8 @@ public class TablePane_CharClassif {
 				@Override
 				public void run() {
 					if(GlobalConstants.ENABLE_TRANSLATION){
-						Parent.sd_translated.getChildren().add(new TextField(translated_sd+"\n\n\n\n\n"));
-						Parent.ld_translated.getChildren().add(new TextField(translated_ld+"\n\n\n\n\n"));
+						Parent.sd_translated.insertText(Parent.sd_translated.getText().length(),translated_sd+"\n\n\n\n\n");
+						Parent.ld_translated.insertText(Parent.sd_translated.getText().length(),translated_ld+"\n\n\n\n\n");
 					}
 					
 				}

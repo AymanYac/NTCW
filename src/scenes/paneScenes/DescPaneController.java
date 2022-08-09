@@ -1,6 +1,8 @@
 package scenes.paneScenes;
 
+import controllers.Char_description;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -9,21 +11,17 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.*;
 import javafx.util.Callback;
-import model.DescriptionDisplayElement;
 import model.DescriptionDataElement;
-import transversal.generic.TextUtils;
-import model.GlobalConstants;
+import model.DescriptionDisplayElement;
+import model.UserAccount;
 import org.fxmisc.richtext.StyleClassedTextArea;
-import model.DescriptionDisplayElement;
-import model.DescriptionDataElement;
 import transversal.generic.TextUtils;
 
 import java.util.ArrayList;
-import java.util.stream.IntStream;
 
 
 public class DescPaneController {
@@ -51,17 +49,12 @@ public class DescPaneController {
     @FXML TableView<DescriptionDisplayElement> elementTable;
 
     double r = 10;
+    private Char_description parent;
+    private UserAccount account;
 
     @FXML void initialize(){
 
         setElemsColumns();
-        ArrayList<DescriptionDisplayElement> elems = new ArrayList<>();
-        elems.add(new DescriptionDisplayElement("Description FR"));
-        elems.add(new DescriptionDisplayElement("Description IT"));
-        elems.add(new DescriptionDisplayElement("Description EN"));
-        elems.add(new DescriptionDisplayElement("PO FR"));
-        elems.add(new DescriptionDisplayElement("PO IT"));
-        elems.add(new DescriptionDisplayElement("PO EN"));
         elementTable.getItems().addListener(new ListChangeListener<DescriptionDisplayElement>() {
             @Override
             public void onChanged(Change<? extends DescriptionDisplayElement> c) {
@@ -69,62 +62,15 @@ public class DescPaneController {
                 refresh_preview();
             }
         });
-        //elementTable.getItems().setAll(elems);
-
         setFieldsColumns();
-        ArrayList<DescriptionDataElement> fields = new ArrayList<>();
-        fields.add(new DescriptionDataElement("Article ID","00000180199"));
-        fields.add(new DescriptionDataElement("INTERNAL NUMBER","ABRA0001"));
-        fields.add(new DescriptionDataElement("Description FR","TRANSFORMATEUR TRIPHASE 18 KVA"));
-        fields.add(new DescriptionDataElement("Description IT","TRASFORMATORE TRIFASE 18 KVA"));
-        fields.add(new DescriptionDataElement("Description EN","THREE PHASE TRANSFORMER 18 KVA"));
-        fields.add(new DescriptionDataElement("PO FR","TRANSFO. MONOPHASE NORME EN60742 SIMPLE ECRAN SECONDAIRE"));
-        fields.add(new DescriptionDataElement("PO IT","TR.2500VA V.230-400/110-0-110|Completo di schermo elettrostatico"));
-        fields.add(new DescriptionDataElement("PO EN","TRANSFO. SINGLE-PHASE EN60742 SEC.230V 250V A PRIM.380"));
-        fields.add(new DescriptionDataElement("PLM Concatenation","Tension = 400 V | Type du raccordement = Vis | Hauteur d'encombrement = 2M"));
-        fields.add(new DescriptionDataElement("PLM Manufacturer info","SIEMENS 3SB3400-3S"));
-        fields.add(new DescriptionDataElement("Vendor information","SIEMENS SAS : 3SB3400-3S\n"));
-        fields.add(new DescriptionDataElement("Material group","Repuestos mantenimiento"));
-        fields.add(new DescriptionDataElement("Sourcing Family","Ceco almacén efectos y repuestos"));
-        fields.add(new DescriptionDataElement("SSR","AETNA GROUP 0001354366"));
-        fields.add(new DescriptionDataElement("Données de base","Type de composant : Mecanique | Fabriquant impose : oui | Ref 0001354366"));
-        fieldTable.getItems().setAll(fields);
+        //fillDummyItems();
     }
 
     private void refresh_preview() {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                previewArea.clear();
-                StringBuilder sb = new StringBuilder();
-                ArrayList<Integer> zones = new ArrayList<>();
-                ArrayList<ArrayList<String>> styles= new ArrayList<>();
-                elementTable.getItems().forEach(elem->{
-                    sb.append((elem.prefix.get()!=null?elem.prefix.get():"")+
-                            fieldTable.getItems().stream().filter(field->field.getFieldName().equals(elem.fieldName)).findFirst().get().getValue()+
-                            (elem.suffix.get()!=null?elem.suffix.get():"")+
-                            (elem.linebreak.get()?"\n":" "));
-                    zones.add(sb.length());
-                    ArrayList<String> tmp = new ArrayList<String>();
-                    tmp.add("basicText");
-                    if(elem.leftATableColumn.getValue()){
-                        tmp.add("greenText");
-                    }
-                    if(elem.rightATableColumn.getValue()){
-                        tmp.add("greyText");
-                    }
-                    if(elem.bold.get()){
-                        tmp.add("boldText");
-                    }
-                    if(elem.italic.get()){
-                        tmp.add("italicText");
-                    }
-                    styles.add(tmp);
-                });
-                previewArea.insertText(0,sb.toString());
-                IntStream.range(0,zones.size()).forEach(idx->{
-                    previewArea.setStyle(idx>0?zones.get(idx-1):0,idx<zones.size()-1?zones.get(idx):sb.length(),styles.get(idx));
-                });
+                TextUtils.renderDescription(previewArea,elementTable.getItems(),fieldTable.getItems(),previewArea.widthProperty());
                 previewArea.setWrapText(true);
             }
         });
@@ -343,4 +289,47 @@ public class DescPaneController {
         });
     }
 
+    public void fillDummyItems(){
+        ArrayList<DescriptionDisplayElement> elems = new ArrayList<>();
+        elems.add(new DescriptionDisplayElement("Description FR"));
+        elems.add(new DescriptionDisplayElement("Description IT"));
+        elems.add(new DescriptionDisplayElement("Description EN"));
+        elems.add(new DescriptionDisplayElement("PO FR"));
+        elems.add(new DescriptionDisplayElement("PO IT"));
+        elems.add(new DescriptionDisplayElement("PO EN"));
+        ArrayList<DescriptionDataElement> fields = new ArrayList<>();
+        fields.add(new DescriptionDataElement("Article ID","00000180199"));
+        fields.add(new DescriptionDataElement("INTERNAL NUMBER","ABRA0001"));
+        fields.add(new DescriptionDataElement("Description FR","TRANSFORMATEUR TRIPHASE 18 KVA"));
+        fields.add(new DescriptionDataElement("Description IT","TRASFORMATORE TRIFASE 18 KVA"));
+        fields.add(new DescriptionDataElement("Description EN","THREE PHASE TRANSFORMER 18 KVA"));
+        fields.add(new DescriptionDataElement("PO FR","TRANSFO. MONOPHASE NORME EN60742 SIMPLE ECRAN SECONDAIRE"));
+        fields.add(new DescriptionDataElement("PO IT","TR.2500VA V.230-400/110-0-110|Completo di schermo elettrostatico"));
+        fields.add(new DescriptionDataElement("PO EN","TRANSFO. SINGLE-PHASE EN60742 SEC.230V 250V A PRIM.380"));
+        fields.add(new DescriptionDataElement("PLM Concatenation","Tension = 400 V | Type du raccordement = Vis | Hauteur d'encombrement = 2M"));
+        fields.add(new DescriptionDataElement("PLM Manufacturer info","SIEMENS 3SB3400-3S"));
+        fields.add(new DescriptionDataElement("Vendor information","SIEMENS SAS : 3SB3400-3S\n"));
+        fields.add(new DescriptionDataElement("Material group","Repuestos mantenimiento"));
+        fields.add(new DescriptionDataElement("Sourcing Family","Ceco almacén efectos y repuestos"));
+        fields.add(new DescriptionDataElement("SSR","AETNA GROUP 0001354366"));
+        fields.add(new DescriptionDataElement("Données de base","Type de composant : Mecanique | Fabriquant impose : oui | Ref 0001354366"));
+        fieldTable.getItems().setAll(fields);
+    }
+
+    public void setParent(Char_description parent) {
+        this.parent = parent;
+    }
+
+    public void setUserAccount(UserAccount account) {
+        this.account = account;
+    }
+
+    public void fillItems(Integer rowIndex, Integer columnIndex) {
+        fillDummyItems();
+    }
+
+    public void setStageWidthProperty(ReadOnlyDoubleProperty widthProperty) {
+        elementTable.prefWidthProperty().bind(widthProperty.multiply(0.4));
+        fieldTable.prefWidthProperty().bind(widthProperty.multiply(0.6));
+    }
 }

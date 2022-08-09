@@ -15,6 +15,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -27,6 +28,8 @@ import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Pair;
@@ -35,8 +38,10 @@ import model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
+import org.fxmisc.richtext.StyleClassedTextArea;
 import org.json.simple.parser.ParseException;
 import scenes.paneScenes.ClassComboDraftController;
+import scenes.paneScenes.DescPaneController;
 import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.*;
@@ -89,10 +94,10 @@ public class Char_description {
 	@FXML public AnchorPane leftAnchor;
 	@FXML public AnchorPane rightAnchor;
 	@FXML public Label aidLabel;
-	@FXML public TextFlow sd;
-	@FXML public TextFlow sd_translated;
-	@FXML public TextFlow ld;
-	@FXML public TextFlow ld_translated;
+	@FXML public StyleClassedTextArea sd;
+	@FXML public StyleClassedTextArea sd_translated;
+	@FXML public StyleClassedTextArea ld;
+	@FXML public StyleClassedTextArea ld_translated;
 	public AutoCompleteBox_CharClassification classification;
 	@FXML public TextField classification_style;
 	@FXML public TextField search_text;
@@ -188,6 +193,7 @@ public class Char_description {
 	public AutoCompleteBox_CharValue valueAutoComplete;
 	public boolean draftingRule=false;
 	public CaracteristicValue lastInputValue;
+	private DescPaneController descSettingController;
 
 
 	@FXML void nextBlank() {
@@ -246,16 +252,31 @@ public class Char_description {
 				copyClientNumber2ClipBoard();
 			}
 		});
-		
-		grid.lookupAll("TextFlow").forEach(tf->{
-			if(tf instanceof TextFlow){
-				((TextFlow) tf).getChildren().clear();
-				System.out.println(GridPane.getColumnIndex(tf));
-				if(GridPane.getColumnIndex(tf)==1){
-					((TextFlow) tf).prefWidthProperty().bind(helperAreaLeft.widthProperty());
-				}else{
-					((TextFlow) tf).prefWidthProperty().bind(helperAreaRight.widthProperty());
-				}
+		grid.lookupAll("Button.settingButton").forEach(btn->{
+			System.out.println(btn.getStyleClass());
+			if(btn instanceof Button){
+				((Button) btn).setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						try {
+							System.out.println(GridPane.getRowIndex(btn)+","+GridPane.getColumnIndex(btn));
+							FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/DescSettingPane.fxml"));
+							Scene scene = new Scene(loader.load());
+							Stage secondaryStage = new Stage();
+							secondaryStage.initStyle(StageStyle.TRANSPARENT);
+							secondaryStage.setMaximized(true);
+							secondaryStage.setScene(scene);
+							secondaryStage.show();
+							descSettingController = loader.getController();
+							descSettingController.setParent(tableController.Parent);
+							descSettingController.setUserAccount(tableController.Parent.account);
+							descSettingController.fillItems(GridPane.getRowIndex(btn),GridPane.getColumnIndex(btn));
+							descSettingController.setStageWidthProperty(secondaryStage.widthProperty());
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				});
 			}
 		});
 
@@ -1566,27 +1587,23 @@ public class Char_description {
 				}
 			}
 		});
-		
-		grid.lookupAll("TextFlow").forEach(TF->{
-			TF.lookupAll("TextField").forEach(tf->{
-				if(tf instanceof TextField){
-					((TextField) tf).selectedTextProperty().addListener(new ChangeListener<String>() {
-						@Override
-						public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-							if(newValue.length()>0){
-								grid.lookupAll("TextFlow").forEach(TFLOOP-> {
-									TFLOOP.lookupAll("TextField").stream().filter(tfloop->tfloop!=tf).forEach(tfloop -> {
-										if(tfloop instanceof TextField){
-											((TextField) tfloop).deselect();
-										}
-									});
-								});
-								deselectBrowsers();
-							}
+
+		grid.lookupAll("StyleClassedTextArea").forEach(pa->{
+			if(pa instanceof StyleClassedTextArea){
+				((StyleClassedTextArea) pa).selectedTextProperty().addListener(new ChangeListener<String>() {
+					@Override
+					public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+						if(newValue.length()>0){
+							grid.lookupAll("StyleClassedTextArea").stream().filter(loopPA->loopPA!=pa).forEach(loopPA->{
+								if(loopPA instanceof StyleClassedTextArea){
+									((StyleClassedTextArea) loopPA).deselect();
+								}
+							});
+							deselectBrowsers();
 						}
-					});
-				}
-			});
+					}
+				});
+			}
 		});
 
 	}
