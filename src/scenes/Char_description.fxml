@@ -7,25 +7,27 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.effect.InnerShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.TextFlow?>
 
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
-<BorderPane xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Char_description">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Char_description">
    <left>
       <StackPane maxWidth="0" />
    </left>
@@ -36,7 +38,7 @@
       <StackPane maxHeight="0" />
    </bottom>
    <top>
-      <fx:include source="../scenes/ribbonScenes/Tool_Header.fxml"/>
+      <fx:include source="../scenes/ribbonScenes/Tool_Header.fxml" />
    </top>
    <center>
       <AnchorPane maxHeight="Infinity" maxWidth="Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0">
@@ -91,7 +93,7 @@
                   <AnchorPane fx:id="leftAnchor" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-color: white;" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="14" />
                   <TextField fx:id="classification_style" editable="false" stylesheets="@../styles/TextField.css" GridPane.columnIndex="1" GridPane.rowIndex="9" />
 
-                  <MenuBar visible="false" fx:id="menubar" maxWidth="1.7976931348623157E308" stylesheets="@../styles/Main.css" GridPane.columnSpan="2147483647" GridPane.valignment="TOP">
+                  <MenuBar fx:id="menubar" maxWidth="1.7976931348623157E308" stylesheets="@../styles/Main.css" visible="false" GridPane.columnSpan="2147483647" GridPane.valignment="TOP">
                      <menus>
                         <Menu mnemonicParsing="false" text="Home" />
                         <Menu mnemonicParsing="false" text="Project set-up">
@@ -153,17 +155,17 @@
                         <Menu fx:id="counterSelection" mnemonicParsing="false" text="Selected items:" />
                      </menus>
                   </MenuBar>
-                  <MenuBar  maxWidth="1.7976931348623157E308" stylesheets="@../styles/Main.css" GridPane.columnSpan="2147483647" GridPane.valignment="TOP">
+                  <MenuBar maxWidth="1.7976931348623157E308" stylesheets="@../styles/Main.css" GridPane.columnSpan="2147483647" GridPane.valignment="TOP">
                      <menus>
                         <Menu id="menuHeader" fx:id="projectMenu" mnemonicParsing="false" text="Project" />
-                        <Menu id="menuHeader" fx:id="homeMenu" mnemonicParsing="false"/>
-                        <Menu id="menuHeader" fx:id="dataMenu" mnemonicParsing="false"/>
-                        <Menu id="menuHeader" fx:id="automationMenu" mnemonicParsing="false"/>
-                        <Menu id="menuHeader" fx:id="navigationMenu" mnemonicParsing="false"/>
-                        <Menu id="menuHeader" fx:id="settingMenu" mnemonicParsing="false"/>
+                        <Menu id="menuHeader" fx:id="homeMenu" mnemonicParsing="false" />
+                        <Menu id="menuHeader" fx:id="dataMenu" mnemonicParsing="false" />
+                        <Menu id="menuHeader" fx:id="automationMenu" mnemonicParsing="false" />
+                        <Menu id="menuHeader" fx:id="navigationMenu" mnemonicParsing="false" />
+                        <Menu id="menuHeader" fx:id="settingMenu" mnemonicParsing="false" />
                      </menus>
                   </MenuBar>
-                  <ToolBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" fx:id="homeToolbar">
+                  <ToolBar fx:id="homeToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
                         <Label style="-fx-text-fill: #737572;" text="Cancellation" />
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
@@ -181,6 +183,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -197,6 +207,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="24.0" />
                         <Label style="-fx-text-fill: #737572;" text="Clipboard" />
@@ -215,6 +233,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -231,6 +257,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -247,6 +281,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -265,6 +307,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -283,6 +335,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="24.0" />
                         <Label style="-fx-text-fill: #737572;" text="Page" />
@@ -303,6 +365,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -321,6 +393,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -339,6 +421,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -357,11 +449,21 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="24.0" />
                      </items>
                   </ToolBar>
-                  <ToolBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" fx:id="dataToolbar">
+                  <ToolBar fx:id="dataToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
                      <items>
                         <Label style="-fx-text-fill: #737572;" text="Import/Export" />
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
@@ -381,6 +483,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -399,6 +511,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="24.0" />
                         <Label style="-fx-text-fill: #737572;" text="Values" />
@@ -417,6 +539,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -433,6 +563,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -449,6 +587,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -465,6 +611,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -481,6 +635,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -497,6 +659,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -513,6 +683,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -531,6 +709,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="24.0" />
                         <Label style="-fx-text-fill: #737572;" text="Search" />
@@ -549,6 +737,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -565,6 +763,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -581,6 +787,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -590,6 +804,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -606,6 +830,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -622,6 +854,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="24.0" />
                         <Label style="-fx-text-fill: #737572;" text="Units of measure" />
@@ -642,6 +882,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -660,10 +910,20 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                      </items>
                   </ToolBar>
-                  <ToolBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" fx:id="automationToolbar">
+                  <ToolBar fx:id="automationToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
                         <Label style="-fx-text-fill: #737572;" text="Automatic filling" />
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
@@ -683,6 +943,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -701,6 +971,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -719,6 +999,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="24.0" />
                         <Label style="-fx-text-fill: #737572;" text="Rule management" />
@@ -739,6 +1029,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -757,6 +1057,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -775,6 +1085,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -793,6 +1113,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="24.0" />
                         <Label style="-fx-text-fill: #737572;" text="Duplicates" />
@@ -813,10 +1143,20 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                      </items>
                   </ToolBar>
-                  <ToolBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" fx:id="navigationToolbar">
+                  <ToolBar fx:id="navigationToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
                         <Label style="-fx-text-fill: #737572;" text="Display" />
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
@@ -836,6 +1176,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -854,6 +1204,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -870,6 +1230,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -886,6 +1254,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -902,6 +1278,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="24.0" />
                         <Label style="-fx-text-fill: #737572;" text="Navigation" />
@@ -920,6 +1304,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -936,6 +1328,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -952,6 +1352,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -968,6 +1376,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -984,6 +1400,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" styleClass="bg-grey-style">
                            <children>
@@ -1000,6 +1424,14 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="24.0" />
                         <Label style="-fx-text-fill: #737572;" text="Panels" />
@@ -1020,6 +1452,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -1038,6 +1480,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -1056,6 +1508,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -1074,6 +1536,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -1092,10 +1564,20 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                      </items>
                   </ToolBar>
-                  <ToolBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" fx:id="settingToolbar">
+                  <ToolBar fx:id="settingToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -1114,6 +1596,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -1132,6 +1624,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -1150,6 +1652,16 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                         <GridPane alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" styleClass="bg-grey-style">
                            <children>
@@ -1168,10 +1680,20 @@
 
                               </Region>
                            </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
                      </items>
                   </ToolBar>
-                  <ToolBar fx:id="toolBar" visible="false" maxHeight="26.0" style="-fx-background-color: #F2F2F2;" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
+                  <ToolBar fx:id="toolBar" maxHeight="26.0" style="-fx-background-color: #F2F2F2;" visible="false" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
                         <ToggleButton disable="true" maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Toolbar_buttons/Icone_stripes.png&quot;);" stylesheets="@../styles/ButtonTool.css">
                            <effect>
@@ -1235,8 +1757,8 @@
                   </ToolBar>
                   <Label fx:id="aidLabel" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Article ID:" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Long Description" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-                  <TextArea editable="false" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextArea.css" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.rowSpan="2" />
-                  <TextArea editable="false" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextArea.css" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5" GridPane.rowSpan="2" />
+                  <TextArea fx:id="helperAreaLeft" editable="false" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextArea.css" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.rowSpan="2" />
+                  <TextArea fx:id="helperAreaRight" editable="false" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextArea.css" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5" GridPane.rowSpan="2" />
                   <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Classification" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                   <Label fx:id="lcLabel" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: WHITE;" text="Classification suggestions" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="11" />
                   <Button fx:id="prop1" mnemonicParsing="false" onContextMenuRequested="#context1" opacity="0.5" prefHeight="100.0" prefWidth="500.0" style="-fx-font-size: 12; -fx-label-padding: 0 15;" stylesheets="@../styles/ButtonBlue.css" text="--" GridPane.columnIndex="1" GridPane.rowIndex="12" />
@@ -1248,10 +1770,26 @@
                   <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
                   <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
                   <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="7" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
-                  <TextArea fx:id="sd" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <TextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" text="Support" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                  <TextArea fx:id="ld" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" text="Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶Montagebeugel voor zoemer Werma type 110¶Orderref.975 109 01 (bracket with protective cap)¶Kleur:zwart¶Diam.:24 mm¶Hoogte:38 mm¶" wrapText="true" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5" />
-                  <TextArea fx:id="ld_translated" prefHeight="300.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" text="Support de montage pour le type buzzer Werma 110¶Orderref.975 109 01 (support de capuchon de protection)" wrapText="true" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="6" />
+                  <ScrollPane GridPane.columnIndex="1" GridPane.rowIndex="5">
+                     <content>
+                        <TextFlow fx:id="sd" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" />
+                     </content>
+                  </ScrollPane>
+                  <ScrollPane GridPane.columnIndex="1" GridPane.rowIndex="6">
+                     <content>
+                        <TextFlow fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" />
+                     </content>
+                  </ScrollPane>
+                  <ScrollPane GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="5">
+                     <content>
+                        <TextFlow fx:id="ld" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" />
+                     </content>
+                  </ScrollPane>
+                  <ScrollPane GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="6">
+                     <content>
+                        <TextFlow fx:id="ld_translated" prefHeight="300.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" />
+                     </content>
+                  </ScrollPane>
                   <Label fx:id="value_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="8" />
                   <Label fx:id="rule_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Rule" visible="false" GridPane.columnIndex="9" GridPane.rowIndex="8" />
                   <Label fx:id="custom_label_21" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Note" visible="false" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="8" />

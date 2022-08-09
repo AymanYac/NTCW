@@ -1,3 +1,25 @@
+
+.basicText {
+    -fx-text-fill: black;
+    -fx-font-weight:normal;
+    -fx-background-color: transparent;
+    -fx-font-family: calibri;
+    -fx-font-size: 1em;
+    -fx-padding: 0em;
+}
+.boldText {
+    -fx-font-weight: bold;
+}
+.greenText{
+    -fx-text-fill: #1EA185;
+}
+.greyText{
+    -fx-text-fill: #737572;
+}
+.italicText{
+    -fx-font-style: italic;
+}
+
 .text-area{
 	-fx-font-family:calibri;
 	-fx-font-size:12;
