@@ -1,4 +1,25 @@
 
+.basicText {
+    -fx-text-fill: black;
+    -fx-font-weight:normal;
+    -fx-background-color: transparent;
+    -fx-font-family: calibri;
+    -fx-font-size: 1em;
+    -fx-padding: 0em;
+}
+.boldText {
+    -fx-font-weight: bold;
+}
+.greenText{
+    -fx-fill: #1EA185;
+}
+.greyText{
+    -fx-fill: #737572;
+}
+.italicText{
+    -fx-font-style: italic;
+}
+
 #leftATableColumn > .label {
     -fx-background-image: url("../pictures/descPane_buttons/leftA.png");
     -fx-background-size: 25 25;

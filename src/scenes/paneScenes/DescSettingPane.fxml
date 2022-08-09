@@ -10,6 +10,7 @@
 <?import model.CustomTableColumn?>
 
 <?import javafx.scene.text.TextFlow?>
+<?import org.fxmisc.richtext.StyleClassedTextArea?>
 <BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:id="mainBorderPane" fx:controller="scenes.paneScenes.DescPaneController" stylesheets="@../../styles/DescPane.css">
     <top>
         <BorderPane fx:id="titleBar">
@@ -148,7 +149,7 @@
                         <HBox prefWidth="10"/>
                     </left>
                     <center>
-                        <TextFlow fx:id="previewArea" prefHeight="120"/>
+                        <StyleClassedTextArea fx:id="previewArea" prefHeight="120"/>
                     </center>
                     <right>
                         <HBox prefWidth="10"/>

@@ -18,8 +18,10 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.*;
 import javafx.util.Callback;
 import model.GlobalConstants;
+import org.fxmisc.richtext.StyleClassedTextArea;
 
 import java.util.ArrayList;
+import java.util.stream.IntStream;
 
 
 public class DescPaneController {
@@ -39,7 +41,7 @@ public class DescPaneController {
     @FXML public TableColumn field;
     @FXML public TableColumn example;
     @FXML public TableColumn add;
-    @FXML TextFlow previewArea;
+    @FXML StyleClassedTextArea previewArea;
 
     @FXML BorderPane mainBorderPane;
     @FXML BorderPane titleBar;
@@ -91,18 +93,37 @@ public class DescPaneController {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                previewArea.getChildren().clear();
+                previewArea.clear();
+                StringBuilder sb = new StringBuilder();
+                ArrayList<Integer> zones = new ArrayList<>();
+                ArrayList<ArrayList<String>> styles= new ArrayList<>();
                 elementTable.getItems().forEach(elem->{
-                    Text txt = new Text(
-                            (elem.prefix.get()!=null?elem.prefix.get():"")+
-                                    fieldTable.getItems().stream().filter(field->field.getFieldName().equals(elem.fieldName)).findFirst().get().getValue()+
-                                    (elem.suffix.get()!=null?elem.suffix.get():"")+
-                                    (elem.linebreak.get()?"\n":" ")
-                    );
-                    txt.setFill(elem.leftATableColumn.getValue()?GlobalConstants.DESC_NEONEC_GREEN:elem.rightATableColumn.getValue()?GlobalConstants.DESC_NEONEC_GREY: Color.BLACK);
-                    txt.setFont(Font.font(GlobalConstants.RULE_DISPLAY_SYNTAX_FONT,elem.bold.get()?FontWeight.BOLD:FontWeight.THIN,elem.italic.get()?FontPosture.ITALIC:FontPosture.REGULAR,GlobalConstants.RULE_DISPLAY_FONT_SIZE));
-                    previewArea.getChildren().add(txt);
+                    sb.append((elem.prefix.get()!=null?elem.prefix.get():"")+
+                            fieldTable.getItems().stream().filter(field->field.getFieldName().equals(elem.fieldName)).findFirst().get().getValue()+
+                            (elem.suffix.get()!=null?elem.suffix.get():"")+
+                            (elem.linebreak.get()?"\n":" "));
+                    zones.add(sb.length());
+                    ArrayList<String> tmp = new ArrayList<String>();
+                    tmp.add("basicText");
+                    if(elem.leftATableColumn.getValue()){
+                        tmp.add("greenText");
+                    }
+                    if(elem.rightATableColumn.getValue()){
+                        tmp.add("greyText");
+                    }
+                    if(elem.bold.get()){
+                        tmp.add("boldText");
+                    }
+                    if(elem.italic.get()){
+                        tmp.add("italicText");
+                    }
+                    styles.add(tmp);
                 });
+                previewArea.insertText(0,sb.toString());
+                IntStream.range(0,zones.size()).forEach(idx->{
+                    previewArea.setStyle(idx>0?zones.get(idx-1):0,idx<zones.size()-1?zones.get(idx):sb.length(),styles.get(idx));
+                });
+                previewArea.setWrapText(true);
             }
         });
     }

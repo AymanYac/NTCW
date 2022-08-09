@@ -10,7 +10,7 @@ import javafx.stage.StageStyle;
 import java.net.URL;
 
 public class test extends Application {
-    private static final String RESOURCE = "ClassCombo_Draft.fxml";
+    private static final String RESOURCE = "DescSettingPane.fxml";
 
     @Override
     public void start(Stage primaryStage) throws Exception
@@ -18,7 +18,7 @@ public class test extends Application {
         URL resource = test.class.getResource(RESOURCE);
         FXMLLoader fxmlLoader = new FXMLLoader(resource);
         Parent root = fxmlLoader.load();
-        ClassComboDraftController controller= fxmlLoader.getController();
+        DescPaneController controller= fxmlLoader.getController();
         Scene scene = new Scene(root);
 
 //        ScenicView.show(scene);

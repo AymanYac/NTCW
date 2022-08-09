@@ -633,5 +633,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="fxmisc.richtext.richtextfx" level="project" />
   </component>
 </module>
