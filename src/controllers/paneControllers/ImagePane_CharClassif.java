@@ -20,7 +20,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import service.BoxBlurFilter;
 import transversal.generic.PixelUtils;
-import transversal.generic.TextUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -58,13 +57,13 @@ import java.util.List;
 		System.out.println(LocalDateTime.now()+" start");
 		String selected_text="";
 		if(checkMethodSelect) {
-			selected_text = TextUtils.getSelectedText(parent.ld);
+			selected_text = parent.ld.getSelectedText();
 			if(selected_text.length()==0) {
-				selected_text = TextUtils.getSelectedText(parent.ld_translated);
+				selected_text = parent.ld_translated.getSelectedText();
 				if(selected_text.length()==0) {
-					selected_text = TextUtils.getSelectedText(parent.sd);
+					selected_text=parent.sd.getSelectedText();
 					if(selected_text.length()==0) {
-						selected_text = TextUtils.getSelectedText(parent.sd_translated);
+						selected_text=parent.sd_translated.getSelectedText();
 					}
 				}
 			}
@@ -323,13 +322,13 @@ import java.util.List;
 		
 		String selected_text="";
 		if(checkMethodSelect) {
-			selected_text = TextUtils.getSelectedText(parent.ld);
+			selected_text = parent.ld.getSelectedText();
 			if(selected_text.length()==0) {
-				selected_text = TextUtils.getSelectedText(parent.ld_translated);
+				selected_text = parent.ld_translated.getSelectedText();
 				if(selected_text.length()==0) {
-					selected_text = TextUtils.getSelectedText(parent.sd);
+					selected_text=parent.sd.getSelectedText();
 					if(selected_text.length()==0) {
-						selected_text = TextUtils.getSelectedText(parent.sd_translated);
+						selected_text=parent.sd_translated.getSelectedText();
 					}
 				}
 			}

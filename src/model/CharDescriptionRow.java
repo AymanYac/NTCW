@@ -658,8 +658,16 @@ public class CharDescriptionRow {
 		ArrayList<DescriptionDataElement> ret = new ArrayList<DescriptionDataElement>();
 		ret.add(new DescriptionDataElement("SHORT_DESC",getShort_desc()));
 		ret.add(new DescriptionDataElement("LONG_DESC",getLong_desc()));
-		//ret.add(new DescriptionDataElement("SHORT_DESC_TRANSLATED",getShort_desc_translated()));
-		//ret.add(new DescriptionDataElement("LONG_DESC_TRANSLATED",getLong_desc_translated()));
+		ret.add(new DescriptionDataElement("SHORT_DESC_TRANSLATED",getShort_desc_translated()));
+		ret.add(new DescriptionDataElement("LONG_DESC_TRANSLATED",getLong_desc_translated()));
+		ret.add(new DescriptionDataElement("SHORT_DESC",getShort_desc()));
+		ret.add(new DescriptionDataElement("LONG_DESC",getLong_desc()));
+		ret.add(new DescriptionDataElement("SHORT_DESC_TRANSLATED",getShort_desc_translated()));
+		ret.add(new DescriptionDataElement("LONG_DESC_TRANSLATED",getLong_desc_translated()));
+		ret.add(new DescriptionDataElement("SHORT_DESC",getShort_desc()));
+		ret.add(new DescriptionDataElement("LONG_DESC",getLong_desc()));
+		ret.add(new DescriptionDataElement("SHORT_DESC_TRANSLATED",getShort_desc_translated()));
+		ret.add(new DescriptionDataElement("LONG_DESC_TRANSLATED",getLong_desc_translated()));
 		return ret;
 	}
 }

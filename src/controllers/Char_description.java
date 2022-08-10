@@ -49,6 +49,7 @@ import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
+import javax.swing.text.Style;
 import java.awt.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -253,13 +254,11 @@ public class Char_description {
 			}
 		});
 		grid.lookupAll("Button.settingButton").forEach(btn->{
-			System.out.println(btn.getStyleClass());
 			if(btn instanceof Button){
 				((Button) btn).setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
 						try {
-							System.out.println(GridPane.getRowIndex(btn)+","+GridPane.getColumnIndex(btn));
 							FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/DescSettingPane.fxml"));
 							Scene scene = new Scene(loader.load());
 							Stage secondaryStage = new Stage();
@@ -275,6 +274,71 @@ public class Char_description {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
+					}
+				});
+			}
+		});
+		grid.lookupAll("Button.scrollDownButton").forEach(btn->{
+			if(btn instanceof Button){
+				((Button) btn).setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						grid.lookupAll("StyleClassedTextArea").forEach(pa->{
+							Integer paCol = GridPane.getColumnIndex(pa);
+							Integer paColSpan = GridPane.getColumnSpan(pa);
+							Integer paRow = GridPane.getRowIndex(pa);
+							Integer paRowSpan = GridPane.getRowSpan(pa);
+
+							Integer finalPaColSpan = paColSpan!=null?new Integer(paColSpan -1):new Integer(0);
+							Integer finalPaRowSpan = paRowSpan!=null?new Integer(paRowSpan -1):new Integer(0);
+
+							if(( GridPane.getColumnIndex(btn).equals(paCol) && GridPane.getRowIndex(btn).equals(paRow) )
+											|| (GridPane.getColumnIndex(btn) == paCol + finalPaColSpan && GridPane.getRowIndex(btn) == paRow + finalPaRowSpan)
+							){
+								if(pa instanceof StyleClassedTextArea){
+									//System.out.println(((StyleClassedTextArea) pa).getProperties().);
+									((StyleClassedTextArea) pa).showParagraphAtTop(
+											((StyleClassedTextArea) pa).getParagraphs().indexOf(
+													((StyleClassedTextArea) pa).getVisibleParagraphs().get(1)
+													)
+									);
+								}
+							}
+						});
+					}
+				});
+			}
+		});
+		grid.lookupAll("Button.scrollUpButton").forEach(btn->{
+			if(btn instanceof Button){
+				((Button) btn).setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						grid.lookupAll("StyleClassedTextArea").forEach(pa->{
+							Integer paCol = GridPane.getColumnIndex(pa);
+							Integer paColSpan = GridPane.getColumnSpan(pa);
+							Integer paRow = GridPane.getRowIndex(pa);
+							Integer paRowSpan = GridPane.getRowSpan(pa);
+
+							Integer finalPaColSpan = paColSpan!=null?new Integer(paColSpan -1):new Integer(0);
+							Integer finalPaRowSpan = paRowSpan!=null?new Integer(paRowSpan -1):new Integer(0);
+
+							if(( GridPane.getColumnIndex(btn).equals(paCol) && GridPane.getRowIndex(btn).equals(paRow) )
+									|| (GridPane.getColumnIndex(btn) == paCol + finalPaColSpan && GridPane.getRowIndex(btn) == paRow + finalPaRowSpan)
+							){
+								if(pa instanceof StyleClassedTextArea){
+									try{
+										((StyleClassedTextArea) pa).showParagraphAtTop(
+												((StyleClassedTextArea) pa).getParagraphs().indexOf(
+														((StyleClassedTextArea) pa).getVisibleParagraphs().get(0)
+												) - 1
+										);
+									}catch (Exception V){
+
+									}
+								}
+							}
+						});
 					}
 				});
 			}
@@ -1538,8 +1602,8 @@ public class Char_description {
 		uom_field = new AutoCompleteBox_UnitOfMeasure("SYMBOL");
 		
 		classification_style.setVisible(false);
-		grid.add(classification, 1, 9);
-		grid.add(uom_field, 5, 9);
+		grid.add(classification, 1, 10);
+		grid.add(uom_field, 5, 10);
 		
 		
 		load_table_pane();
@@ -1590,6 +1654,7 @@ public class Char_description {
 
 		grid.lookupAll("StyleClassedTextArea").forEach(pa->{
 			if(pa instanceof StyleClassedTextArea){
+				//Disable multi selection
 				((StyleClassedTextArea) pa).selectedTextProperty().addListener(new ChangeListener<String>() {
 					@Override
 					public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -1603,9 +1668,58 @@ public class Char_description {
 						}
 					}
 				});
+				//Add scroll listeners
+				((StyleClassedTextArea) pa).estimatedScrollYProperty().addListener(new ChangeListener<Double>() {
+					@Override
+					public void changed(ObservableValue<? extends Double> observable, Double oldValue, Double newValue) {
+						refreshScrollButton((StyleClassedTextArea)pa);
+					}
+				});
 			}
 		});
 
+	}
+
+	public void refreshScrollButton(StyleClassedTextArea pa) {
+		try{
+			Integer paCol = GridPane.getColumnIndex(pa);
+			Integer paColSpan = GridPane.getColumnSpan(pa);
+			Integer paRow = GridPane.getRowIndex(pa);
+			Integer paRowSpan = GridPane.getRowSpan(pa);
+
+			Integer finalPaColSpan = paColSpan!=null?new Integer(paColSpan -1):new Integer(0);
+			Integer finalPaRowSpan = paRowSpan!=null?new Integer(paRowSpan -1):new Integer(0);
+
+			Button su = (Button) grid.lookupAll("Button.scrollUpButton").stream()
+					.filter(btn->( GridPane.getColumnIndex(btn).equals(paCol) && GridPane.getRowIndex(btn).equals(paRow) )
+							|| (GridPane.getColumnIndex(btn) == paCol + finalPaColSpan && GridPane.getRowIndex(btn) == paRow + finalPaRowSpan)
+							).findAny().get();
+			Button sd = (Button) grid.lookupAll("Button.scrollDownButton").stream()
+					.filter(btn->( GridPane.getColumnIndex(btn).equals(paCol) && GridPane.getRowIndex(btn).equals(paRow) )
+							|| (GridPane.getColumnIndex(btn) == paCol + finalPaColSpan && GridPane.getRowIndex(btn) == paRow + finalPaRowSpan)
+					).findAny().get();
+
+			su.setVisible(true);
+			sd.setVisible(true);
+			if (pa.getEstimatedScrollY() == pa.totalHeightEstimateProperty().getValue() - pa.heightProperty().get()) {
+				sd.setVisible(false);
+			}
+			if (pa.getEstimatedScrollY() == 0.0) {
+				su.setVisible(false);
+			}
+		}catch (Exception V){
+			//V.printStackTrace(System.err);
+		}
+	}
+	public void refreshScrollButtons() {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				grid.lookupAll("StyleClassedTextArea").forEach(pa-> {
+					refreshScrollButton((StyleClassedTextArea) pa);
+				});
+			}
+		});
 	}
 
 	private void deselectBrowsers() {
@@ -2759,4 +2873,5 @@ public class Char_description {
 	@FXML public void clearLink() {
 		ExternalSearchServices.clearingURL(true);
 	}
+
 }

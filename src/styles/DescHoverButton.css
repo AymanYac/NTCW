@@ -1,0 +1,51 @@
+.settingButton:hover{
+  -fx-opacity: 1.0;
+}
+.settingButton {
+  -fx-pref-width : 1.2em;
+  -fx-pref-height : 1.2em;
+  -fx-background-image: url("../pictures/gearBlue.png");
+  -fx-background-color: transparent;
+  -fx-background-repeat: no-repeat no-repeat;
+  -fx-background-size: contain;
+  -fx-background-position: center center;
+  -fx-translate-x: -0.3em;
+  -fx-translate-y: 0.3em;
+  -fx-padding: 0;
+  -fx-opacity: 0.3;
+}
+
+.scrollUpButton:hover{
+  -fx-opacity: 1.0;
+}
+.scrollUpButton {
+  -fx-pref-width : 1.2em;
+  -fx-pref-height : 1.2em;
+  -fx-background-image: url("../pictures/arrowDesc.png");
+  -fx-background-color: transparent;
+  -fx-background-repeat: no-repeat no-repeat;
+  -fx-background-size: contain;
+  -fx-background-position: center center;
+  -fx-translate-x: -0.3em;
+  -fx-translate-y: -1.2em;
+  -fx-padding: 0;
+  -fx-opacity: 0.3;
+}
+
+.scrollDownButton:hover{
+  -fx-opacity: 1.0;
+}
+.scrollDownButton {
+  -fx-pref-width : 1.2em;
+  -fx-pref-height : 1.2em;
+  -fx-background-image: url("../pictures/arrowDesc.png");
+  -fx-rotate : 180;
+  -fx-background-color: transparent;
+  -fx-background-repeat: no-repeat no-repeat;
+  -fx-background-size: contain;
+  -fx-background-position: center center;
+  -fx-translate-x: -0.3em;
+  -fx-translate-y: -0.0em;
+  -fx-padding: 0;
+  -fx-opacity: 0.3;
+}

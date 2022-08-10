@@ -43,7 +43,7 @@ public class DescriptionDisplayElement {
             return randomizedSetting;
         }*/
         double color = Math.random();
-        randomizedSetting = keySet.stream().map(fieldName->new DescriptionDisplayElement(fieldName, Math.random() > 0.5, true, Math.random() > 0.5, 0.8 > color && color > 0.5, color > 0.8, Math.random() > 0.5,"",""))
+        randomizedSetting = keySet.stream().map(fieldName->new DescriptionDisplayElement(fieldName, Math.random() > 0.5, Math.random()>0.5, Math.random() > 0.5, 0.8 > color && color > 0.5, color > 0.8, Math.random() > 0.5,"",""))
                 .collect(Collectors.toCollection(ArrayList::new));
         return randomizedSetting;
     }

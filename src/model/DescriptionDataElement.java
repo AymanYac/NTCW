@@ -14,6 +14,9 @@ public class DescriptionDataElement {
     }
 
     public String getValue() {
-        return value;
+        if(value!=null){
+            return value;
+        }
+        return "";
     }
 }

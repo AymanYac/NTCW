@@ -62,9 +62,9 @@ public class TablePane_CharClassif {
 
 
 	@FXML public TableView<CharDescriptionRow> charDescriptionTable;
-	
-	
-	
+
+
+
 	public static Char_description Parent;
 	protected String translated_sd;
 	protected String translated_ld;
@@ -82,15 +82,15 @@ public class TablePane_CharClassif {
 
 
 
-	private Task<Void> translationTask;
+	private Task<Void> imageFetchTask;
 
 
 
-	private boolean stop_translation;
+	private boolean stopimageFetchTask;
 
 
 
-	private Thread translationThread;
+	private Thread imageFetchThread;
 
 
 
@@ -214,8 +214,8 @@ public class TablePane_CharClassif {
 		
 		
 	}
-	
-	
+
+
 	@SuppressWarnings("deprecation")
 	private void item_selection_routine(CharDescriptionRow tmp)  {
 		Parent.CHANGING_CLASS=true;
@@ -243,105 +243,12 @@ public class TablePane_CharClassif {
 		}
 
 		Parent.refresh_ui_display();
-		
-		
-		
+
 		try {
-			translationTask.cancel();
-			stop_translation=true;
-			translationThread.stop();
-		}catch(Exception V) {
-			
+			Parent.load_image_pane(false);
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
 		}
-		translationTask = new Task<Void>() {
-		    
-			@Override
-		    protected Void call() throws Exception {
-				try {
-
-					translated_sd = tmp.getShort_desc_translated();
-					translated_ld = tmp.getLong_desc_translated();
-					Platform.runLater(new Runnable(){
-
-						@Override
-						public void run() {
-
-							TextUtils.renderDescription(Parent.sd_translated,tmp,Parent.helperAreaLeft.widthProperty());
-							TextUtils.renderDescription(Parent.ld_translated,tmp,Parent.helperAreaRight.widthProperty());
-
-						}
-
-					});
-					TimeUnit.MILLISECONDS.sleep(800);
-					Platform.runLater(new Runnable(){
-
-						@Override
-						public void run() {
-
-							try {
-								Parent.load_image_pane(false);
-								if(GlobalConstants.ENABLE_TRANSLATION){
-									translated_sd = tmp.getShort_desc_translated()!=null?tmp.getShort_desc_translated():translate2UserLanguage(tmp.getShort_desc());
-									translated_ld = tmp.getLong_desc_translated()!=null?tmp.getLong_desc_translated():translate2UserLanguage(tmp.getLong_desc());
-								}
-							} catch (IOException | ParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						
-						});
-				} catch ( InterruptedException e1) {
-					
-					// TODO Auto-generated catch block
-				}
-				
-				stop_translation = false;
-		    	advancement.refresh(Parent);
-		    	
-		    	
-		    	return null;
-		    }
-		};
-		translationTask.setOnSucceeded(e -> {
-			
-			if(stop_translation) {
-				return;
-			}
-			Platform.runLater(new Runnable(){
-
-				@Override
-				public void run() {
-					if(GlobalConstants.ENABLE_TRANSLATION){
-						Parent.sd_translated.insertText(Parent.sd_translated.getText().length(),translated_sd+"\n\n\n\n\n");
-						Parent.ld_translated.insertText(Parent.sd_translated.getText().length(),translated_ld+"\n\n\n\n\n");
-					}
-					
-				}
-				
-				});
-		
-			});
-
-		translationTask.setOnFailed(e -> {
-		    Throwable problem = translationTask.getException();
-		    //problem.printStackTrace();
-		    problem.printStackTrace(System.err);
-		    
-		    //problem.printStackTrace(System.err);
-		});
-
-		translationTask.setOnCancelled(e -> {
-		    
-			;
-		});
-		
-		translationThread = new Thread(translationTask);; translationThread.setDaemon(true);
-		translationThread.setName("Trnsl");
-		translationThread.start();
-		
-		
-		
 		
 		
 	}
@@ -660,12 +567,12 @@ public class TablePane_CharClassif {
 		List<String> classItems = CharItemFetcher.classifiedItems.entrySet().stream().filter(m->m.getValue().contains(active_class)).map(Entry::getKey).collect(Collectors.toList());
 		return classItems;
 	}
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	/*
 	@SuppressWarnings("unused")
 	private void assignValuesToItemsByClass_V1(String target_class_id, String target_class_name, List<String> target_items) throws ClassNotFoundException, SQLException {
@@ -1187,9 +1094,12 @@ public class TablePane_CharClassif {
 		    	
 		    	
 		    	Parent.aidLabel.setText("Article ID: "+tmp.getClient_item_number());
-				TextUtils.renderDescription(Parent.sd,tmp, Parent.helperAreaRight.widthProperty());
+				TextUtils.renderDescription(Parent.sd,tmp, Parent.helperAreaLeft.widthProperty());
 				TextUtils.renderDescription(Parent.ld,tmp, Parent.helperAreaRight.widthProperty());
-		    	item_selection_routine(tmp);
+				TextUtils.renderDescription(Parent.sd_translated,tmp, Parent.helperAreaLeft.widthProperty());
+				TextUtils.renderDescription(Parent.ld_translated,tmp, Parent.helperAreaRight.widthProperty());
+				item_selection_routine(tmp);
+				Parent.refreshScrollButtons();
 		    	Parent.value_field.requestFocus();
 		    	Parent.hideAutoCompletePopups();
 		    	Parent.refreshAutoCompleteEntries();
