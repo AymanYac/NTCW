@@ -19,6 +19,7 @@ public class test extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(resource);
         Parent root = fxmlLoader.load();
         DescPaneController controller= fxmlLoader.getController();
+        controller.fillDummyItems();
         Scene scene = new Scene(root);
 
 //        ScenicView.show(scene);
