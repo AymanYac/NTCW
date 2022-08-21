@@ -34,6 +34,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.util.Callback;
+import javafx.util.Pair;
 import model.*;
 import org.json.simple.parser.ParseException;
 import service.*;
@@ -57,6 +58,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TablePane_CharClassif {
 
@@ -113,6 +115,7 @@ public class TablePane_CharClassif {
 	private HashMap<String,Double> collapsedColumns = new HashMap<>();
 	private HashMap<String,Double> visibleColumns = new HashMap<>();
 	private boolean alreadyListeningWidthChange = false;
+	public boolean disableColumnListener=false;
 
 	public void restoreLastSessionLayout() {
 		try{
@@ -458,6 +461,7 @@ public class TablePane_CharClassif {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void refresh_table_with_segment(String active_class) throws ClassNotFoundException, SQLException {
+		disableColumnListener=true;
 		Parent.proposer.clearCustomValues();
 		account.setUser_desc_class(active_class);
 		Tools.set_desc_class(account);
@@ -508,7 +512,7 @@ public class TablePane_CharClassif {
 			this.selected_col = 0;
 			Parent.refresh_ui_display();
 		}
-		
+		disableColumnListener=false;
 	}
 
 	private void selectLastDescribedItem() {
@@ -1037,6 +1041,48 @@ public class TablePane_CharClassif {
 
 		this.charDescriptionTable.getItems().addAll(this.itemArray);
 
+		charDescriptionTable.getColumns().addListener(new ListChangeListener<TableColumn<CharDescriptionRow, ?>>() {
+			@Override
+			public void onChanged(Change<? extends TableColumn<CharDescriptionRow, ?>> c) {
+				if(disableColumnListener){
+					return;
+				}
+				Map<Integer, ? extends TableColumn<CharDescriptionRow, ?>> idxMap =
+													c.getList().stream().map(col -> new Pair<Integer, TableColumn<CharDescriptionRow, ?>>
+													(c.getList().indexOf(col), col)).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+				LinkedList<Integer> carIndexDiffs = new LinkedList<Integer>();
+				ArrayList<Integer> carIndexes = idxMap.entrySet().stream().filter(p -> p.getValue().getId() != null).map(p -> p.getKey()).sorted().collect(Collectors.toCollection(ArrayList::new));
+				carIndexes.stream().reduce((a, b)->{carIndexDiffs.add(b-a);return b;});
+				LinkedList<Pair<Integer,Integer>> jumpIndexes = new LinkedList<Pair<Integer,Integer>>();
+				carIndexDiffs.stream().filter(diff->diff>1).findFirst().ifPresent(diff-> {
+					IntStream.range(carIndexDiffs.indexOf(diff)+1, carIndexes.size()).forEach(idx -> {
+						Integer car = carIndexes.get(idx);
+						jumpIndexes.add(new Pair<Integer, Integer>(car, idx+1));
+					});
+				});
+				if(jumpIndexes.size()==0){
+					return;
+				}
+				System.out.println(c.getList().stream().map(col->col.getText()).collect(Collectors.joining(",")));
+				jumpIndexes.forEach(p->System.out.print(c.getList().get(p.getKey()).getText()+","));
+				System.out.println("");
+				disableColumnListener = true;
+				jumpIndexes.forEach(pair->{
+					Integer start = pair.getKey();
+					Integer end = pair.getValue()+1;
+					TableColumn<CharDescriptionRow, ?> target = c.getList().get(start);
+					IntStream.range(end,start).boxed().sorted(Comparator.reverseOrder()).forEach(colIdx->{
+						TableColumn<CharDescriptionRow, ?> tmp = charDescriptionTable.getColumns().get(colIdx);
+						charDescriptionTable.getColumns().set(colIdx,new TableColumn<>());
+						charDescriptionTable.getColumns().set(colIdx+1,tmp);
+					});
+					charDescriptionTable.getColumns().set(end,target);
+					System.out.println("*"+charDescriptionTable.getColumns().stream().map(col->col.getText()).collect(Collectors.joining(",")));
+				});
+				System.out.println("=");
+				disableColumnListener=false;
+			}
+		});
 
 		charDescriptionTable.getSortOrder().addListener((ListChangeListener)(c -> {
 			if(allowOverWriteAccountPreference){

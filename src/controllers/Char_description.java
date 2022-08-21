@@ -44,12 +44,12 @@ import scenes.paneScenes.ClassComboDraftController;
 import scenes.paneScenes.DescPaneController;
 import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
+import transversal.data_exchange_toolbox.ScrollTimer;
 import transversal.dialog_toolbox.*;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
 
-import javax.swing.text.Style;
 import java.awt.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -195,6 +195,7 @@ public class Char_description {
 	public boolean draftingRule=false;
 	public CaracteristicValue lastInputValue;
 	private DescPaneController descSettingController;
+	private ScrollTimer scrollTimer = new ScrollTimer();
 
 
 	@FXML void nextBlank() {
@@ -280,65 +281,38 @@ public class Char_description {
 		});
 		grid.lookupAll("Button.scrollDownButton").forEach(btn->{
 			if(btn instanceof Button){
-				((Button) btn).setOnAction(new EventHandler<ActionEvent>() {
+				((Button) btn).addEventFilter(MouseEvent.ANY, new EventHandler<MouseEvent>() {
+
 					@Override
-					public void handle(ActionEvent event) {
-						grid.lookupAll("StyleClassedTextArea").forEach(pa->{
-							Integer paCol = GridPane.getColumnIndex(pa);
-							Integer paColSpan = GridPane.getColumnSpan(pa);
-							Integer paRow = GridPane.getRowIndex(pa);
-							Integer paRowSpan = GridPane.getRowSpan(pa);
+					public void handle(MouseEvent event) {
+						if(event.getEventType().equals(MouseEvent.MOUSE_ENTERED)){
+							scrollTimer.prepareScrollDown(grid,btn);
+						}
+						if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+							scrollTimer.start();
+						} else {
+							scrollTimer.stop();
+						}
 
-							Integer finalPaColSpan = paColSpan!=null?new Integer(paColSpan -1):new Integer(0);
-							Integer finalPaRowSpan = paRowSpan!=null?new Integer(paRowSpan -1):new Integer(0);
-
-							if(( GridPane.getColumnIndex(btn).equals(paCol) && GridPane.getRowIndex(btn).equals(paRow) )
-											|| (GridPane.getColumnIndex(btn) == paCol + finalPaColSpan && GridPane.getRowIndex(btn) == paRow + finalPaRowSpan)
-							){
-								if(pa instanceof StyleClassedTextArea){
-									//System.out.println(((StyleClassedTextArea) pa).getProperties().);
-									((StyleClassedTextArea) pa).showParagraphAtTop(
-											((StyleClassedTextArea) pa).getParagraphs().indexOf(
-													((StyleClassedTextArea) pa).getVisibleParagraphs().get(1)
-													)
-									);
-								}
-							}
-						});
 					}
 				});
 			}
 		});
 		grid.lookupAll("Button.scrollUpButton").forEach(btn->{
 			if(btn instanceof Button){
-				((Button) btn).setOnAction(new EventHandler<ActionEvent>() {
+				((Button) btn).addEventFilter(MouseEvent.ANY, new EventHandler<MouseEvent>() {
+
 					@Override
-					public void handle(ActionEvent event) {
-						grid.lookupAll("StyleClassedTextArea").forEach(pa->{
-							Integer paCol = GridPane.getColumnIndex(pa);
-							Integer paColSpan = GridPane.getColumnSpan(pa);
-							Integer paRow = GridPane.getRowIndex(pa);
-							Integer paRowSpan = GridPane.getRowSpan(pa);
+					public void handle(MouseEvent event) {
+						if(event.getEventType().equals(MouseEvent.MOUSE_ENTERED)){
+							scrollTimer.prepareScrollUp(grid,btn);
+						}
+						if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+							scrollTimer.start();
+						} else {
+							scrollTimer.stop();
+						}
 
-							Integer finalPaColSpan = paColSpan!=null?new Integer(paColSpan -1):new Integer(0);
-							Integer finalPaRowSpan = paRowSpan!=null?new Integer(paRowSpan -1):new Integer(0);
-
-							if(( GridPane.getColumnIndex(btn).equals(paCol) && GridPane.getRowIndex(btn).equals(paRow) )
-									|| (GridPane.getColumnIndex(btn) == paCol + finalPaColSpan && GridPane.getRowIndex(btn) == paRow + finalPaRowSpan)
-							){
-								if(pa instanceof StyleClassedTextArea){
-									try{
-										((StyleClassedTextArea) pa).showParagraphAtTop(
-												((StyleClassedTextArea) pa).getParagraphs().indexOf(
-														((StyleClassedTextArea) pa).getVisibleParagraphs().get(0)
-												) - 1
-										);
-									}catch (Exception V){
-
-									}
-								}
-							}
-						});
 					}
 				});
 			}
@@ -1701,7 +1675,9 @@ public class Char_description {
 
 			su.setVisible(true);
 			sd.setVisible(true);
-			if (pa.getEstimatedScrollY() == pa.totalHeightEstimateProperty().getValue() - pa.heightProperty().get()) {
+			if (Math.floor(pa.getEstimatedScrollY()+pa.heightProperty().get()
+					-pa.totalHeightEstimateProperty().getValue()
+					-pa.getPadding().getTop()-pa.getPadding().getBottom())==0) {
 				sd.setVisible(false);
 			}
 			if (pa.getEstimatedScrollY() == 0.0) {
