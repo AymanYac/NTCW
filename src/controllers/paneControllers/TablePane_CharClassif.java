@@ -55,6 +55,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -262,7 +263,7 @@ public class TablePane_CharClassif {
 			return;
 		}
 		if (offset==1 && tvX.getLastVisibleIndex()<target){
-			System.out.println("Scroll advance");
+
 			charDescriptionTable.scrollTo(Math.max(target-offset,0));
 		}
 
@@ -730,16 +731,16 @@ public class TablePane_CharClassif {
 		}
 		Double visibleWidth = charDescriptionTable.getColumns().stream().filter(TableColumnBase::isVisible).filter(col -> col.getWidth() > 0).mapToDouble(col -> col.getWidth()).sum();
 		if(visibleWidth<0.98*charDescriptionTable.getWidth()){
-			System.out.println("Fixing");
+
 			Optional<TableColumn<CharDescriptionRow, ?>> activeCol = charDescriptionTable.getColumns().stream().filter(col -> col.getId()!=null && col.getId().equals("active-column")).findFirst();
 			if(activeCol.isPresent()){
 				activeCol.get().prefWidthProperty().unbind();
 				activeCol.get().prefWidthProperty().set(activeCol.get().getWidth()+(charDescriptionTable.getWidth()*0.98-(visibleWidth)));
 			}
 		}else{
-			System.out.print("No column underflow: "+visibleWidth);
-			System.out.print(">=");
-			System.out.println(charDescriptionTable.getWidth()*0.98);
+
+
+
 		}
 
 		if(Parent.valueAutoComplete!=null) {
@@ -777,6 +778,7 @@ public class TablePane_CharClassif {
 				alreadyListeningWidthChange=true;
 			}
 		});
+		reOrderCarColumns();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -1046,56 +1048,7 @@ public class TablePane_CharClassif {
 				if(disableColumnListener){
 					return;
 				}
-				Map<Integer, ? extends TableColumn<CharDescriptionRow, ?>> idxMap =
-													c.getList().stream().map(col -> new Pair<Integer, TableColumn<CharDescriptionRow, ?>>
-													(c.getList().indexOf(col), col)).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
-				ArrayList<Integer> carIndexes = idxMap.entrySet().stream().filter(p -> p.getValue().getId() != null && !p.getValue().isVisible()).map(p -> p.getKey()).sorted().collect(Collectors.toCollection(ArrayList::new));
-				Integer activeIndex = idxMap.entrySet().stream().filter(p -> Objects.equals(p.getValue().getId(), "active-column")).map(p -> p.getKey()).findFirst().get();
-				LinkedList<Pair<Integer,Integer>> jumpIndexes = new LinkedList<Pair<Integer,Integer>>();
-				AtomicInteger beforeActiveCarCounter= new AtomicInteger(0);
-				carIndexes.forEach(caridx->{
-					jumpIndexes.add(new Pair<Integer,Integer>(caridx<activeIndex?caridx-beforeActiveCarCounter.getAndAdd(1):caridx,activeIndex));
-				});
-				if(jumpIndexes.size()==0){
-					return;
-				}
-				ArrayList<Integer> carIndexDiffs = new ArrayList<>();
-				idxMap.entrySet().stream().filter(p -> p.getValue().getId() != null).map(p -> p.getKey()).sorted().reduce((a, b)->{carIndexDiffs.add(b-a);return b;});
-				if(activeIndex==(idxMap.entrySet().stream().filter(p -> p.getValue().getId() != null).map(p -> p.getKey()).min(Comparator.naturalOrder()).get())
-						&&!carIndexDiffs.stream().anyMatch(diff->diff>1)){
-					System.out.println("No need to reorder");
-					return;
-				}else{
-					System.out.println("**");
-				}
-				System.out.println(c.getList().stream().map(col->col.getText()).collect(Collectors.joining(",")));
-				jumpIndexes.forEach(p->System.out.print(c.getList().get(p.getKey()).getText()+","));
-				System.out.println("");
-				disableColumnListener = true;
-				jumpIndexes.forEach(pair->{
-					Integer start = pair.getKey();
-					Integer end = pair.getValue()+1;
-					if(start<end){
-						TableColumn<CharDescriptionRow, ?> target = c.getList().get(start);
-						IntStream.range(start+1,end).forEach(colIdx->{
-							TableColumn<CharDescriptionRow, ?> tmp = charDescriptionTable.getColumns().get(colIdx);
-							charDescriptionTable.getColumns().set(colIdx,new TableColumn<>());
-							charDescriptionTable.getColumns().set(colIdx-1,tmp);
-						});
-						charDescriptionTable.getColumns().set(end-1,target);
-					}else if(end<start){
-						TableColumn<CharDescriptionRow, ?> target = c.getList().get(start);
-						IntStream.range(end,start).boxed().sorted(Comparator.reverseOrder()).forEach(colIdx->{
-							TableColumn<CharDescriptionRow, ?> tmp = charDescriptionTable.getColumns().get(colIdx);
-							charDescriptionTable.getColumns().set(colIdx,new TableColumn<>());
-							charDescriptionTable.getColumns().set(colIdx+1,tmp);
-						});
-						charDescriptionTable.getColumns().set(end,target);
-					}
-					System.out.println("*"+charDescriptionTable.getColumns().stream().map(col->col.getText()).collect(Collectors.joining(",")));
-				});
-				System.out.println("=");
-				disableColumnListener=false;
+				reOrderCarColumns();
 			}
 		});
 
@@ -1172,6 +1125,89 @@ public class TablePane_CharClassif {
 		    	Parent.counterSelection.setVisible(false);
 		    }
 		 });
+	}
+
+	private void reOrderCarColumns() {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				Map<Integer, ? extends TableColumn<CharDescriptionRow, ?>> idxMap =
+						charDescriptionTable.getColumns().stream().map(col -> new Pair<Integer, TableColumn<CharDescriptionRow, ?>>
+								(charDescriptionTable.getColumns().indexOf(col), col)).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+				ArrayList<Integer> nonVisibleCarIndexes = idxMap.entrySet().stream().filter(p -> p.getValue().getId() != null && !p.getValue().isVisible()).map(p -> p.getKey()).sorted().collect(Collectors.toCollection(ArrayList::new));
+				Integer activeIndex = idxMap.entrySet().stream().filter(p -> Objects.equals(p.getValue().getId(), "active-column")).map(p -> p.getKey()).findFirst().get();
+				Integer minIndx = idxMap.entrySet().stream().filter(p -> p.getValue().getId() != null).map(p -> p.getKey()).min(Comparator.naturalOrder()).get();
+				LinkedList<Pair<Integer,Integer>> jumpIndexes = new LinkedList<Pair<Integer,Integer>>();
+				AtomicInteger beforeActiveCarCounter= new AtomicInteger(0);
+				nonVisibleCarIndexes.forEach(caridx->{
+					jumpIndexes.add(new Pair<Integer,Integer>(caridx<activeIndex?caridx-beforeActiveCarCounter.getAndAdd(1):caridx,activeIndex));
+				});
+				if(jumpIndexes.size()==0){
+					return;
+				}
+				ArrayList<Integer> carIndexDiffs = new ArrayList<>();
+				if(carIndexDiffs.stream().anyMatch(diff->diff>1)){
+					System.out.println("Reordring car columns");
+				}else{
+					if(activeIndex.equals(minIndx)){
+						System.out.println("No need for reordring car columns");
+						return;
+					}else{
+						System.out.println("Reordering active car");
+						jumpIndexes.clear();
+						jumpIndexes.add(new Pair<Integer,Integer>(activeIndex,minIndx-1));
+						ArrayList<Integer> nonVisibleOrActiveCarIndexes = idxMap.entrySet().stream().filter(p -> p.getValue().getId() != null && (p.getValue().getId().equals("active-column") || !p.getValue().isVisible())).map(p -> p.getKey()).sorted().collect(Collectors.toCollection(ArrayList::new));
+						ArrayList<Integer> carIndexDiffsInner = new ArrayList<>();
+						nonVisibleOrActiveCarIndexes.stream().reduce((a, b)->{carIndexDiffsInner.add(b-a);return b;});
+						ArrayList<Integer> diffGaps = carIndexDiffsInner.stream().filter(diff -> diff > 1).collect(Collectors.toCollection(ArrayList::new));
+						AtomicBoolean allowReturn= new AtomicBoolean(true);
+						diffGaps.forEach(diffGap->{
+							Integer beforeGap = nonVisibleOrActiveCarIndexes.get(carIndexDiffsInner.indexOf(diffGap));
+							Integer afterGap = nonVisibleOrActiveCarIndexes.get(carIndexDiffsInner.indexOf(diffGap)+1);
+							if(IntStream.range(beforeGap+1,afterGap).boxed()
+									.map(loop->idxMap.get(loop.intValue()))
+									.filter(col->col.isVisible()&&col.getId()!=null).count()==afterGap-beforeGap-1)
+							{
+								System.out.println("in gap");
+							}else{
+								System.out.println("out of gap");
+								allowReturn.set(false);
+							}
+						});
+						if(allowReturn.get()){
+							System.out.println("no problematic gap");
+							return;
+						}
+					}
+				}
+
+				disableColumnListener = true;
+				jumpIndexes.forEach(pair->{
+					Integer start = pair.getKey();
+					Integer end = pair.getValue()+1;
+					if(start<end){
+						TableColumn<CharDescriptionRow, ?> target = charDescriptionTable.getColumns().get(start);
+						IntStream.range(start+1,end).forEach(colIdx->{
+							TableColumn<CharDescriptionRow, ?> tmp = charDescriptionTable.getColumns().get(colIdx);
+							charDescriptionTable.getColumns().set(colIdx,new TableColumn<>());
+							charDescriptionTable.getColumns().set(colIdx-1,tmp);
+						});
+						charDescriptionTable.getColumns().set(end-1,target);
+					}else if(end<start){
+						TableColumn<CharDescriptionRow, ?> target = charDescriptionTable.getColumns().get(start);
+						IntStream.range(end,start).boxed().sorted(Comparator.reverseOrder()).forEach(colIdx->{
+							TableColumn<CharDescriptionRow, ?> tmp = charDescriptionTable.getColumns().get(colIdx);
+							charDescriptionTable.getColumns().set(colIdx,new TableColumn<>());
+							charDescriptionTable.getColumns().set(colIdx+1,tmp);
+						});
+						charDescriptionTable.getColumns().set(end,target);
+					}
+
+				});
+
+				disableColumnListener=false;
+			}
+		});
 	}
 
 	private void setObjectHeaderClickListeners(){
@@ -1303,7 +1339,6 @@ public class TablePane_CharClassif {
 		// Step 3: Add click listener to the header columns.
 		for (int i = 0; i < headers.size(); i++) {
 			TableColumnHeader header = headers.get(i);
-			System.out.println("Setting header for column "+header.getTableColumn().getText());
 			final int index = i;
 			header.setOnMouseClicked(mouseEvent -> {
 				// Optional:
@@ -1313,7 +1348,6 @@ public class TablePane_CharClassif {
 
 				// Step 4: Handle double mouse click event.
 				if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-					System.out.println("Header cell " + index + " clicked! " + column.getText());
 					final Popup popup = new Popup();
 					popup.setAutoHide(true);
 					final Label ligne0 = new Label("Hide Column");

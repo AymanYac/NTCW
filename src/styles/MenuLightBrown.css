@@ -1,0 +1,68 @@
+.menu-bar{
+	-fx-background-color:#525351;
+	-fx-border-color:#525351;
+}
+
+.stackpane{
+	-fx-background-color:#445469;
+}
+
+.menu-item{
+	-fx-background-color:#525351;
+	-fx-padding:5 0 5 5;
+}
+
+.label{
+	-fx-font-family:Calibri;
+	-fx-font-weight:bold;
+	-fx-font-size:12px;
+	-fx-text-fill:#212934;
+}
+
+.table-view:row-selection .column-header-background .filler{
+	-fx-background-color:#ACB9CA;
+}
+
+.menu-item:focused {
+	-fx-background: #1EA185;
+    -fx-background-color: #1EA185;
+    -fx-border-color:#1EA185;
+}
+
+.menu-bar .container .menu:hover{
+    -fx-background-color: #1EA185;
+}
+
+.menu-bar .container .menu:pressed{
+    -fx-background-color: #1EA185;
+}
+
+.menu-bar .container .menu:showing{
+    -fx-background-color: #1EA185;
+}
+
+.activeMenu{
+    -fx-background-color: #1EA185;
+}
+
+
+.stackpane{
+	-fx-background-color:#445469;
+}
+
+
+.label{
+	-fx-font-family:Calibri;
+	-fx-font-weight:normal;
+	-fx-font-size:1em;
+	-fx-text-fill:white;
+}
+
+.table-view:row-selection .column-header-background .filler{
+	-fx-background-color:#8497B0;
+}
+
+.tool-bar:horizontal{
+	-fx-background-color:#445469;
+	-fx-border-color:#445469;
+}

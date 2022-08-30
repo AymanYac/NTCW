@@ -105,7 +105,9 @@
 }
 
 .table-view .column-header#active-column {
-  -fx-background-color: #BD392F, #445469, linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%), linear-gradient(#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
+  -fx-background-color:#1EA185,
+  	    linear-gradient(#167862 0%, #167862 20%, #1EA185 100%),
+        linear-gradient(#94EBD8 0%, #5EE1C4 5%, #1EA185 50%, #1EA185 51%, #167862 100%);
   -fx-background-insets: 0px, 2px;
 
 }

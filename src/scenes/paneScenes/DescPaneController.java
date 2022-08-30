@@ -11,9 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.shape.Circle;
 import javafx.util.Callback;
 import model.DescriptionDataElement;
 import model.DescriptionDisplayElement;
@@ -48,7 +46,6 @@ public class DescPaneController {
     @FXML TableView<DescriptionDataElement> fieldTable;
     @FXML TableView<DescriptionDisplayElement> elementTable;
 
-    double r = 10;
     private Char_description parent;
     private UserAccount account;
 
@@ -100,12 +97,7 @@ public class DescPaneController {
                         elementTable.refresh();
                     }
                 });
-                btn.getStylesheets().add(DescPaneController.class.getResource("/styles/DescPane.css").toExternalForm());
                 btn.getStyleClass().add("addButton");
-                btn.setPrefSize(20,20);
-                btn.setShape(new Circle(r));
-                btn.setMinSize(2*r, 2*r);
-                btn.setShape(new Circle(1.5));
                 return new ReadOnlyObjectWrapper(btn);
             }
         });
@@ -131,6 +123,7 @@ public class DescPaneController {
         translate.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.translateXProperty().bind((cb.widthProperty()).multiply(0.25).negate());
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -144,6 +137,7 @@ public class DescPaneController {
         linebreak.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.translateXProperty().bind((cb.widthProperty()).multiply(0.25).negate());
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -157,6 +151,7 @@ public class DescPaneController {
         bold.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.translateXProperty().bind((cb.widthProperty()).multiply(0.25).negate());
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -170,6 +165,7 @@ public class DescPaneController {
         italic.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.translateXProperty().bind((cb.widthProperty()).multiply(0.25).negate());
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -183,6 +179,7 @@ public class DescPaneController {
         leftATableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.translateXProperty().bind((cb.widthProperty()).multiply(0.25).negate());
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -199,6 +196,7 @@ public class DescPaneController {
         rightATableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox>, ObservableValue<CheckBox>>() {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 CheckBox cb = new CheckBox();
+                cb.translateXProperty().bind((cb.widthProperty()).multiply(0.25).negate());
                 cb.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -216,6 +214,7 @@ public class DescPaneController {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 TextField tf = new TextField();
                 tf.textProperty().bindBidirectional(r.getValue().prefix);
+                tf.translateXProperty().bind(prefix.widthProperty().subtract(tf.widthProperty()).multiply(0.5).negate());
                 return new ReadOnlyObjectWrapper(tf);
             }
         });
@@ -223,6 +222,7 @@ public class DescPaneController {
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, CheckBox> r) {
                 TextField tf = new TextField();
                 tf.textProperty().bindBidirectional(r.getValue().suffix);
+                tf.translateXProperty().bind(suffix.widthProperty().subtract(tf.widthProperty()).multiply(0.5).negate());
                 return new ReadOnlyObjectWrapper(tf);
             }
         });
@@ -238,12 +238,8 @@ public class DescPaneController {
                     }
                 });
                 btn.visibleProperty().bind(b.getValue().position.greaterThan(0));
-                btn.getStylesheets().add(DescPaneController.class.getResource("/styles/DescPane.css").toExternalForm());
                 btn.getStyleClass().add("upButton");
-                btn.setPrefSize(20,20);
-                btn.setShape(new Circle(r));
-                btn.setMinSize(2*r, 2*r);
-                btn.setShape(new Circle(1.5));
+                btn.translateXProperty().bind(up.widthProperty().multiply(0.25).negate());
                 return new ReadOnlyObjectWrapper(btn);
             }
         });
@@ -259,12 +255,8 @@ public class DescPaneController {
                     }
                 });
                 btn.visibleProperty().bind(b.getValue().position.lessThan(elementTable.getItems().size()-1));
-                btn.getStylesheets().add(DescPaneController.class.getResource("/styles/DescPane.css").toExternalForm());
                 btn.getStyleClass().add("downButton");
-                btn.setPrefSize(20,20);
-                btn.setShape(new Circle(r));
-                btn.setMinSize(2*r, 2*r);
-                btn.setShape(new Circle(1.5));
+                btn.translateXProperty().bind(down.widthProperty().multiply(0.25).negate());
                 return new ReadOnlyObjectWrapper(btn);
             }
         });
@@ -278,12 +270,8 @@ public class DescPaneController {
                         elementTable.refresh();
                     }
                 });
-                btn.getStylesheets().add(DescPaneController.class.getResource("/styles/DescPane.css").toExternalForm());
                 btn.getStyleClass().add("clearButton");
-                btn.setPrefSize(20,20);
-                btn.setShape(new Circle(r));
-                btn.setMinSize(2*r, 2*r);
-                btn.setShape(new Circle(1.5));
+                btn.translateXProperty().bind(clear.widthProperty().multiply(0.25).negate());
                 return new ReadOnlyObjectWrapper(btn);
             }
         });
@@ -329,7 +317,7 @@ public class DescPaneController {
     }
 
     public void setStageWidthProperty(ReadOnlyDoubleProperty widthProperty) {
-        elementTable.prefWidthProperty().bind(widthProperty.multiply(0.4));
-        fieldTable.prefWidthProperty().bind(widthProperty.multiply(0.6));
+        elementTable.prefWidthProperty().bind(widthProperty.multiply(0.6));
+        //fieldTable.prefWidthProperty().bind(widthProperty.multiply(0.6));
     }
 }

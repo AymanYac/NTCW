@@ -263,8 +263,8 @@ public class Char_description {
 							FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/DescSettingPane.fxml"));
 							Scene scene = new Scene(loader.load());
 							Stage secondaryStage = new Stage();
+							secondaryStage.setWidth(btn.getScene().getWindow().getWidth()*0.7);
 							secondaryStage.initStyle(StageStyle.TRANSPARENT);
-							secondaryStage.setMaximized(true);
 							secondaryStage.setScene(scene);
 							secondaryStage.show();
 							descSettingController = loader.getController();

@@ -20,6 +20,23 @@
 	-fx-text-fill:#8496AE;
 }
 
+#fieldTable{
+	-fx-font-family:Calibri;
+	-fx-font-size: 0.5em;
+	-fx-text-fill:#8496AE;
+}
+#fieldTable .column-header,
+#fieldTable .column-header-background {
+    -fx-background-color: #445469;
+    -fx-border-width: 1em;
+}
+#fieldTable .column-header .label {
+    -fx-alignment: baseline-center;
+    -fx-text-alignment: center;
+    -fx-wrap-text: false;
+    -fx-font-size: 0.5em;
+    -fx-text-fill: white;
+}
 
 
 .table-row-cell:filled:even{
@@ -149,7 +166,9 @@
 }
 
 .table-view .column-header#active-column {
-  -fx-background-color: #BD392F, #445469, linear-gradient(#323E4E 0%, #323E4E 20%, #445469 100%), linear-gradient(#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
+  -fx-background-color:#1EA185,
+  	    linear-gradient(#167862 0%, #167862 20%, #1EA185 100%),
+        linear-gradient(#94EBD8 0%, #5EE1C4 5%, #1EA185 50%, #1EA185 51%, #167862 100%);
   -fx-background-insets: 0px, 2px;
 
 }
