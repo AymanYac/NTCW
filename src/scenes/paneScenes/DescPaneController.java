@@ -329,7 +329,7 @@ public class DescPaneController {
     }
 
     public void setStageWidthProperty(ReadOnlyDoubleProperty widthProperty) {
-        elementTable.prefWidthProperty().bind(widthProperty.multiply(0.4));
-        fieldTable.prefWidthProperty().bind(widthProperty.multiply(0.6));
+        elementTable.prefWidthProperty().bind(widthProperty.multiply(0.6));
+        fieldTable.prefWidthProperty().bind(widthProperty.multiply(0.4));
     }
 }

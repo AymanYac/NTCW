@@ -28,6 +28,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -264,7 +265,8 @@ public class Char_description {
 							Scene scene = new Scene(loader.load());
 							Stage secondaryStage = new Stage();
 							secondaryStage.initStyle(StageStyle.TRANSPARENT);
-							secondaryStage.setMaximized(true);
+							//secondaryStage.setMaximized(true);
+							secondaryStage.setWidth(Math.floor(Screen.getPrimary().getBounds().getWidth()*0.7));
 							secondaryStage.setScene(scene);
 							secondaryStage.show();
 							descSettingController = loader.getController();

@@ -60,7 +60,9 @@
 
 
 #elementTable .table-row-cell {
-    -fx-background-color: #445469;
+    -fx-background-color: white;
+    /*-fx-background-color: #445469;*/
+    -fx-padding: 0;
 }
 
 #elementTable .table-row-cell .text {
