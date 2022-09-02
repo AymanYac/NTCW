@@ -137,7 +137,7 @@
                         <Menu fx:id="counterSelection" mnemonicParsing="false" text="Selected items:" />
                      </menus>
                   </MenuBar>
-                  <MenuBar maxWidth="1.7976931348623157E308" stylesheets="@../styles/MenuLightBrown.css" GridPane.columnSpan="2147483647" GridPane.valignment="TOP">
+                  <MenuBar maxWidth="1.7976931348623157E308" stylesheets="@../styles/MenuLightBlue.css" GridPane.columnSpan="2147483647" GridPane.valignment="TOP">
                      <menus>
                         <Menu id="menuHeader" fx:id="projectMenu" mnemonicParsing="false" text="Project" />
                         <Menu id="menuHeader" fx:id="homeMenu" mnemonicParsing="false" />

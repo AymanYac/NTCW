@@ -2,7 +2,6 @@ package scenes.paneScenes;
 
 import controllers.Char_description;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -12,7 +11,9 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import javafx.util.Callback;
+import model.CharDescriptionRow;
 import model.DescriptionDataElement;
 import model.DescriptionDisplayElement;
 import model.UserAccount;
@@ -20,6 +21,8 @@ import org.fxmisc.richtext.StyleClassedTextArea;
 import transversal.generic.TextUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class DescPaneController {
@@ -35,7 +38,6 @@ public class DescPaneController {
     @FXML public TableColumn linebreak;
     @FXML public TableColumn translate;
     @FXML public TableColumn fieldName;
-    @FXML public TableColumn position;
     @FXML public TableColumn field;
     @FXML public TableColumn example;
     @FXML public TableColumn add;
@@ -48,6 +50,8 @@ public class DescPaneController {
 
     private Char_description parent;
     private UserAccount account;
+    private Integer parentRowIndex;
+    private Integer parentColumnIndex;
 
     @FXML void initialize(){
 
@@ -71,6 +75,7 @@ public class DescPaneController {
                 previewArea.setWrapText(true);
             }
         });
+        DescriptionDisplayElement.DisplaySettings.put(parentRowIndex.toString()+parentColumnIndex.toString(),elementTable.getItems());
     }
 
     private void setFieldsColumns() {
@@ -93,7 +98,7 @@ public class DescPaneController {
                 btn.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
-                        elementTable.getItems().add(new DescriptionDisplayElement(param.getValue().getFieldName()));
+                        elementTable.getItems().add(DescriptionDisplayElement.createDescriptionDisplayElement(param.getValue().getFieldName()));
                         elementTable.refresh();
                     }
                 });
@@ -107,13 +112,6 @@ public class DescPaneController {
     private void setElemsColumns() {
 
 
-
-        position.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, String> param) {
-                return new ReadOnlyObjectWrapper(String.valueOf(elementTable.getItems().indexOf(param.getValue())+1));
-            }
-        });
         fieldName.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<DescriptionDisplayElement, String>, ObservableValue<String>>() {
               @Override
               public ObservableValue<String> call(TableColumn.CellDataFeatures<DescriptionDisplayElement, String> param) {
@@ -268,12 +266,12 @@ public class DescPaneController {
 
     public void fillDummyItems(){
         ArrayList<DescriptionDisplayElement> elems = new ArrayList<>();
-        elems.add(new DescriptionDisplayElement("Description FR"));
-        elems.add(new DescriptionDisplayElement("Description IT"));
-        elems.add(new DescriptionDisplayElement("Description EN"));
-        elems.add(new DescriptionDisplayElement("PO FR"));
-        elems.add(new DescriptionDisplayElement("PO IT"));
-        elems.add(new DescriptionDisplayElement("PO EN"));
+        elems.add(DescriptionDisplayElement.createDescriptionDisplayElement("Description FR"));
+        elems.add(DescriptionDisplayElement.createDescriptionDisplayElement("Description IT"));
+        elems.add(DescriptionDisplayElement.createDescriptionDisplayElement("Description EN"));
+        elems.add(DescriptionDisplayElement.createDescriptionDisplayElement("PO FR"));
+        elems.add(DescriptionDisplayElement.createDescriptionDisplayElement("PO IT"));
+        elems.add(DescriptionDisplayElement.createDescriptionDisplayElement("PO EN"));
         ArrayList<DescriptionDataElement> fields = new ArrayList<>();
         fields.add(new DescriptionDataElement("Article ID","00000180199"));
         fields.add(new DescriptionDataElement("INTERNAL NUMBER","ABRA0001"));
@@ -290,23 +288,41 @@ public class DescPaneController {
         fields.add(new DescriptionDataElement("Sourcing Family","Ceco almacén efectos y repuestos"));
         fields.add(new DescriptionDataElement("SSR","AETNA GROUP 0001354366"));
         fields.add(new DescriptionDataElement("Données de base","Type de composant : Mecanique | Fabriquant impose : oui | Ref 0001354366"));
+
+        fillTable(new LinkedList<DescriptionDisplayElement>(),fields);
+    }
+
+    private void fillTable(List<DescriptionDisplayElement> elements, List<DescriptionDataElement> fields) {
+        elementTable.getItems().setAll(elements);
         fieldTable.getItems().setAll(fields);
     }
 
-    public void setParent(Char_description parent) {
+    public void setParent(Char_description parent, Integer rowIndex, Integer columnIndex) {
         this.parent = parent;
+        this.parentRowIndex = rowIndex;
+        this.parentColumnIndex = columnIndex;
     }
 
     public void setUserAccount(UserAccount account) {
         this.account = account;
     }
 
-    public void fillItems(Integer rowIndex, Integer columnIndex) {
-        fillDummyItems();
+    public void fillItems() {
+        CharDescriptionRow tmp = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
+        fillTable(DescriptionDisplayElement.returnElementsForItem(tmp,parentRowIndex,parentColumnIndex),tmp.getDescriptionDataFields());
     }
 
-    public void setStageWidthProperty(ReadOnlyDoubleProperty widthProperty) {
-        elementTable.prefWidthProperty().bind(widthProperty.multiply(0.6));
-        fieldTable.prefWidthProperty().bind(widthProperty.multiply(0.4));
+    public void setStageWidthProperty(Stage stage) {
+        elementTable.prefWidthProperty().bind(stage.widthProperty().multiply(0.6));
+        //fieldTable.prefWidthProperty().bind(widthProperty.multiply(0.4));
+        stage.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if(!newValue){
+                    parent.refresh_ui_display();
+                    stage.close();
+                }
+            }
+        });
     }
 }

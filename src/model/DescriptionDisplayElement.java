@@ -5,12 +5,12 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DescriptionDisplayElement {
-    private static ArrayList<DescriptionDisplayElement> randomizedSetting;
+    public static HashMap<String, List<DescriptionDisplayElement>> DisplaySettings = new HashMap<String, List<DescriptionDisplayElement>>();
     public SimpleIntegerProperty position = new SimpleIntegerProperty();
     public String fieldName;
     public SimpleBooleanProperty translate = new SimpleBooleanProperty(false);
@@ -34,8 +34,9 @@ public class DescriptionDisplayElement {
         this.suffix.set(suffix);
     }
 
-    public DescriptionDisplayElement(String fieldName) {
-        this.fieldName = fieldName;
+    public static DescriptionDisplayElement createDescriptionDisplayElement(String fieldName) {
+        double color = Math.random();
+        return new DescriptionDisplayElement(fieldName, Math.random() > 0.5, Math.random()>0.5, Math.random() > 0.5, 0.8 > color && color > 0.5, color > 0.8, Math.random() > 0.5,"","");
     }
 
     public static List<DescriptionDisplayElement> randomDisplayElements(ArrayList<String> keySet) {
@@ -43,8 +44,17 @@ public class DescriptionDisplayElement {
             return randomizedSetting;
         }*/
         double color = Math.random();
-        randomizedSetting = keySet.stream().map(fieldName->new DescriptionDisplayElement(fieldName, Math.random() > 0.5, Math.random()>0.5, Math.random() > 0.5, 0.8 > color && color > 0.5, color > 0.8, Math.random() > 0.5,"",""))
+        return keySet.stream().map(fieldName->new DescriptionDisplayElement(fieldName, Math.random() > 0.5, Math.random()>0.5, Math.random() > 0.5, 0.8 > color && color > 0.5, color > 0.8, Math.random() > 0.5,"",""))
                 .collect(Collectors.toCollection(ArrayList::new));
-        return randomizedSetting;
     }
+
+    public static List<DescriptionDisplayElement> returnElementsForItem(CharDescriptionRow tmp, Integer rowIndex, Integer columnIndex) {
+        List<DescriptionDisplayElement> ret = DescriptionDisplayElement.DisplaySettings.get(rowIndex.toString() + columnIndex.toString());
+        if(ret==null){
+            ret = DescriptionDisplayElement.randomDisplayElements(tmp.getDescriptionDataFields().stream().map(e -> e.getFieldName()).collect(Collectors.toCollection(ArrayList::new)));
+            DescriptionDisplayElement.DisplaySettings.put(rowIndex.toString()+columnIndex.toString(),ret);
+        }
+        return ret;
+    }
+
 }

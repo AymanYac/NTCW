@@ -3,12 +3,17 @@
 
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
 <VBox fx:id="top" prefWidth="300" prefHeight="36" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" stylesheets="@../../styles/ToolHeader.css">
     <AnchorPane fx:id="title">
         <Label fx:id="neonecIcon" prefWidth="43" prefHeight="30" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="3.0"/>
         <Label fx:id="neonecTitle" text="Neonec Data Enhancement Wizard - v6.0" prefHeight="30" AnchorPane.leftAnchor="53.0" AnchorPane.topAnchor="3.0"/>
-        <Label fx:id="winClose" prefWidth="30" prefHeight="30" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="3.0"/>
-        <Label fx:id="winMaximize" prefWidth="30" prefHeight="30" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="3.0"/>
-        <Label fx:id="winMinimize" prefWidth="30" prefHeight="30" AnchorPane.rightAnchor="75.0" AnchorPane.topAnchor="3.0"/>
+        <HBox prefWidth="108" prefHeight="36" spacing="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <Label fx:id="winMinimize" prefWidth="36" prefHeight="36"/>
+                <Label fx:id="winMaximize" prefWidth="36" prefHeight="36"/>
+                <Label fx:id="winClose" prefWidth="36" prefHeight="36"/>
+            </children>
+        </HBox>
     </AnchorPane>
 </VBox>

@@ -1,6 +1,6 @@
 .menu-bar{
 	-fx-background-color:#ACB9CA;
-	-fx-border-color:#ACB9CA;	
+	-fx-border-color:#ACB9CA;
 }
 
 .stackpane{
@@ -21,4 +21,8 @@
 
 .table-view:row-selection .column-header-background .filler{
 	-fx-background-color:#ACB9CA;
+}
+
+.activeMenu{
+    -fx-background-color: #D6DCE4;
 }

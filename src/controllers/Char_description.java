@@ -47,6 +47,7 @@ import service.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.data_exchange_toolbox.ScrollTimer;
 import transversal.dialog_toolbox.*;
+import transversal.generic.TextUtils;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 import transversal.language_toolbox.WordUtils;
@@ -270,10 +271,10 @@ public class Char_description {
 							secondaryStage.setScene(scene);
 							secondaryStage.show();
 							descSettingController = loader.getController();
-							descSettingController.setParent(tableController.Parent);
+							descSettingController.setParent(tableController.Parent,GridPane.getRowIndex(btn),GridPane.getColumnIndex(btn));
 							descSettingController.setUserAccount(tableController.Parent.account);
-							descSettingController.fillItems(GridPane.getRowIndex(btn),GridPane.getColumnIndex(btn));
-							descSettingController.setStageWidthProperty(secondaryStage.widthProperty());
+							descSettingController.fillItems();
+							descSettingController.setStageWidthProperty(secondaryStage);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -320,7 +321,12 @@ public class Char_description {
 			}
 		});
 
-		initRibbon();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				initRibbon();
+			}
+		});
 		toolBarButtonListener();
 		initializePropButtons();
 
@@ -2267,6 +2273,12 @@ public class Char_description {
 	
 	@SuppressWarnings("static-access")
 	public  void refresh_ui_display() {
+
+		TextUtils.renderDescription(sd,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaLeft.widthProperty());
+		TextUtils.renderDescription(ld,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaRight.widthProperty());
+		TextUtils.renderDescription(sd_translated,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaLeft.widthProperty());
+		TextUtils.renderDescription(ld_translated,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaRight.widthProperty());
+
 		proposer.clearPropButtons();
 		double RIGHT_TRANSLATE = 0.0*rule_field.getWidth();
 		clear_data_fields();

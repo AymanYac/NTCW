@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
 import model.CharDescriptionRow;
 import model.DescriptionDisplayElement;
 import javafx.scene.control.TextField;
@@ -65,8 +66,8 @@ public class TextUtils {
 
 
     public static void renderDescription(StyleClassedTextArea previewArea, CharDescriptionRow tmp, ReadOnlyDoubleProperty readOnlyDoubleProperty) {
-        renderDescription(previewArea,
-                DescriptionDisplayElement.randomDisplayElements(tmp.getDescriptionDataFields().stream().map(e->e.getFieldName()).collect(Collectors.toCollection(ArrayList::new))),
+        renderDescription(previewArea,DescriptionDisplayElement.returnElementsForItem(tmp, GridPane.getRowIndex(previewArea),GridPane.getColumnIndex(previewArea))
+                ,
                 tmp.getDescriptionDataFields(),readOnlyDoubleProperty);
     }
     public static void renderDescription(StyleClassedTextArea previewArea, List<DescriptionDisplayElement> items, List<DescriptionDataElement> fieldTableItems, ReadOnlyDoubleProperty readOnlyDoubleProperty) {

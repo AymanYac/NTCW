@@ -35,10 +35,13 @@
             <center>
                 <TableView fx:id="fieldTable" stylesheets="@../../styles/TableViewDescription.css" styleClass="fieldTable">
                     <columns>
-                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: CENTER-LEFT;" text="Field name" fx:id="field" percentageWidth="0.2"/>
-                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: CENTER-LEFT;" text="Examples" fx:id="example" percentageWidth="0.68"/>
-                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: CENTER;" fx:id="add" percentageWidth="0.06"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER-LEFT;" editable="false" resizable="true" text="Field name" fx:id="field" percentageWidth="0.24"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER-LEFT;" editable="false" resizable="true" text="Examples" fx:id="example" percentageWidth="0.65"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" fx:id="add" percentageWidth="0.06"/>
                     </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
                 </TableView>
             </center>
             <left>
@@ -60,20 +63,22 @@
             <center>
                 <TableView fx:id="elementTable" stylesheets="/styles/DescPane.css">
                     <columns>
-                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-LEFT;" fx:id="position" percentageWidth="0.035"/>
-                        <CustomTableColumn editable="false" resizable="false" style="-fx-alignment: TOP-LEFT;" fx:id="fieldName" percentageWidth="0.16"/>
-                        <CustomTableColumn editable="false" resizable="false" text="Auto-&#10;translate" fx:id="translate" percentageWidth="0.06"/>
-                        <CustomTableColumn editable="false" resizable="false" text="Line&#10;Break" fx:id="linebreak" percentageWidth="0.06"/>
-                        <CustomTableColumn editable="false" resizable="false" text="Bold" fx:id="bold" percentageWidth="0.06"/>
-                        <CustomTableColumn editable="false" resizable="false" text="Italic" fx:id="italic" percentageWidth="0.06" />
-                        <CustomTableColumn editable="false" resizable="false" fx:id="leftATableColumn" percentageWidth="0.06"/>
-                        <CustomTableColumn editable="false" resizable="false" fx:id="rightATableColumn" percentageWidth="0.06" />
-                        <CustomTableColumn editable="false" resizable="false" text="Prefix" fx:id="prefix" percentageWidth="0.16"/>
-                        <CustomTableColumn editable="false" resizable="false" text="Suffix" fx:id="suffix" percentageWidth="0.16"/>
-                        <CustomTableColumn editable="false" resizable="false" fx:id="up" percentageWidth="0.04" />
-                        <CustomTableColumn editable="false" resizable="false" fx:id="down" percentageWidth="0.04" />
-                        <CustomTableColumn editable="false" resizable="false" fx:id="clear" percentageWidth="0.04" />
+                        <CustomTableColumn style="-fx-alignment:CENTER-LEFT;" editable="false" resizable="true" fx:id="fieldName" percentageWidth="0.2"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" text="Translate" fx:id="translate" percentageWidth="0.06"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" text="Line&#10;Break" fx:id="linebreak" percentageWidth="0.06"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" text="Bold" fx:id="bold" percentageWidth="0.06"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" text="Italic" fx:id="italic" percentageWidth="0.06" />
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" fx:id="leftATableColumn" percentageWidth="0.06"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" fx:id="rightATableColumn" percentageWidth="0.06" />
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" text="Prefix" fx:id="prefix" percentageWidth="0.14"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" text="Suffix" fx:id="suffix" percentageWidth="0.14"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" fx:id="up" percentageWidth="0.04" />
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" fx:id="down" percentageWidth="0.04" />
+                        <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" fx:id="clear" percentageWidth="0.04" />
                     </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
                 </TableView>
             </center>
             <left>

@@ -252,8 +252,7 @@ public class TablePane_CharClassif {
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
-		
-		
+
 	}
 
 	private void scrollToSelectedItem(CharDescriptionRow tmp, int offset) {
@@ -1108,10 +1107,6 @@ public class TablePane_CharClassif {
 		    	
 		    	
 		    	Parent.aidLabel.setText("Article ID: "+tmp.getClient_item_number());
-				TextUtils.renderDescription(Parent.sd,tmp, Parent.helperAreaLeft.widthProperty());
-				TextUtils.renderDescription(Parent.ld,tmp, Parent.helperAreaRight.widthProperty());
-				TextUtils.renderDescription(Parent.sd_translated,tmp, Parent.helperAreaLeft.widthProperty());
-				TextUtils.renderDescription(Parent.ld_translated,tmp, Parent.helperAreaRight.widthProperty());
 				item_selection_routine(tmp);
 				Parent.refreshScrollButtons();
 		    	Parent.value_field.requestFocus();

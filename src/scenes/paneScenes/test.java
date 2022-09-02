@@ -33,7 +33,7 @@ public class test extends Application {
         primaryStage.show();
         primaryStage.setWidth(Screen.getPrimary().getBounds().getWidth()*0.7);
         primaryStage.setX(0);
-        controller.setStageWidthProperty(primaryStage.widthProperty());
+        controller.setStageWidthProperty(primaryStage);
     }
 
     public static void main(String[] args)
