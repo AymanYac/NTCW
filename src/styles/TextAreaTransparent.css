@@ -4,8 +4,16 @@
     -fx-font-weight:normal;
     -fx-background-color: transparent;
     -fx-font-family: calibri;
-    -fx-font-size: 1em;
     -fx-padding: 0em;
+}
+.smallFont {
+    -fx-font-size: 0.8em;
+}
+.midFont {
+    -fx-font-size: 1em;
+}
+.bigFont {
+    -fx-font-size: 1.2em;
 }
 .boldText {
     -fx-font-weight: bold;

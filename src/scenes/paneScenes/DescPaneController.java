@@ -41,6 +41,10 @@ public class DescPaneController {
     @FXML public TableColumn field;
     @FXML public TableColumn example;
     @FXML public TableColumn add;
+    @FXML public Button incFontButton;
+    @FXML public Button decFontButton;
+    @FXML public Button applyButton;
+    @FXML public Button cancelButton;
     @FXML StyleClassedTextArea previewArea;
 
     @FXML BorderPane mainBorderPane;
@@ -64,6 +68,36 @@ public class DescPaneController {
             }
         });
         setFieldsColumns();
+        incFontButton.setVisible(!DescriptionDisplayElement.fontSizeMode.equals("bigFont"));
+        decFontButton.setVisible(!DescriptionDisplayElement.fontSizeMode.equals("smallFont"));
+        incFontButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if(DescriptionDisplayElement.fontSizeMode.equals("midFont")){
+                    incFontButton.setVisible(false);
+                    DescriptionDisplayElement.fontSizeMode="bigFont";
+                }else{
+                    //fontSizeMode = smallFont
+                    decFontButton.setVisible(true);
+                    DescriptionDisplayElement.fontSizeMode="midFont";
+                }
+                refresh_preview();
+            }
+        });
+        decFontButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if(DescriptionDisplayElement.fontSizeMode.equals("midFont")){
+                    decFontButton.setVisible(false);
+                    DescriptionDisplayElement.fontSizeMode="smallFont";
+                }else{
+                    //fontSizeMode = smallFont
+                    incFontButton.setVisible(true);
+                    DescriptionDisplayElement.fontSizeMode="midFont";
+                }
+                refresh_preview();
+            }
+        });
         //fillDummyItems();
     }
 
@@ -71,11 +105,10 @@ public class DescPaneController {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                TextUtils.renderDescription(previewArea,elementTable.getItems(),fieldTable.getItems(),previewArea.widthProperty());
+                TextUtils.renderDescription(previewArea,elementTable.getItems(),fieldTable.getItems(),previewArea.widthProperty(),DescriptionDisplayElement.fontSizeMode);
                 previewArea.setWrapText(true);
             }
         });
-        DescriptionDisplayElement.DisplaySettings.put(parentRowIndex.toString()+parentColumnIndex.toString(),elementTable.getItems());
     }
 
     private void setFieldsColumns() {
@@ -315,13 +348,35 @@ public class DescPaneController {
     public void setStageWidthProperty(Stage stage) {
         elementTable.prefWidthProperty().bind(stage.widthProperty().multiply(0.6));
         //fieldTable.prefWidthProperty().bind(widthProperty.multiply(0.4));
-        stage.focusedProperty().addListener(new ChangeListener<Boolean>() {
+        /*stage.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if(!newValue){
+                    try{
+                        parent.refresh_ui_display();
+                        stage.close();
+                    }catch (Exception E){
+
+                    }
+                }
+            }
+        });*/
+        applyButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try{
+                    DescriptionDisplayElement.DisplaySettings.put(parentRowIndex.toString() + parentColumnIndex.toString(), elementTable.getItems());
                     parent.refresh_ui_display();
                     stage.close();
+                }catch (Exception E){
+
                 }
+            }
+        });
+        cancelButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                stage.close();
             }
         });
     }

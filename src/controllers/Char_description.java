@@ -2274,10 +2274,10 @@ public class Char_description {
 	@SuppressWarnings("static-access")
 	public  void refresh_ui_display() {
 
-		TextUtils.renderDescription(sd,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaLeft.widthProperty());
-		TextUtils.renderDescription(ld,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaRight.widthProperty());
-		TextUtils.renderDescription(sd_translated,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaLeft.widthProperty());
-		TextUtils.renderDescription(ld_translated,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaRight.widthProperty());
+		TextUtils.renderDescription(sd,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaLeft.widthProperty(), DescriptionDisplayElement.fontSizeMode);
+		TextUtils.renderDescription(ld,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaRight.widthProperty(), DescriptionDisplayElement.fontSizeMode);
+		TextUtils.renderDescription(sd_translated,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaLeft.widthProperty(), DescriptionDisplayElement.fontSizeMode);
+		TextUtils.renderDescription(ld_translated,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaRight.widthProperty(), DescriptionDisplayElement.fontSizeMode);
 
 		proposer.clearPropButtons();
 		double RIGHT_TRANSLATE = 0.0*rule_field.getWidth();

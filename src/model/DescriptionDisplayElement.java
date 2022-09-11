@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 public class DescriptionDisplayElement {
     public static HashMap<String, List<DescriptionDisplayElement>> DisplaySettings = new HashMap<String, List<DescriptionDisplayElement>>();
+    public static String fontSizeMode = "midFont";
     public SimpleIntegerProperty position = new SimpleIntegerProperty();
     public String fieldName;
     public SimpleBooleanProperty translate = new SimpleBooleanProperty(false);

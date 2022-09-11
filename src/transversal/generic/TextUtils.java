@@ -3,24 +3,16 @@ package transversal.generic;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import model.CharDescriptionRow;
 import model.DescriptionDisplayElement;
-import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
 import javafx.scene.text.*;
-import model.GlobalConstants;
 import model.DescriptionDataElement;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TextUtils {
@@ -65,12 +57,12 @@ public class TextUtils {
     }
 
 
-    public static void renderDescription(StyleClassedTextArea previewArea, CharDescriptionRow tmp, ReadOnlyDoubleProperty readOnlyDoubleProperty) {
+    public static void renderDescription(StyleClassedTextArea previewArea, CharDescriptionRow tmp, ReadOnlyDoubleProperty readOnlyDoubleProperty, String fontSizeMode) {
         renderDescription(previewArea,DescriptionDisplayElement.returnElementsForItem(tmp, GridPane.getRowIndex(previewArea),GridPane.getColumnIndex(previewArea))
                 ,
-                tmp.getDescriptionDataFields(),readOnlyDoubleProperty);
+                tmp.getDescriptionDataFields(),readOnlyDoubleProperty,fontSizeMode);
     }
-    public static void renderDescription(StyleClassedTextArea previewArea, List<DescriptionDisplayElement> items, List<DescriptionDataElement> fieldTableItems, ReadOnlyDoubleProperty readOnlyDoubleProperty) {
+    public static void renderDescription(StyleClassedTextArea previewArea, List<DescriptionDisplayElement> items, List<DescriptionDataElement> fieldTableItems, ReadOnlyDoubleProperty readOnlyDoubleProperty, String fontSizeMode) {
         previewArea.clear();
         StringBuilder sb = new StringBuilder();
         ArrayList<Integer> zones = new ArrayList<>();
@@ -83,6 +75,7 @@ public class TextUtils {
             zones.add(sb.length());
             ArrayList<String> tmp = new ArrayList<String>();
             tmp.add("basicText");
+            tmp.add(fontSizeMode);
             if(elem.leftATableColumn.getValue()){
                 tmp.add("greenText");
             }

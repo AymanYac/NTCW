@@ -7,6 +7,7 @@
 <?import model.CustomTableColumn?>
 <?import org.fxmisc.richtext.StyleClassedTextArea?>
 
+<?import javafx.scene.control.Button?>
 <BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:id="mainBorderPane" fx:controller="scenes.paneScenes.DescPaneController" stylesheets="@../../styles/DescPane.css">
     <top>
         <BorderPane fx:id="titleBar">
@@ -35,7 +36,7 @@
             <center>
                 <TableView fx:id="fieldTable" stylesheets="@../../styles/TableViewDescription.css" styleClass="fieldTable">
                     <columns>
-                        <CustomTableColumn style="-fx-alignment:CENTER-LEFT;" editable="false" resizable="true" text="Field name" fx:id="field" percentageWidth="0.24"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER-LEFT; -fx-font-weight:bold;" editable="false" resizable="true" text="Field name" fx:id="field" percentageWidth="0.24"/>
                         <CustomTableColumn style="-fx-alignment:CENTER-LEFT;" editable="false" resizable="true" text="Examples" fx:id="example" percentageWidth="0.65"/>
                         <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" fx:id="add" percentageWidth="0.06"/>
                     </columns>
@@ -63,7 +64,7 @@
             <center>
                 <TableView fx:id="elementTable" stylesheets="/styles/DescPane.css">
                     <columns>
-                        <CustomTableColumn style="-fx-alignment:CENTER-LEFT;" editable="false" resizable="true" fx:id="fieldName" percentageWidth="0.2"/>
+                        <CustomTableColumn style="-fx-alignment:CENTER-LEFT; -fx-font-weight:lighter;" editable="false" resizable="true" fx:id="fieldName" percentageWidth="0.2"/>
                         <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" text="Translate" fx:id="translate" percentageWidth="0.06"/>
                         <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" text="Line&#10;Break" fx:id="linebreak" percentageWidth="0.06"/>
                         <CustomTableColumn style="-fx-alignment:CENTER;" editable="false" resizable="true" text="Bold" fx:id="bold" percentageWidth="0.06"/>
@@ -109,7 +110,7 @@
                         <Label text="Description preview" prefHeight="30" translateX="20" BorderPane.alignment="CENTER_LEFT"/>
                     </center>
                     <right>
-                        <!--<BorderPane prefHeight="30">
+                        <BorderPane prefHeight="30">
                             <top>
                                 <HBox prefHeight="0"/>
                             </top>
@@ -117,27 +118,17 @@
                                 <HBox prefHeight="0"/>
                             </bottom>
                             <left>
-                                <Button prefWidth="30" prefHeight="30" translateX="-10">
-                                    <graphic>
-                                        <ImageView fitHeight="30" fitWidth="30" pickOnBounds="true" preserveRatio="true">
-                                            <Image url="@../../pictures/toolbar_buttons/Decrease_font_size.png" />
-                                        </ImageView>
-                                    </graphic>
+                                <Button fx:id="incFontButton" stylesheets="/styles/DescPane.css" styleClass="increaseFont" prefWidth="30" prefHeight="30" translateX="-10">
                                 </Button>
                             </left>
                             <center>
                                 <HBox prefWidth="5"/>
                             </center>
                             <right>
-                                <Button prefWidth="30" prefHeight="30"  translateX="-10">
-                                    <graphic>
-                                        <ImageView fitHeight="30" fitWidth="30" pickOnBounds="true" preserveRatio="true">
-                                            <Image url="@../../pictures/toolbar_buttons/Increase_font_size.png" />
-                                        </ImageView>
-                                    </graphic>
+                                <Button fx:id="decFontButton" stylesheets="/styles/DescPane.css" styleClass="decreaseFont" prefWidth="30" prefHeight="30"  translateX="-10">
                                 </Button>
                             </right>
-                        </BorderPane>-->
+                        </BorderPane>
                     </right>
                 </BorderPane>
             </top>
@@ -167,7 +158,13 @@
                 <HBox prefWidth="10"/>
             </right>
             <bottom>
-                <HBox prefHeight="10"/>
+                <HBox spacing="10" alignment="CENTER_RIGHT" prefHeight="60">
+                    <children>
+                        <Button fx:id="applyButton" stylesheets="@../../styles/ButtonBlue.css" text="Apply"/>
+                        <Button fx:id="cancelButton" stylesheets="@../../styles/ButtonBlue.css" text="Cancel"/>
+                        <HBox prefWidth="0"/>
+                    </children>
+                </HBox>
             </bottom>
         </BorderPane>
     </bottom>

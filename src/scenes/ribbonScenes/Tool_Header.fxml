@@ -11,7 +11,7 @@
         <HBox prefWidth="108" prefHeight="36" spacing="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
                 <Label fx:id="winMinimize" prefWidth="36" prefHeight="36"/>
-                <Label fx:id="winMaximize" prefWidth="36" prefHeight="36"/>
+                <Label disable="true" fx:id="winMaximize" prefWidth="36" prefHeight="36"/>
                 <Label fx:id="winClose" prefWidth="36" prefHeight="36"/>
             </children>
         </HBox>
