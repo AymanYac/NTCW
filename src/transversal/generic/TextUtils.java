@@ -58,7 +58,7 @@ public class TextUtils {
 
 
     public static void renderDescription(StyleClassedTextArea previewArea, CharDescriptionRow tmp, ReadOnlyDoubleProperty readOnlyDoubleProperty, String fontSizeMode) {
-        renderDescription(previewArea,DescriptionDisplayElement.returnElementsForItem(tmp, GridPane.getRowIndex(previewArea),GridPane.getColumnIndex(previewArea))
+        renderDescription(previewArea,DescriptionDisplayElement.returnElementsForItem(tmp, GridPane.getRowIndex(previewArea),GridPane.getColumnIndex(previewArea)+GridPane.getColumnSpan(previewArea)-1)
                 ,
                 tmp.getDescriptionDataFields(),readOnlyDoubleProperty,fontSizeMode);
     }
@@ -96,11 +96,11 @@ public class TextUtils {
         });
         previewArea.setWrapText(true);
         previewArea.prefWidthProperty().bind(readOnlyDoubleProperty);
-        Platform.runLater(new Runnable() {
+        /*Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 previewArea.scrollYToPixel(0.0);
             }
-        });
+        });*/
     }
 }

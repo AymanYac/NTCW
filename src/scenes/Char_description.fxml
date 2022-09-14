@@ -1751,11 +1751,11 @@
                   <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="13" />
                   <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="13" />
                   <Button maxHeight="15.0" maxWidth="15.0" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-image: url(&quot;pictures/Icone_info.png&quot;); -fx-background-size: cover; -fx-background-repeat: no-repeat; -fx-background-color: transparent; -fx-border-color: white; -fx-border-radius: 20; -fx-font-size: 6; -fx-scale-shape: true; -fx-translate-x: -7;" visible="false" GridPane.columnIndex="7" GridPane.halignment="RIGHT" GridPane.rowIndex="13" />
-                  <StyleClassedTextArea fx:id="sd" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                  <StyleClassedTextArea fx:id="sd" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" GridPane.columnIndex="1" GridPane.columnSpan="1" GridPane.rowIndex="5">
                      <padding>
                         <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                      </padding></StyleClassedTextArea>
-                  <StyleClassedTextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                  <StyleClassedTextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" GridPane.columnIndex="1" GridPane.columnSpan="1" GridPane.rowIndex="7">
                      <padding>
                         <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                      </padding></StyleClassedTextArea>
