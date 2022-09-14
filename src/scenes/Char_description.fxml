@@ -1755,7 +1755,7 @@
                      <padding>
                         <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                      </padding></StyleClassedTextArea>
-                  <StyleClassedTextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" GridPane.columnIndex="1" GridPane.columnSpan="1" GridPane.rowIndex="7">
+                  <StyleClassedTextArea fx:id="sd_translated" prefHeight="200.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" GridPane.columnIndex="1" GridPane.columnSpan="1" GridPane.rowIndex="7">
                      <padding>
                         <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                      </padding></StyleClassedTextArea>
@@ -1763,7 +1763,7 @@
                      <padding>
                         <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                      </padding></StyleClassedTextArea>
-                  <StyleClassedTextArea fx:id="ld_translated" prefHeight="300.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparentLight.css" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="7">
+                  <StyleClassedTextArea fx:id="ld_translated" prefHeight="300.0" prefWidth="200.0" stylesheets="@../styles/TextAreaTransparent.css" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="7">
                      <padding>
                         <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                      </padding></StyleClassedTextArea>

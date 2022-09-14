@@ -498,7 +498,7 @@ public class Char_description {
 		
 		uiDataFields = new TextField[] {value_field,uom_field,min_field_uom,max_field_uom,note_field_uom,rule_field,min_field,max_field,note_field,translated_value_field};
 		
-		sd.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() 
+		aidLabel.getScene().setOnKeyPressed(new EventHandler<KeyEvent>()
         {
             public void handle(final KeyEvent keyEvent) 
             {
@@ -510,8 +510,8 @@ public class Char_description {
 				}
             }
         });
-		
-		sd.getScene().setOnKeyReleased(new EventHandler<KeyEvent>() 
+
+		aidLabel.getScene().setOnKeyReleased(new EventHandler<KeyEvent>()
         {
             public void handle(final KeyEvent keyEvent) 
             {
@@ -523,8 +523,8 @@ public class Char_description {
 				}
             }
         });
-		
-		sd.getScene().getWindow().focusedProperty().addListener(new ChangeListener<Boolean>()
+
+		aidLabel.getScene().getWindow().focusedProperty().addListener(new ChangeListener<Boolean>()
 		{
 		    @Override
 		    public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue)

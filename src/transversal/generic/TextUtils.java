@@ -96,11 +96,11 @@ public class TextUtils {
         });
         previewArea.setWrapText(true);
         previewArea.prefWidthProperty().bind(readOnlyDoubleProperty);
-        /*Platform.runLater(new Runnable() {
+        Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 previewArea.scrollYToPixel(0.0);
             }
-        });*/
+        });
     }
 }
