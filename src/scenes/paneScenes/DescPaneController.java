@@ -11,6 +11,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.CharDescriptionRow;
@@ -73,13 +74,14 @@ public class DescPaneController {
         incFontButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if(DescriptionDisplayElement.fontSizeMode.equals("midFont")){
+                String fontMode = DescriptionDisplayElement.getFontSizeForKey(parentRowIndex.toString() + parentColumnIndex.toString());
+                if(fontMode.equals("midFont")){
                     incFontButton.setVisible(false);
-                    DescriptionDisplayElement.fontSizeMode="bigFont";
+                    DescriptionDisplayElement.fontSizeMode.put(parentRowIndex.toString() + parentColumnIndex.toString(),"bigFont");
                 }else{
                     //fontSizeMode = smallFont
                     decFontButton.setVisible(true);
-                    DescriptionDisplayElement.fontSizeMode="midFont";
+                    DescriptionDisplayElement.fontSizeMode.put(parentRowIndex.toString() + parentColumnIndex.toString(),"midFont");
                 }
                 refresh_preview();
             }
@@ -87,13 +89,14 @@ public class DescPaneController {
         decFontButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if(DescriptionDisplayElement.fontSizeMode.equals("midFont")){
+                String fontMode = DescriptionDisplayElement.getFontSizeForKey(parentRowIndex.toString() + parentColumnIndex.toString());
+                if(fontMode.equals("midFont")){
                     decFontButton.setVisible(false);
-                    DescriptionDisplayElement.fontSizeMode="smallFont";
+                    DescriptionDisplayElement.fontSizeMode.put(parentRowIndex.toString() + parentColumnIndex.toString(),"smallFont");
                 }else{
                     //fontSizeMode = smallFont
                     incFontButton.setVisible(true);
-                    DescriptionDisplayElement.fontSizeMode="midFont";
+                    DescriptionDisplayElement.fontSizeMode.put(parentRowIndex.toString() + parentColumnIndex.toString(),"midFont");
                 }
                 refresh_preview();
             }
@@ -105,7 +108,7 @@ public class DescPaneController {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                TextUtils.renderDescription(previewArea,elementTable.getItems(),fieldTable.getItems(),previewArea.widthProperty(),DescriptionDisplayElement.fontSizeMode);
+                TextUtils.renderDescription(previewArea,elementTable.getItems(),fieldTable.getItems(),previewArea.widthProperty(),DescriptionDisplayElement.getFontSizeForKey(parentRowIndex.toString()+parentColumnIndex.toString()));
                 previewArea.setWrapText(true);
             }
         });

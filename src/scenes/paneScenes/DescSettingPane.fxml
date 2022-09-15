@@ -8,6 +8,8 @@
 <?import org.fxmisc.richtext.StyleClassedTextArea?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:id="mainBorderPane" fx:controller="scenes.paneScenes.DescPaneController" stylesheets="@../../styles/DescPane.css">
     <top>
         <BorderPane fx:id="titleBar">
@@ -110,25 +112,7 @@
                         <Label text="Description preview" prefHeight="30" translateX="20" BorderPane.alignment="CENTER_LEFT"/>
                     </center>
                     <right>
-                        <BorderPane prefHeight="30">
-                            <top>
-                                <HBox prefHeight="0"/>
-                            </top>
-                            <bottom>
-                                <HBox prefHeight="0"/>
-                            </bottom>
-                            <left>
-                                <Button fx:id="incFontButton" stylesheets="/styles/DescPane.css" styleClass="increaseFont" prefWidth="30" prefHeight="30" translateX="-10">
-                                </Button>
-                            </left>
-                            <center>
-                                <HBox prefWidth="5"/>
-                            </center>
-                            <right>
-                                <Button fx:id="decFontButton" stylesheets="/styles/DescPane.css" styleClass="decreaseFont" prefWidth="30" prefHeight="30"  translateX="-10">
-                                </Button>
-                            </right>
-                        </BorderPane>
+                        <HBox prefWidth="0"/>
                     </right>
                 </BorderPane>
             </top>
@@ -141,7 +125,16 @@
                         <HBox prefWidth="10"/>
                     </left>
                     <center>
-                        <StyleClassedTextArea fx:id="previewArea" prefHeight="120"/>
+                        <GridPane>
+                            <children>
+                                <StyleClassedTextArea fx:id="previewArea" prefHeight="120" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                <Button fx:id="incFontButton" stylesheets="/styles/DescPane.css" styleClass="increaseFont" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT" GridPane.hgrow="NEVER" GridPane.valignment="TOP"/>
+                                <Button fx:id="decFontButton" stylesheets="/styles/DescPane.css" styleClass="decreaseFont" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.halignment="RIGHT" GridPane.hgrow="NEVER" GridPane.valignment="TOP"/>
+                            </children>
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="100" />
+                            </columnConstraints>
+                        </GridPane>
                     </center>
                     <right>
                         <HBox prefWidth="10"/>

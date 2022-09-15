@@ -107,18 +107,7 @@
 	-fx-background-color:#D6DCE4;
     -fx-text-fill:#445469;
 }
-.increaseFont {
-    -fx-background-image: url("../pictures/toolbar_buttons/Increase_font_size.png");
-    -fx-background-size: contain;
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center center;
-}
-.decreaseFont {
-    -fx-background-image: url("../pictures/toolbar_buttons/Decrease_font_size.png");
-    -fx-background-size: contain;
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center center;
-}
+
 .addButton {
     -fx-background-image: url("../pictures/descPane_buttons/addButton.png");
     -fx-background-insets: 10,10;
@@ -200,4 +189,37 @@
 	linear-gradient(from 0% 0% to 0% 100%,#323E4E 0%, #323E4E 20%, #445469 100%),
     linear-gradient(from 0% 0% to 0% 100%,#ACB9CA 0%, #8496AE 5%, #445469 50%, #445469 51%, #323E4E 100%);
 
+}
+
+.increaseFont:hover{
+  -fx-opacity: 1.0;
+}
+.increaseFont {
+  -fx-pref-width : 1.5em;
+  -fx-pref-height : 1.5em;
+  -fx-background-image: url("../pictures/toolbar_buttons/Increase_font_size.png");
+  -fx-background-color: transparent;
+  -fx-background-repeat: no-repeat no-repeat;
+  -fx-background-size: contain;
+  -fx-background-position: center center;
+  -fx-padding: 0;
+  -fx-translate-x: 0.5em;
+  -fx-translate-y: 0.5em;
+  -fx-opacity: 0.3;
+}
+.decreaseFont:hover{
+  -fx-opacity: 1.0;
+}
+.decreaseFont {
+  -fx-pref-width : 1.5em;
+  -fx-pref-height : 1.5em;
+  -fx-background-image: url("../pictures/toolbar_buttons/Decrease_font_size.png");
+  -fx-background-color: transparent;
+  -fx-background-repeat: no-repeat no-repeat;
+  -fx-background-size: contain;
+  -fx-background-position: center center;
+  -fx-translate-x: -1.5em;
+  -fx-translate-y: 0.5em;
+  -fx-padding: 0;
+  -fx-opacity: 0.3;
 }

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class DescriptionDisplayElement {
     public static HashMap<String, List<DescriptionDisplayElement>> DisplaySettings = new HashMap<String, List<DescriptionDisplayElement>>();
-    public static String fontSizeMode = "midFont";
+    public static HashMap<String,String> fontSizeMode = new HashMap<String,String>();
     public SimpleIntegerProperty position = new SimpleIntegerProperty();
     public String fieldName;
     public SimpleBooleanProperty translate = new SimpleBooleanProperty(false);
@@ -58,4 +58,12 @@ public class DescriptionDisplayElement {
         return ret;
     }
 
+    public static String getFontSizeForKey(String key) {
+        String ret = fontSizeMode.get(key);
+        if(ret!=null){
+            return ret;
+        }
+        fontSizeMode.put(key,"midFont");
+        return "midFont";
+    }
 }

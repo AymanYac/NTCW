@@ -57,12 +57,12 @@ public class TextUtils {
     }
 
 
-    public static void renderDescription(StyleClassedTextArea previewArea, CharDescriptionRow tmp, ReadOnlyDoubleProperty readOnlyDoubleProperty, String fontSizeMode) {
+    public static void renderDescription(StyleClassedTextArea previewArea, CharDescriptionRow tmp, ReadOnlyDoubleProperty readOnlyDoubleProperty) {
         renderDescription(previewArea,DescriptionDisplayElement.returnElementsForItem(tmp, GridPane.getRowIndex(previewArea),GridPane.getColumnIndex(previewArea)+GridPane.getColumnSpan(previewArea)-1)
                 ,
-                tmp.getDescriptionDataFields(),readOnlyDoubleProperty,fontSizeMode);
+                tmp.getDescriptionDataFields(),readOnlyDoubleProperty,DescriptionDisplayElement.getFontSizeForKey(GridPane.getRowIndex(previewArea).toString()+String.valueOf(GridPane.getColumnIndex(previewArea)+GridPane.getColumnSpan(previewArea)-1)));
     }
-    public static void renderDescription(StyleClassedTextArea previewArea, List<DescriptionDisplayElement> items, List<DescriptionDataElement> fieldTableItems, ReadOnlyDoubleProperty readOnlyDoubleProperty, String fontSizeMode) {
+    public static void renderDescription(StyleClassedTextArea previewArea, List<DescriptionDisplayElement> items, List<DescriptionDataElement> fieldTableItems, ReadOnlyDoubleProperty readOnlyDoubleProperty, String fontMode) {
         previewArea.clear();
         StringBuilder sb = new StringBuilder();
         ArrayList<Integer> zones = new ArrayList<>();
@@ -75,7 +75,7 @@ public class TextUtils {
             zones.add(sb.length());
             ArrayList<String> tmp = new ArrayList<String>();
             tmp.add("basicText");
-            tmp.add(fontSizeMode);
+            tmp.add(fontMode);
             if(elem.leftATableColumn.getValue()){
                 tmp.add("greenText");
             }

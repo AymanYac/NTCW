@@ -149,6 +149,7 @@
                   </MenuBar>
                   <ToolBar fx:id="homeToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="26.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
+                        <HBox styleClass="gapbox" prefHeight="26.0"/>
                         <Label style="-fx-text-fill: #737572;" text="Cancellation" />
                         <GridPane maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
@@ -447,6 +448,7 @@
                   </ToolBar>
                   <ToolBar fx:id="dataToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="26.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
                      <items>
+                        <HBox styleClass="gapbox" prefHeight="26.0"/>
                         <Label style="-fx-text-fill: #737572;" text="Import/Export" />
                         <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
@@ -907,6 +909,7 @@
                   </ToolBar>
                   <ToolBar fx:id="automationToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="26.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
+                        <HBox styleClass="gapbox" prefHeight="26.0"/>
                         <Label style="-fx-text-fill: #737572;" text="Automatic filling" />
                         <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
@@ -1140,6 +1143,7 @@
                   </ToolBar>
                   <ToolBar fx:id="navigationToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="26.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
+                        <HBox styleClass="gapbox" prefHeight="26.0"/>
                         <Label style="-fx-text-fill: #737572;" text="Display" />
                         <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
@@ -1561,6 +1565,7 @@
                   </ToolBar>
                   <ToolBar fx:id="settingToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="26.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
+                        <HBox styleClass="gapbox" prefHeight="26.0"/>
                         <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />

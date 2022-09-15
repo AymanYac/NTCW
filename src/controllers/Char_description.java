@@ -14,6 +14,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -27,11 +28,9 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.TextFlow;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
+import javafx.stage.*;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
@@ -256,6 +255,23 @@ public class Char_description {
 				copyClientNumber2ClipBoard();
 			}
 		});
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				grid.lookupAll("ToolBar").forEach(tb -> {
+					if (tb instanceof ToolBar) {
+						((ToolBar) tb).getItems().forEach(node -> {
+							if (node instanceof HBox) {
+								if (node.getStyleClass().contains("gapbox")) {
+									//((HBox) node).setPrefWidth(projectMenu.getGraphic().getBoundsInParent().getMinX() - node.getBoundsInParent().getMinX());
+									((HBox) node).setPrefWidth(10);
+								}
+							}
+						});
+					}
+				});
+			}
+		});
 		grid.lookupAll("Button.settingButton").forEach(btn->{
 			if(btn instanceof Button){
 				((Button) btn).setOnAction(new EventHandler<ActionEvent>() {
@@ -265,6 +281,8 @@ public class Char_description {
 							FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/DescSettingPane.fxml"));
 							Scene scene = new Scene(loader.load());
 							Stage secondaryStage = new Stage();
+							secondaryStage.initModality(Modality.WINDOW_MODAL);
+							secondaryStage.initOwner(aidLabel.getScene().getWindow());
 							secondaryStage.initStyle(StageStyle.TRANSPARENT);
 							//secondaryStage.setMaximized(true);
 							secondaryStage.setWidth(Math.floor(Screen.getPrimary().getBounds().getWidth()*0.7));
@@ -2274,10 +2292,10 @@ public class Char_description {
 	@SuppressWarnings("static-access")
 	public  void refresh_ui_display() {
 
-		TextUtils.renderDescription(sd,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaLeft.widthProperty(), DescriptionDisplayElement.fontSizeMode);
-		TextUtils.renderDescription(ld,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaRight.widthProperty(), DescriptionDisplayElement.fontSizeMode);
-		TextUtils.renderDescription(sd_translated,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaLeft.widthProperty(), DescriptionDisplayElement.fontSizeMode);
-		TextUtils.renderDescription(ld_translated,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaRight.widthProperty(), DescriptionDisplayElement.fontSizeMode);
+		TextUtils.renderDescription(sd,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaLeft.widthProperty());
+		TextUtils.renderDescription(ld,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaRight.widthProperty());
+		TextUtils.renderDescription(sd_translated,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaLeft.widthProperty());
+		TextUtils.renderDescription(ld_translated,tableController.charDescriptionTable.getSelectionModel().getSelectedItem(), helperAreaRight.widthProperty());
 
 		proposer.clearPropButtons();
 		double RIGHT_TRANSLATE = 0.0*rule_field.getWidth();
