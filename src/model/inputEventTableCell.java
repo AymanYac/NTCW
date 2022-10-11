@@ -37,8 +37,8 @@ public final class inputEventTableCell<S, T> extends TextFieldTableCell<S, T> {
     }
     private static <S, T> Callback<TableColumn<S, T>, TableCell<S, T>> forCharEdition(final StringConverter<T> converter, Char_description parent) {
         return new Callback<TableColumn<S, T>, TableCell<S, T>>() {
-            private static final String HOVERED_BUTTON_STYLE = "-fx-background-color:#212934; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#ACB9CA;";
-            private static final String STANDARD_BUTTON_STYLE="-fx-background-color:#ACB9CA; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#212934;";
+            private static final String HOVERED_BUTTON_STYLE = "-fx-background-color:#445469; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#ACB9CA;";
+            private static final String STANDARD_BUTTON_STYLE="-fx-background-color:#ACB9CA; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#445469;";
             @Override
             public TableCell<S, T> call(TableColumn<S, T> list) {
                 final TextFieldTableCell<S, T> result = new TextFieldTableCell<S, T>(converter);

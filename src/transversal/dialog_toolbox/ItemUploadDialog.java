@@ -25,12 +25,12 @@ public class ItemUploadDialog {
 	public static void uploadItems(Project_parameters parent) throws SQLException, ClassNotFoundException {
 		
 		// Create the custom dialog.
-		Dialog dialog = new Dialog<>();
-		dialog.setTitle("Updating project item list");
+		CustomDialog dialog = new CustomDialog(parent.apply_data);
+		dialog.setCDTitle("Updating project item list");
 		dialog.getDialogPane().setMinHeight(80);
 		dialog.getDialogPane().setMinWidth(640);
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-		dialog.getDialogPane().getStyleClass().add("customDialog");
+		
+		
 		
 		Label progressStage = new Label();
 		progressStage.setVisible(false);
@@ -43,10 +43,10 @@ public class ItemUploadDialog {
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
-		grid.setPadding(new Insets(10, 10, 10, 10));
+		grid.setPadding(new Insets(0, 0, 0, 0));
 		grid.add(progressStage, 0, 0);
 		grid.add(progressBar, 0, 1);
-		dialog.getDialogPane().setContent(grid);
+		dialog.setContent(grid);
 
 		dialog.show();
 		//Upsert the items

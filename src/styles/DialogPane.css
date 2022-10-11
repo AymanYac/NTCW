@@ -178,7 +178,7 @@
 
 #arrowButton{
     -fx-background-image:url("../pictures/editValueArrow.png");
-    -fx-background-color:transparent,
+    -fx-background-color:transparent;
     -fx-border-color:transparent;
     -fx-border-width:0px;
     -fx-background-radius:0px;

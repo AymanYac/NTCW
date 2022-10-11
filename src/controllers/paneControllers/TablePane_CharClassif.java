@@ -43,7 +43,6 @@ import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.dialog_toolbox.FxUtilTest;
 import service.ExternalSearchServices;
-import transversal.generic.TextUtils;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -725,6 +724,7 @@ public class TablePane_CharClassif {
 					col.prefWidthProperty().bind(charDescriptionTable.widthProperty().multiply(
 							((Parent.visibleRight.get() ? collapsedColumns : visibleColumns).get(col.getId()))));
 				}
+				System.out.println(col.getId()+","+col.getText()+":"+col.prefWidthProperty().get());
 			}
 			col.setId(col.getId()!=null && col.getId().equals(activeChar.getCharacteristic_id())?"active-column":col.getId());
 		}
@@ -747,7 +747,7 @@ public class TablePane_CharClassif {
 		}else {
 			Parent.valueAutoComplete = new AutoCompleteBox_CharValue(Parent, Parent.value_field, true, account);
 		}
-		
+
 		if(Parent.translationAutoComplete!=null) {
 			Parent.translationAutoComplete.refresh_entries(false);
 		}else {
@@ -858,11 +858,12 @@ public class TablePane_CharClassif {
 				}else if (colname.startsWith("Short Description") || colname.startsWith("Long Description")){
 					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
-							return new ReadOnlyObjectWrapper<>(CharClassifProposer.getCustomDescription(r.getValue(),colname));
+							return new ReadOnlyObjectWrapper<>(r.getValue().getCustomDescription(colname));
 						}
 						/*descriptionColumn.prefWidthProperty().bind(this.tableGrid.widthProperty().multiply(0.4));;
 						descriptionColumn.setStyle( "-fx-alignment: CENTER-LEFT;");*/
 					});
+					tmp.setStyle("-fx-alignment: CENTER-LEFT;");
 				}else if(colname.equals("Link")){
 					tmp.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 						public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
@@ -1212,6 +1213,7 @@ public class TablePane_CharClassif {
 			final MenuItem ligne0 = new MenuItem("Hide Column");
 			final MenuItem ligne1 = new MenuItem("Default table display");
 			final Menu ligne2 = new Menu("Display additional column...");
+			final Menu ligneCar = new Menu ("Display addition characteristic ...");
 
 			ligne0.setDisable(column.getId()!=null && column.getId().equals("active-column"));
 			ligne0.setOnAction(new EventHandler<ActionEvent>() {
@@ -1245,7 +1247,6 @@ public class TablePane_CharClassif {
 					popup.hide();
 				}
 			});
-
 			hiddenColumns.forEach(hiddenField->{
 				Optional<ClassCaracteristic> charMatch = CharValuesLoader.active_characteristics.get(Parent.classCombo.getValue().getSegmentId()).stream().filter(car -> car.getCharacteristic_id().equals(hiddenField)).findAny();
 				MenuItem elem = new MenuItem(charMatch.isPresent()?charMatch.get().getCharacteristic_name():hiddenField);
@@ -1273,10 +1274,14 @@ public class TablePane_CharClassif {
 					hiddenColumns.remove(hiddenField);
 					redimensionGrid();
 				});
-				ligne2.getItems().add(elem);
+				if(charMatch.isPresent()){
+					ligneCar.getItems().add(elem);
+				}else{
+					ligne2.getItems().add(elem);
+				}
 			});
 
-
+			ligne2.getItems().add(ligneCar);
 			popup.getItems().add(ligne0);
 			popup.getItems().add(ligne1);
 			popup.getItems().add(ligne2);
@@ -1315,106 +1320,6 @@ public class TablePane_CharClassif {
 		}
 	}
 
-	private void setSkinHeaderClickListeners() {
-		// Step 1: Get the table header row.
-		TableHeaderRow headerRow = null;
-		for (Node n : ((TableViewSkin<?>) charDescriptionTable.getSkin()).getChildren()) {
-			if (n instanceof TableHeaderRow) {
-				headerRow = (TableHeaderRow) n;
-			}
-		}
-		if (headerRow == null) {
-			return;
-		}
-
-		// Step 2: Get the list of the header columns.
-		NestedTableColumnHeader ntch = (NestedTableColumnHeader) headerRow.getChildren().get(1);
-		ObservableList<TableColumnHeader> headers = ntch.getColumnHeaders();
-
-		// Step 3: Add click listener to the header columns.
-		for (int i = 0; i < headers.size(); i++) {
-			TableColumnHeader header = headers.get(i);
-			final int index = i;
-			header.setOnMouseClicked(mouseEvent -> {
-				// Optional:
-				// Get the TableColumnBase (which is the object responsible
-				// for displaying the content of the column.)
-				TableColumnBase column = header.getTableColumn();
-
-				// Step 4: Handle double mouse click event.
-				if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-					final Popup popup = new Popup();
-					popup.setAutoHide(true);
-					final Label ligne0 = new Label("Hide Column");
-					final Label ligne1 = new Label("Default table display");
-					final Label ligne2 = new Label("Display additional column...");
-
-					ligne0.setOnMouseClicked(new EventHandler<MouseEvent>() {
-						@Override
-						public void handle(MouseEvent event) {
-							popup.hide();
-							if(Parent.visibleRight.get()){
-
-							}else{
-
-							}
-						}
-					});
-					ligne0.setDisable(column.getId()!=null && column.getId().equals("active-column"));
-
-					ligne1.setOnMouseClicked(new EventHandler<MouseEvent>() {
-						@Override
-						public void handle(MouseEvent event) {
-							popup.hide();
-						}
-					});
-					ligne2.setOnMouseClicked(new EventHandler<MouseEvent>() {
-						@Override
-						public void handle(MouseEvent event) {
-							popup.hide();
-						}
-					});
-
-					setPopupLigneStyle(ligne0);
-					setPopupLigneStyle(ligne1);
-					setPopupLigneStyle(ligne2);
-
-
-					GridPane contentGrid = new GridPane();
-					contentGrid.add(ligne0, 0, 0);
-					contentGrid.add(ligne1, 0, 1);
-					contentGrid.add(ligne2, 0, 2);
-					contentGrid.setHgrow(ligne0, Priority.ALWAYS);
-					ligne0.setMaxWidth(Integer.MAX_VALUE);
-					contentGrid.setHgrow(ligne1, Priority.ALWAYS);
-					ligne1.setMaxWidth(Integer.MAX_VALUE);
-					contentGrid.setHgrow(ligne2, Priority.ALWAYS);
-					ligne2.setMaxWidth(Integer.MAX_VALUE);
-					contentGrid.setGridLinesVisible(true);
-
-					popup.getContent().clear();
-					popup.getContent().add(contentGrid);
-
-					popup.show(header, mouseEvent.getScreenX() + 10, mouseEvent.getScreenY());
-				}
-			});
-		}
-	}
-
-			private void setPopupLigneStyle(Node ligne) {
-				final String HOVERED_BUTTON_STYLE = "-fx-background-color:#212934; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#ACB9CA;";
-				final String STANDARD_BUTTON_STYLE="-fx-background-color:#ACB9CA; -fx-border-color:#ACB9CA; -fx-border-width: 1px; -fx-padding: 5px; -fx-text-fill:#212934;";
-				ligne.styleProperty().bind(
-						Bindings
-								.when(ligne.hoverProperty())
-								.then(
-										new SimpleStringProperty(HOVERED_BUTTON_STYLE)
-								)
-								.otherwise(
-										new SimpleStringProperty(STANDARD_BUTTON_STYLE)
-								)
-				);
-			}
 
 	public void setColumns() {
 		hiddenColumns.clear();
@@ -1441,6 +1346,9 @@ public class TablePane_CharClassif {
 			this.collapsedColumns.put(carac.getCharacteristic_id(),0.1);
 			this.hiddenColumns.add(carac.getCharacteristic_id());
 		});
+		this.hiddenColumns.add("Long Description 2");
+		this.hiddenColumns.add("Short Description 1");
+		this.hiddenColumns.add("Short Description 2");
 	}
 
 

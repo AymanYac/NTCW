@@ -16,6 +16,7 @@ import javafx.scene.layout.Priority;
 import model.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.dialog_toolbox.CaracEditionDialog;
+import transversal.dialog_toolbox.CustomDialog;
 import transversal.dialog_toolbox.FxUtilTest;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 
 
 public class ExternalSearchServices {
-    private static Dialog<Object> dialog;
+    private static CustomDialog dialog;
     private static GridPane contentGrid;
     private static CharDescriptionRow sourceItem;
     private static String sourceSegment;
@@ -47,11 +48,11 @@ public class ExternalSearchServices {
 
 
     public static void editSearchPrefrence(Char_description parent) {
-        dialog = new Dialog<>();
-        dialog.setTitle("Custom search text");
-        dialog.setHeaderText(null);
-        dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-        dialog.getDialogPane().getStyleClass().add("customDialog");
+        dialog = new CustomDialog(parent.aidLabel);
+        dialog.setCDTitle("Custom search text");
+        dialog.setCDHeaderText(null);
+        
+        
 
         // Set the button types.
         ButtonType clearBT = new ButtonType("Clear", ButtonBar.ButtonData.LEFT);
@@ -76,8 +77,8 @@ public class ExternalSearchServices {
         contentGrid = new GridPane();
         contentGrid.setHgap(10);
         contentGrid.setVgap(10);
-        contentGrid.setPadding(new Insets(10, 10, 10, 10));
-        dialog.getDialogPane().setContent(contentGrid);
+        contentGrid.setPadding(new Insets(0, 0, 0, 0));
+        dialog.setContent(contentGrid);
 
 
         storeSearchSourceData(parent);

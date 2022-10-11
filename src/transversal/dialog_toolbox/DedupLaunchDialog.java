@@ -23,7 +23,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.*;
@@ -56,7 +55,7 @@ import java.util.stream.IntStream;
 
 public class DedupLaunchDialog {
 
-    private static Dialog<ClassCaracteristic>  dialog;
+    private static CustomDialog dialog;
     private static GridPane grid;
     private static TextField minMatches;
     private static TextField maxMismatches;
@@ -90,19 +89,19 @@ public class DedupLaunchDialog {
     private static ClassSegmentClusterComboRow previousTarget;
 
 
-    private static void showDetailedClassClusters(ClassSegment itemSegment,ComboBox<ClassSegmentClusterComboRow> ClassLink) {
-        Dialog dialog = new Dialog<>();
-        dialog.setTitle("Listing all impacted classes");
-        dialog.setHeaderText(null);
-        dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-        dialog.getDialogPane().getStyleClass().add("customDialog");
+    private static void showDetailedClassClusters(ClassSegment itemSegment,ComboBox<ClassSegmentClusterComboRow> ClassLink, Node parentNode) {
+        CustomDialog dialog = new CustomDialog(parentNode);
+        dialog.setCDTitle("Listing all impacted classes");
+        dialog.setCDHeaderText(null);
+        
+        
 
         // Set the button types.
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setPadding(new Insets(0, 0, 0, 0));
         TableView<Pair<ClassSegment, SimpleBooleanProperty>> tableview = new TableView<Pair<ClassSegment, SimpleBooleanProperty>>();
 
         TableColumn col1 = new TableColumn("Class ID");
@@ -197,7 +196,7 @@ public class DedupLaunchDialog {
         ColumnConstraints c3 = new ColumnConstraints();
         c3.setPercentWidth(10);
         grid.getColumnConstraints().addAll(c1,c2,c3);
-        dialog.getDialogPane().setContent(grid);
+        dialog.setContent(grid);
 
         dialog.showAndWait();
     }
@@ -209,7 +208,7 @@ public class DedupLaunchDialog {
         loadLastSessionWeights(currentItemSegment.getSegmentId());
 
         // Create the custom dialog.
-        create_dialog();
+        create_dialog(parent.aidLabel);
 
         // Create the carac labels and fields.
         create_dialog_fields();
@@ -220,7 +219,7 @@ public class DedupLaunchDialog {
         //Set fields behavior
         set_fields_behavior();
 
-        dialog.getDialogPane().setContent(grid);
+        dialog.setContent(grid);
 
         // Request focus on the char name by default.
         Platform.runLater(() -> {
@@ -376,13 +375,13 @@ public class DedupLaunchDialog {
         sourceDetailsLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                showDetailedClassClusters(currentItemSegment,sourceCharClassLink);
+                showDetailedClassClusters(currentItemSegment,sourceCharClassLink,sourceDetailsLabel);
             }
         });
         targetDetailsLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                showDetailedClassClusters(currentItemSegment,targetCharClassLink);
+                showDetailedClassClusters(currentItemSegment,targetCharClassLink,targetDetailsLabel);
             }
         });
         Button validationButton = (Button) dialog.getDialogPane().lookupButton(validateButtonType);
@@ -395,9 +394,7 @@ public class DedupLaunchDialog {
 
             }
             //dialog.close();
-            Dialog<Object> progressDialog = new Dialog<>();
-            progressDialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-            progressDialog.getDialogPane().getStyleClass().add("customDialog");
+            CustomDialog progressDialog = new CustomDialog(validationButton);
             GridPane progressGrid = new GridPane();
             Label progressText = new Label("Filtering items for comparison...");
             progressText.setAlignment(Pos.CENTER);
@@ -407,7 +404,7 @@ public class DedupLaunchDialog {
             progressBar.setMinWidth(1024);
             progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
             progressGrid.add(progressBar,0,1);
-            progressDialog.getDialogPane().setContent(progressGrid);
+            progressDialog.setContent(progressGrid);
             ArrayList<String> sourceSegmentIDS = sourceCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
             ArrayList<String> targetSegmentIDS = targetCharClassLink.getValue().getRowSegments().stream().filter(p -> p.getValue().getValue()).map(p -> p.getKey().getSegmentId()).collect(Collectors.toCollection(ArrayList::new));
             HashMap<String, DedupLaunchDialogRow> weightTable = new HashMap<>();
@@ -606,17 +603,17 @@ public class DedupLaunchDialog {
     }
 
 
-    private static void create_dialog() {
-        dialog = new Dialog<>();
+    private static void create_dialog(Node aidLabel) {
+        dialog = new CustomDialog(aidLabel);
         dialog.getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 event.consume();
             }
         });
-        dialog.setTitle("Item deduplication settings");
-        dialog.setHeaderText(null);
-        dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-        dialog.getDialogPane().getStyleClass().add("customDialog");
+        dialog.setCDTitle("Item deduplication settings");
+        dialog.setCDHeaderText(null);
+        
+        
 
         // Set the button types.
         validateButtonType = new ButtonType("Launch", ButtonData.APPLY);
@@ -1284,7 +1281,7 @@ public class DedupLaunchDialog {
     private static void set_fields_layout() {
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setPadding(new Insets(0, 0, 0, 0));
         ColumnConstraints col0 = new ColumnConstraints();
         col0.setPercentWidth(0);
         col0.setFillWidth(true);

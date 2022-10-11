@@ -12,6 +12,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 import model.GenericClassRule;
 import model.ItemFetcherRow;
 import model.UserAccount;
@@ -24,7 +26,7 @@ public class ConfirmationDialog {
 	
 	public static void show(String title,String header,String yes,String no, Project_parameters parent, boolean confirmed) {
 		
-		Alert alert = new Alert(AlertType.CONFIRMATION);
+		Alert alert = new Alert(AlertType.CONFIRMATION);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
@@ -59,7 +61,7 @@ public class ConfirmationDialog {
 	public static void show(String title, String header, String yes, String no, Project_selection parent,
 			boolean confirmed) {
 		
-		Alert alert = new Alert(AlertType.CONFIRMATION);
+		Alert alert = new Alert(AlertType.CONFIRMATION);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
@@ -94,7 +96,7 @@ public class ConfirmationDialog {
 	public static void show(String title, String header, String yes, String no, String cancel,Auto_classification_progress parent) {
 		
 		
-		Alert alert = new Alert(AlertType.WARNING);
+		Alert alert = new Alert(AlertType.WARNING);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
@@ -127,9 +129,9 @@ public class ConfirmationDialog {
 	public static void show(String title, String header, String yes, Auto_classification_progress parent) {
 		Alert alert = null;
 		if(title.contains("failed")) {
-			alert =new Alert(AlertType.ERROR);
+			alert =new Alert(AlertType.ERROR);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		}else {
-			alert =new Alert(AlertType.INFORMATION);
+			alert =new Alert(AlertType.INFORMATION);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		}
 		alert.setTitle(title);
 		alert.setHeaderText(header);
@@ -155,7 +157,7 @@ public class ConfirmationDialog {
 	public static Boolean show(String title, String header, String yes, String no, String cancel,
 			EventHandler<MouseEvent> eventHandler,Auto_classification_progress parent) {
 		
-		Alert alert = new Alert(AlertType.WARNING);
+		Alert alert = new Alert(AlertType.WARNING);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
@@ -186,7 +188,7 @@ public class ConfirmationDialog {
 	public static Boolean show(String title, String header, String yes, String no, String cancel,
 			EventHandler<ActionEvent> eventHandler, Auto_classification_progress parent, Object object) {
 
-		Alert alert = new Alert(AlertType.WARNING);
+		Alert alert = new Alert(AlertType.WARNING);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
@@ -217,9 +219,9 @@ public class ConfirmationDialog {
 	public static void show(String title, String header, String ok) {
 		Alert alert = null;
 		if(title.contains("failed")) {
-			alert =new Alert(AlertType.ERROR);
+			alert =new Alert(AlertType.ERROR);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		}else {
-			alert =new Alert(AlertType.INFORMATION);
+			alert =new Alert(AlertType.INFORMATION);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		}
 		alert.setTitle(title);
 		alert.setHeaderText(header);
@@ -237,7 +239,7 @@ public class ConfirmationDialog {
 	
 	public static void showRuleImportConfirmation(String title,String header,String yes,String no, Project_parameters parent, UserAccount account, ArrayList<GenericClassRule> grs, ArrayList<ArrayList<String[]>> itemRuleMaps, ArrayList<Boolean> activeStatuses, ArrayList<String> METHODS, List<ItemFetcherRow> databaseSyncLists, String datainputmethod) {
 		
-		Alert alert = new Alert(AlertType.CONFIRMATION);
+		Alert alert = new Alert(AlertType.CONFIRMATION);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
@@ -267,7 +269,7 @@ public class ConfirmationDialog {
 
 
     public static Boolean showCaracDeleteScopeConfirmation() {
-		Alert alert = new Alert(AlertType.CONFIRMATION);
+		Alert alert = new Alert(AlertType.CONFIRMATION);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.setTitle("Confirm characteristic deletion scope");
 		alert.setHeaderText("Delete this characteristic for:");
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
@@ -295,7 +297,7 @@ public class ConfirmationDialog {
     }
 
 	public static String showCaracValueEdition(String title, String oldValue){
-		Alert alert = new Alert(AlertType.NONE);
+		Alert alert = new Alert(AlertType.NONE);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.setTitle(title);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
@@ -342,7 +344,7 @@ public class ConfirmationDialog {
 	}
 
 	public static boolean showCaracOrValueDeleteImpactConfirmation(String warningText) {
-		Alert alert = new Alert(AlertType.WARNING);
+		Alert alert = new Alert(AlertType.WARNING);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.setTitle("Confirm deletion impact");
 		alert.setHeaderText(warningText);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
@@ -367,7 +369,7 @@ public class ConfirmationDialog {
 	}
 
     public static boolean WarningClearingUnknownValues() {
-		Alert alert = new Alert(AlertType.WARNING);
+		Alert alert = new Alert(AlertType.WARNING);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.setTitle("Confirm action");
 		alert.setHeaderText("All empty values of the current class' items will be marked as *UNKNOWN*");
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());

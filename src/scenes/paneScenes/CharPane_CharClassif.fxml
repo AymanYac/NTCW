@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 
+<?import model.CustomTableColumn?>
 <GridPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.paneControllers.CharPane_CharClassif">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" percentWidth="4.0" prefWidth="100.0" />
@@ -42,21 +43,24 @@
    </rowConstraints>
    <children>
       <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #445469; -fx-opacity: 0.7;" GridPane.columnSpan="12" GridPane.rowSpan="13" />
-      <TableView fx:id="tableGrid" prefHeight="200.0" prefWidth="200.0" stylesheets="@../../styles/TableViewLightNoHeader.css" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="2">
+      <TableView fx:id="tableGrid" stylesheets="@../../styles/TableViewLightNoHeader.css" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="2">
          <columns>
-            <TableColumn fx:id="critcalityColumn" prefWidth="40.0" />
-            <TableColumn fx:id="seqColumn" prefWidth="40.0" text="#" />
-            <TableColumn fx:id="charNameColumn" prefWidth="210.0" text="Characteristic" />
-            <TableColumn fx:id="uomColumn" prefWidth="75.0" text="Unit" />
-            <TableColumn fx:id="valueColumn" prefWidth="210.0" text="Value" />
+            <CustomTableColumn fx:id="critcalityColumn" percentageWidth="0.05" resizable="false"/>
+            <CustomTableColumn fx:id="seqColumn" percentageWidth="0.05" resizable="false" text="#" />
+            <CustomTableColumn fx:id="charNameColumn" percentageWidth="0.3" resizable="false" text="Characteristic" />
+            <CustomTableColumn fx:id="uomColumn" percentageWidth="0.10" resizable="false" text="Unit" />
+            <CustomTableColumn fx:id="valueColumn" percentageWidth="0.48" resizable="false" text="Value" />
          </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+         </columnResizePolicy>
       </TableView>
-      <Button mnemonicParsing="false" prefWidth="500.0" style="-fx-font-size: 10;" stylesheets="@../../styles/ButtonBlue.css" text="Add a tip..." GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="4" />
+      <!--<Button mnemonicParsing="false" prefWidth="500.0" style="-fx-font-size: 10;" stylesheets="@../../styles/ButtonBlue.css" text="Add a tip..." GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="4" />
       <Button mnemonicParsing="false" style="-fx-font-size: 10; -fx-translate-x: 15;" stylesheets="@../../styles/ButtonBlue.css" text="Add a question..." GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="4">
          <GridPane.margin>
             <Insets />
          </GridPane.margin>
-      </Button>
+      </Button>-->
       <Button mnemonicParsing="false" onAction="#add_carac" style="-fx-font-size: 10;" stylesheets="@../../styles/ButtonBlue.css" text="Add a characteristic..." GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
       <Button maxHeight="17.0" maxWidth="17.0" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" onAction="#PaneClose" prefHeight="17.0" prefWidth="17.0" style="-fx-font-size: 9; -fx-background-radius: 2; -fx-border-radius: 2; -fx-border-color: transparent; -fx-text-fill: white;" stylesheets="@../../styles/CloseButtonBlue.css" text="X" textAlignment="CENTER" GridPane.columnIndex="6" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
       <Label style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Class characteristics" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />

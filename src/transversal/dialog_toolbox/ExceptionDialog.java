@@ -6,6 +6,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -15,7 +17,7 @@ public class ExceptionDialog {
 	
 	public static void show(String title,String header,String content) {
 		
-		Alert alert = new Alert(AlertType.ERROR);
+		Alert alert = new Alert(AlertType.ERROR);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
 		alert.setContentText(content);

@@ -91,7 +91,7 @@ public class Login_page {
 				controller.scene = scene;
 				scene.setCursor(Cursor.WAIT);
 				
-				primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION);
+				ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION);
 				primaryStage.setScene(scene);
 				
 				//Sets up next screen size

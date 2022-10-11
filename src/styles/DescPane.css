@@ -90,11 +90,6 @@
     -fx-text-fill: white;
 }
 
-#windowTitle{
-    -fx-font-size: 14px;
-    -fx-text-fill: #445469;
-}
-
 #mainBorderPane{
 	-fx-background-color:#445469;
 }
@@ -102,12 +97,6 @@
 #previewPane{
 	-fx-background-color:white;
 }
-
-#titleBar{
-	-fx-background-color:#D6DCE4;
-    -fx-text-fill:#445469;
-}
-
 .addButton {
     -fx-background-image: url("../pictures/descPane_buttons/addButton.png");
     -fx-background-insets: 10,10;

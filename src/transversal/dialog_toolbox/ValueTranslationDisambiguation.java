@@ -7,6 +7,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 import model.CharValueTextSuggestion;
 
 import java.util.Optional;
@@ -16,7 +18,7 @@ public class ValueTranslationDisambiguation {
 	
 	public static Boolean promptTranslationUpdate(Char_description parent,CharValueTextSuggestion result, String otherText) {
 		
-		Alert alert = new Alert(AlertType.CONFIRMATION);
+		Alert alert = new Alert(AlertType.CONFIRMATION);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
@@ -57,7 +59,7 @@ public class ValueTranslationDisambiguation {
 	public static Boolean promptTranslationWarning(Char_description parent, CharValueTextSuggestion result,
 			String otherText) {
 		
-		Alert alert = new Alert(AlertType.WARNING);
+		Alert alert = new Alert(AlertType.WARNING);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
@@ -100,7 +102,7 @@ public class ValueTranslationDisambiguation {
 	public static Boolean promptTranslationCreation(Char_description parent, CharValueTextSuggestion result,
 			CharValueTextSuggestion otherResult) {
 		
-		Alert alert = new Alert(AlertType.CONFIRMATION);
+		Alert alert = new Alert(AlertType.CONFIRMATION);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
@@ -148,7 +150,7 @@ public class ValueTranslationDisambiguation {
 	public static Boolean promptTranslationCreation(Char_description parent, CharValueTextSuggestion result,
 			String otherText) {
 		
-		Alert alert = new Alert(AlertType.CONFIRMATION);
+		Alert alert = new Alert(AlertType.CONFIRMATION);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
@@ -225,7 +227,7 @@ public class ValueTranslationDisambiguation {
 
 	public static Boolean promptTranslationDeletion(Char_description parent, CharValueTextSuggestion result) {
 		
-		Alert alert = new Alert(AlertType.CONFIRMATION);
+		Alert alert = new Alert(AlertType.CONFIRMATION);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
@@ -267,7 +269,7 @@ public class ValueTranslationDisambiguation {
 
 	public static Boolean promptTranslationUpdate(String text, String text2) {
 
-		Alert alert = new Alert(AlertType.CONFIRMATION);
+		Alert alert = new Alert(AlertType.CONFIRMATION);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		
@@ -308,7 +310,7 @@ public class ValueTranslationDisambiguation {
 
 	public static Boolean promptTranslationWarning(String text, CharValueTextSuggestion otherResult) {
 
-		Alert alert = new Alert(AlertType.WARNING);
+		Alert alert = new Alert(AlertType.WARNING);alert.initModality(Modality.APPLICATION_MODAL);alert.initStyle(StageStyle.TRANSPARENT);
 		alert.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
 		alert.getDialogPane().getStyleClass().add("customDialog");
 		

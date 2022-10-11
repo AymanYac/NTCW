@@ -12,18 +12,18 @@ import org.controlsfx.control.ToggleSwitch;
 public class UrlBookMarkDialog {
     static boolean pageCorrectionEnded = true;
 
-    public static void promptBookMarkForItemClass(String pageURL, CharDescriptionRow selectedItem, StringProperty browserUrlProperty) {
-        Dialog dialog = new Dialog<>();
-        dialog.setTitle("External PDF bookmark");
-        dialog.setHeaderText("Bookmark this PDF?");
-        dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-        dialog.getDialogPane().getStyleClass().add("customDialog");
+    /*public static void promptBookMarkForItemClass(String pageURL, CharDescriptionRow selectedItem, StringProperty browserUrlProperty) {
+        CustomDialog dialog = new CustomDialog();
+        dialog.setCDTitle("External PDF bookmark");
+        dialog.setCDHeaderText("Bookmark this PDF?");
+        
+        
 
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setPadding(new Insets(0, 0, 0, 0));
 
         Label label = new Label("Page");
         label.setMinWidth(10);
@@ -62,7 +62,7 @@ public class UrlBookMarkDialog {
         ButtonType noButton = new ButtonType("Dismiss", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialog.getDialogPane().getButtonTypes().addAll(yesButton,noButton);
 
-        dialog.getDialogPane().setContent(grid);
+        dialog.setContent(grid);
 
         dialog.showAndWait().ifPresent(newConfig -> {
             System.out.println("Exiting bookmark");
@@ -71,5 +71,5 @@ public class UrlBookMarkDialog {
 
 
 
-    }
+    }*/
 }

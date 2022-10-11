@@ -217,7 +217,7 @@ public class Auto_classification_launch {
 
 			Scene scene = new Scene(root,400,400);
 			
-			primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+			ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 			primaryStage.setScene(scene);
 			//primaryStage.setMinHeight(768);
 			//primaryStage.setMinWidth(1024);
@@ -392,7 +392,7 @@ public class Auto_classification_launch {
 			//Set the new window with the controller
 			Scene scene = new Scene(root,400,400);
 			//Set the window's title
-			primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+			ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 			primaryStage.setScene(scene);
 			//Set the window's size
 			primaryStage.setMinHeight(768);primaryStage.setMinWidth(1024);primaryStage.setMaximized(true);primaryStage.setResizable(false);primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/pictures/NEONEC_Logo_Blue.png")));

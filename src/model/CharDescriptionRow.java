@@ -14,6 +14,7 @@ import javafx.scene.text.TextBoundsType;
 import org.apache.commons.lang3.StringUtils;
 import service.CharValuesLoader;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
+import transversal.generic.TextUtils;
 import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 
@@ -56,7 +57,26 @@ public class CharDescriptionRow {
 		private static Unidecode unidecode;
 		private String accentFreeDescriptionNoCR;
 
-	public void allocateDataField(String target_class) {
+    public String getCustomDescription(String descField) {
+        int rowIdx=0;
+        int columnIdx=0;
+        if(descField.equals("Long Description 1")){
+            rowIdx=5;
+            columnIdx=9;
+        }else if(descField.equals("Long Description 2")){
+            rowIdx=7;
+            columnIdx=9;
+        }else if(descField.equals("Short Description 1")){
+            rowIdx=5;
+            columnIdx=1;
+        }else{
+            rowIdx=7;
+            columnIdx=1;
+        }
+        return TextUtils.getDescription(DescriptionDisplayElement.returnElementsForItem(this, rowIdx,columnIdx), this.getDescriptionDataFields());
+    }
+
+    public void allocateDataField(String target_class) {
 			if(this.data.containsKey(target_class)) {
 				//This item class has already been initalized with the target class
 			}else {

@@ -3,6 +3,9 @@ package transversal.generic;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.IndexRange;
 import javafx.scene.layout.GridPane;
 import model.CharDescriptionRow;
 import model.DescriptionDisplayElement;
@@ -56,7 +59,16 @@ public class TextUtils {
         return ld.getSelectedText();
     }
 
-
+    public static String getDescription(List<DescriptionDisplayElement> items, List<DescriptionDataElement> fieldTableItems){
+        StringBuilder sb = new StringBuilder();
+        items.forEach(elem->{
+            sb.append((elem.prefix.get()!=null?elem.prefix.get():"")+
+                    fieldTableItems.stream().filter(field->field.getFieldName().equals(elem.fieldName)).findFirst().get().getValue()+
+                    (elem.suffix.get()!=null?elem.suffix.get():"")+
+                    (elem.linebreak.get()?"\n":" "));
+        });
+        return sb.toString();
+    }
     public static void renderDescription(StyleClassedTextArea previewArea, CharDescriptionRow tmp, ReadOnlyDoubleProperty readOnlyDoubleProperty) {
         renderDescription(previewArea,DescriptionDisplayElement.returnElementsForItem(tmp, GridPane.getRowIndex(previewArea),GridPane.getColumnIndex(previewArea)+GridPane.getColumnSpan(previewArea)-1)
                 ,

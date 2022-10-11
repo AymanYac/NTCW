@@ -17,7 +17,7 @@ import transversal.generic.Tools;
 
 
 public class PatternEditionDialog {
-    private static Dialog<Object> dialog;
+    private static CustomDialog dialog;
     private static GridPane contentGrid;
     private static CharDescriptionRow sourceItem;
     private static String sourceSegment;
@@ -35,11 +35,11 @@ public class PatternEditionDialog {
 
 
     public static void editRule(Char_description parent) {
-        dialog = new Dialog<>();
-        dialog.setTitle("Description pattern edition");
-        dialog.setHeaderText(null);
-        dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-        dialog.getDialogPane().getStyleClass().add("customDialog");
+        dialog = new CustomDialog(parent.aidLabel);
+        dialog.setCDTitle("Description pattern edition");
+        dialog.setCDHeaderText(null);
+        
+        
 
         // Set the button types.
         ButtonType applyBT = new ButtonType("Apply");
@@ -47,8 +47,8 @@ public class PatternEditionDialog {
         contentGrid = new GridPane();
         contentGrid.setHgap(10);
         contentGrid.setVgap(10);
-        contentGrid.setPadding(new Insets(10, 10, 10, 10));
-        dialog.getDialogPane().setContent(contentGrid);
+        contentGrid.setPadding(new Insets(0, 0, 0, 0));
+        dialog.setContent(contentGrid);
 
 
         storeSourceData(parent);

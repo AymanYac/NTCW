@@ -2,6 +2,7 @@ package transversal.generic;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import controllers.ToolHeaderController;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -411,7 +412,7 @@ public class Tools {
 					controller.scene = scene;
 					scene.setCursor(Cursor.WAIT);
 					
-					primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+					ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 					primaryStage.setScene(scene);
 					
 					//Sets up next screen size
@@ -453,7 +454,7 @@ public class Tools {
 					scene.setCursor(Cursor.WAIT);
 				    
 					
-					primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+					ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 					primaryStage.setScene(scene);
 					//primaryStage.setMinHeight(768);
 					//primaryStage.setMinWidth(1024);
@@ -491,7 +492,7 @@ public class Tools {
 
 					Scene scene = new Scene(root,400,400);
 					
-					primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+					ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 					primaryStage.setScene(scene);
 					//primaryStage.setMinHeight(768);
 					//primaryStage.setMinWidth(1024);
@@ -552,7 +553,7 @@ public class Tools {
 
 							Scene scene = new Scene(root,400,400);
 							
-							primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+							ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 							primaryStage.setScene(scene);
 							//primaryStage.setMinHeight(768);
 							//primaryStage.setMinWidth(1024);
@@ -610,7 +611,7 @@ public class Tools {
 
 							Scene scene = new Scene(root,400,400);
 							
-							primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+							ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 							primaryStage.setScene(scene);
 							//primaryStage.setMinHeight(768);
 							//primaryStage.setMinWidth(1024);
@@ -660,7 +661,7 @@ public class Tools {
 
 							Scene scene = new Scene(root,400,400);
 							
-							primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+							ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 							primaryStage.setScene(scene);
 							//primaryStage.setMinHeight(768);
 							//primaryStage.setMinWidth(1024);

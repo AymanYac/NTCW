@@ -49,7 +49,7 @@ import static transversal.data_exchange_toolbox.CharDescriptionExportServices.*;
 
 public class CaracEditionDialog {
 
-	private static Dialog<ClassCaracteristic>  dialog;
+	private static CustomDialog dialog;
 	private static GridPane grid;
 	private static AutoCompleteBox_CharDeclarationName charName;
 	private static Label searchLabel;
@@ -76,19 +76,19 @@ public class CaracEditionDialog {
 	private static Unidecode unidecode;
 
 
-	private static void showDetailedClassClusters(ClassSegment itemSegment) {
-		Dialog dialog = new Dialog<>();
-		dialog.setTitle("Listing all impacted classes");
-		dialog.setHeaderText(null);
-		dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-		dialog.getDialogPane().getStyleClass().add("customDialog");
+	private static void showDetailedClassClusters(ClassSegment itemSegment, Node parentNode) {
+		CustomDialog dialog = new CustomDialog(parentNode);
+		dialog.setCDTitle("Listing all impacted classes");
+		dialog.setCDHeaderText(null);
+		
+		
 
 		// Set the button types.
 		dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
-		grid.setPadding(new Insets(10, 10, 10, 10));
+		grid.setPadding(new Insets(0, 0, 0, 0));
 		TableView<Pair<ClassSegment,SimpleBooleanProperty>> tableview = new TableView<Pair<ClassSegment, SimpleBooleanProperty>>();
 
 		TableColumn col1 = new TableColumn("Class ID");
@@ -183,7 +183,7 @@ public class CaracEditionDialog {
 		ColumnConstraints c3 = new ColumnConstraints();
 		c3.setPercentWidth(10);
 		grid.getColumnConstraints().addAll(c1,c2,c3);
-		dialog.getDialogPane().setContent(grid);
+		dialog.setContent(grid);
 
 		dialog.showAndWait();
 	}
@@ -192,7 +192,7 @@ public class CaracEditionDialog {
 
 
 		// Create the custom dialog.
-		create_dialog();
+		create_dialog(parent.aidLabel);
 		
 		// Create the carac labels and fields.
 		create_dialog_fields(editingCarac,account,currentItemSegment,parent);
@@ -203,7 +203,7 @@ public class CaracEditionDialog {
 		//Set fields behavior
 		set_fields_behavior(dialog,validateButtonType,account,currentItemSegment,"NAME",editingCarac,parent,defaultSeq);
 				
-		dialog.getDialogPane().setContent(grid);
+		dialog.setContent(grid);
 
 		// Request focus on the char name by default.
 		Platform.runLater(() -> {
@@ -222,7 +222,7 @@ public class CaracEditionDialog {
 	}
 
 
-	private static void set_fields_behavior(Dialog<ClassCaracteristic> dialog, ButtonType validateButtonType, UserAccount account, ClassSegment currentItemSegment, String templateCriterion, Pair<ClassSegment, ClassCaracteristic> editingCarac, Char_description parent,Integer defaultSeq) throws SQLException, ClassNotFoundException {
+	private static void set_fields_behavior(CustomDialog dialog, ButtonType validateButtonType, UserAccount account, ClassSegment currentItemSegment, String templateCriterion, Pair<ClassSegment, ClassCaracteristic> editingCarac, Char_description parent, Integer defaultSeq) throws SQLException, ClassNotFoundException {
 		//Fill the carac name field and the template UoMs DS
 		ArrayList<ClassCaracteristic> uniqueCharTemplate = new ArrayList<ClassCaracteristic>();
 		HashSet<String> uniqueCharIDs = new HashSet<String>();
@@ -489,7 +489,7 @@ public class CaracEditionDialog {
 		detailsLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				showDetailedClassClusters(currentItemSegment);
+				showDetailedClassClusters(currentItemSegment,detailsLabel);
 			}
 		});
 
@@ -501,30 +501,28 @@ public class CaracEditionDialog {
 				ClassCaracteristic newCarac = loadCaracFromDialog(editingCarac);
 				ArrayList<ClassSegment> droppedClassInsertions = dispatchCaracOnClassesReturnDropped(newCarac, charClassLink.getValue().getRowSegments(),currentItemSegment,account,parent);
 				dialog.close();
-				showDroppedClassInsertions(droppedClassInsertions);
+				showDroppedClassInsertions(droppedClassInsertions,validationButton);
 			}
 		});
 
 
 	}
 
-	private static void showDroppedClassInsertions(ArrayList<ClassSegment> droppedClassInsertions) {
+	private static void showDroppedClassInsertions(ArrayList<ClassSegment> droppedClassInsertions, Node validationButton) {
 		if(droppedClassInsertions.size()==0){
 			return;
 		}
 		ClassSegment firstRow = droppedClassInsertions.get(0);
-		Dialog dialog = new Dialog<>();
-		dialog.setTitle("Listing dropped characteristic insertion");
-		dialog.setHeaderText("Duplicate characteristic name within segments is not allowed. The following classes have not been changed:");
-		dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-		dialog.getDialogPane().getStyleClass().add("customDialog");
+		CustomDialog dialog = new CustomDialog(validationButton);
+
+		
 
 		// Set the button types.
 		dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
-		grid.setPadding(new Insets(10, 10, 10, 10));
+		grid.setPadding(new Insets(0, 0, 0, 0));
 		TableView<ClassSegment> tableview = new TableView<ClassSegment>();
 
 		TableColumn col1 = new TableColumn("Class ID");
@@ -560,8 +558,9 @@ public class CaracEditionDialog {
 
 		grid.add(tableview,0,0);
 		tableview.setMinWidth(800);
-		dialog.getDialogPane().setContent(grid);
-
+		dialog.setContent(grid);
+		dialog.setCDTitle("Listing dropped characteristic insertion");
+		dialog.setCDHeaderText("Duplicate characteristic name within segments is not allowed. The following classes have not been changed:");
 		dialog.showAndWait();
 	}
 
@@ -733,12 +732,12 @@ public class CaracEditionDialog {
 		return newCarac;
 	}
 
-	private static void create_dialog() {
-		dialog = new Dialog<>();
-		dialog.setTitle("New class characteristic declaration");
-		dialog.setHeaderText(null);
-		dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-		dialog.getDialogPane().getStyleClass().add("customDialog");
+	private static void create_dialog(Node aidLabel) {
+		dialog = new CustomDialog(aidLabel);
+		dialog.setCDTitle("New class characteristic declaration");
+		dialog.setCDHeaderText(null);
+		
+		
 		
 		// Set the button types.
 		validateButtonType = new ButtonType("Apply", ButtonData.OK_DONE);
@@ -881,11 +880,11 @@ public class CaracEditionDialog {
 	}
 
 	private static void showAdvancedSearchPane(UserAccount account, ClassSegment currentItemSegment, Char_description parent) throws SQLException, ClassNotFoundException {
-		Dialog dialog = new Dialog<>();
-		dialog.setTitle("Advance characteristic search");
-		dialog.setHeaderText(null);
-		dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-		dialog.getDialogPane().getStyleClass().add("customDialog");
+		CustomDialog dialog = new CustomDialog(parent.aidLabel);
+		dialog.setCDTitle("Advance characteristic search");
+		dialog.setCDHeaderText(null);
+		
+		
 
 		// Set the button types.
 		ButtonType importButtonType = new ButtonType("Import selected",ButtonData.APPLY);
@@ -895,7 +894,7 @@ public class CaracEditionDialog {
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
-		grid.setPadding(new Insets(10, 10, 10, 10));
+		grid.setPadding(new Insets(0, 0, 0, 0));
 		grid.add(new Label("Search by characteristic name"),0,0);
 		Button conjButton = new Button("AND");
 		conjButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -964,7 +963,7 @@ public class CaracEditionDialog {
 		r3.setVgrow(Priority.ALWAYS);
 		grid.getRowConstraints().setAll(r1,r2,r3);
 
-		dialog.getDialogPane().setContent(grid);
+		dialog.setContent(grid);
 
 		HashMap<String, ClassSegment> sid2Segment = Tools.get_project_segments(account);
 		HashSet<String> uniqueCaracNames = new HashSet<String>();
@@ -1111,7 +1110,7 @@ public class CaracEditionDialog {
 		// TODO Auto-generated method stub
 		grid.setHgap(10);
 		grid.setVgap(10);
-		grid.setPadding(new Insets(10, 10, 10, 10));
+		grid.setPadding(new Insets(0, 0, 0, 0));
 		ColumnConstraints col0 = new ColumnConstraints();
 	    col0.setPercentWidth(0);
 	    col0.setFillWidth(true);
@@ -1274,19 +1273,19 @@ public class CaracEditionDialog {
 	}
 
     public static void CaracValueListEdit(ClassCaracteristic carac, String segmentID, Char_description parent) {
-		dialog = new Dialog<>();
-		dialog.setTitle("\""+carac.getCharacteristic_name()+"\" characteristic");
-		dialog.setHeaderText("Value list:");
-		dialog.getDialogPane().getStylesheets().add(CaracEditionDialog.class.getResource("/styles/EditCaracKnownValueTable.css").toExternalForm());
-		dialog.getDialogPane().getStyleClass().add("customDialog");
+		dialog = new CustomDialog(parent.aidLabel);
+
+		
 		validateButtonType = new ButtonType("Exit", ButtonData.OK_DONE);
 		dialog.getDialogPane().getButtonTypes().add(validateButtonType);
 
 		GridPane grid = new GridPane();
 		grid.setHgap(10);
 		grid.setVgap(10);
-		grid.setPadding(new Insets(10, 10, 10, 10));
-		dialog.getDialogPane().setContent(grid);
+		grid.setPadding(new Insets(0, 0, 0, 0));
+		dialog.setContent(grid);
+		dialog.setCDTitle("\""+carac.getCharacteristic_name()+"\" characteristic");
+		dialog.setCDHeaderText("Value list:");
 
 		TableView<String> tableView = new TableView<String>();
 		tableView.setId("valueTable");

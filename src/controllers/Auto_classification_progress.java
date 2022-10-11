@@ -436,7 +436,7 @@ public class Auto_classification_progress {
 					controller.scene = scene;
 					scene.setCursor(Cursor.WAIT);
 					
-					primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+					ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 					primaryStage.setScene(scene);
 					
 					//Sets up next screen size
@@ -496,7 +496,7 @@ public class Auto_classification_progress {
 					scene.setCursor(Cursor.WAIT);
 				    
 					
-					primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+					ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 					primaryStage.setScene(scene);
 					//primaryStage.setMinHeight(768);
 					//primaryStage.setMinWidth(1024);
@@ -548,7 +548,7 @@ public class Auto_classification_progress {
 
 					Scene scene = new Scene(root,400,400);
 					
-					primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+					ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 					primaryStage.setScene(scene);
 					//primaryStage.setMinHeight(768);
 					//primaryStage.setMinWidth(1024);
@@ -626,7 +626,7 @@ public class Auto_classification_progress {
 
 							Scene scene = new Scene(root,400,400);
 							
-							primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+							ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 							primaryStage.setScene(scene);
 							//primaryStage.setMinHeight(768);
 							//primaryStage.setMinWidth(1024);

@@ -12,20 +12,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:id="mainBorderPane" fx:controller="scenes.paneScenes.DescPaneController" stylesheets="@../../styles/DescPane.css">
     <top>
-        <BorderPane fx:id="titleBar">
-            <top>
-                <HBox prefHeight="0"/>
-            </top>
-            <left>
-                <Label fx:id="windowTitle" text="Item data field display" prefHeight="25" translateX="20"/>
-            </left>
-            <right>
-                <HBox prefWidth="0"/>
-            </right>
-            <bottom>
-                <HBox prefHeight="0"/>
-            </bottom>
-        </BorderPane>
+        <fx:include source="titlePane.fxml"/>
     </top>
     <left>
         <HBox prefWidth="10" />

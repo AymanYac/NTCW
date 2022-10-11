@@ -1,3 +1,18 @@
+.deleteButton:hover{
+  -fx-opacity: 1.0;
+}
+.deleteButton {
+  -fx-pref-width : 1.2em;
+  -fx-pref-height : 1.2em;
+  -fx-background-image: url("../pictures/dropRed.png");
+  -fx-background-color: transparent;
+  -fx-background-repeat: no-repeat no-repeat;
+  -fx-background-size: contain;
+  -fx-background-position: center center;
+  -fx-translate-x: -0.3em;
+  -fx-padding: 0;
+  -fx-opacity: 0.3;
+}
 .settingButton:hover{
   -fx-opacity: 1.0;
 }

@@ -3,16 +3,35 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="top" prefHeight="36" prefWidth="300" stylesheets="@../../styles/ToolHeader.css" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ToolHeaderController">
-    <AnchorPane fx:id="title">
-        <Label fx:id="neonecIcon" prefHeight="30" prefWidth="43" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="3.0" />
-        <Label fx:id="neonecTitle" prefHeight="30" text="Neonec Data Enhancement Wizard - v6.0" AnchorPane.leftAnchor="53.0" AnchorPane.topAnchor="3.0" />
-        <HBox prefHeight="36" prefWidth="108" spacing="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <children>
-                <Label fx:id="winMinimize" prefHeight="36" prefWidth="36" />
-                <Label fx:id="winMaximize" disable="true" prefHeight="36" prefWidth="36" />
-                <Label fx:id="winClose" onMouseClicked="#closeWindow" prefHeight="36" prefWidth="36" />
-            </children>
-        </HBox>
-    </AnchorPane>
-</VBox>
+<GridPane fx:id="titleBar" prefHeight="30" prefWidth="10000" stylesheets="@../../styles/ToolHeader.css" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ToolHeaderController">
+    <children>
+        <BorderPane prefHeight="30" GridPane.rowIndex="0" GridPane.columnIndex="0">
+            <top>
+                <VBox prefHeight="5"/>
+            </top>
+            <bottom>
+                <VBox prefHeight="5"/>
+            </bottom>
+            <left>
+                <Label fx:id="neonecIcon" translateX="10"/>
+            </left>
+            <right>
+                <HBox fx:id="buttonBox" prefHeight="36" prefWidth="108" spacing="0">
+                    <children>
+                        <Label fx:id="winMinimize" prefHeight="36" prefWidth="36" />
+                        <Label fx:id="winMaximize" disable="true" prefHeight="36" prefWidth="36" />
+                        <Label fx:id="winClose" onMouseClicked="#closeWindow" prefHeight="36" prefWidth="36" />
+                    </children>
+                </HBox>
+            </right>
+        </BorderPane>
+        <BorderPane prefHeight="30" GridPane.rowIndex="0" GridPane.columnIndex="0">
+            <center>
+                <Label fx:id="neonecTitle" prefHeight="30" text="Neonec Data Enhancement Wizard - v6.0"/>
+            </center>
+        </BorderPane>
+    </children>
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="30.0" prefWidth="100.0" />
+    </columnConstraints>
+</GridPane>

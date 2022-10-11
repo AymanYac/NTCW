@@ -370,6 +370,7 @@ public class DescPaneController {
                 try{
                     DescriptionDisplayElement.DisplaySettings.put(parentRowIndex.toString() + parentColumnIndex.toString(), elementTable.getItems());
                     parent.refresh_ui_display();
+                    parent.tableController.charDescriptionTable.refresh();
                     stage.close();
                 }catch (Exception E){
 

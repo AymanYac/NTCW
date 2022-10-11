@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -85,6 +86,13 @@ public class CharPane_CharClassif {
 		this.parent = char_description;
 		this.tableGrid.getItems().addAll( this.paneRows);
 		this.tvx = new TableViewExtra(this.tableGrid);
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				final ScrollBar scrollBarH = (ScrollBar) tableGrid.lookup(".scroll-bar:hotizontal");
+				scrollBarH.setVisible(false);
+			}
+		});
 		critcalityColumn.setCellValueFactory(new PropertyValueFactory<>("Criticality"));
 		charNameColumn.setCellValueFactory(new PropertyValueFactory<String, CharPaneRow>("Char_name_complete"));
 		//charNameColumn.setCellFactory(model.mouseHoverTableCell.forCharNameTranslation(this.tableGrid));
@@ -124,7 +132,7 @@ public class CharPane_CharClassif {
 		charNameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
 		uomColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
 		valueColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
-		
+
 		tableGrid.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
 			if (newSelection != null && this.triggerItemTableRefresh) {
 				Platform.runLater(new Runnable (){

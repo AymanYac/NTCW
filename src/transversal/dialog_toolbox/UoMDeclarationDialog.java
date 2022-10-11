@@ -39,11 +39,9 @@ public class UoMDeclarationDialog {
 		proposedUomSymbol  = proposedUomSymbol.trim();
 
 		// Create the custom dialog.
-		Dialog<UnitOfMeasure> dialog = new Dialog<>();
-		dialog.setTitle("New unit of measure declaration");
-		dialog.setHeaderText("Defining a new unit of measure");
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-		dialog.getDialogPane().getStyleClass().add("customDialog");
+		CustomDialog dialog = new CustomDialog(uom_field);
+
+		
 
 		// Set the button types.
 		ButtonType validateButtonType = new ButtonType("Store new unit", ButtonData.OK_DONE);
@@ -58,7 +56,9 @@ public class UoMDeclarationDialog {
 		setFieldListeners(dialog,validateButtonType, proposedUomSymbol, null);
 
 
-		dialog.getDialogPane().setContent(grid);
+		dialog.setContent(grid);
+		dialog.setCDTitle("New unit of measure declaration");
+		dialog.setCDHeaderText("Defining a new unit of measure");
 
 		// Request focus on the multiplier field by default.
 		Platform.runLater(() -> uomMultiplier.requestFocus());
@@ -102,11 +102,9 @@ public class UoMDeclarationDialog {
 		CharUomFamily = UnitOfMeasure.RunTimeUOMS.get(active_char.getAllowedUoms().get(0)).getUom_base_id();
 		
 		// Create the custom dialog.
-		Dialog<UnitOfMeasure> dialog = new Dialog<>();
-		dialog.setTitle("New unit of measure declaration");
-		dialog.setHeaderText("Defining a new unit of measure");
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-		dialog.getDialogPane().getStyleClass().add("customDialog");
+		CustomDialog dialog = new CustomDialog(uom_field);
+
+		
 		
 		// Set the button types.
 		ButtonType validateButtonType = new ButtonType("Store new unit", ButtonData.OK_DONE);
@@ -121,7 +119,9 @@ public class UoMDeclarationDialog {
 		setFieldListeners(dialog,validateButtonType, proposedUomSymbol, active_char);
 		
 		
-		dialog.getDialogPane().setContent(grid);
+		dialog.setContent(grid);
+		dialog.setCDTitle("New unit of measure declaration");
+		dialog.setCDHeaderText("Defining a new unit of measure");
 
 		// Request focus on the multiplier field by default.
 		Platform.runLater(() -> uomMultiplier.requestFocus());
@@ -164,11 +164,9 @@ public class UoMDeclarationDialog {
 		String preparedRule=CharClassifProposer.getRuleForButton(activeButtonIndex);
 		
 		// Create the custom dialog.
-		Dialog<UnitOfMeasure> dialog = new Dialog<>();
-		dialog.setTitle("New unit of measure declaration");
-		dialog.setHeaderText("Defining a new unit of measure");
-		dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-		dialog.getDialogPane().getStyleClass().add("customDialog");
+		CustomDialog dialog = new CustomDialog(parent.aidLabel);
+
+		
 		
 		// Set the button types.
 		ButtonType validateButtonType = new ButtonType("Store new unit", ButtonData.OK_DONE);
@@ -183,7 +181,9 @@ public class UoMDeclarationDialog {
 		setFieldListeners(dialog,validateButtonType, proposedUomSymbol, active_char);
 		
 		
-		dialog.getDialogPane().setContent(grid);
+		dialog.setContent(grid);
+		dialog.setCDTitle("New unit of measure declaration");
+		dialog.setCDHeaderText("Defining a new unit of measure");
 
 		// Request focus on the multiplier field by default.
 		Platform.runLater(() -> uomMultiplier.requestFocus());
@@ -355,7 +355,7 @@ public class UoMDeclarationDialog {
 		grid.setHgap(10);
 		grid.setVgap(10);
 		//grid.setPadding(new Insets(20, 150, 10, 10));
-		grid.setPadding(new Insets(10, 10, 10, 10));
+		grid.setPadding(new Insets(0, 0, 0, 0));
 		
 		uomName.setText("");
 		uomSymbol.setText(proposedUomSymbol);

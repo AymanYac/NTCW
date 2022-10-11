@@ -1801,8 +1801,8 @@
                   <Label fx:id="custom_label_12" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="9" />
                   <Label fx:id="note_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="9" />
                   <Label fx:id="custom_label_value" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="9" />
-                  <ComboBox fx:id="classCombo" maxWidth="1.7976931348623157E308" stylesheets="@../styles/ComboBoxBlue.css" GridPane.columnIndex="9" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" />
-                  <Label fx:id="deleteValueLabel" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="⦻" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
+                  <ComboBox fx:id="classCombo" minHeight="0.0" prefHeight="20" maxWidth="1.7976931348623157E308" stylesheets="@../styles/ComboBoxBlue.css" GridPane.columnIndex="9" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" />
+                  <Button fx:id="deleteValueLabel" alignment="BASELINE_CENTER" mnemonicParsing="false" styleClass="deleteButton" stylesheets="@../styles/DescHoverButton.css"  GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
                </children>
             </GridPane>
          </children>

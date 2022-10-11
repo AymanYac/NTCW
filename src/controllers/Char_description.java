@@ -135,7 +135,7 @@ public class Char_description {
 	@FXML public TextField value_field;
 	@FXML public TextField translated_value_field;
 
-	@FXML Label deleteValueLabel;
+	@FXML Button deleteValueLabel;
 	@FXML Label custom_label_11;
 	@FXML Label custom_label_12;
 	@FXML Label custom_label_21;
@@ -227,7 +227,7 @@ public class Char_description {
 	@FXML void export() throws SQLException, ClassNotFoundException {
 
 		try {
-			Optional<ArrayList<Boolean>> choice = DescriptionExportExcelSheets.choicePopUp();
+			Optional<ArrayList<Boolean>> choice = DescriptionExportExcelSheets.choicePopUp(aidLabel);
 			if(choice.isPresent()){
 				CharDescriptionExportServices.ExportItemDataForClass(null,this,choice.get().get(0),choice.get().get(1),choice.get().get(2),choice.get().get(3),choice.get().get(4));
 			}
@@ -283,7 +283,7 @@ public class Char_description {
 							Stage secondaryStage = new Stage();
 							secondaryStage.initModality(Modality.WINDOW_MODAL);
 							secondaryStage.initOwner(aidLabel.getScene().getWindow());
-							secondaryStage.initStyle(StageStyle.TRANSPARENT);
+							secondaryStage.initStyle(StageStyle.DECORATED);
 							//secondaryStage.setMaximized(true);
 							secondaryStage.setWidth(Math.floor(Screen.getPrimary().getBounds().getWidth()*0.7));
 							secondaryStage.setScene(scene);
@@ -2165,7 +2165,7 @@ public class Char_description {
 		charPaneController.setParent(this);
 		refresh_ui_display();
 
-		
+
 	}
 	
 	private void load_browser_pane() throws IOException {
@@ -2195,7 +2195,7 @@ public class Char_description {
 			rightAnchor.setVisible(true);
 			grid.setColumnSpan(rightAnchor, 3);
 			grid.setColumnSpan(leftAnchor, 5);
-			
+
 		}else {
 			rightAnchor.getChildren().removeAll(rightAnchor.getChildren());
 			rightAnchor.setVisible(false);
@@ -2349,6 +2349,7 @@ public class Char_description {
 				}catch (Exception L){
 				}
 			}
+			GridPane.setColumnIndex(deleteValueLabel,3);
 			if(active_char.getIsNumeric()) {
 				if( (active_char.getAllowedUoms()!=null && active_char.getAllowedUoms().size()>0)) {
 
@@ -2573,6 +2574,7 @@ public class Char_description {
 					}
 					rule_field.setVisible(true);
 				}else {
+					GridPane.setColumnIndex(deleteValueLabel,5);
 					//Setting the value
 					value_label.setText("Value");
 					value_label.setVisible(true);

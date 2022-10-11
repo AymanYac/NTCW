@@ -1,16 +1,21 @@
-#top {
+#titleBar {
     -fx-background-color: #445469;
 }
 
 #neonecIcon{
-    -fx-background-image:url("../pictures/Neonec-white-Logo-only.png");
-    -fx-background-repeat:no-repeat;
-    -fx-background-size: contain;
+  -fx-pref-height : 2em;
+  -fx-pref-width: 2em;
+  -fx-background-image:url("../pictures/Neonec-white-Logo-only.png");
+  -fx-background-color: transparent;
+  -fx-background-repeat: no-repeat no-repeat;
+  -fx-background-size: contain;
+  -fx-background-position: center center;
+  -fx-padding: 0;
 }
 
 #neonecTitle{
     -fx-font-weight: bold;
-    -fx-font-size: 12pt;
+    -fx-font-size: 1em;
     -fx-text-background-color: white;
 }
 

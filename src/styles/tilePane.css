@@ -1,0 +1,9 @@
+
+#titleBar{
+	-fx-background-color:#D6DCE4;
+    -fx-text-fill:#445469;
+}
+#windowTitle{
+    -fx-font-size: 14px;
+    -fx-text-fill: #445469;
+}

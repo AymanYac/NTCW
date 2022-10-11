@@ -60,7 +60,7 @@ public class Front_page {
 
 					Scene scene = new Scene(root,400,400);
 					
-					primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+					ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 					primaryStage.setScene(scene);
 					//primaryStage.setMinHeight(768);
 					//primaryStage.setMinWidth(1024);
@@ -102,7 +102,7 @@ public class Front_page {
 
 					Scene scene = new Scene(root,400,400);
 					
-					primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+					ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 					primaryStage.setScene(scene);
 					//primaryStage.setMinHeight(768);
 					//primaryStage.setMinWidth(1024);
@@ -171,7 +171,7 @@ public class Front_page {
 
 						Scene scene = new Scene(root,400,400);
 						
-						primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+						ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 						primaryStage.setScene(scene);
 						//primaryStage.setMinHeight(768);
 						//primaryStage.setMinWidth(1024);
@@ -217,7 +217,7 @@ public class Front_page {
 
 					Scene scene = new Scene(root,400,400);
 					
-					primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+					ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 					primaryStage.setScene(scene);
 					//primaryStage.setMinHeight(768);
 					//primaryStage.setMinWidth(1024);
@@ -267,7 +267,7 @@ public class Front_page {
 			scene.setCursor(Cursor.WAIT);
 		    
 			
-			primaryStage.setTitle("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
+			ToolHeaderController.titleProperty.setValue("Neonec classification wizard - V"+GlobalConstants.TOOL_VERSION+" ["+account.getActive_project_name()+"]");
 			primaryStage.setScene(scene);
 			//primaryStage.setMinHeight(768);
 			//primaryStage.setMinWidth(1024);

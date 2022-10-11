@@ -210,8 +210,12 @@ public Boolean processValueOnFocusLost(boolean isDataField) {
 
 
 public void refresh_entries(boolean isDataField) {
-	  entries = TranslationServices.getTextEntriesForActiveCharOnLanguages(parent,isDataField);
-	}
+	  try{
+		  entries = TranslationServices.getTextEntriesForActiveCharOnLanguages(parent,isDataField);
+	  }catch (Exception E){
+
+	  }
+}
 
 
 

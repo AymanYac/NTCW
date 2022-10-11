@@ -1,4 +1,6 @@
-
+.styled-text-area .selection {
+    -fx-fill: #1EA185;
+}
 .basicText {
     -fx-fill: black;
     -fx-font-weight:normal;

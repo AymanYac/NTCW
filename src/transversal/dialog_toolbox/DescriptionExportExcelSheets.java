@@ -1,7 +1,7 @@
 package transversal.dialog_toolbox;
 
+import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -11,13 +11,10 @@ import java.util.Optional;
 
 
 public class DescriptionExportExcelSheets {
-    public static Optional<ArrayList<Boolean>> choicePopUp(){
+    public static Optional<ArrayList<Boolean>> choicePopUp(Node aidLabel){
         // Create the custom dialog.
-        Dialog<ArrayList<Boolean>> dialog = new Dialog<>();
-        dialog.setTitle("Exporting item description data");
-        dialog.setHeaderText("Please choose export sheets");
-        dialog.getDialogPane().getStylesheets().add(ItemUploadDialog.class.getResource("/styles/DialogPane.css").toExternalForm());
-        dialog.getDialogPane().getStyleClass().add("customDialog");
+        CustomDialog dialog = new CustomDialog(aidLabel);
+
 
         // Set the button types.
         ButtonType validateButtonType = new ButtonType("Export", ButtonBar.ButtonData.OK_DONE);
@@ -53,7 +50,10 @@ public class DescriptionExportExcelSheets {
         c2.setPercentWidth(20);
         grid.getColumnConstraints().addAll(c1,c2);
 
-        dialog.getDialogPane().setContent(grid);
+        dialog.setContent(grid);
+        dialog.setCDTitle("Exporting item description data");
+        dialog.setCDHeaderText("Please choose export sheets");
+
 
         dialog.getDialogPane().lookupButton(validateButtonType).disableProperty().bind((reviewCB.selectedProperty().or(baseCB.selectedProperty()).or(taxoCB.selectedProperty()).or(kvCB.selectedProperty())).not());
 
