@@ -2,6 +2,7 @@ package controllers.paneControllers;
 
 import com.sun.javafx.geom.Rectangle;
 import controllers.Char_description;
+import controllers.ToolHeaderController;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -9,6 +10,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
@@ -29,6 +31,7 @@ import org.icepdf.core.pobjects.graphics.text.LineText;
 import org.icepdf.core.views.DocumentViewController;
 import org.icepdf.ri.common.SwingController;
 import org.json.simple.parser.ParseException;
+import scenes.paneScenes.TitlePaneControler;
 import service.CharPatternServices;
 import service.CharValuesLoader;
 import service.ExternalSearchServices;
@@ -523,7 +526,22 @@ public class Browser_CharClassif {
 		headerBar.getItems().setAll(title,verticalSpace,close);
 		headerBar.getStylesheets().add(Browser_CharClassif.class.getResource("/styles/Main.css").toExternalForm());
 		GridPane.setValignment(headerBar, VPos.TOP);
-		secondaryLayout.add(headerBar,0,0);
+
+		if(GlobalConstants.BROWSER_TO_SHARE_POPUP_HEADER){
+			try {
+				FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/ribbonScenes/Tool_Header.fxml"));
+				GridPane titleBar = loader.load();
+				ToolHeaderController titleCntrlr=loader.getController();
+				titleCntrlr.neonecTitle.textProperty().unbind();
+				titleCntrlr.neonecTitle.setText(title.getText());
+				secondaryLayout.add(titleBar,0,0);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}else{
+			secondaryLayout.add(headerBar,0,0);
+		}
+
 
 		Rectangle dragDelta = new Rectangle();
 		headerBar.setOnMousePressed(new EventHandler<MouseEvent>() {
@@ -540,9 +558,9 @@ public class Browser_CharClassif {
 			}
 		});
 		RowConstraints R1 = new RowConstraints();
-		R1.setPercentHeight(5);
+		R1.setPercentHeight(3);
 		RowConstraints R2 = new RowConstraints();
-		R2.setPercentHeight(95);
+		R2.setPercentHeight(97);
 		secondaryLayout.getRowConstraints().setAll(R1,R2);
 		ColumnConstraints C0 = new ColumnConstraints();
 		C0.setPercentWidth(100);

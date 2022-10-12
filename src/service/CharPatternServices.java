@@ -25,6 +25,9 @@ public class CharPatternServices {
 	public static ConcurrentHashMap<String,GenericCharRule> descriptionRules = new ConcurrentHashMap<String,GenericCharRule>();
 
 	public static void scanSelectionForPatternDetection(Char_description parent, ClassCaracteristic active_char,String selectedText) throws SQLException {
+		if(selectedText==null || selectedText.length()==0){
+			return;
+		}
 		parent.refresh_ui_display();
 		Unidecode unidecode = Unidecode.toAscii();
 		System.out.println("Processing selected text ::: "+selectedText);

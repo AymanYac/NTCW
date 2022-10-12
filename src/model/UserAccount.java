@@ -1,16 +1,20 @@
 package model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import javafx.scene.input.KeyCode;
 import service.CharValuesLoader;
 import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.generic.CustomKeyboardListener;
 import transversal.generic.Tools;
 
+import java.lang.reflect.Type;
+import java.net.CookieManager;
+import java.net.HttpCookie;
+import java.net.URI;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 public class UserAccount {
 	String user_id;
@@ -26,6 +30,7 @@ public class UserAccount {
 	static ArrayList<ArrayList<String>> searchPreferences = new ArrayList<ArrayList<String>>();
 	private String activeCharItemID;
 	private String activeCharID;
+	public static CookieManager cookieManager;
 
 
 	public String getUser_desc_class(String defaultSegment) {
@@ -236,6 +241,38 @@ public class UserAccount {
 		return ret;
 	}
 
+	public void saveBrowserCookies() {
+		new Thread (()->{
+			Connection conn = null;
+			PreparedStatement stmt=null;
+			List<HttpCookie> httpCookies = cookieManager.getCookieStore().getCookies();
+			Gson gson = new GsonBuilder().create();
+			String jsonCookie = gson.toJson(httpCookies);
+			try {
+				conn = Tools.spawn_connection_from_pool();
+				stmt = conn.prepareStatement("update users_x_projects set browser_cookies = ? where project_id = ? and user_id = ?");
+				stmt.setString(1, jsonCookie);
+				stmt.setString(2,getActive_project());
+				stmt.setString(3,getUser_id());
+				stmt.execute();
+				//System.out.println(stmt.toString());
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				stmt.close();
+			} catch (SQLException throwables) {
+				throwables.printStackTrace();
+			}
+			try {
+				conn.close();
+			} catch (SQLException throwables) {
+				throwables.printStackTrace();
+			}
+		}).start();
+	}
+	
+
 	public void saveSearchSettings(ArrayList<ArrayList<String>> concatElems) {
 		searchPreferences = concatElems;
 		new Thread (()->{
@@ -281,5 +318,18 @@ public class UserAccount {
 	}
 	public String getActiveChar() {
 		return this.activeCharID;
+	}
+
+	public void setBrowserCookies(String json) {
+		cookieManager = new CookieManager();
+		java.net.CookieHandler.setDefault(cookieManager);
+		cookieManager.getCookieStore().removeAll();
+		Gson gson = new GsonBuilder().create();
+		List<HttpCookie> httpCookies = new ArrayList<>();
+		Type type = new TypeToken<List<HttpCookie>>() {}.getType();
+		httpCookies = gson.fromJson(json, type);   // convert json string to list
+		for (HttpCookie cookie : httpCookies) {
+			cookieManager.getCookieStore().add(URI.create(cookie.getDomain()), cookie);
+		}
 	}
 }

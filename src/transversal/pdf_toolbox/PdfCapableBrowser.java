@@ -8,6 +8,7 @@ import javafx.embed.swing.SwingNode;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import model.GlobalConstants;
+import model.UserAccount;
 import org.icepdf.core.util.PropertyConstants;
 import org.icepdf.core.views.DocumentViewModel;
 import org.icepdf.ri.common.SwingController;
@@ -295,6 +296,7 @@ public class PdfCapableBrowser {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                parent.parent.account.saveBrowserCookies();
             }
         });
 

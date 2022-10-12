@@ -65,9 +65,10 @@ public class GlobalConstants {
 	public static final boolean CHAR_DESC_PATTERN_SPAN_SUPERRULES_ACCROS_CHARS = false;
 	public static final boolean PROMOTE_SUGGESTION_TO_APPLIED_OLD_SCHEMA = false;
     public static final boolean IMAGE_SEARCH_THUMBNAIL = true;
+	public static final boolean BROWSER_TO_SHARE_POPUP_HEADER = true;
 
 
-    public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
+	public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS = 5;
 	public static boolean USE_TAXOIMPORT_NEW_SCHEMA = true;
 	
@@ -77,7 +78,7 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_4 = "4";
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
-	public static final boolean DEV_RUNTIME = true;
+	public static final boolean DEV_RUNTIME = false;
 	public static final boolean REDIRECT_OUTSTREAM = false;
 	public static final boolean REDIRECT_ERR_ONLY = true;
 	public static final String TOOL_VERSION = "6 Alpha";

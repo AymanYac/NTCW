@@ -47,6 +47,7 @@ import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
 import java.io.IOException;
+import java.net.HttpCookie;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -171,7 +172,7 @@ public class TablePane_CharClassif {
 
 		Connection conn = Tools.spawn_connection_from_pool();
 		PreparedStatement stmt = conn.prepareStatement("select "
-				+ "user_description_sorting_columns, user_description_sorting_order,search_preferences, activeCharID, activeItemID"
+				+ "user_description_sorting_columns, user_description_sorting_order,search_preferences, activeCharID, activeItemID, browser_cookies"
 				+ " from administration.users_x_projects where project_id = ? and user_id = ?");
 		stmt.setString(1, account.getActive_project());
 		stmt.setString(2, account.getUser_id());
@@ -183,8 +184,9 @@ public class TablePane_CharClassif {
 			account.setSearchSettings(ComplexMap2JdbcObject.deserialize(rs.getString("search_preferences"),new TypeToken<ArrayList<ArrayList<String>>>(){}.getType()));
 			account.setActiveItem(rs.getString("activeItemID"));
 			account.setActiveChar(rs.getString("activeCharID"));
+			account.setBrowserCookies(rs.getString("browser_cookies"));
 		}catch(Exception V) {
-			//V.printStackTrace(System.err);
+			V.printStackTrace(System.err);
 		}
 		rs.close();
 		stmt.close();

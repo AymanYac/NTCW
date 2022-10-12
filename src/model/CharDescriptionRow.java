@@ -522,23 +522,28 @@ public class CharDescriptionRow {
 	}
 
 	public ArrayList<CharRuleResult> getRulePropositions(String charId) {
-		ArrayList<CharRuleResult> ret = new ArrayList<CharRuleResult>();
-		CaracteristicValue charItemData = getData(getClass_segment_string().split("&&&")[0]).get(charId);
-		if(
-				(!GlobalConstants.HIDE_RULE_RESULT_SUGGESTION_WHEN_KNOWN_VALUE && charItemData!=null && charItemData.getDisplayValue(false,false).length()>0)
-				|| (getRuleResults().get(charId).stream().anyMatch(result -> result.getStatus()!=null && result.getStatus().equals("Applied")))
-		){
-			return ret;
-		}
 		try{
-			ret = new ArrayList<CharRuleResult>(
-					getRuleResults().get(charId).stream()
-							.filter(result -> result.getStatus() != null && result.getStatus().startsWith("Suggestion ") && !result.isOrphan())
-							.collect(Collectors.toCollection(ArrayList::new)));
-		}catch (Exception V){
+			ArrayList<CharRuleResult> ret = new ArrayList<CharRuleResult>();
+			CaracteristicValue charItemData = getData(getClass_segment_string().split("&&&")[0]).get(charId);
+			if (
+					(!GlobalConstants.HIDE_RULE_RESULT_SUGGESTION_WHEN_KNOWN_VALUE && charItemData != null && charItemData.getDisplayValue(false, false).length() > 0)
+							|| (getRuleResults().get(charId).stream().anyMatch(result -> result.getStatus() != null && result.getStatus().equals("Applied")))
+			) {
+				return ret;
+			}
+			try {
+				ret = new ArrayList<CharRuleResult>(
+						getRuleResults().get(charId).stream()
+								.filter(result -> result.getStatus() != null && result.getStatus().startsWith("Suggestion ") && !result.isOrphan())
+								.collect(Collectors.toCollection(ArrayList::new)));
+			} catch (Exception V) {
 
+			}
+			return ret;
+		}catch (Exception E){
+			//E.printStackTrace(System.err);
+			return new ArrayList<CharRuleResult>();
 		}
-		return ret;
 	}
 
 	@Override
