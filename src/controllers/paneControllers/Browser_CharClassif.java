@@ -303,8 +303,9 @@ public class Browser_CharClassif {
 		if(toolBar.isVisible()){
 			closingBrowser=true;
 		}
-		System.out.println("hide_browser()");
+		/*System.out.println("hide_browser()");
 		System.out.println("Closing browser >"+String.valueOf(closingBrowser));
+		*/
 		switch_pane_hide_browser(true);
 		parent.ruleButton.setSelected(false);
 		parent.charButton.setSelected(false);
@@ -585,7 +586,7 @@ public class Browser_CharClassif {
 				}
 				if(event.getCode().equals(KeyCode.ENTER)){
 					if(event.isControlDown()){
-						System.out.println("CTRL+ENTER");
+						/*System.out.println("CTRL+ENTER");*/
 						((Stage)parent.charButton.getScene().getWindow()).toFront();
 						parent.value_field.requestFocus();
 						int active_char_index = Math.floorMod(parent.tableController.selected_col, CharValuesLoader.active_characteristics.get(parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
@@ -622,11 +623,11 @@ public class Browser_CharClassif {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				if(newValue){
-					System.out.println("now showing pdf");
+					/*System.out.println("now showing pdf");*/
 					browsePreviousPageButton.setDisable(false);
 					browseNextPageButton.setDisable(true);
 				}else{
-					System.out.println("closed pdf");
+					/*System.out.println("closed pdf");*/
 					browsePreviousPageButton.setDisable( browser.toNode().getEngine().getHistory().currentIndexProperty().getValue() == 0 );
 					browseNextPageButton.setDisable(false);
 				}

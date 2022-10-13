@@ -73,7 +73,7 @@ public class CharValuesLoader {
 				try{
 					val.setParentChar(CharValuesLoader.active_characteristics.get(loop_class_id).get(charIdArrays.get(loop_class_id).indexOf(characteristic_id)));
 				}catch(Exception V) {
-					System.out.println("Couldn't set parent for char "+characteristic_id+" in class "+loop_class_id);
+					System.err.println("Couldn't set parent for char "+characteristic_id+" in class "+loop_class_id);
 				}
 				knownValues.add(val);
 				i+=1;
@@ -84,7 +84,7 @@ public class CharValuesLoader {
 				try{
 					row.getData(loop_class_id).put(characteristic_id,val);
 				}catch(Exception V) {
-					System.out.println("Couldn't set data for char "+characteristic_id+" in class "+loop_class_id);
+					System.err.println("Couldn't set data for char "+characteristic_id+" in class "+loop_class_id);
 				}
 
 
@@ -256,7 +256,7 @@ public class CharValuesLoader {
 			try{
 				val.setParentChar(carac);
 			}catch(Exception V) {
-				System.out.println("Couldn't set parent for char "+carac.getCharacteristic_id());
+				System.err.println("Couldn't set parent for char "+carac.getCharacteristic_id());
 			}
 			CharItemFetcher.defaultCharValues.add(new Pair<ClassCaracteristic,CaracteristicValue>(carac,val));
 			TranslationServices.beAwareOfNewValue(val,carac);

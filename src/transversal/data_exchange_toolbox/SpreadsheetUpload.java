@@ -219,14 +219,14 @@ public class SpreadsheetUpload {
 	    
 	    
 	    int current_row = -1;
-	    System.out.println("Number of rows in excel "+number_of_rows);
+	    /*System.out.println("Number of rows in excel "+number_of_rows);*/
         while (rowIterator.hasNext()) {
         	current_row+=1;
         	try{
         		if(Math.floorMod(current_row, Math.floorDiv(number_of_rows, 20))==0) {
         			progressBar.setProgress(current_row*1.0/number_of_rows*1.0);
-        			System.out.println("current row "+current_row);
-        			System.out.println(progressBar.getProgress());
+        			System.err.println("current row "+current_row);
+        			System.err.println(progressBar.getProgress());
         		}
         	}catch(Exception V) {
         		
@@ -401,7 +401,7 @@ public class SpreadsheetUpload {
     ps2.close();
     conn.close();
     conn2.close();
-    System.out.println("Upserted "+String.valueOf(affectedItemIDs.size())+" items");
+    System.err.println("Upserted "+String.valueOf(affectedItemIDs.size())+" items");
     return affectedItemIDs;
 }
 	

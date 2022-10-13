@@ -283,7 +283,7 @@ public class Char_description {
 							Stage secondaryStage = new Stage();
 							secondaryStage.initModality(Modality.WINDOW_MODAL);
 							secondaryStage.initOwner(aidLabel.getScene().getWindow());
-							secondaryStage.initStyle(StageStyle.DECORATED);
+							secondaryStage.initStyle(StageStyle.TRANSPARENT);
 							//secondaryStage.setMaximized(true);
 							secondaryStage.setWidth(Math.floor(Screen.getPrimary().getBounds().getWidth()*0.7));
 							secondaryStage.setScene(scene);

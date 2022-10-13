@@ -281,13 +281,13 @@ public class CaracEditionDialog {
 
 					//sequence.getSelectionModel().select(Integer.valueOf(Math.min(selectedCar.getSequence(),Collections.max((Collection<? extends Integer>) sequence.getItems().stream().map(i->i.getKey()).collect(Collectors.toCollection(ArrayList::new))))));
 					if(editingCarac!=null){
-						System.out.println("Editing carac seq");
+						/*System.out.println("Editing carac seq");*/
 						sequence.getSelectionModel().select(selectedCar.getSequence()-1);
 					}else if(defaultSeq!=null){
-						System.out.println("Default seq =>"+defaultSeq);
+						/*System.out.println("Default seq =>"+defaultSeq);*/
 						sequence.getSelectionModel().select(defaultSeq-1);
 					}else{
-						System.out.println("No default seq");
+						/*System.out.println("No default seq");*/
 						sequence.getSelectionModel().select(sequence.getItems().size()-1);
 					}
 					criticality.getSelectionModel().select(selectedCar.getIsCritical()?"Critical":"Not critical");
@@ -1060,7 +1060,7 @@ public class CaracEditionDialog {
 		segCombo.valueProperty().addListener(new ChangeListener<ClassSegment>() {
 			@Override
 			public void changed(ObservableValue<? extends ClassSegment> observable, ClassSegment oldValue, ClassSegment newValue) {
-				System.out.println("New seg value "+newValue);
+				/*System.out.println("New seg value "+newValue);*/
 			}
 		});
 		conjButton.textProperty().addListener(new ChangeListener<String>() {

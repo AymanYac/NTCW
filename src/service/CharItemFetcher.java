@@ -149,7 +149,7 @@ public class CharItemFetcher {
 			allRowItems.get(e.getValue()).allocateDataField(target_class_id);
 		});
 		
-		System.out.println("Class change :: allocated data fields for "+itemList.size()+" items");
+		/*System.out.println("Class change :: allocated data fields for "+itemList.size()+" items");*/
 	}
 
 	public static void initClassDataFields() {

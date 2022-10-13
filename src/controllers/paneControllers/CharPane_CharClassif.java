@@ -77,7 +77,6 @@ public class CharPane_CharClassif {
 		}catch(Exception V) {
 			triggerItemTableRefresh = true;
 		}
-
 		
 	}
 
@@ -152,7 +151,7 @@ public class CharPane_CharClassif {
 			TableRow<CharPaneRow> row = new TableRow<>();
 			tvx.rows.add(row);
 			row.setOnDragDetected(event -> {
-				System.out.println("start drag detected");
+				/*System.out.println("start drag detected");*/
 				if (! row.isEmpty()) {
 					Integer index = row.getIndex();
 					Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
@@ -162,7 +161,7 @@ public class CharPane_CharClassif {
 					db.setContent(cc);
 					event.consume();
 				}
-				System.out.println("end drag detected");
+				/*System.out.println("end drag detected");*/
 			});
 
 			row.setOnDragOver(event -> {
@@ -176,7 +175,7 @@ public class CharPane_CharClassif {
 			});
 
 			row.setOnDragDropped(event -> {
-				System.out.println("start drag drop");
+				/*System.out.println("start drag drop");*/
 				Dragboard db = event.getDragboard();
 				if (db.hasContent(GlobalConstants.SERIALIZED_MIME_TYPE)) {
 					int draggedIndex = (Integer) db.getContent(GlobalConstants.SERIALIZED_MIME_TYPE);

@@ -51,9 +51,9 @@ public class FxUtilTest {
                     if (!comboBox.isShowing()) {
                         comboBox.show();
                         comboBox.getSelectionModel().clearAndSelect(Math.min(comboBox.getSelectionModel().getSelectedIndex()+1,comboBox.getItems().size()-1));
-                        System.out.println("selected >"+comboBox.getSelectionModel().getSelectedItem().toString()+"<");
+                        //System.out.println("selected >"+comboBox.getSelectionModel().getSelectedItem().toString()+"<");
                         try{
-                            System.out.println("should have been>"+ comboBox.getItems().stream().filter(e -> e.toString().equals(comboBox.getEditor().getText())).findAny().get().toString());
+                            //System.out.println("should have been>"+ comboBox.getItems().stream().filter(e -> e.toString().equals(comboBox.getEditor().getText())).findAny().get().toString());
                         }catch (Exception V){
 
                         }

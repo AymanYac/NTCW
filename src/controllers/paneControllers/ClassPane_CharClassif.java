@@ -42,7 +42,6 @@ public class ClassPane_CharClassif {
     }
 
     public void addRuleButtonAction(ActionEvent actionEvent) {
-        System.out.println("Hello");
         ruleView.getItems().add("hqs");
         ruleView.refresh();
     }

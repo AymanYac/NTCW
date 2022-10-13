@@ -642,11 +642,11 @@ public class ExternalSearchServices {
         if(lastManualInputTime!=null && Duration.between(lastManualInputTime,LocalDateTime.now()).getSeconds() > GlobalConstants.ManualValuesBufferFlushTime){
             CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account, null);
             lastManualInputTime = LocalDateTime.now();
-            System.out.println("Flushing manual values after "+String.valueOf(GlobalConstants.ManualValuesBufferFlushTime)+ " seconds");
+            System.err.println("Flushing manual values after "+String.valueOf(GlobalConstants.ManualValuesBufferFlushTime)+ " seconds");
         }else if(manualInputCounter%GlobalConstants.ManualValuesBufferFlushSize ==0){
             CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account, null);
             lastManualInputTime = LocalDateTime.now();
-            System.out.println("Flushing manual values after "+String.valueOf(GlobalConstants.ManualValuesBufferFlushSize)+ " inputs");
+            System.err.println("Flushing manual values after "+String.valueOf(GlobalConstants.ManualValuesBufferFlushSize)+ " inputs");
         }
         manualInputCounter+=1;
     }

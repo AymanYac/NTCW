@@ -481,9 +481,8 @@ public class TablePane_CharClassif {
 			//Not needed any more loadAllClassCharWithKnownValues calls loadAllKnownValuesAssociated2Items
 			//assignValuesToItemsByClass_V2(active_class,FxUtilTest.getComboBoxValue(Parent.classCombo).getclassName(),classItems);
 
-			setColumns();
 			restorePreviousLayout();
-
+			setColumns();
 			fillTable(false);
 			selectLastDescribedItem();
 			this.selected_col = -1;
@@ -706,6 +705,7 @@ public class TablePane_CharClassif {
 
 	@SuppressWarnings("rawtypes")
 	private void selectChartAtIndex(int i) {
+		//System.out.println("visible right? "+Parent.visibleRight.get()+", table width: "+charDescriptionTable.widthProperty().get());
 		clearActiveColumnId();
 		Parent.lastInputValue = null;
 		while(selected_col<0){
@@ -714,23 +714,27 @@ public class TablePane_CharClassif {
 		int selected_col = Math.floorMod(i,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).size());
 		ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).get(selected_col);
 		for( TableColumn col:this.charDescriptionTable.getColumns()) {
-			col.setVisible(
-					( (!hiddenColumns.contains(col.getText()) && !hiddenColumns.contains(col.getId())) || (col.getId()!=null && col.getId().equals(activeChar.getCharacteristic_id())))
-				&&	(!Parent.visibleRight.get() || collapsedColumns.containsKey(col.getText()) || collapsedColumns.containsKey(col.getId()))
-			);
-			if(col.isVisible()){
-				try{
-					col.prefWidthProperty().bind(charDescriptionTable.widthProperty().multiply(
-							((Parent.visibleRight.get() ? collapsedColumns : visibleColumns).get(col.getText()))));
-				}catch (Exception V){
-					col.prefWidthProperty().bind(charDescriptionTable.widthProperty().multiply(
-							((Parent.visibleRight.get() ? collapsedColumns : visibleColumns).get(col.getId()))));
+			if(col instanceof CustomTableColumn){
+				col.setVisible(
+						( (!hiddenColumns.contains(col.getText()) && !hiddenColumns.contains(col.getId())) || (col.getId()!=null && col.getId().equals(activeChar.getCharacteristic_id())))
+								&&	(!Parent.visibleRight.get() || collapsedColumns.containsKey(col.getText()) || collapsedColumns.containsKey(col.getId()))
+				);
+				if(col.isVisible()){
+					try{
+						((CustomTableColumn<?, ?>) col).setPercentageWidth((Parent.visibleRight.get() ? collapsedColumns : visibleColumns).get(col.getText()));
+					/*col.prefWidthProperty().bind(charDescriptionTable.widthProperty().multiply(
+							((Parent.visibleRight.get() ? collapsedColumns : visibleColumns).get(col.getText()))));*/
+					}catch (Exception V){
+						((CustomTableColumn<?, ?>) col).setPercentageWidth((Parent.visibleRight.get() ? collapsedColumns : visibleColumns).get(col.getId()));
+						/*col.prefWidthProperty().bind(charDescriptionTable.widthProperty().multiply(
+								((Parent.visibleRight.get() ? collapsedColumns : visibleColumns).get(col.getId()))));*/
+					}
+					//System.out.println(col.getText()+":"+((CustomTableColumn<?, ?>) col).getPercentageWidth());
 				}
-				System.out.println(col.getId()+","+col.getText()+":"+col.prefWidthProperty().get());
+				col.setId(col.getId()!=null && col.getId().equals(activeChar.getCharacteristic_id())?"active-column":col.getId());
 			}
-			col.setId(col.getId()!=null && col.getId().equals(activeChar.getCharacteristic_id())?"active-column":col.getId());
 		}
-		Double visibleWidth = charDescriptionTable.getColumns().stream().filter(TableColumnBase::isVisible).filter(col -> col.getWidth() > 0).mapToDouble(col -> col.getWidth()).sum();
+		/*Double visibleWidth = charDescriptionTable.getColumns().stream().filter(TableColumnBase::isVisible).filter(col -> col.getWidth() > 0).mapToDouble(col -> col.getWidth()).sum();
 		if(visibleWidth<0.98*charDescriptionTable.getWidth()){
 
 			Optional<TableColumn<CharDescriptionRow, ?>> activeCol = charDescriptionTable.getColumns().stream().filter(col -> col.getId()!=null && col.getId().equals("active-column")).findFirst();
@@ -738,11 +742,7 @@ public class TablePane_CharClassif {
 				activeCol.get().prefWidthProperty().unbind();
 				activeCol.get().prefWidthProperty().set(activeCol.get().getWidth()+(charDescriptionTable.getWidth()*0.98-(visibleWidth)));
 			}
-		}else{
-
-
-
-		}
+		}*/
 
 		if(Parent.valueAutoComplete!=null) {
 			Parent.valueAutoComplete.refresh_entries(true);
@@ -786,14 +786,13 @@ public class TablePane_CharClassif {
 	private void fillTable(boolean defaultValueCharClassActive) {
 		this.charDescriptionTable.getItems().clear();
         this.charDescriptionTable.getColumns().clear();
-		this.charDescriptionTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        if(!defaultValueCharClassActive) {
+		if(!defaultValueCharClassActive) {
 			HashSet<String> colnames = new HashSet<String>();
 			colnames.addAll(visibleColumns.keySet());
 			colnames.addAll(collapsedColumns.keySet());
 			colnames.addAll(hiddenColumns);
 			colnames.forEach(colname->{
-				TableColumn tmp = new TableColumn<>(colname);
+				TableColumn tmp = new CustomTableColumn<>(colname);
 				Optional<ClassCaracteristic> charMatch = CharValuesLoader.active_characteristics.values().parallelStream()
 						.flatMap(Collection::stream)
 						.filter(c -> c.getCharacteristic_id().equals(colname)).findAny();
@@ -963,20 +962,20 @@ public class TablePane_CharClassif {
         }else {
         	Parent.classification.setEditable(false);
         	Parent.classification.setDisable(true);
-        	
-        	TableColumn CaracNameColumn = new TableColumn<>("Caracteristic name");
+
+			CustomTableColumn CaracNameColumn = new CustomTableColumn<>("Caracteristic name");
         	CaracNameColumn.setCellValueFactory(new PropertyValueFactory<>("Short_desc"));
         	CaracNameColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.3));;
         	CaracNameColumn.setResizable(false);
             this.charDescriptionTable.getColumns().add(CaracNameColumn);
-            
-            TableColumn CaracValueColumn = new TableColumn<>("Caracteristic value");
+
+			CustomTableColumn CaracValueColumn = new CustomTableColumn<>("Caracteristic value");
             CaracValueColumn.setCellValueFactory(new PropertyValueFactory<>("Long_desc"));
             CaracValueColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.3));;
             CaracValueColumn.setResizable(false);
             this.charDescriptionTable.getColumns().add(CaracValueColumn);
 
-			TableColumn sourceColumn = new TableColumn<>("Source");
+			CustomTableColumn sourceColumn = new CustomTableColumn<>("Source");
 			//sourceColumn.setCellValueFactory(new PropertyValueFactory<>("source"));
 			sourceColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 				public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
@@ -992,7 +991,7 @@ public class TablePane_CharClassif {
 			sourceColumn.setResizable(false);
 			this.charDescriptionTable.getColumns().add(sourceColumn);
 
-			TableColumn ruleColumn = new TableColumn<>("Rule");
+			CustomTableColumn ruleColumn = new CustomTableColumn<>("Rule");
 			//ruleColumn.setCellValueFactory(new PropertyValueFactory<>("rule_id"));
 			ruleColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 				public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
@@ -1017,7 +1016,7 @@ public class TablePane_CharClassif {
 			ruleColumn.setResizable(false);
 			this.charDescriptionTable.getColumns().add(ruleColumn);
 
-			TableColumn authorColumn = new TableColumn<>("Author");
+			CustomTableColumn authorColumn = new CustomTableColumn<>("Author");
 			//authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
 			authorColumn.setCellValueFactory(new Callback<CellDataFeatures<CharDescriptionRow, String>, ObservableValue<String>>() {
 				public ObservableValue<String> call(CellDataFeatures<CharDescriptionRow, String> r) {
@@ -1034,7 +1033,7 @@ public class TablePane_CharClassif {
 			authorColumn.setResizable(false);
 			this.charDescriptionTable.getColumns().add(authorColumn);
 
-			TableColumn articleColumn = new TableColumn<>("Article ID");
+			CustomTableColumn articleColumn = new CustomTableColumn<>("Article ID");
 			articleColumn.setCellValueFactory(new PropertyValueFactory<>("client_item_number"));
 			articleColumn.prefWidthProperty().bind(this.charDescriptionTable.widthProperty().multiply(0.1));;
 			articleColumn.setResizable(false);
@@ -1145,13 +1144,13 @@ public class TablePane_CharClassif {
 				}
 				ArrayList<Integer> carIndexDiffs = new ArrayList<>();
 				if(carIndexDiffs.stream().anyMatch(diff->diff>1)){
-					System.out.println("Reordring car columns");
+					//System.out.println("Reordring car columns");
 				}else{
 					if(activeIndex.equals(minIndx)){
-						System.out.println("No need for reordring car columns");
+						//System.out.println("No need for reordring car columns");
 						return;
 					}else{
-						System.out.println("Reordering active car");
+						//System.out.println("Reordering active car");
 						jumpIndexes.clear();
 						jumpIndexes.add(new Pair<Integer,Integer>(activeIndex,minIndx-1));
 						ArrayList<Integer> nonVisibleOrActiveCarIndexes = idxMap.entrySet().stream().filter(p -> p.getValue().getId() != null && (p.getValue().getId().equals("active-column") || !p.getValue().isVisible())).map(p -> p.getKey()).sorted().collect(Collectors.toCollection(ArrayList::new));
@@ -1166,14 +1165,14 @@ public class TablePane_CharClassif {
 									.map(loop->idxMap.get(loop.intValue()))
 									.filter(col->col.isVisible()&&col.getId()!=null).count()==afterGap-beforeGap-1)
 							{
-								System.out.println("in gap");
+								//System.out.println("in gap");
 							}else{
-								System.out.println("out of gap");
+								//System.out.println("out of gap");
 								allowReturn.set(false);
 							}
 						});
 						if(allowReturn.get()){
-							System.out.println("no problematic gap");
+							//System.out.println("no problematic gap");
 							return;
 						}
 					}
@@ -1333,7 +1332,7 @@ public class TablePane_CharClassif {
 	private void restaureDefaultColumns() {
 		this.visibleColumns.put("Completion Status",0.085);
 		this.visibleColumns.put("Class Name",0.085);
-		this.visibleColumns.put("Long Description 1",0.215);
+		this.visibleColumns.put("Long Description 1",0.23);
 		this.visibleColumns.put("Link",0.1);
 		this.visibleColumns.put("Source",0.1);
 		this.visibleColumns.put("Rule",0.1);

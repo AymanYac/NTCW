@@ -66,7 +66,7 @@ public class CharClassifProposer {
 		}
 		for(int i=0;i<=lastestActiveSAIndex;i++) {
 			Button loopBtn = parent.propButtons.get(i);
-			System.out.println("Checking for button "+loopBtn.getText());
+			/*System.out.println("Checking for button "+loopBtn.getText());*/
 			if(loopBtn.getText().equals(buttonText)) {
 				clearRulefromButton(i);
 				return;
@@ -99,7 +99,8 @@ public class CharClassifProposer {
 			
 		});
 		
-		System.out.println("Putting in prop "+lastestActiveSAIndex+" rule "+preparedRule);
+		/*System.out.println("Putting in prop "+lastestActiveSAIndex+" rule "+preparedRule);
+		*/
 		Pair<CaracteristicValue,String> data = new Pair<CaracteristicValue,String>(preparedValue, preparedRule);
 		buttonToData.put(lastestActiveSAIndex, data);
 		
@@ -107,23 +108,23 @@ public class CharClassifProposer {
 	}
 
 	private static void clearRulefromButton(int i) {
-		System.out.println("Disabling rule on button "+String.valueOf(i));
+		/*System.out.println("Disabling rule on button "+String.valueOf(i));*/
 		buttonToData.put(i, new Pair<CaracteristicValue,String>(buttonToData.get(i).getKey(),null));
 	}
 
 	public static CaracteristicValue getValueForButton(int currentLoopButtonIndex) {
-		System.out.println("*GETTING VALUE*");
+		/*System.out.println("*GETTING VALUE*");
 		System.out.println(currentLoopButtonIndex);
 		System.out.println(buttonToData.get(currentLoopButtonIndex).getKey());
-		System.out.println(buttonToData.get(currentLoopButtonIndex).getValue());
+		System.out.println(buttonToData.get(currentLoopButtonIndex).getValue());*/
 		return buttonToData.get(currentLoopButtonIndex).getKey();
 	}
 
 	public static String getRuleForButton(int currentLoopButtonIndex) {
-		System.out.println("*GETTING RULE*");
+		/*System.out.println("*GETTING RULE*");
 		System.out.println(currentLoopButtonIndex);
 		System.out.println(buttonToData.get(currentLoopButtonIndex).getKey());
-		System.out.println(buttonToData.get(currentLoopButtonIndex).getValue());
+		System.out.println(buttonToData.get(currentLoopButtonIndex).getValue());*/
 		return buttonToData.get(currentLoopButtonIndex).getValue();
 	}
 

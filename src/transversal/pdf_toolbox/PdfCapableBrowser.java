@@ -262,7 +262,7 @@ public class PdfCapableBrowser {
                 if(parent.showingPdf.getValue()){
                     return;
                 }
-                System.out.println("Browsing location: "+newValue);
+                System.err.println("Browsing location: "+newValue);
                 URI address = null;
                 try {
                     address = new URI(observable.getValue());

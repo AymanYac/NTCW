@@ -165,7 +165,7 @@ class CellUtilsCustom {
         } else {
             if (cell.isEditing()) {
                 if (textField != null) {
-                    System.out.println("!updating item!");
+                    /*System.out.println("!updating item!");*/
                     //textField.setText(getItemText(cell, converter));
                 }
                 cell.setText(null);
@@ -189,7 +189,8 @@ class CellUtilsCustom {
                               final Node graphic,
                               final TextField textField) {
         if (textField != null) {
-            System.out.println("Supposed to get value <=="+getItemText(cell,converter));
+            /*System.out.println("Supposed to get value <=="+getItemText(cell,converter));
+            */
             textField.setText("TATA");
         }
         cell.setText(null);

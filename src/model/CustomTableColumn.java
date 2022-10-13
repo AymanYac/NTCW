@@ -18,10 +18,31 @@ public class CustomTableColumn<S, T> extends javafx.scene.control.TableColumn<S,
                 if(CustomTableColumn.this.prefWidthProperty().isBound()) {
                     CustomTableColumn.this.prefWidthProperty().unbind();
                 }
+                try {
+                    CustomTableColumn.this.prefWidthProperty().bind(t1.widthProperty().multiply(percentageWidth));
+                }catch (Exception V){
 
-                CustomTableColumn.this.prefWidthProperty().bind(t1.widthProperty().multiply(percentageWidth));
+                }
             }
         });
+    }
+
+    public CustomTableColumn(String colname) {
+        tableViewProperty().addListener(new ChangeListener<TableView<S>>() {
+
+            @Override
+            public void changed(ObservableValue<? extends TableView<S>> ov, TableView<S> t, TableView<S> t1) {
+                if(CustomTableColumn.this.prefWidthProperty().isBound()) {
+                    CustomTableColumn.this.prefWidthProperty().unbind();
+                }
+                try {
+                    CustomTableColumn.this.prefWidthProperty().bind(t1.widthProperty().multiply(percentageWidth));
+                }catch (Exception V){
+
+                }
+            }
+        });
+        setText(colname);
     }
 
     public final DoubleProperty percentageWidthProperty() {

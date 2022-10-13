@@ -1068,7 +1068,7 @@ public class CharDescriptionExportServices {
 		int initRuleBufferSize = CharDescriptionExportServices.itemRuleBuffer.size();
 		if(GlobalConstants.PUSH_RULE_BUFFER_BY_BLOCK){
 			IntStream.range(0,20).forEach(loop->{
-				System.out.println("\t Buffer Block "+String.valueOf(loop+1)+"/20");
+				System.err.println("\t Buffer Block "+String.valueOf(loop+1)+"/20");
 				int bufferBlockIdx =0;
 				while (CharDescriptionExportServices.itemRuleBuffer.peek()!=null && bufferBlockIdx<(1.0*initRuleBufferSize)/20.0){
 					CharDescriptionRow row = CharDescriptionExportServices.itemRuleBuffer.poll();
@@ -1114,7 +1114,7 @@ public class CharDescriptionExportServices {
 			    /* code to execute if task throws exception */
 				problem.printStackTrace(System.err);
 				if(runTaskOnFailed!=null){
-					System.out.println("PERFORMING SESSION DUMP ON TO LOCAL DISK");
+					System.err.println("PERFORMING SESSION DUMP ON TO LOCAL DISK");
 					runTaskOnFailed.run();
 				}
 				throw new RuntimeException(dbFlushTask.getException());
@@ -1130,7 +1130,7 @@ public class CharDescriptionExportServices {
 			if(!threadedDBFlushActive.getAndSet(true)){
 				dbFlushThread.start();
 			}else{
-				System.out.println("******* QUEUING CARAC DB FLUSH *******");
+				System.err.println("******* QUEUING CARAC DB FLUSH *******");
 			}
 			
 		}

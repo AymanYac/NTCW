@@ -871,19 +871,19 @@ public class WordUtils {
 		}
 
 	public static String quoteStringsInDescPatternExperimental(String ruleMarker) {
-		System.out.print(ruleMarker+"=>");
+		System.err.print(ruleMarker+"=>");
 		Pattern p = Pattern.compile("(?<!~)\"");
 		Matcher m = p.matcher(ruleMarker);
 		//33"~"" -> 33%%%~"%%%
 		//(|+0)"qsdqsd"(|+1)"vvv" -> (|+0)%%%qsdqsd%%%(|+1)%%%vvv%%%
 		AtomicReference<String> target = new AtomicReference<>(m.replaceAll("%%%"));
-		System.out.print(target+"=>");
+		System.err.print(target+"=>");
 		AtomicInteger quoteIdx = new AtomicInteger(0);
 		AtomicReference<String> ret = new AtomicReference<>("");
 		Arrays.stream(target.get().split("%%%")).sequential().forEach(split->{
 			ret.set(ret.get()+split+(quoteIdx.getAndAdd(1)%2==0?"\\Q":"\\E"));
 		});
-		System.out.println(ret.get().substring(0,ret.get().length()-2));
+		System.err.println(ret.get().substring(0,ret.get().length()-2));
 		return ret.get().substring(0,ret.get().length()-2);
 		//return m.replaceAll("\\\\Q"+"$1"+"\\\\E");
 		//String q = Pattern.quote(ruleMarker);
@@ -1235,7 +1235,7 @@ public class WordUtils {
 					.replace(",", "").replace(".","").replace("______",".");
 			return String.valueOf(new DoubleEvaluator().evaluate(action));
 		}catch (Exception V){
-			System.out.println("=> Arith Error on> "+action);
+			System.err.println("=> Arith Error on> "+action);
 			return String.valueOf(new DoubleEvaluator().evaluate(action));
 		}
 	}

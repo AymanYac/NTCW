@@ -54,7 +54,7 @@ import java.util.List;
 	
 	@SuppressWarnings("static-access")
 	private void download_images_bing(boolean checkMethodSelect) throws IOException, ParseException{
-		System.out.println(LocalDateTime.now()+" start");
+		/*System.out.println(LocalDateTime.now()+" start");*/
 		String selected_text="";
 		if(checkMethodSelect) {
 			selected_text = parent.ld.getSelectedText();
@@ -97,10 +97,10 @@ import java.util.List;
 				if(GlobalConstants.IMAGE_SEARCH_THUMBNAIL){
 					image_url = element.attr("src");
 					if(!image_url.startsWith("http")){
-						System.out.println("rejected "+image_url);
+						/*System.out.println("rejected "+image_url);*/
 						continue;
 					}else{
-						System.out.println("in "+image_url);
+						/*System.out.println("in "+image_url);*/
 					}
 					image_height = Long.valueOf(element.attr("height"));
 					image_width =  Long.valueOf(element.attr("width"));
@@ -184,14 +184,14 @@ import java.util.List;
 		    	node.setStyle(node.getStyle()+"-fx-background-image: url('" + noImageBG + "');");
 		    }
 
-		System.out.println(LocalDateTime.now()+" got all pics");
+		/*System.out.println(LocalDateTime.now()+" got all pics");*/
 
 
 
 
 		int i = 0;
 		    for (ImageResult image : resultImages) {
-		    	System.out.println("image "+LocalDateTime.now());
+		    	/*System.out.println("image "+LocalDateTime.now());*/
 		    	String imageUrl = image.getUrl();
 		    	if(imageUrl.contains("http:")) {
 		    		//continue;
@@ -596,7 +596,7 @@ import java.util.List;
 			@Override
 		    protected Void call() throws Exception {
 				download_images_bing(checkMethodSelect);
-				System.out.println("Done");
+				/*System.out.println("Done");*/
 		    	return null;
 		    }
 		};

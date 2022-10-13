@@ -61,9 +61,9 @@ public class DeduplicationServices {
             });
         });
         Collections.shuffle(computeItemPairs);
-        System.out.println("::::::::::::::::::::::::::::: TARGET ITEMS : "+inClass.size()+" :::::::::::::::::::::::::::::");
-        System.out.println("::::::::::::::::::::::::::::: ITEMS IN PROJECT : "+CharItemFetcher.allRowItems.size()+" :::::::::::::::::::::::::::::");
-        System.out.println("::::::::::::::::::::::::::::: COMPARISONS TO BE MADE : "+ computeItemPairs.size()+" :::::::::::::::::::::::::::::");
+        System.err.println("::::::::::::::::::::::::::::: TARGET ITEMS : "+inClass.size()+" :::::::::::::::::::::::::::::");
+        System.err.println("::::::::::::::::::::::::::::: ITEMS IN PROJECT : "+CharItemFetcher.allRowItems.size()+" :::::::::::::::::::::::::::::");
+        System.err.println("::::::::::::::::::::::::::::: COMPARISONS TO BE MADE : "+ computeItemPairs.size()+" :::::::::::::::::::::::::::::");
         Instant start = Instant.now();
         AtomicInteger doneComparisons = new AtomicInteger(0);
         computeItemPairs.parallelStream().forEach(e -> {
@@ -249,8 +249,8 @@ public class DeduplicationServices {
 
 
         Duration processingTime = Duration.between(start, Instant.now());
-        System.out.println("::::::::::::::::::::::::::::: RETAINED COUPLES : "+fullCompResults.size()+" ::::::::::::::::::::::::::::: in "+processingTime.getSeconds() +" seconds");
-        System.out.println("::::::::::::::::::::::::::::: IGNORED COUPLES : "+clearedCompResults.size()+" ::::::::::::::::::::::::::::: in "+processingTime.getSeconds() +" seconds");
+        System.err.println("::::::::::::::::::::::::::::: RETAINED COUPLES : "+fullCompResults.size()+" ::::::::::::::::::::::::::::: in "+processingTime.getSeconds() +" seconds");
+        System.err.println("::::::::::::::::::::::::::::: IGNORED COUPLES : "+clearedCompResults.size()+" ::::::::::::::::::::::::::::: in "+processingTime.getSeconds() +" seconds");
         Optional<Double> finalDetailLimitedMinScore = detailLimitedMinScore;
         Platform.runLater(new Runnable() {
             @Override
@@ -374,7 +374,7 @@ public class DeduplicationServices {
             carComparison.getAndSet(carComparison.get()+ comparaisonResult.getResultType());
             pairComparison.getAndSet(pairComparison.get() + "\n\t>" + carComparison.get());
         });
-        System.out.println(pairComparison.get());
+        /*System.out.println(pairComparison.get());*/
     }
 
 
@@ -602,16 +602,16 @@ public class DeduplicationServices {
                         }
                     }
                 });
-                if(itemPairIsViable(strongMatches,weakMatches,descMatches,mismatches,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,0)){
-                    /*System.out.println("XXXXXXXXXXXX "+item_A.getClient_item_number()+" XXXXXXXXXXXX "+item_B.getClient_item_number()+" XXXXXXXXXXXX");
+                /*if(itemPairIsViable(strongMatches,weakMatches,descMatches,mismatches,GLOBAL_MIN_MATCHES,GLOBAL_MAX_MISMATCHES,GLOBAL_MISMATCH_RATIO,0)){
+                    System.out.println("XXXXXXXXXXXX "+item_A.getClient_item_number()+" XXXXXXXXXXXX "+item_B.getClient_item_number()+" XXXXXXXXXXXX");
                     System.out.println(item_A.getClient_item_number() +">"+ item_A.getAccentFreeDescriptionsNoCR());
                     System.out.println(item_B.getClient_item_number() +">"+ item_B.getAccentFreeDescriptionsNoCR());
                     System.out.println("\t"+"strong matches> "+String.valueOf(strongMatches.get()));
                     System.out.println("\t"+"weak matches> "+String.valueOf(weakMatches.get()));
                     System.out.println("\t"+"desc matches> "+String.valueOf(descMatches.get()));
                     System.out.println("\t"+"total matches> "+String.valueOf(strongMatches.get()+weakMatches.get()+descMatches.get()));
-                    System.out.println("\t"+"total mismatches> "+String.valueOf(mismatches.get()));*/
-                }
+                    System.out.println("\t"+"total mismatches> "+String.valueOf(mismatches.get()));
+                }*/
             });
             if(Math.random()<0.01){
                 double progress = (idx_A * 100.0) / computeItems.size();

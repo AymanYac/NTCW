@@ -1790,8 +1790,8 @@ public class Auto_classification_progress {
 		    	
 		    	ResultSet rs = st.executeQuery("select rule_id, main, application, complement, material_group," + 
 						"pre_classification, drawing, class_id, active_status, source_project_id from "+pid+".project_rules");
-				System.out.println("select rule_id, main, application, complement, material_group," + 
-						"pre_classification, drawing, class_id, active_status, source_project_id from "+pid+".project_rules");
+				/*System.out.println("select rule_id, main, application, complement, material_group," +
+						"pre_classification, drawing, class_id, active_status, source_project_id from "+pid+".project_rules");*/
 				while(rs.next()) {
 					GenericClassRule gr = new GenericClassRule();
 					gr.setMain(rs.getString("main"));
@@ -1810,7 +1810,7 @@ public class Auto_classification_progress {
 				
 		    	
 				rs = st.executeQuery("select item_id,rule_id from "+pid+".project_items_x_rules");
-				System.out.println("select item_id,rule_id from "+pid+".project_items_x_rules");
+				/*System.out.println("select item_id,rule_id from "+pid+".project_items_x_rules");*/
 				while(rs.next()) {
 					String item = rs.getString("item_id");
 					String rule = rs.getString("rule_id");

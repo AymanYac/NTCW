@@ -32,7 +32,7 @@ public class traversalEngineGenerator {
             	int index;
                 for(index=0;index<textFields.length;index++) {
                 	if(textFields[index].isFocused()) {
-                		System.out.println(String.valueOf(index)+" is focused!");
+                		/*System.out.println(String.valueOf(index)+" is focused!");*/
                 	}
                 }
                 switch (drctn) {
@@ -53,7 +53,7 @@ public class traversalEngineGenerator {
                 }
                 index %= textFields.length;
 
-                System.out.println("Select <" + index + ">");
+                /*System.out.println("Select <" + index + ">");*/
 
                 return textFields[index];
             }

@@ -89,7 +89,7 @@ public class ItemUploadDialog {
 						Button saveButton = (Button)dialog.getDialogPane().lookupButton(saveClasses);
 						Button cancelButton = (Button)dialog.getDialogPane().lookupButton(discardClasses);
 						saveButton.setOnAction(a->{
-							System.out.println(":::OK:::");
+							/*System.out.println(":::OK:::");*/
 							Tools.StoreRules(parent.account, grs, itemRuleMaps, activeStatuses, METHODS);
 							Tools.ItemFetcherRow2ClassEvent(databaseSyncLists,parent.account,DataInputMethods.USER_CLASSIFICATION_RULE);
 						});
