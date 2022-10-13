@@ -1612,36 +1612,48 @@ public class Char_description {
 		//load_image_pane();
 		//load_rule_pane();
 		//load_taxo_pane();
-		aidLabel.getScene().getWindow().setOnCloseRequest(event -> {
-			try {
-				browserController.secondaryStage.close();
-			}catch (Exception V){
+		EventHandler closeHandler = new EventHandler<MouseEvent>() {
+			/**
+			 * Invoked when a specific event of the type for which this handler is
+			 * registered happens.
+			 *
+			 * @param event the event which occurred
+			 */
+			@Override
+			public void handle(MouseEvent event) {
+				try {
+					browserController.secondaryStage.close();
+				} catch (Exception V) {
 
-			}
-			ConfirmationDialog.show("Saving latest modifications", "Click (OK) to persist local changes to remote server. This should only take a few seconds", "OK");
-			Runnable onFailed = new Runnable() {
-				@Override
-				public void run() {
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							ConfirmationDialog.show("Could not reach server", "Click (OK) to export project data to spreadsheet", "OK");
-						}
-					});
-					try {
-						CharDescriptionExportServices.ExportItemDataForClass(null, Char_description.this, true, true, true, true, true);
-					} catch (ClassNotFoundException | SQLException | IOException classNotFoundException) {
-						classNotFoundException.printStackTrace();
-					}
 				}
-			};
-			//CharDescriptionExportServices.flushItemDataToDBThreaded(account,onFailed);
-			try{
-				CharDescriptionExportServices.flushItemDataToDBNoThread(account);
-			}catch (Exception V){
-				onFailed.run();
+				ConfirmationDialog.show("Saving latest modifications", "Click (OK) to persist local changes to remote server. This should only take a few seconds", "OK");
+				Runnable onFailed = new Runnable() {
+					@Override
+					public void run() {
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								ConfirmationDialog.show("Could not reach server", "Click (OK) to export project data to spreadsheet", "OK");
+							}
+						});
+						try {
+							CharDescriptionExportServices.ExportItemDataForClass(null, Char_description.this, true, true, true, true, true);
+						} catch (ClassNotFoundException | SQLException | IOException classNotFoundException) {
+							classNotFoundException.printStackTrace();
+						}
+					}
+				};
+				//CharDescriptionExportServices.flushItemDataToDBThreaded(account,onFailed);
+				try {
+					CharDescriptionExportServices.flushItemDataToDBNoThread(account);
+				} catch (Exception V) {
+					onFailed.run();
+				}
+				Platform.exit();
 			}
-		});
+		};
+		ToolHeaderController.setCloseHandler(closeHandler);
+		ToolHeaderController.closeHandlerSet.set(true);
 		
 		urlLink.textProperty().addListener(new ChangeListener<String>() {
 			@Override

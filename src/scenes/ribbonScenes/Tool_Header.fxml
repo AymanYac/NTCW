@@ -6,12 +6,11 @@
 <GridPane fx:id="titleBar" prefHeight="30" prefWidth="10000" stylesheets="@../../styles/ToolHeader.css" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ToolHeaderController">
     <children>
         <BorderPane prefHeight="30" GridPane.rowIndex="0" GridPane.columnIndex="0">
-            <top>
-                <VBox prefHeight="5"/>
-            </top>
-            <bottom>
-                <VBox prefHeight="5"/>
-            </bottom>
+            <center>
+                <Label fx:id="neonecTitle" prefHeight="30" text="Neonec Data Enhancement Wizard - v6.0"/>
+            </center>
+        </BorderPane>
+        <BorderPane prefHeight="30" GridPane.rowIndex="0" GridPane.columnIndex="0">
             <left>
                 <Label fx:id="neonecIcon" translateX="10"/>
             </left>
@@ -24,11 +23,6 @@
                     </children>
                 </HBox>
             </right>
-        </BorderPane>
-        <BorderPane prefHeight="30" GridPane.rowIndex="0" GridPane.columnIndex="0">
-            <center>
-                <Label fx:id="neonecTitle" prefHeight="30" text="Neonec Data Enhancement Wizard - v6.0"/>
-            </center>
         </BorderPane>
     </children>
     <columnConstraints>
