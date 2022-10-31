@@ -35,3 +35,10 @@
     -fx-background-color: rgba(115, 117, 114, .2);
     -fx-cursor:hand;
 }
+
+.bg-normal-style :hover{
+    -fx-cursor:hand;
+}
+.bg-selected-style{
+    -fx-background-color: rgba(115, 117, 114, .2);
+}

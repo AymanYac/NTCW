@@ -78,7 +78,7 @@ public class GlobalConstants {
 	public static final String MANUAL_PROPS_4 = "4";
 	public static final String MANUAL_PROPS_5 = "5";
 	public static final int SEARCH_WORD_LARGE = 3;
-	public static final boolean DEV_RUNTIME = false;
+	public static final boolean DEV_RUNTIME = true;
 	public static final boolean REDIRECT_OUTSTREAM = false;
 	public static final boolean REDIRECT_ERR_ONLY = true;
 	public static final String TOOL_VERSION = "6 Alpha";

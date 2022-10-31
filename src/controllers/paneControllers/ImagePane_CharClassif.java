@@ -43,7 +43,7 @@ import java.util.List;
 
 
 		@FXML public void imagePaneClose() {
-		parent.imageButton.setSelected(false);
+		parent.imagesVisible.set(false);
 		parent.setBottomRegionColumnSpans(false);
 		parent.value_field.requestFocus();
 		parent.hideAutoCompletePopups();

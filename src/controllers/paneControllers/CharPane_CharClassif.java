@@ -225,7 +225,7 @@ public class CharPane_CharClassif {
 	}
 
 	public void PaneClose() {
-		parent.charButton.setSelected(false);
+		parent.charsVisible.set(false);
 		parent.setBottomRegionColumnSpans(false);
 	}
 	

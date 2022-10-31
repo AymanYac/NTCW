@@ -467,7 +467,7 @@ public class RulePane_CharClassif {
     }
 
     @FXML public void PaneClose() {
-        parent.ruleButton.setSelected(false);
+        parent.rulesVisible.set(false);
         parent.setBottomRegionColumnSpans(false);
 
     }

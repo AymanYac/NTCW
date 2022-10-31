@@ -204,16 +204,16 @@ public class Browser_CharClassif {
 		} catch (ParseException | IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
-		parent.ruleButton.setSelected(false);
-		parent.charButton.setSelected(false);
-		parent.imageButton.setSelected(false);
+		parent.rulesVisible.set(false);
+		parent.charsVisible.set(false);
+		parent.imagesVisible.set(false);
 		if(lastPaneLayout!=null && lastPaneLayout.equals("BIG")){
 			return;
 		}
 		if(parent.lastRightPane.equals("RULES")){
 			try {
 				parent.view_rules();
-				parent.ruleButton.setSelected(true);
+				parent.rulesVisible.set(true);
 			} catch (IOException | ParseException e) {
 				e.printStackTrace();
 			}
@@ -221,7 +221,7 @@ public class Browser_CharClassif {
 		if(parent.lastRightPane.equals("CHARS")){
 			try {
 				parent.view_chars();
-				parent.charButton.setSelected(true);
+				parent.charsVisible.set(true);
 			} catch (IOException | ParseException | ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
 			}
@@ -229,7 +229,7 @@ public class Browser_CharClassif {
 		if(parent.lastRightPane.equals("IMAGES")){
 			try {
 				parent.search_image();
-				parent.imageButton.setSelected(true);
+				parent.imagesVisible.set(true);
 			} catch (IOException | ParseException e) {
 				e.printStackTrace();
 			}
@@ -307,14 +307,14 @@ public class Browser_CharClassif {
 		System.out.println("Closing browser >"+String.valueOf(closingBrowser));
 		*/
 		switch_pane_hide_browser(true);
-		parent.ruleButton.setSelected(false);
-		parent.charButton.setSelected(false);
-		parent.imageButton.setSelected(false);
+		parent.rulesVisible.set(false);
+		parent.charsVisible.set(false);
+		parent.imagesVisible.set(false);
 		if(closingBrowser){
 			if(parent.lastRightPane.equals("RULES")){
 				try {
 					parent.view_rules();
-					parent.ruleButton.setSelected(true);
+					parent.rulesVisible.set(true);
 				} catch (IOException | ParseException e) {
 					e.printStackTrace();
 				}
@@ -322,7 +322,7 @@ public class Browser_CharClassif {
 			if(parent.lastRightPane.equals("CHARS")){
 				try {
 					parent.view_chars();
-					parent.charButton.setSelected(true);
+					parent.charsVisible.set(true);
 				} catch (IOException | ParseException | ClassNotFoundException | SQLException e) {
 					e.printStackTrace();
 				}
@@ -330,7 +330,7 @@ public class Browser_CharClassif {
 			if(parent.lastRightPane.equals("IMAGES")){
 				try {
 					parent.search_image();
-					parent.imageButton.setSelected(true);
+					parent.imagesVisible.set(true);
 				} catch (IOException | ParseException e) {
 					e.printStackTrace();
 				}
@@ -587,7 +587,7 @@ public class Browser_CharClassif {
 				if(event.getCode().equals(KeyCode.ENTER)){
 					if(event.isControlDown()){
 						/*System.out.println("CTRL+ENTER");*/
-						((Stage)parent.charButton.getScene().getWindow()).toFront();
+						((Stage)parent.aidLabel.getScene().getWindow()).toFront();
 						parent.value_field.requestFocus();
 						int active_char_index = Math.floorMod(parent.tableController.selected_col, CharValuesLoader.active_characteristics.get(parent.tableController.charDescriptionTable.getSelectionModel().getSelectedItem().getClass_segment_string().split("&&&")[0]).size());
 						try{

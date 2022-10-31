@@ -144,7 +144,7 @@ public class CharClassifProposer {
 					CharDescriptionExportServices.addItemCharDataToPush(row, segment, charId);
 					CharDescriptionExportServices.flushItemDataToDBThreaded(parent.account, null);
 					clearPropButtons();
-					if(!parent.charButton.isSelected()){
+					if(!parent.charsVisible.get()){
 						try {
 							int idx = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedIndex();
 							parent.tableController.charDescriptionTable.getSelectionModel().clearAndSelect(idx + 1);
@@ -180,7 +180,7 @@ public class CharClassifProposer {
 							CharValuesLoader.updateRuntimeDataForItem(row,row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id(),copy.shallowCopy(parent.account));
 							CharDescriptionExportServices.addItemCharDataToPush(row, row.getClass_segment_string().split("&&&")[0],activeChar.getCharacteristic_id());
 						});
-						if(!parent.charButton.isSelected()){
+						if(!parent.charsVisible.get()){
 							int idx = parent.tableController.charDescriptionTable.getSelectionModel().getSelectedIndex();
 							parent.tableController.jumpNext();
 							//parent.tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);

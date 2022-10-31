@@ -157,7 +157,7 @@ public class CharPaneRow {
 		if(!(this.getValue()!=null)) {
 			return null;
 		}
-		return this.getValue().getFormatedDisplayAndUomPair(parent.data_language!=parent.user_language, parent.conversionToggle.isSelected(),carac).getValue();
+		return this.getValue().getFormatedDisplayAndUomPair(parent.data_language!=parent.user_language, parent.conversionActive.get(),carac).getValue();
 	}
 
 	public void setItem(CharDescriptionRow selected_row) {

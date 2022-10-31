@@ -138,7 +138,7 @@ public class CaracteristicValue implements Serializable {
 
 	//Display value is user formatted display value (value column in table and item export)
 	public String getDisplayValue(Char_description parent) {
-		return getDisplayValue(parent.data_language!=parent.user_language,parent.conversionToggle.isSelected());
+		return getDisplayValue(parent.data_language!=parent.user_language,parent.conversionActive.get());
 	}
 	//Display value is user formatted display value (value column in table and item export)
 	public String getDisplayValue(boolean projectSupportsTranslation,boolean projectRequiresTranslation) {

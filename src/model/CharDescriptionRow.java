@@ -620,6 +620,11 @@ public class CharDescriptionRow {
 		return CharValuesLoader.active_characteristics.get(itemClass).stream().anyMatch(
 				c -> !(getData(itemClass).get(c.getCharacteristic_id()) != null && getData(itemClass).get(c.getCharacteristic_id()).getParentChar() != null && getData(itemClass).get(c.getCharacteristic_id()).getDisplayValue(false,false).length() > 0));
 	}
+	public boolean hasClearValueOnChar(String charID) {
+		String itemClass = getClass_segment_string().split("&&&")[0];
+		return CharValuesLoader.active_characteristics.get(itemClass).stream().filter(c->c.getCharacteristic_id().equals(charID)).anyMatch(
+				c -> !(getData(itemClass).get(c.getCharacteristic_id()) != null && getData(itemClass).get(c.getCharacteristic_id()).getParentChar() != null && getData(itemClass).get(c.getCharacteristic_id()).getDisplayValue(false,false).length() > 0));
+	}
 
     public String getItemURLListForClass(String segment) {
 		HashSet<String> ret = getData(segment).values().stream().filter(v->v!=null && v.getUrl()!=null && v.getUrl().length()>0).map(v->v.getUrl()).collect(Collectors.toCollection(HashSet<String>::new));

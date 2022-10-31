@@ -14,7 +14,6 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -77,6 +76,13 @@ public class Char_description {
 	public ToolBar settingToolbar;
 	public TextArea helperAreaLeft;
 	public TextArea helperAreaRight;
+	public Button googleButton;
+	public GridPane convertItem;
+	public GridPane convertChar;
+	public GridPane convertClass;
+	public GridPane imageButton1;
+	public GridPane imageButton2;
+	public GridPane uomconvertButton;
 
 
 	@FXML MenuBar menubar;
@@ -104,19 +110,16 @@ public class Char_description {
 	@FXML public TextField classification_style;
 	@FXML public TextField search_text;
 
-	@FXML ToolBar toolBar;
-	@FXML Button paneToggle;
-	@FXML Button classDDButton;
-	@FXML public Button exportButton;
-	@FXML public Button clearLinkButton;
-	@FXML ToggleButton googleButton;
-	@FXML ToggleButton tableButton;
-	@FXML public ToggleButton ruleButton;
-	@FXML public ToggleButton imageButton;
-	@FXML public ToggleButton charButton;
-	@FXML public ToggleButton conversionToggle;
+	public GridPane ruleButton1;
+	public GridPane ruleButton2;
+	public SimpleBooleanProperty rulesVisible = new SimpleBooleanProperty(false);
+	public SimpleBooleanProperty imagesVisible = new SimpleBooleanProperty(false);
+	public GridPane charButton1;
+	public GridPane charButton2;
+	public SimpleBooleanProperty charsVisible = new SimpleBooleanProperty(false);
+	public SimpleBooleanProperty conversionActive = new SimpleBooleanProperty(false);
 
-	@FXML Button searchSettingButton;
+
 	@FXML Button prop1;
 	@FXML Button prop2;
 	@FXML Button prop3;
@@ -243,6 +246,16 @@ public class Char_description {
 		final ClipboardContent content = new ClipboardContent();
 		try{
 			content.putString(aidLabel.getText().split("Article ID: ")[1]);
+			Clipboard.getSystemClipboard().setContent(content);
+		}catch (Exception V){
+
+		}
+	}
+	@FXML void copyURL2ClipBoard(){
+		final Clipboard clipboard = Clipboard.getSystemClipboard();
+		final ClipboardContent content = new ClipboardContent();
+		try{
+			content.putString(urlLink.getText());
 			Clipboard.getSystemClipboard().setContent(content);
 		}catch (Exception V){
 
@@ -474,23 +487,16 @@ public class Char_description {
 		
 	}
 	private void toolBarButtonListener() {
-		conversionToggle.setText("Value conversion: Yes");
-		conversionToggle.setTooltip(new Tooltip("Display item values only in allowed uoms"));
-		
-		conversionToggle.selectedProperty().addListener(new ChangeListener<Boolean>() {
+
+		conversionActive.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldVal, Boolean newVal) {
-				if(newVal) {
-					conversionToggle.setText("Value conversion: No");
-				}else {
-					conversionToggle.setText("Value conversion: Yes");
-				}
 				refresh_ui_display();
 				tableController.charDescriptionTable.refresh();
 			}
 			
 		});
-		visibleRight.bind(charButton.selectedProperty().or(ruleButton.selectedProperty()).or(imageButton.selectedProperty()));
+		visibleRight.bind(charsVisible.or(rulesVisible).or(imagesVisible));
 
 	}
 
@@ -781,7 +787,7 @@ public class Char_description {
 						CharValuesLoader.storeItemDatafromScreen(idx,this);
 					}
 				}
-				if(!charButton.isSelected()){
+				if(!charsVisible.get()){
 					tableController.jumpNext();
 					//tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
 				}
@@ -887,18 +893,18 @@ public class Char_description {
 		
 		if(account.PRESSED_KEYBOARD.get(KeyCode.SHIFT) && account.PRESSED_KEYBOARD.get(KeyCode.ENTER)) {
 			this.lastRightPane="";
-			if(this.charButton.isSelected()) {
+			if(this.charsVisible.get()) {
 				this.lastRightPane="CHARS";
 			}
-			if(this.imageButton.isSelected()) {
+			if(this.imagesVisible.get()) {
 				this.lastRightPane="IMAGES";
 			}
-			if(this.ruleButton.isSelected()) {
+			if(this.rulesVisible.get()) {
 				this.lastRightPane="RULES";
 			}
 
 			if(!GlobalConstants.TURN_OFF_IMAGE_SEARCH_FOR_DESCRIPTION){
-				imageButton.setSelected(true);
+				imagesVisible.set(true);
 			}
 			launch_search(true);
 		}
@@ -924,21 +930,7 @@ public class Char_description {
 		if(account.PRESSED_KEYBOARD.get(KeyCode.ESCAPE)) {
 			
 			ExternalSearchServices.clearingURL(false);
-			try {
-				imagePaneController.imagePaneClose();
-			}catch(Exception V) {
-				
-			}
-			try {
-				charPaneController.PaneClose();
-			}catch(Exception V) {
-				
-			}
-			try {
-				rulePaneController.PaneClose();
-			}catch(Exception V) {
-
-			}
+			closeAllPanels();
 
 			boolean closingBrowser=false;
 			try{
@@ -972,20 +964,20 @@ public class Char_description {
 			}catch (Exception V){
 
 			}
-			ruleButton.setSelected(false);
-			charButton.setSelected(false);
-			imageButton.setSelected(false);
+			rulesVisible.set(false);
+			charsVisible.set(false);
+			imagesVisible.set(false);
 			if(closingBrowser){
 				if(this.lastRightPane.equals("CHARS")) {
-					charButton.setSelected(true);
+					charsVisible.set(true);
 					view_chars();
 				}
 				if(this.lastRightPane.equals("IMAGES")) {
-					imageButton.setSelected(true);
+					imagesVisible.set(true);
 					search_image();
 				}
 				if(this.lastRightPane.equals("RULES")) {
-					ruleButton.setSelected(true);
+					rulesVisible.set(true);
 					view_rules();
 				}
 			}else{
@@ -997,12 +989,12 @@ public class Char_description {
 			
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.I)) {
-			if(this.charButton.isSelected()) {
+			if(this.charsVisible.get()) {
 				//this.charPaneController.PaneClose();
 			}else {
-				imageButton.setSelected(false);
-				charButton.setSelected(true);
-				ruleButton.setSelected(false);
+				imagesVisible.set(false);
+				charsVisible.set(true);
+				rulesVisible.set(false);
 				load_char_pane();
 			}
 		}
@@ -1019,12 +1011,12 @@ public class Char_description {
 								.get(active_char_index),selectedText);
 				draftingRule=false;
 			}
-			if(this.ruleButton.isSelected()) {
+			if(this.rulesVisible.get()) {
 				//this.rulePaneController.PaneClose();
 			}else {
-				imageButton.setSelected(false);
-				charButton.setSelected(false);
-				ruleButton.setSelected(true);
+				imagesVisible.set(false);
+				charsVisible.set(false);
+				rulesVisible.set(true);
 			}
 			Platform.runLater(new Runnable() {
 				@Override
@@ -1038,12 +1030,12 @@ public class Char_description {
 			});
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.CONTROL) && account.PRESSED_KEYBOARD.get(KeyCode.P)) {
-			if(this.imageButton.isSelected()) {
+			if(this.imagesVisible.get()) {
 				//this.imagePaneController.imagePaneClose();
 			}else {
-				imageButton.setSelected(true);
-				charButton.setSelected(false);
-				ruleButton.setSelected(false);
+				imagesVisible.set(true);
+				charsVisible.set(false);
+				rulesVisible.set(false);
 				load_image_pane(true);
 			}
 		}
@@ -1112,7 +1104,7 @@ public class Char_description {
 			}else{
 				tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(r->r.markUnknownClearValues(account,null));
 			}
-			if(!charButton.isSelected()){
+			if(!charsVisible.get()){
 				tableController.jumpNext();
 				//int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
 				//tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
@@ -1133,7 +1125,7 @@ public class Char_description {
 			val.setRule_id(null);
 			assignValueOnSelectedItems(val);
 			ExternalSearchServices.manualValueInput();
-			if(!charButton.isSelected()){
+			if(!charsVisible.get()){
 				tableController.jumpNext();
 				//int idx = tableController.tableGrid.getSelectionModel().getSelectedIndex();
 				//tableController.tableGrid.getSelectionModel().clearAndSelect(idx+1);
@@ -1486,12 +1478,24 @@ public class Char_description {
 	}
 
 	@FXML public void view_rules() throws IOException, ParseException {
-		if(!this.ruleButton.isSelected()) {
+		imageButton1.getStyleClass().remove("bg-selected-style");
+		imageButton2.getStyleClass().remove("bg-selected-style");
+		charButton1.getStyleClass().remove("bg-selected-style");
+		charButton2.getStyleClass().remove("bg-selected-style");
+
+		if(ruleButton1.getStyleClass().remove("bg-selected-style")){
+			ruleButton2.getStyleClass().remove("bg-selected-style");
+		}else{
+			ruleButton1.getStyleClass().add("bg-selected-style");
+			ruleButton2.getStyleClass().add("bg-selected-style");
+		}
+		rulesVisible.set(rulesVisible.not().get());
+		if(!this.rulesVisible.get()) {
 			this.rulePaneController.PaneClose();
 		}else {
-			imageButton.setSelected(false);
-			charButton.setSelected(false);
-			ruleButton.setSelected(true);
+			imagesVisible.set(false);
+			charsVisible.set(false);
+			rulesVisible.set(true);
 		}
 		Platform.runLater(new Runnable() {
 			@Override
@@ -1506,12 +1510,24 @@ public class Char_description {
 	}
 
 	@FXML public void search_image() throws IOException, ParseException {
-		if(!this.imageButton.isSelected()) {
+		charButton1.getStyleClass().remove("bg-selected-style");
+		charButton2.getStyleClass().remove("bg-selected-style");
+		ruleButton1.getStyleClass().remove("bg-selected-style");
+		ruleButton2.getStyleClass().remove("bg-selected-style");
+
+		if(imageButton1.getStyleClass().remove("bg-selected-style")){
+			imageButton2.getStyleClass().remove("bg-selected-style");
+		}else{
+			imageButton1.getStyleClass().add("bg-selected-style");
+			imageButton2.getStyleClass().add("bg-selected-style");
+		}
+		this.imagesVisible.set(this.imagesVisible.not().get());
+		if(!this.imagesVisible.get()) {
 			this.imagePaneController.imagePaneClose();
 		}else {
-			imageButton.setSelected(true);
-			charButton.setSelected(false);
-			ruleButton.setSelected(false);
+			imagesVisible.set(true);
+			charsVisible.set(false);
+			rulesVisible.set(false);
 		}
 		Platform.runLater(new Runnable() {
 			@Override
@@ -1526,12 +1542,24 @@ public class Char_description {
 	}
 	
 	@FXML public void view_chars() throws IOException, ParseException, ClassNotFoundException, SQLException {
-		if(!this.charButton.isSelected()) {
+		imageButton1.getStyleClass().remove("bg-selected-style");
+		imageButton2.getStyleClass().remove("bg-selected-style");
+		ruleButton1.getStyleClass().remove("bg-selected-style");
+		ruleButton2.getStyleClass().remove("bg-selected-style");
+
+		if(charButton1.getStyleClass().remove("bg-selected-style")){
+			charButton2.getStyleClass().remove("bg-selected-style");
+		}else{
+			charButton1.getStyleClass().add("bg-selected-style");
+			charButton2.getStyleClass().add("bg-selected-style");
+		}
+		this.charsVisible.set(this.charsVisible.not().get());
+		if(!this.charsVisible.get()) {
 			this.charPaneController.PaneClose();
 		}else {
-			imageButton.setSelected(false);
-			charButton.setSelected(true);
-			ruleButton.setSelected(false);
+			imagesVisible.set(false);
+			charsVisible.set(true);
+			rulesVisible.set(false);
 		}
 		Platform.runLater(new Runnable() {
 			@Override
@@ -1547,8 +1575,6 @@ public class Char_description {
 	
 	
 	@FXML public void show_table() throws IOException, ParseException {
-		
-		tableButton.setSelected(true);
 		
 		try {
 			browserController.switch_pane_hide_browser(true);
@@ -2053,7 +2079,6 @@ public class Char_description {
 	@SuppressWarnings("static-access")
 	private void load_table_pane() throws IOException, ClassNotFoundException, SQLException {
 		
-		tableButton.setSelected(true);
 		setBottomRegionColumnSpans(false);
 		
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/TablePane_CharClassif.fxml"));
@@ -2086,7 +2111,7 @@ public class Char_description {
 	public void load_image_pane(boolean checkMethodSelect) throws IOException, ParseException {
 		
 
-		if(!imageButton.isSelected()) {
+		if(!imagesVisible.get()) {
 			return;
 		}
 		
@@ -2136,7 +2161,7 @@ public class Char_description {
 	}
 	@SuppressWarnings("static-access")
 	public void load_rule_pane() throws IOException, ClassNotFoundException, SQLException {
-		if(!ruleButton.isSelected()) {
+		if(!rulesVisible.get()) {
 			return;
 		}
 
@@ -2159,7 +2184,7 @@ public class Char_description {
 
 	@SuppressWarnings("static-access")
 	public void load_char_pane() throws IOException, ClassNotFoundException, SQLException {
-		if(!charButton.isSelected()) {
+		if(!charsVisible.get()) {
 			return;
 		}
 		
@@ -2182,7 +2207,6 @@ public class Char_description {
 	
 	private void load_browser_pane() throws IOException {
 		System.out.println("Loading browser for the first time");
-		googleButton.setSelected(true);
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/paneScenes/Browser_CharClassif.fxml"));
 		loader.load();
 		browserController = loader.getController();
@@ -2248,12 +2272,17 @@ public class Char_description {
 	}
 	
 	@FXML void search_google_inplace() throws IOException {
+		imageButton1.getStyleClass().remove("bg-selected-style");
+		imageButton2.getStyleClass().remove("bg-selected-style");
+		charButton1.getStyleClass().remove("bg-selected-style");
+		charButton2.getStyleClass().remove("bg-selected-style");
+		ruleButton1.getStyleClass().remove("bg-selected-style");
+		ruleButton2.getStyleClass().remove("bg-selected-style");
+
 		search_google_inplace(false);
 	}
 	
 	void search_google_inplace(boolean checkMethodSelect) throws IOException {
-		
-		googleButton.setSelected(true);
 		
 		/*if(search_text.getText().replaceAll(" ", "").length()==0) {
 			return;
@@ -2312,10 +2341,10 @@ public class Char_description {
 		proposer.clearPropButtons();
 		double RIGHT_TRANSLATE = 0.0*rule_field.getWidth();
 		clear_data_fields();
-		if(this.charButton.isSelected()) {
+		if(this.charsVisible.get()) {
 			this.charPaneController.load_item_chars();
 		}
-		if(this.ruleButton.isSelected() && !draftingRule) {
+		if(this.rulesVisible.get() && !draftingRule) {
 			this.rulePaneController.load_description_patterns();
 		}
 		CharDescriptionRow row = (CharDescriptionRow) this.tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
@@ -2372,7 +2401,7 @@ public class Char_description {
 					
 					CaracteristicValue val = row.getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id());
 					try{
-						Pair<ArrayList<String>, TextFlow> tmp = val.getFormatedDisplayAndUomPair(data_language!=user_language,conversionToggle.isSelected(), active_char);
+						Pair<ArrayList<String>, TextFlow> tmp = val.getFormatedDisplayAndUomPair(data_language!=user_language,conversionActive.get(), active_char);
 						local_uom = UnitOfMeasure.RunTimeUOMS.get(tmp.getKey().get(0));
 						local_nom = tmp.getKey().get(1);
 						local_min = tmp.getKey().get(2);
@@ -2388,7 +2417,7 @@ public class Char_description {
 							this.uom_field.getEntries().add(loopUom);
 						}
 					}
-					if(!conversionToggle.isSelected()) {
+					if(!conversionActive.get()) {
 						if(local_uom!=null && this.uom_field.getEntries().contains(local_uom)) {
 
 						}else if(local_uom!=null){
@@ -2401,7 +2430,7 @@ public class Char_description {
 					value_label.setText("Nominal value");
 					value_label.setVisible(true);
 					try{
-						if(!conversionToggle.isSelected()) {
+						if(!conversionActive.get()) {
 							value_field.setText(local_nom);
 						}else {
 							value_field.setText(row.getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getNominal_value());
@@ -2414,7 +2443,7 @@ public class Char_description {
 					custom_label_11.setText("Unit of measure");
 					custom_label_11.setVisible(true);
 					try{
-						if(!conversionToggle.isSelected()) {
+						if(!conversionActive.get()) {
 							uom_field.setUom(local_uom);
 						}else{
 							uom_field.setUom(UnitOfMeasure.RunTimeUOMS.get( row.getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getUom_id() ));
@@ -2448,7 +2477,7 @@ public class Char_description {
 					custom_label_12.setTranslateX(0.5*(rule_field.getWidth()+(value_field.localToScene(value_field.getBoundsInLocal()).getMinX()-classification_style.localToScene(classification_style.getBoundsInLocal()).getMaxX())));
 					custom_label_12.setVisible(true);
 					try{
-						if(!conversionToggle.isSelected()) {
+						if(!conversionActive.get()) {
 							min_field_uom.setText(local_min);
 						}else{
 							min_field_uom.setText(row.getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getMin_value());
@@ -2462,7 +2491,7 @@ public class Char_description {
 					custom_label_21.setText("Maximum value");
 					custom_label_21.setVisible(true);
 					try {
-						if(!conversionToggle.isSelected()) {
+						if(!conversionActive.get()) {
 							max_field_uom.setText(local_max);
 						}else{
 							max_field_uom.setText(row.getData(itemClass).get(CharValuesLoader.active_characteristics.get(itemClass).get(selected_col).getCharacteristic_id()).getMax_value());
@@ -2773,7 +2802,7 @@ public class Char_description {
 				assignValueOnSelectedItems(tmp);
 				CharDescriptionRow targetItem = tableController.charDescriptionTable.getSelectionModel().getSelectedItem();
 				try{
-					if (!charButton.isSelected()) {
+					if (!charsVisible.get()) {
 						int idx = tableController.charDescriptionTable.getSelectionModel().getSelectedIndex();
 						tableController.charDescriptionTable.getSelectionModel().clearAndSelect(idx + 1);
 					}
@@ -2896,4 +2925,71 @@ public class Char_description {
 		ExternalSearchServices.clearingURL(true);
 	}
 
+	@FXML public void uomConvert() {
+		if(!uomconvertButton.getStyleClass().remove("bg-selected-style")){
+			uomconvertButton.getStyleClass().add("bg-selected-style");
+		}
+		this.conversionActive.set(conversionActive.not().get());
+	}
+
+	@FXML public void convertItem() {
+		if(convertItem.getStyleClass().remove("bg-selected-style")){
+			tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(item->item.clearUnknownValues(null));
+		}else{
+			convertItem.getStyleClass().add("bg-selected-style");
+			tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(item->item.markUnknownClearValues(account,null));
+
+		}
+		tableController.redimensionGrid();
+		tableController.charDescriptionTable.refresh();
+	}
+	@FXML public void convertChar() {
+		int active_char_index = Math.floorMod(tableController.selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()).size());
+		String activeClass = FxUtilTest.getComboBoxValue(classCombo).getSegmentId();
+		ClassCaracteristic activeChar = CharValuesLoader.active_characteristics.get(activeClass).get(active_char_index);
+		if(convertChar.getStyleClass().remove("bg-selected-style")){
+			tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(item->item.clearUnknownValues(activeChar.getCharacteristic_id()));
+		}else{
+			convertChar.getStyleClass().add("bg-selected-style");
+			tableController.charDescriptionTable.getSelectionModel().getSelectedItems().forEach(item->item.markUnknownClearValues(account,activeChar.getCharacteristic_id()));
+
+		}
+		tableController.redimensionGrid();
+		tableController.charDescriptionTable.refresh();
+	}
+	@FXML public void convertClass() {
+		if(convertClass.getStyleClass().remove("bg-selected-style")){
+			tableController.charDescriptionTable.getItems().forEach(item->item.clearUnknownValues(null));
+		}else{
+			convertClass.getStyleClass().add("bg-selected-style");
+			tableController.charDescriptionTable.getItems().forEach(item->item.markUnknownClearValues(account,null));
+
+		}
+		tableController.redimensionGrid();
+		tableController.charDescriptionTable.refresh();
+	}
+
+	@FXML public void closeAllPanels() {
+		imageButton1.getStyleClass().remove("bg-selected-style");
+		imageButton2.getStyleClass().remove("bg-selected-style");
+		charButton1.getStyleClass().remove("bg-selected-style");
+		charButton2.getStyleClass().remove("bg-selected-style");
+		ruleButton1.getStyleClass().remove("bg-selected-style");
+		ruleButton2.getStyleClass().remove("bg-selected-style");
+		try {
+			imagePaneController.imagePaneClose();
+		}catch(Exception V) {
+
+		}
+		try {
+			charPaneController.PaneClose();
+		}catch(Exception V) {
+
+		}
+		try {
+			rulePaneController.PaneClose();
+		}catch(Exception V) {
+
+		}
+	}
 }

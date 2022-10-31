@@ -467,7 +467,8 @@ public class TablePane_CharClassif {
 		Tools.set_desc_class(account);
 		if(!active_class.equals(GlobalConstants.DEFAULT_CHARS_CLASS)) {
 			charDescriptionTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-			Parent.charButton.setDisable(false);
+			Parent.charButton1.setDisable(false);
+			Parent.charButton2.setDisable(false);
 
 			this.classItems = getActiveItemsID(active_class);
 
@@ -501,8 +502,10 @@ public class TablePane_CharClassif {
 			}catch(Exception V) {
 
 			}
-			Parent.charButton.setDisable(true);
-			Parent.ruleButton.setDisable(true);
+			Parent.charButton1.setDisable(false);
+			Parent.charButton2.setDisable(false);
+			Parent.ruleButton1.setDisable(true);
+			Parent.ruleButton2.setDisable(true);
 
 			CharItemFetcher.generateDefaultCharEditingItems(this);
 			
@@ -1117,8 +1120,25 @@ public class TablePane_CharClassif {
 				Parent.value_field.end();
 				Parent.value_field.selectAll();
 				traverseGridFocus=true;
-				
-		    }else {
+
+				ArrayList<Boolean> unknownCardinality = charDescriptionTable.getSelectionModel().getSelectedItems().stream().map(CharDescriptionRow::hasClearValue).collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ArrayList::new));
+				Parent.convertItem.getStyleClass().remove("bg-selected-style");
+				if(unknownCardinality.size()==1 && !unknownCardinality.get(0)){
+					Parent.convertItem.getStyleClass().add("bg-selected-style");
+				}
+
+				while(selected_col<0){
+					selected_col = selected_col + CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).size();
+				}
+				selected_col = Math.floorMod(selected_col,CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).size());
+				String activeCharID = CharValuesLoader.active_characteristics.get(FxUtilTest.getComboBoxValue(Parent.classCombo).getSegmentId()).get(selected_col).getCharacteristic_id();
+				unknownCardinality = charDescriptionTable.getSelectionModel().getSelectedItems().stream().map(item->item.hasClearValueOnChar(activeCharID)).collect(Collectors.toCollection(HashSet::new)).stream().collect(Collectors.toCollection(ArrayList::new));
+				Parent.convertChar.getStyleClass().remove("bg-selected-style");
+				if(unknownCardinality.size()==1 && !unknownCardinality.get(0)){
+					Parent.convertChar.getStyleClass().add("bg-selected-style");
+				}
+
+			}else {
 		    	Parent.counterSelection.setVisible(false);
 		    }
 		 });
