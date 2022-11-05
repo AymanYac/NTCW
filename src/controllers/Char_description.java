@@ -35,6 +35,7 @@ import javafx.util.Pair;
 import javafx.util.StringConverter;
 import model.*;
 import org.apache.commons.lang3.StringUtils;
+import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.richtext.StyleClassedTextArea;
@@ -83,14 +84,24 @@ public class Char_description {
 	public GridPane imageButton1;
 	public GridPane imageButton2;
 	public GridPane uomconvertButton;
+	public ToolBar charCounterTB;
+	public Label charCounterRemaining;
+	public Label charCounterIncluding;
+	public Label charCounterExcluding;
+	public Label charCounterIncludingDaily;
+	public Label charCounterSelection;
+	public ToolBar counterToggleToolbar;
+	public ToggleSwitch counterToggle;
+	public Label toggleText;
+
 
 
 	@FXML MenuBar menubar;
-	@FXML MenuBar secondaryMenuBar;
-	@FXML public Menu counterTotal;
-	@FXML public Menu counterRemaining;
-	@FXML public Menu counterDaily;
-	@FXML public Menu counterSelection;
+	@FXML ToolBar classCounterTB;
+	@FXML public Label classCounterTotal;
+	@FXML public Label classCounterRemaining;
+	@FXML public Label classCounterDaily;
+	@FXML public Label classCounterSelection;
 	@FXML public ComboBox<ClassSegment> classCombo;
 	private ClassSegment latestClassComboValue;
 	private ListView classComboAutoCompleteView;
@@ -205,12 +216,10 @@ public class Char_description {
 	@FXML void nextBlank() {
 	}
 	@FXML void previousBlank() {
-		}
+	}
 	@FXML void firstBlank() {
-
 	}
 	@FXML void lastBlank() {
-
 	}
 
 	@SuppressWarnings("static-access")
@@ -268,10 +277,24 @@ public class Char_description {
 				copyClientNumber2ClipBoard();
 			}
 		});
+		counterToggle.selectedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if(newValue){
+					classCounterTB.setVisible(true);
+					charCounterTB.setVisible(false);
+					toggleText.setText(toggleText.getText().replace("classification","description"));
+				}else{
+					classCounterTB.setVisible(false);
+					charCounterTB.setVisible(true);
+					toggleText.setText(toggleText.getText().replace("description","classification"));
+				}
+			}
+		});
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				grid.lookupAll("ToolBar").forEach(tb -> {
+				grid.lookupAll("ToolBar").stream().filter(tb->!(tb.getId().equals("counterToggleToolbar")||tb.getId().equals("classCounterTB")||tb.getId().equals("charCounterTB"))).forEach(tb -> {
 					if (tb instanceof ToolBar) {
 						((ToolBar) tb).getItems().forEach(node -> {
 							if (node instanceof HBox) {
@@ -365,7 +388,7 @@ public class Char_description {
 	}
 
 	private void initRibbon() {
-		grid.lookupAll("ToolBar").forEach(tb->{
+		grid.lookupAll("ToolBar").stream().filter(tb->!(tb.getId().equals("counterToggleToolbar")||tb.getId().equals("classCounterTB")||tb.getId().equals("charCounterTB"))).forEach(tb->{
 			tb.setVisible(false);
 		});
 		homeToolbar.setVisible(true);
@@ -379,7 +402,7 @@ public class Char_description {
 		homeLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				grid.lookupAll("ToolBar").forEach(tb->{
+				grid.lookupAll("ToolBar").stream().filter(tb->!(tb.getId().equals("counterToggleToolbar")||tb.getId().equals("classCounterTB")||tb.getId().equals("charCounterTB"))).forEach(tb->{
 					tb.setVisible(false);
 				});
 				homeToolbar.setVisible(true);
@@ -394,7 +417,7 @@ public class Char_description {
 		dataLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				grid.lookupAll("ToolBar").forEach(tb->{
+				grid.lookupAll("ToolBar").stream().filter(tb->!(tb.getId().equals("counterToggleToolbar")||tb.getId().equals("classCounterTB")||tb.getId().equals("charCounterTB"))).forEach(tb->{
 					tb.setVisible(false);
 				});
 				dataToolbar.setVisible(true);
@@ -409,7 +432,7 @@ public class Char_description {
 		automationLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				grid.lookupAll("ToolBar").forEach(tb->{
+				grid.lookupAll("ToolBar").stream().filter(tb->!(tb.getId().equals("counterToggleToolbar")||tb.getId().equals("classCounterTB")||tb.getId().equals("charCounterTB"))).forEach(tb->{
 					tb.setVisible(false);
 				});
 				automationToolbar.setVisible(true);
@@ -424,7 +447,7 @@ public class Char_description {
 		navigationLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				grid.lookupAll("ToolBar").forEach(tb->{
+				grid.lookupAll("ToolBar").stream().filter(tb->!(tb.getId().equals("counterToggleToolbar")||tb.getId().equals("classCounterTB")||tb.getId().equals("charCounterTB"))).forEach(tb->{
 					tb.setVisible(false);
 				});
 				navigationToolbar.setVisible(true);
@@ -439,7 +462,7 @@ public class Char_description {
 		settingLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				grid.lookupAll("ToolBar").forEach(tb->{
+				grid.lookupAll("ToolBar").stream().filter(tb->!(tb.getId().equals("counterToggleToolbar")||tb.getId().equals("classCounterTB")||tb.getId().equals("charCounterTB"))).forEach(tb->{
 					tb.setVisible(false);
 				});
 				settingToolbar.setVisible(true);

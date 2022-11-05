@@ -14,6 +14,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CharAdvancementUpdater {
 
@@ -25,7 +27,38 @@ public class CharAdvancementUpdater {
 		this.parentScene=parent;
 	}
 
-	public void refresh(Char_description parent) throws SQLException {
+	public void refreshAdvancement(Char_description parent) throws SQLException {
+
+		try {
+			Map<String, Long> charadvancementmap = CharItemFetcher.allRowItems.parallelStream().map(CharDescriptionRow::getCompletionStatusString).collect(Collectors.groupingBy(string -> string, Collectors.counting()));
+			Map<String, Long> charadvancementmapclass = CharItemFetcher.allRowItems.parallelStream().filter(item->item.getClass_segment_string()!=null && item.getClass_segment_string().split("&&&")[0].equals(parent.classCombo.getValue().getSegmentId())).map(CharDescriptionRow::getCompletionStatusString).collect(Collectors.groupingBy(string -> string, Collectors.counting()));
+			Map<String, Long> charadvancementmapDaily = CharItemFetcher.allRowItems.parallelStream().filter(CharDescriptionRow::hasDataFromToday).map(CharDescriptionRow::getCompletionStatusString).collect(Collectors.groupingBy(string -> string, Collectors.counting()));
+			Map<String, Long> charadvancementmapclassDaily = CharItemFetcher.allRowItems.parallelStream().filter(CharDescriptionRow::hasDataFromToday).filter(item->item.getClass_segment_string()!=null && item.getClass_segment_string().split("&&&")[0].equals(parent.classCombo.getValue().getSegmentId())).map(CharDescriptionRow::getCompletionStatusString).collect(Collectors.groupingBy(string -> string, Collectors.counting()));
+			Platform.runLater(() -> {
+				parentScene.charCounterRemaining.setText("Items remaining (class/total): " +
+						(charadvancementmapclass.get("Missing critical")!=null?charadvancementmapclass.get("Missing critical"):0)
+						+"/"+
+						(charadvancementmap.get("Missing critical")!=null?charadvancementmap.get("Missing critical"):0)
+				);
+				parentScene.charCounterIncluding.setText("Total items completed (inc. unknowns) (class/total): " +
+						(charadvancementmapclass.get("Completed critical (inc. Unknown)")!=null?charadvancementmapclass.get("Completed critical (inc. Unknown)"):0)
+						+"/"+
+						(charadvancementmap.get("Completed critical (inc. Unknown)")!=null?charadvancementmap.get("Completed critical (inc. Unknown)"):0)
+				);
+				parentScene.charCounterExcluding.setText("Total items completed (exc. unknowns) (class/total): " +
+						(charadvancementmapclass.get("Completed critical (exc. Unknown)")!=null?charadvancementmapclass.get("Completed critical (exc. Unknown)"):0)
+						+"/"+
+						(charadvancementmap.get("Completed critical (exc. Unknown)")!=null?charadvancementmap.get("Completed critical (exc. Unknown)"):0)
+				);
+				parentScene.charCounterIncludingDaily.setText("Completed today (class/total): " +
+						(charadvancementmapclassDaily.get("Completed critical (inc. Unknown)")!=null?charadvancementmapclassDaily.get("Completed critical (inc. Unknown)"):0)
+						+"/"+
+						(charadvancementmapDaily.get("Completed critical (inc. Unknown)")!=null?charadvancementmapDaily.get("Completed critical (inc. Unknown)"):0)
+				);
+			});
+		}catch (Exception V){
+
+		}
 		Connection conn=null;
 		try {
 			conn = Tools.spawn_connection();
@@ -81,22 +114,12 @@ public class CharAdvancementUpdater {
 			final int finaldailyTeam = dailyTeam;
 			
 			
-			Platform.runLater(new Runnable(){
-
-				@Override
-				public void run() {
-					
-					parentScene.counterTotal.setText("Total items classified: "+finalsum);
-					parentScene.counterRemaining.setText("Items to be classified: "+(projectCardinality-finalsum));
-					parentScene.counterDaily.setText("Daily personal: "+finaldailyPersonal+" | Daily team : "+finaldailyTeam);
-					
-				}
-				
+			Platform.runLater(()->{
+					parentScene.classCounterTotal.setText("Total items classified: "+finalsum);
+					parentScene.classCounterRemaining.setText("Items to be classified: "+(projectCardinality-finalsum));
+					parentScene.classCounterDaily.setText("Daily personal: "+finaldailyPersonal+" | Daily team : "+finaldailyTeam);
 				});
-			
-			
-			
-			
+
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

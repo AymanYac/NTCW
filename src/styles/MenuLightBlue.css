@@ -1,3 +1,7 @@
+.toolbar{
+	-fx-background-color:#ACB9CA;
+	-fx-border-color:#ACB9CA;
+}
 .menu-bar{
 	-fx-background-color:#ACB9CA;
 	-fx-border-color:#ACB9CA;

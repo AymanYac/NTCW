@@ -1,15 +1,10 @@
 package controllers.paneControllers;
 
 import com.google.gson.reflect.TypeToken;
-import com.sun.javafx.scene.control.skin.NestedTableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableColumnHeader;
-import com.sun.javafx.scene.control.skin.TableHeaderRow;
-import com.sun.javafx.scene.control.skin.TableViewSkin;
 import controllers.Char_description;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -24,15 +19,10 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
-import javafx.stage.Popup;
 import javafx.util.Callback;
 import javafx.util.Pair;
 import model.*;
@@ -47,7 +37,6 @@ import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
 import java.io.IOException;
-import java.net.HttpCookie;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -55,6 +44,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -116,6 +106,8 @@ public class TablePane_CharClassif {
 	private HashMap<String,Double> visibleColumns = new HashMap<>();
 	private boolean alreadyListeningWidthChange = false;
 	public boolean disableColumnListener=false;
+	private Task<Void> advancementTask;
+	private Thread advancementThread;
 
 	public void restoreLastSessionLayout() {
 		try{
@@ -253,6 +245,30 @@ public class TablePane_CharClassif {
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
+
+		try {
+			advancementTask.cancel();
+			advancementThread.stop();
+		}catch(Exception V) {
+
+		}
+		advancementTask = new Task<Void>() {
+
+			@Override
+			protected Void call() throws Exception {
+				TimeUnit.MILLISECONDS.sleep(800);
+				advancement.refreshAdvancement(Parent);
+				return null;
+			}
+		};
+		advancementTask.setOnFailed(e -> {
+			advancementTask.getException().printStackTrace(System.err);
+		});
+
+		advancementThread = new Thread(advancementTask);
+		advancementThread.setDaemon(true);
+		advancementThread.setName("advancement");
+		advancementThread.start();
 
 	}
 
@@ -450,9 +466,9 @@ public class TablePane_CharClassif {
 		this.advancement = new CharAdvancementUpdater();
 		advancement.setParentScene(Parent);
 		advancement.account=account;
-		advancement.refresh(Parent);
-    	
-		
+		advancement.refreshAdvancement(Parent);
+
+
 	}
 	
 	public void redimensionGrid() {
@@ -1104,8 +1120,10 @@ public class TablePane_CharClassif {
 		charDescriptionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
 		    if (newSelection != null ) {
 		    	
-		    	Parent.counterSelection.setVisible(true);
-		    	Parent.counterSelection.setText("Selected items: "+String.valueOf( charDescriptionTable.getSelectionModel().getSelectedIndices().size()) );
+		    	Parent.classCounterSelection.setVisible(true);
+				Parent.charCounterSelection.setVisible(true);
+		    	Parent.classCounterSelection.setText("Selected items: "+String.valueOf( charDescriptionTable.getSelectionModel().getSelectedIndices().size()) );
+				Parent.charCounterSelection.setText("Selected items: "+String.valueOf( charDescriptionTable.getSelectionModel().getSelectedIndices().size()) );
 		    	
 		    	int max_selected = (int) Collections.max(charDescriptionTable.getSelectionModel().getSelectedIndices());
 		    	CharDescriptionRow tmp = (CharDescriptionRow) charDescriptionTable.getItems().get(max_selected);
@@ -1139,7 +1157,8 @@ public class TablePane_CharClassif {
 				}
 
 			}else {
-		    	Parent.counterSelection.setVisible(false);
+		    	Parent.classCounterSelection.setVisible(false);
+				Parent.charCounterSelection.setVisible(false);
 		    }
 		 });
 	}

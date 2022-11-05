@@ -2,12 +2,11 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.effect.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import org.fxmisc.richtext.*?>
 
+<?import org.controlsfx.control.ToggleSwitch?>
 <BorderPane xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Char_description">
    <left>
       <StackPane maxWidth="0" />
@@ -129,14 +128,35 @@
                         </Menu>
                      </menus>
                   </MenuBar>
-                  <MenuBar fx:id="secondaryMenuBar" stylesheets="@../styles/MenuLightBlue.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
-                     <menus>
-                        <Menu fx:id="counterTotal" mnemonicParsing="false" text="Total items classified: -" />
-                        <Menu fx:id="counterRemaining" mnemonicParsing="false" text="Items to be classified: -" />
-                        <Menu fx:id="counterDaily" mnemonicParsing="false" text="Daily personal: - | Daily team : -" />
-                        <Menu fx:id="counterSelection" mnemonicParsing="false" text="Selected items:" />
-                     </menus>
-                  </MenuBar>
+                  <ToolBar fx:id="counterToggleToolbar" stylesheets="@../styles/MenuLightBlue.css" GridPane.columnIndex="0"
+                           GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" GridPane.columnSpan="3">
+                     <ToggleSwitch fx:id="counterToggle" prefHeight="8" prefWidth="8"/>
+                     <Label fx:id="toggleText" text="Switch toggle to display classification advancement"/>
+                  </ToolBar>
+                  <ToolBar visible="false" fx:id="classCounterTB" stylesheets="@../styles/MenuLightBlue.css" GridPane.columnSpan="12" GridPane.rowIndex="2" GridPane.columnIndex="3" GridPane.vgrow="ALWAYS">
+                     <items>
+                        <Label fx:id="classCounterTotal" text="Total items classified: -" />
+                        <Separator orientation="VERTICAL" />
+                        <Label fx:id="classCounterRemaining" text="Items to be classified: -" />
+                        <Separator orientation="VERTICAL" />
+                        <Label fx:id="classCounterDaily" text="Daily personal: - | Daily team : -" />
+                        <Separator orientation="VERTICAL" />
+                        <Label fx:id="classCounterSelection" text="Selected items:" />
+                     </items>
+                  </ToolBar>
+                  <ToolBar fx:id="charCounterTB" stylesheets="@../styles/MenuLightBlue.css" GridPane.columnSpan="12" GridPane.rowIndex="2" GridPane.columnIndex="3" GridPane.vgrow="ALWAYS">
+                     <items>
+                        <Label fx:id="charCounterRemaining" text="Items remaining (class/total): -" />
+                        <Separator orientation="VERTICAL" />
+                        <Label fx:id="charCounterIncluding" text="Total items completed (inc. unknowns) (class/total): -" />
+                        <Separator orientation="VERTICAL" />
+                        <Label fx:id="charCounterExcluding" text="Total items completed (exc. unknowns) (class/total): -" />
+                        <Separator orientation="VERTICAL" />
+                        <Label fx:id="charCounterIncludingDaily" text="Completed today (class/total): -" />
+                        <Separator orientation="VERTICAL" />
+                        <Label fx:id="charCounterSelection" text="Selected items:" />
+                     </items>
+                  </ToolBar>
                   <MenuBar maxWidth="1.7976931348623157E308" stylesheets="@../styles/MenuLightBlue.css" GridPane.columnSpan="2147483647" GridPane.valignment="TOP">
                      <menus>
                         <Menu id="menuHeader" fx:id="projectMenu" mnemonicParsing="false" text="Project" />
@@ -149,7 +169,7 @@
                   </MenuBar>
                   <ToolBar fx:id="homeToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="26.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
-                        <HBox styleClass="gapbox" prefHeight="26.0"/>
+                        <HBox prefHeight="26.0" styleClass="gapbox" />
                         <Label style="-fx-text-fill: #737572;" text="Cancellation" />
                         <GridPane maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
@@ -273,7 +293,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#copyClientNumber2ClipBoard" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#copyClientNumber2ClipBoard" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -301,7 +321,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#copyURL2ClipBoard" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#copyURL2ClipBoard" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -448,7 +468,7 @@
                   </ToolBar>
                   <ToolBar fx:id="dataToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="26.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
                      <items>
-                        <HBox styleClass="gapbox" prefHeight="26.0"/>
+                        <HBox prefHeight="26.0" styleClass="gapbox" />
                         <Label style="-fx-text-fill: #737572;" text="Import/Export" />
                         <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
@@ -478,7 +498,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#export" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#export" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -532,7 +552,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#classDD" maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
+                        <GridPane maxHeight="26.0" minHeight="26.0" onMouseClicked="#classDD" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
@@ -604,7 +624,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane fx:id="convertItem" onMouseClicked="#convertItem" maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
+                        <GridPane fx:id="convertItem" maxHeight="26.0" minHeight="26.0" onMouseClicked="#convertItem" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
@@ -628,7 +648,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane fx:id="convertChar" onMouseClicked="#convertChar" maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
+                        <GridPane fx:id="convertChar" maxHeight="26.0" minHeight="26.0" onMouseClicked="#convertChar" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
@@ -652,7 +672,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane fx:id="convertClass" onMouseClicked="#convertClass" maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
+                        <GridPane fx:id="convertClass" maxHeight="26.0" minHeight="26.0" onMouseClicked="#convertClass" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
@@ -676,7 +696,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#view_chars" fx:id="charButton1" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane fx:id="charButton1" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#view_chars" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -708,8 +728,8 @@
                         <Label style="-fx-text-fill: #737572;" text="Search" />
                         <GridPane>
                            <children>
-                              <TextField fx:id="search_text" minWidth="150" prefWidth="400.0" GridPane.halignment="LEFT" GridPane.valignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2"/>
-                              <GridPane onMouseClicked="#editSearchSettings" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-normal-style" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                              <TextField fx:id="search_text" minWidth="150" prefWidth="400.0" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="0" GridPane.valignment="CENTER" />
+                              <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#editSearchSettings" prefHeight="22.0" styleClass="bg-normal-style" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.valignment="CENTER">
                                  <children>
                                     <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
                                        <graphic>
@@ -723,14 +743,27 @@
 
                                     </Region>
                                  </children>
+                                 <columnConstraints>
+                                    <ColumnConstraints />
+                                    <ColumnConstraints />
+                                    <ColumnConstraints />
+                                    <ColumnConstraints />
+                                    <ColumnConstraints />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                 </rowConstraints>
                               </GridPane>
                            </children>
                            <columnConstraints>
-                              <ColumnConstraints prefWidth="400.0"/>
-                              <ColumnConstraints prefWidth="22.0"/>
+                              <ColumnConstraints prefWidth="400.0" />
+                              <ColumnConstraints prefWidth="22.0" />
                            </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#search_google_inplace" maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
+                        <GridPane maxHeight="26.0" minHeight="26.0" onMouseClicked="#search_google_inplace" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button fx:id="googleButton" maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
@@ -754,7 +787,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane fx:id="imageButton1" onMouseClicked="#search_image" maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
+                        <GridPane fx:id="imageButton1" maxHeight="26.0" minHeight="26.0" onMouseClicked="#search_image" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
@@ -778,7 +811,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <TextField maxHeight="22.0" minHeight="22.0" fx:id="urlLink" minWidth="150" prefWidth="400.0"/>
+                        <TextField fx:id="urlLink" maxHeight="22.0" minHeight="22.0" minWidth="150" prefWidth="400.0" />
                         <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="4" />
                         <GridPane maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
@@ -804,7 +837,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#clearLink" maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
+                        <GridPane maxHeight="26.0" minHeight="26.0" onMouseClicked="#clearLink" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
@@ -830,7 +863,7 @@
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="22.0" />
                         <Label style="-fx-text-fill: #737572;" text="Units of measure" />
-                        <GridPane fx:id="uomconvertButton" onMouseClicked="#uomConvert" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane fx:id="uomconvertButton" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#uomConvert" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -890,7 +923,7 @@
                   </ToolBar>
                   <ToolBar fx:id="automationToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="26.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
-                        <HBox styleClass="gapbox" prefHeight="26.0"/>
+                        <HBox prefHeight="26.0" styleClass="gapbox" />
                         <Label style="-fx-text-fill: #737572;" text="Automatic filling" />
                         <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
@@ -978,7 +1011,7 @@
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="22.0" />
                         <Label style="-fx-text-fill: #737572;" text="Rule management" />
-                        <GridPane onMouseClicked="#view_rules" fx:id="ruleButton1" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane fx:id="ruleButton1" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#view_rules" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -1124,9 +1157,9 @@
                   </ToolBar>
                   <ToolBar fx:id="navigationToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="26.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
-                        <HBox styleClass="gapbox" prefHeight="26.0"/>
+                        <HBox prefHeight="26.0" styleClass="gapbox" />
                         <Label style="-fx-text-fill: #737572;" text="Display" />
-                        <GridPane onMouseClicked="#switchPane" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#switchPane" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -1256,7 +1289,7 @@
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="22.0" />
                         <Label style="-fx-text-fill: #737572;" text="Navigation" />
-                        <GridPane onMouseClicked="#previousBlank" maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
+                        <GridPane maxHeight="26.0" minHeight="26.0" onMouseClicked="#previousBlank" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
@@ -1280,7 +1313,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#nextBlank" maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
+                        <GridPane maxHeight="26.0" minHeight="26.0" onMouseClicked="#nextBlank" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
@@ -1304,7 +1337,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#firstBlank" maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
+                        <GridPane maxHeight="26.0" minHeight="26.0" onMouseClicked="#firstBlank" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
@@ -1328,7 +1361,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#lastBlank" maxHeight="26.0" minHeight="26.0" prefHeight="26.0" styleClass="bg-grey-style">
+                        <GridPane maxHeight="26.0" minHeight="26.0" onMouseClicked="#lastBlank" prefHeight="26.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" styleClass="..stylesButtonTool.css" GridPane.columnIndex="1">
@@ -1402,7 +1435,7 @@
                         </GridPane>
                         <Separator orientation="VERTICAL" prefHeight="22.0" />
                         <Label style="-fx-text-fill: #737572;" text="Panels" />
-                        <GridPane onMouseClicked="#search_google_inplace" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#search_google_inplace" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -1430,7 +1463,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane fx:id="imageButton2" onMouseClicked="#search_image" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane fx:id="imageButton2" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#search_image" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -1458,7 +1491,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#view_rules" fx:id="ruleButton2" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane fx:id="ruleButton2" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#view_rules" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -1486,7 +1519,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#view_chars" fx:id="charButton2" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane fx:id="charButton2" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#view_chars" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -1514,7 +1547,7 @@
                               <RowConstraints />
                            </rowConstraints>
                         </GridPane>
-                        <GridPane onMouseClicked="#closeAllPanels" alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
+                        <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" onMouseClicked="#closeAllPanels" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
                               <Button maxHeight="22.0" maxWidth="24.0" minHeight="22.0" minWidth="24.0" mnemonicParsing="false" prefWidth="24.0" GridPane.columnIndex="1">
@@ -1546,7 +1579,7 @@
                   </ToolBar>
                   <ToolBar fx:id="settingToolbar" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="26.0" style="-fx-background-color: #D6DCE4;-fx-spacing: 0.1em;" stylesheets="@../styles/RibbonToolbar.css" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <items>
-                        <HBox styleClass="gapbox" prefHeight="26.0"/>
+                        <HBox prefHeight="26.0" styleClass="gapbox" />
                         <GridPane alignment="CENTER_LEFT" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" styleClass="bg-grey-style">
                            <children>
                               <HBox maxHeight="26.0" maxWidth="2.0" minHeight="26.0" minWidth="2.0" GridPane.columnIndex="0" />
@@ -1720,8 +1753,8 @@
                   <Label fx:id="custom_label_12" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" text="Value" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="9" />
                   <Label fx:id="note_label" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="9" />
                   <Label fx:id="custom_label_value" style="-fx-font-size: 12; -fx-font-style: italic; -fx-font-weight: bold; -fx-text-fill: white;" visible="false" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="9" />
-                  <ComboBox fx:id="classCombo" minHeight="0.0" prefHeight="20" maxWidth="1.7976931348623157E308" stylesheets="@../styles/ComboBoxBlue.css" GridPane.columnIndex="9" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" />
-                  <Button fx:id="deleteValueLabel" alignment="BASELINE_CENTER" mnemonicParsing="false" styleClass="deleteButton" stylesheets="@../styles/DescHoverButton.css"  GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
+                  <ComboBox fx:id="classCombo" maxWidth="1.7976931348623157E308" minHeight="0.0" prefHeight="20" stylesheets="@../styles/ComboBoxBlue.css" GridPane.columnIndex="9" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" />
+                  <Button fx:id="deleteValueLabel" alignment="BASELINE_CENTER" mnemonicParsing="false" styleClass="deleteButton" stylesheets="@../styles/DescHoverButton.css" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
                </children>
             </GridPane>
          </children>

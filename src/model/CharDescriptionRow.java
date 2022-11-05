@@ -19,6 +19,7 @@ import transversal.generic.Tools;
 import transversal.language_toolbox.Unidecode;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -691,5 +692,9 @@ public class CharDescriptionRow {
 		ret.add(new DescriptionDataElement("SHORT_DESC_TRANSLATED",getShort_desc_translated()));
 		ret.add(new DescriptionDataElement("LONG_DESC_TRANSLATED",getLong_desc_translated()));
 		return ret;
+	}
+
+	public boolean hasDataFromToday() {
+		return getData().values().stream().flatMap(v->v.values().stream()).anyMatch(val->val.getDescriptionTime().toLocalDate().isEqual(LocalDateTime.now().toLocalDate()));
 	}
 }
