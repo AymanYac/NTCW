@@ -66,6 +66,7 @@ public class GlobalConstants {
 	public static final boolean PROMOTE_SUGGESTION_TO_APPLIED_OLD_SCHEMA = false;
     public static final boolean IMAGE_SEARCH_THUMBNAIL = true;
 	public static final boolean BROWSER_TO_SHARE_POPUP_HEADER = true;
+    public static final int MAX_THREADS = 16;
 
 
 	public static int NUMBER_OF_MANUAL_PROPOSITIONS_OLD = 3;
