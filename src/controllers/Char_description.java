@@ -24,10 +24,12 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.effect.BoxBlur;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.text.TextFlow;
 import javafx.stage.*;
 import javafx.util.Callback;
@@ -77,10 +79,9 @@ public class Char_description {
 	public ToolBar settingToolbar;
 	public TextArea helperAreaLeft;
 	public TextArea helperAreaRight;
-	public Button googleButton;
-	public GridPane convertItem;
-	public GridPane convertChar;
-	public GridPane convertClass;
+	public GridPane googleButton;
+	public Region convertItem;
+	public Region convertClass;
 	public GridPane imageButton1;
 	public GridPane imageButton2;
 	public GridPane uomconvertButton;
@@ -92,8 +93,54 @@ public class Char_description {
 	public Label charCounterSelection;
 	public ToolBar counterToggleToolbar;
 	public ToggleSwitch counterToggle;
-	public Label toggleText;
-
+	public Label toggleTextLeft;
+	public Label toggleTextRight;
+	public GridPane cancelPane;
+	public GridPane repeatPane;
+	public GridPane cutPane;
+	public GridPane copyPane;
+	public GridPane pastePane;
+	public GridPane copyAIDPane;
+	public GridPane copyURLPane;
+	public GridPane reloadPane;
+	public GridPane refreshPane;
+	public GridPane reevaluatePane;
+	public GridPane synchronizePane;
+	public GridPane importPane;
+	public GridPane exportPane;
+	public GridPane reapplyPane;
+	public GridPane applyFirstPane;
+	public GridPane clearValuePane;
+	public GridPane changeCasePane;
+	public GridPane searchPane;
+	public GridPane urlPane;
+	public GridPane clearURLPane;
+	public GridPane declarePane;
+	public GridPane fillPane;
+	public GridPane applyPane;
+	public GridPane clearSuggestionPane;
+	public GridPane keywordPane;
+	public GridPane importRulePane;
+	public GridPane createRulePane;
+	public GridPane dupplicatePane;
+	public GridPane resizePane;
+	public GridPane defaultPane;
+	public GridPane increaseFontPane;
+	public GridPane decreaseFontPane;
+	public GridPane wrapPane;
+	public GridPane previousPane;
+	public GridPane nextPane;
+	public GridPane firstPane;
+	public GridPane lastPane;
+	public GridPane previousColPane;
+	public GridPane nextColPane;
+	public GridPane navigatorPane;
+	public GridPane closeAllPane;
+	public GridPane projectPane;
+	public GridPane userPane;
+	public GridPane managePane;
+	public GridPane networkPane;
+	public Region convertChar;
 
 
 	@FXML MenuBar menubar;
@@ -211,6 +258,7 @@ public class Char_description {
 	public CaracteristicValue lastInputValue;
 	private DescPaneController descSettingController;
 	private ScrollTimer scrollTimer = new ScrollTimer();
+	private int tableFontSize = 12;
 
 
 	@FXML void nextBlank() {
@@ -271,6 +319,7 @@ public class Char_description {
 		}
 	}
 	@FXML void initialize(){
+		initToolTips();
 		aidLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -280,14 +329,17 @@ public class Char_description {
 		counterToggle.selectedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+
 				if(newValue){
 					classCounterTB.setVisible(true);
 					charCounterTB.setVisible(false);
-					toggleText.setText(toggleText.getText().replace("classification","description"));
+					toggleTextRight.getStyleClass().remove("unactiveLabel");
+					toggleTextLeft.getStyleClass().add("unactiveLabel");
 				}else{
 					classCounterTB.setVisible(false);
 					charCounterTB.setVisible(true);
-					toggleText.setText(toggleText.getText().replace("description","classification"));
+					toggleTextLeft.getStyleClass().remove("unactiveLabel");
+					toggleTextRight.getStyleClass().add("unactiveLabel");
 				}
 			}
 		});
@@ -385,6 +437,67 @@ public class Char_description {
 		initializePropButtons();
 
 
+	}
+
+	private void initToolTips() {
+		Tooltip.install(cancelPane,new Tooltip("Cancel (Ctrl+Z)"));
+		Tooltip.install(repeatPane,new Tooltip("Repeat (Ctrl+Y)"));
+		Tooltip.install(cutPane,new Tooltip("Cut (Ctrl+X)"));
+		Tooltip.install(copyPane,new Tooltip("Copy (Ctrl+C)"));
+		Tooltip.install(pastePane,new Tooltip("Paste (Ctrl+V)"));
+		Tooltip.install(copyAIDPane,new Tooltip("Copy article ID"));
+		Tooltip.install(copyURLPane,new Tooltip("Copy active URL"));
+		Tooltip.install(reloadPane,new Tooltip("Reload"));
+		Tooltip.install(refreshPane,new Tooltip("Refresh"));
+		Tooltip.install(reevaluatePane,new Tooltip("Reevaluate"));
+		Tooltip.install(synchronizePane,new Tooltip("Synchronize"));
+		Tooltip.install(importPane,new Tooltip("Import data"));
+		Tooltip.install(exportPane,new Tooltip("Export"));
+		Tooltip.install(reapplyPane,new Tooltip("Reapply (Ctrl+W)"));
+		Tooltip.install(applyFirstPane,new Tooltip("Apply first (Ctrl+D)"));
+		Tooltip.install(clearValuePane,new Tooltip("Clear value (Ctrl+E)"));
+		Tooltip.install(changeCasePane,new Tooltip("Change case (Shift+F3)"));
+		Tooltip.install(convertItem,new Tooltip("Convert empty values (item) (Ctrl+U)"));
+		Tooltip.install(convertChar,new Tooltip("Convert empty values (characteristic)"));
+		Tooltip.install(convertClass,new Tooltip("Convert empty values (class)"));
+		Tooltip.install(charButton1,new Tooltip("Open the item panel (Ctrl+I)"));
+		Tooltip.install(search_text,new Tooltip("Search content"));
+		Tooltip.install(searchPane,new Tooltip("Search parameters"));
+		Tooltip.install(googleButton,new Tooltip("Google search (Shift+Enter)"));
+		Tooltip.install(imageButton1,new Tooltip("Google image search"));
+		Tooltip.install(urlLink,new Tooltip("Active URL"));
+		Tooltip.install(urlPane,new Tooltip("Open the active URL (Ctrl+O)"));
+		Tooltip.install(clearURLPane,new Tooltip("Clear active URL"));
+		Tooltip.install(uomconvertButton,new Tooltip("Convert"));
+		Tooltip.install(declarePane,new Tooltip("Declare a new unit"));
+		Tooltip.install(fillPane,new Tooltip("Fill from selection (Ctrl+Enter)"));
+		Tooltip.install(applyPane,new Tooltip("Apply suggestion… (Ctrl+1…5)"));
+		Tooltip.install(clearSuggestionPane,new Tooltip("Clear suggestions"));
+		Tooltip.install(ruleButton1,new Tooltip("Open the rule panel (Ctrl+R)"));
+		Tooltip.install(keywordPane,new Tooltip("Keyword lists"));
+		Tooltip.install(importRulePane,new Tooltip("Import rules"));
+		Tooltip.install(createRulePane,new Tooltip("Create rule coreset"));
+		Tooltip.install(dupplicatePane,new Tooltip("Search duplicates"));
+		Tooltip.install(resizePane,new Tooltip("Resize columns"));
+		Tooltip.install(defaultPane,new Tooltip("Display default columns"));
+		Tooltip.install(increaseFontPane,new Tooltip("Increase font size"));
+		Tooltip.install(decreaseFontPane,new Tooltip("Decrease font size"));
+		Tooltip.install(wrapPane,new Tooltip("Wrap text"));
+		Tooltip.install(previousPane,new Tooltip("Previous empty row (Ctrl+Up)"));
+		Tooltip.install(nextPane,new Tooltip("Next empty row (Ctrl+Down)"));
+		Tooltip.install(firstPane,new Tooltip("First row (Ctrl+Home)"));
+		Tooltip.install(lastPane,new Tooltip("Last row (Ctrl+End)"));
+		Tooltip.install(previousColPane,new Tooltip("Previous column (Ctrl+K)"));
+		Tooltip.install(nextColPane,new Tooltip("Next column (Ctrl+M)"));
+		Tooltip.install(navigatorPane,new Tooltip("Navigator"));
+		Tooltip.install(imageButton2,new Tooltip("Image search"));
+		Tooltip.install(ruleButton2,new Tooltip("Rule panel"));
+		Tooltip.install(charButton2,new Tooltip("Item panel"));
+		Tooltip.install(closeAllPane,new Tooltip("Close all panels (Escape)"));
+		Tooltip.install(projectPane,new Tooltip("Project settings"));
+		Tooltip.install(userPane,new Tooltip("User preferences"));
+		Tooltip.install(managePane,new Tooltip("Manage users"));
+		Tooltip.install(networkPane,new Tooltip("Network"));
 	}
 
 	private void initRibbon() {
@@ -1064,25 +1177,7 @@ public class Char_description {
 		}
 
 		if(account.PRESSED_KEYBOARD.get(KeyCode.O) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
-			if(GlobalConstants.OPEN_LINKS_IN_EXTERNAL || account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)){
-				Desktop.getDesktop().browse(new URL(urlLink.getText()).toURI());
-			}else{
-				try {
-					browserController.browser.FORCE_PDF_IN_VIEWER = true;
-					browserController.setContainerWindow();
-					browserController.browser.loadPage(urlLink.getText());
-				} catch (Exception V) {
-					try {
-						load_browser_pane();
-						browserController.browser.FORCE_PDF_IN_VIEWER = true;
-						browserController.setContainerWindow();
-						browserController.browser.loadPage(urlLink.getText());
-					} catch (Exception L) {
-						L.printStackTrace(System.err);
-					}
-				}
-				browserController.browser.FORCE_PDF_IN_VIEWER = GlobalConstants.FORCE_PDF_IN_VIEWER;
-			}
+			followArticleURL();
 		}
 		if(account.PRESSED_KEYBOARD.get(KeyCode.K) && account.PRESSED_KEYBOARD.get(KeyCode.CONTROL)) {
 			tableController.previousChar();
@@ -1139,6 +1234,28 @@ public class Char_description {
 
 		return;
 		
+	}
+
+	@FXML private void followArticleURL() throws IOException, URISyntaxException {
+		if(GlobalConstants.OPEN_LINKS_IN_EXTERNAL || account.PRESSED_KEYBOARD.get(KeyCode.SHIFT)){
+			Desktop.getDesktop().browse(new URL(urlLink.getText()).toURI());
+		}else{
+			try {
+				browserController.browser.FORCE_PDF_IN_VIEWER = true;
+				browserController.setContainerWindow();
+				browserController.browser.loadPage(urlLink.getText());
+			} catch (Exception V) {
+				try {
+					load_browser_pane();
+					browserController.browser.FORCE_PDF_IN_VIEWER = true;
+					browserController.setContainerWindow();
+					browserController.browser.loadPage(urlLink.getText());
+				} catch (Exception L) {
+					L.printStackTrace(System.err);
+				}
+			}
+			browserController.browser.FORCE_PDF_IN_VIEWER = GlobalConstants.FORCE_PDF_IN_VIEWER;
+		}
 	}
 
 	private void reassignPreviousValue() {
@@ -1880,15 +1997,19 @@ public class Char_description {
 		MenuItem launchDedup = new MenuItem("Launch Deduplication settings");
 		launchDedup.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent t) {
-				try {
-					DedupLaunchDialog.Settings(Tools.get_project_segments(parent.account).get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()),tableController.Parent);
-				} catch (SQLException | ClassNotFoundException throwables) {
-					throwables.printStackTrace();
-				}
+				launchDedupSettings();
 			}
 		});
 
 		desc.getItems().addAll(reeval_rules_true,clear_unknowns,mark_as_known,clear_unknowns_active_char,mark_as_known_active_char,clear_unknowns_class,mark_as_known_class,launchDedup);
+	}
+
+	@FXML private void launchDedupSettings() {
+		try {
+			DedupLaunchDialog.Settings(Tools.get_project_segments(account).get(FxUtilTest.getComboBoxValue(classCombo).getSegmentId()),this);
+		} catch (SQLException | ClassNotFoundException throwables) {
+			throwables.printStackTrace();
+		}
 	}
 
 
@@ -3013,6 +3134,35 @@ public class Char_description {
 			rulePaneController.PaneClose();
 		}catch(Exception V) {
 
+		}
+	}
+
+	@FXML public void declareNewUoM() {
+		aidLabel.getScene().getRoot().setEffect(new BoxBlur());
+		try {
+			UoMDeclarationDialog.GenericUomDeclarationPopUp(aidLabel.getScene().getRoot());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		aidLabel.getScene().getRoot().setEffect(null);
+	}
+
+	@FXML public void increaseFontSize() {
+		if(tableFontSize==1){
+			decreaseFontPane.setDisable(false);
+		}
+		tableFontSize=tableFontSize+1;
+		for (Node n: tableController.tableControllerRoot.lookupAll(".table-view")) {
+			n.setStyle("-fx-font-size: "+tableFontSize+"px;");
+		}
+	}
+	@FXML public void decreaseFontSize() {
+		if(tableFontSize==2){
+			decreaseFontPane.setDisable(true);
+		}
+		tableFontSize=tableFontSize-1;
+		for (Node n: tableController.tableControllerRoot.lookupAll(".table-view")) {
+			n.setStyle("-fx-font-size: "+tableFontSize+"px;");
 		}
 	}
 }

@@ -19,6 +19,7 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
@@ -58,6 +59,7 @@ public class TablePane_CharClassif {
 
 
 	public static Char_description Parent;
+	public GridPane tableControllerRoot;
 	protected String translated_sd;
 	protected String translated_ld;
 	private static UserAccount account;

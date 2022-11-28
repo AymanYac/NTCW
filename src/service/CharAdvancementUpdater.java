@@ -35,7 +35,7 @@ public class CharAdvancementUpdater {
 			Map<String, Long> charadvancementmapDaily = CharItemFetcher.allRowItems.parallelStream().filter(CharDescriptionRow::hasDataFromToday).map(CharDescriptionRow::getCompletionStatusString).collect(Collectors.groupingBy(string -> string, Collectors.counting()));
 			Map<String, Long> charadvancementmapclassDaily = CharItemFetcher.allRowItems.parallelStream().filter(CharDescriptionRow::hasDataFromToday).filter(item->item.getClass_segment_string()!=null && item.getClass_segment_string().split("&&&")[0].equals(parent.classCombo.getValue().getSegmentId())).map(CharDescriptionRow::getCompletionStatusString).collect(Collectors.groupingBy(string -> string, Collectors.counting()));
 			Platform.runLater(() -> {
-				parentScene.charCounterRemaining.setText("Items remaining (class/total): " +
+				parentScene.charCounterRemaining.setText("    Items remaining (class/total): " +
 						(charadvancementmapclass.get("Missing critical")!=null?charadvancementmapclass.get("Missing critical"):0)
 						+"/"+
 						(charadvancementmap.get("Missing critical")!=null?charadvancementmap.get("Missing critical"):0)
@@ -115,7 +115,7 @@ public class CharAdvancementUpdater {
 			
 			
 			Platform.runLater(()->{
-					parentScene.classCounterTotal.setText("Total items classified: "+finalsum);
+					parentScene.classCounterTotal.setText("    Total items classified: "+finalsum);
 					parentScene.classCounterRemaining.setText("Items to be classified: "+(projectCardinality-finalsum));
 					parentScene.classCounterDaily.setText("Daily personal: "+finaldailyPersonal+" | Daily team : "+finaldailyTeam);
 				});

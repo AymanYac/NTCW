@@ -25,8 +25,8 @@ public class ImportTaxoRow {
     
 	private static boolean forceUpdate;
 	private static boolean accumulateUoMs;
-	
-	
+
+
 	public ClassSegment getSegment() {
 		return segment;
 	}
@@ -544,6 +544,70 @@ public class ImportTaxoRow {
 	}
 	private void caracParseFail() {
 		this.caracParseFail = true;
+	}
+
+	public static void setColumnMap(Row taxoHeader) {
+		taxoHeader.cellIterator().forEachRemaining(cell->{
+			switch (cell.getStringCellValue().toLowerCase()){
+				case "domain id":
+					columnMap.put("number_0",cell.getColumnIndex()-1);
+					break;
+				case "domain name":
+					columnMap.put("name_0",cell.getColumnIndex()-1);
+					break;
+				case "group id":
+					columnMap.put("number_1",cell.getColumnIndex()-1);
+					break;
+				case "group name":
+					columnMap.put("name_1",cell.getColumnIndex()-1);
+					break;
+				case "family id":
+					columnMap.put("number_2",cell.getColumnIndex()-1);
+					break;
+				case "family name":
+					columnMap.put("name_2",cell.getColumnIndex()-1);
+					break;
+				case "class id":
+					columnMap.put("number_3",cell.getColumnIndex()-1);
+					break;
+				case "class name":
+					columnMap.put("name_3",cell.getColumnIndex()-1);
+					break;
+				case "Characteristic ID":
+					columnMap.put("charId",cell.getColumnIndex()-1);
+					break;
+				case "Characteristic name":
+					columnMap.put("charName",cell.getColumnIndex()-1);
+					break;
+				case "Characteristic name translation":
+					columnMap.put("charNameTranslated",cell.getColumnIndex()-1);
+					break;
+				case "Sequence":
+					columnMap.put("charSequence",cell.getColumnIndex()-1);
+					break;
+				case "Characteristic type (TXT/NUM)":
+					columnMap.put("charType",cell.getColumnIndex()-1);
+					break;
+				case "Translatable? (Y/N)":
+					columnMap.put("charIsTranslatable",cell.getColumnIndex()-1);
+					break;
+				case "Mandatory? (Y/N)":
+					columnMap.put("charIsMandatory",cell.getColumnIndex()-1);
+					break;
+				case "Unit of measure":
+					columnMap.put("charUoM",cell.getColumnIndex()-1);
+					break;
+				case "Class command":
+					columnMap.put("classCommand",cell.getColumnIndex()-1);
+					break;
+				case "Characteristic command":
+					columnMap.put("charCommand",cell.getColumnIndex()-1);
+					break;
+				case "Class x Characteristic command":
+					columnMap.put("classCharCommand",cell.getColumnIndex()-1);
+					break;
+			}
+		});
 	}
 	
 	public static void setColumnMap() {

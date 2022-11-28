@@ -33,6 +33,47 @@ public class UoMDeclarationDialog {
 	private static String CharUomFamily = "";
 	private static HashSet<String> uomCompBases;
 
+	public static void GenericUomDeclarationPopUp(Node parent) throws SQLException {
+		// Create the custom dialog.
+		CustomDialog dialog = new CustomDialog(parent);
+
+		// Set the button types.
+		ButtonType validateButtonType = new ButtonType("Store new unit", ButtonData.OK_DONE);
+		dialog.getDialogPane().getButtonTypes().addAll(validateButtonType, ButtonType.CANCEL);
+
+		// Create the  uom labels and fields.
+
+		createFields();
+
+		clear_fields("",null);
+
+		setFieldListeners(dialog,validateButtonType, "", null);
+
+
+		dialog.setContent(grid);
+		dialog.setCDTitle("New unit of measure declaration");
+		dialog.setCDHeaderText("Defining a new unit of measure");
+
+		// Request focus on the multiplier field by default.
+		Platform.runLater(() -> uomMultiplier.requestFocus());
+
+
+		// Convert the result to a uom when the store button is clicked.
+		dialog.setResultConverter(dialogButton -> {
+			if (dialogButton == validateButtonType) {
+				return createUomfromField();
+			}
+			return null;
+		});
+
+		Optional<UnitOfMeasure> result = dialog.showAndWait();
+		if(result.isPresent()){
+			UnitOfMeasure newUom = result.get();
+			UnitOfMeasure.storeNewUom(newUom);
+		}
+
+	}
+
 	public static void GenericUomDeclarationPopUp(String proposedUomSymbol,
 																	 AutoCompleteBox_UnitOfMeasure uom_field) throws SQLException {
 

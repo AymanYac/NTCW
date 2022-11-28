@@ -1,13 +1,17 @@
 package application;
 
 import controllers.ToolHeaderController;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import model.GlobalConstants;
 import model.UserAccount;
 import transversal.dialog_toolbox.ExceptionDialog;
@@ -16,6 +20,7 @@ import transversal.generic.Tools;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Locale;
@@ -24,6 +29,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		setUserAgentStylesheet("/styles/skin.css");
+		hackTooltipStartTiming(new Tooltip());
 		if(GlobalConstants.DEV_RUNTIME){
 			try {
 				UserAccount account = Tools.checkpass("Ayman", "neonec");
@@ -92,5 +98,22 @@ public class Main extends Application {
 			System.err.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX >" + LocalDateTime.now() + "< XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 		}
 		launch(args);
+	}
+
+	public static void hackTooltipStartTiming(Tooltip tooltip) {
+		try {
+			Field fieldBehavior = tooltip.getClass().getDeclaredField("BEHAVIOR");
+			fieldBehavior.setAccessible(true);
+			Object objBehavior = fieldBehavior.get(tooltip);
+
+			Field fieldTimer = objBehavior.getClass().getDeclaredField("activationTimer");
+			fieldTimer.setAccessible(true);
+			Timeline objTimer = (Timeline) fieldTimer.get(objBehavior);
+
+			objTimer.getKeyFrames().clear();
+			objTimer.getKeyFrames().add(new KeyFrame(new Duration(50)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
