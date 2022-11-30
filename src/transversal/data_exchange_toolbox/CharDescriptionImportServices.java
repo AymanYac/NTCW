@@ -65,13 +65,13 @@ public class CharDescriptionImportServices {
 
 
 
+		ImportTaxoRow.setColumnMap();
 		ImportTaxoRow.loadTaxoDS(active_pid);
         Sheet taxoSheet = workbook.getSheet(taxoSheetName);
 		Iterator<Row> rows = taxoSheet.rowIterator();
 		//Skip the header row
 		if(rows.hasNext()) {
 			taxoHeader = rows.next();
-			ImportTaxoRow.setColumnMap(taxoHeader);
 		}
 		Patterns2Apply = new ArrayList<Pair<GenericCharRule,ClassCaracteristic>>();
 		while(rows.hasNext()) {
