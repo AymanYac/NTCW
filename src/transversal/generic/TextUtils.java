@@ -3,14 +3,13 @@ package transversal.generic;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.IndexRange;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextBoundsType;
 import model.CharDescriptionRow;
-import model.DescriptionDisplayElement;
-import javafx.scene.text.*;
 import model.DescriptionDataElement;
+import model.DescriptionDisplayElement;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 import java.util.ArrayList;

@@ -4,7 +4,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
-import model.CharDescriptionRow;
 
 import java.util.LinkedHashSet;
 

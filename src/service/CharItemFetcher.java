@@ -5,20 +5,24 @@ import controllers.paneControllers.TablePane_CharClassif;
 import javafx.util.Pair;
 import model.*;
 import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
+import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.generic.Tools;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CharItemFetcher {
 	
 	public static ArrayList<CharDescriptionRow> allRowItems;
 	public static HashMap<String,Integer> indexedRowItems = new HashMap<String,Integer>();
-	public static HashMap<String, String> classifiedItems;
+	public static HashMap<String, QueryFormater.ItemClassificationData> classifiedItems;
 	private static int fakeItemIdx;
 	public static ArrayList<Pair<ClassCaracteristic,CaracteristicValue>> defaultCharValues;
 
@@ -72,11 +76,12 @@ public class CharItemFetcher {
 					tmp.setMaterial_group(rs.getString("material_group"));
 					tmp.setPreclassif(rs.getString("pre_classification"));
 					
-					String loop_class_segment = CharItemFetcher.classifiedItems.get(rs.getString("item_id"));
-					String loop_class_id = loop_class_segment.split("&&&")[4];
-					String loop_class_name = loop_class_segment.split("&&&")[1];
-					String loop_class_number = loop_class_segment.split("&&&")[0];
+					ClassSegment loop_class_segment = CharItemFetcher.classifiedItems.get(rs.getString("item_id")).getClassSegment();
+					String loop_class_id = loop_class_segment.getSegmentId();
+					String loop_class_name = loop_class_segment.getClassName();
+					String loop_class_number = loop_class_segment.getClassNumber();
 					tmp.setClass_segment_string(loop_class_id+"&&&"+loop_class_name+"&&&"+loop_class_number);
+					tmp.setClass_segment(loop_class_segment);
 
 					tmp.setRuleResults(Item2RuleResults.get(tmp.getItem_id()));
 					i+=1;
@@ -154,7 +159,7 @@ public class CharItemFetcher {
 
 	public static void initClassDataFields() {
 		allRowItems.forEach(r->{
-			String item_class_id = classifiedItems.get(r.getItem_id()).split("&&&")[4];
+			String item_class_id = classifiedItems.get(r.getItem_id()).getClassSegment().getSegmentId();
 			r.allocateDataField(item_class_id);
 			
 		});

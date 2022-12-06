@@ -13,7 +13,10 @@ import java.lang.reflect.Type;
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.URI;
-import java.sql.*;
+import java.sql.Array;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 
 public class UserAccount {

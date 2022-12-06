@@ -25,6 +25,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import model.*;
 import org.apache.poi.util.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import transversal.dialog_toolbox.ExceptionDialog;
 
 import java.awt.*;
@@ -350,6 +351,29 @@ public class Tools {
 
     	return sid2Segment;
     }
+
+	public static HashMap<String, ClassSegment> get_project_segments(@NotNull String project_id) throws SQLException, ClassNotFoundException {
+		HashMap<String,ClassSegment> sid2Segment = new HashMap<String,ClassSegment>();
+		Connection conn = Tools.spawn_connection_from_pool();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("select * from "+project_id+".project_segments");
+		while(rs.next()){
+			ClassSegment tmp = new ClassSegment();
+			tmp.setSegmentGranularity(Tools.get_project_granularity(project_id));
+			tmp.setSegmentId(rs.getString(1));
+			for(int lvl=0;lvl<4;lvl++){
+				tmp.setLevelNumber(lvl,rs.getString(1+lvl*3+1));
+				tmp.setLevelName(lvl,rs.getString(1+lvl*3+2));
+				tmp.setLevelNameTranslated(lvl,rs.getString(1+lvl*3+3));
+			}
+			sid2Segment.put(tmp.getSegmentId(),tmp);
+		}
+		rs.close();
+		stmt.close();
+		conn.close();
+
+		return sid2Segment;
+	}
 
 
 

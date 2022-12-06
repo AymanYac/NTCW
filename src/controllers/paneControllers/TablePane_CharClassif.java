@@ -33,7 +33,6 @@ import transversal.data_exchange_toolbox.CharDescriptionExportServices;
 import transversal.data_exchange_toolbox.ComplexMap2JdbcObject;
 import transversal.data_exchange_toolbox.QueryFormater;
 import transversal.dialog_toolbox.FxUtilTest;
-import service.ExternalSearchServices;
 import transversal.generic.Tools;
 import transversal.language_toolbox.WordUtils;
 
@@ -357,12 +356,12 @@ public class TablePane_CharClassif {
 				//tmp.setClass_segment(loop_class_id+"&&&"+loop_class_name+"&&&"+loop_class_number);
 				item.setClass_segment_string(result);
 				String[] resultSplit = result.split("&&&");
+				QueryFormater.ItemClassificationData tmp = new QueryFormater.ItemClassificationData();
+				tmp.setClassSegment(Tools.get_project_segments((UserAccount) null).get(resultSplit[1]));
+				tmp.setClassificationMethod(DataInputMethods.MANUAL);
+				tmp.setClassificationMethod(account.getUser_id());
 				CharItemFetcher.classifiedItems.put(item.getItem_id(),
-						resultSplit[2]+"&&&"
-						+resultSplit[1]+"&&&"
-						+DataInputMethods.MANUAL+"&&&"
-						+account.getUser_id()+"&&&"
-						+resultSplit[0]);
+						tmp);
 			}catch(Exception V) {
 				item.setClass_segment_string(null);
 				CharItemFetcher.classifiedItems.put(item.getItem_id(), null);
@@ -588,7 +587,7 @@ public class TablePane_CharClassif {
 			
 		});*/
 
-		List<String> classItems = CharItemFetcher.classifiedItems.entrySet().stream().filter(m->m.getValue().contains(active_class)).map(Entry::getKey).collect(Collectors.toList());
+		List<String> classItems = CharItemFetcher.classifiedItems.entrySet().stream().filter(m->m.getValue().getClassSegment().getSegmentId().equals(active_class)).map(Entry::getKey).collect(Collectors.toList());
 		return classItems;
 	}
 

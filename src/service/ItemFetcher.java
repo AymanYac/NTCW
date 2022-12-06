@@ -25,7 +25,7 @@ public class ItemFetcher {
 	public ArrayList<String> orderedItems;
 	private Integer projectCardinality;
 	private Integer projectGranularity;
-	public HashMap<String, String> classifiedItems;
+	public HashMap<String, QueryFormater.ItemClassificationData> classifiedItems;
 	public HashMap<String, String> CID2NAME = new HashMap<String,String>();
 	public HashMap<String, String> ONLINE_LABELS = new HashMap<String,String>();
 	private List<String> dw_words;
@@ -45,7 +45,7 @@ public class ItemFetcher {
 		if(GlobalConstants.MANUAL_PREORDER) {
 			orderedItems = new ArrayList<String>(projectCardinality);
 		}
-		classifiedItems = new HashMap<String,String>();
+		classifiedItems = new HashMap<String,QueryFormater.ItemClassificationData>();
 		
 		
 		
@@ -152,36 +152,36 @@ public class ItemFetcher {
 			//tmp.setRule_id(rs.getString("rule_id"));
 			//tmp.setRule_description(rs.getString("rule_application_description_form"));
 			try{
-				//tmp.setSegment_number(classifiedItems.get(tmp.getItem_id()).split("&&&")[0]);
-				//tmp.setSegment_id(classifiedItems.get(tmp.getItem_id()).split("&&&")[4]);
-				//tmp.setSegment_name(classifiedItems.get(tmp.getItem_id()).split("&&&")[1]);
-				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(DataInputMethods.MANUAL)){
-					tmp.setManual_segment_number( classifiedItems.get(tmp.getItem_id()).split("&&&")[0] );
-					tmp.setManual_segment_id( classifiedItems.get(tmp.getItem_id()).split("&&&")[4] );
-					tmp.setManual_segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
-					tmp.setSource_Manual(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
-					tmp.setAuthor_Manual(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
+				//tmp.setSegment_number(classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassNumber());
+				//tmp.setSegment_id(classifiedItems.get(tmp.getItem_id()).getClassSegment().getSegmentId());
+				//tmp.setSegment_name(classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassName());
+				if(classifiedItems.get(tmp.getItem_id()).getClassificationMethod().equals(DataInputMethods.MANUAL)){
+					tmp.setManual_segment_number( classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassNumber() );
+					tmp.setManual_segment_id( classifiedItems.get(tmp.getItem_id()).getClassSegment().getSegmentId() );
+					tmp.setManual_segment_name( classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassName() );
+					tmp.setSource_Manual(classifiedItems.get(tmp.getItem_id()).getClassificationMethod());
+					tmp.setAuthor_Manual(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).getUserID()));
 					tmp.setReviewer_Manual(tmp.getAuthor_Manual());
 				}
-				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(DataInputMethods.PROJECT_SETUP_UPLOAD)){
-					tmp.setUpload_segment_number( classifiedItems.get(tmp.getItem_id()).split("&&&")[0] );
-					tmp.setUpload_segment_id( classifiedItems.get(tmp.getItem_id()).split("&&&")[4] );
-					tmp.setUpload_segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
-					tmp.setSource_Upload(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
-					tmp.setAuthor_Upload(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
+				if(classifiedItems.get(tmp.getItem_id()).getClassificationMethod().equals(DataInputMethods.PROJECT_SETUP_UPLOAD)){
+					tmp.setUpload_segment_number( classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassNumber() );
+					tmp.setUpload_segment_id( classifiedItems.get(tmp.getItem_id()).getClassSegment().getSegmentId() );
+					tmp.setUpload_segment_name( classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassName() );
+					tmp.setSource_Upload(classifiedItems.get(tmp.getItem_id()).getClassificationMethod());
+					tmp.setAuthor_Upload(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).getUserID()));
 					tmp.setReviewer_Upload(tmp.getAuthor_Upload());
 				}
-				if(classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(DataInputMethods.USER_CLASSIFICATION_RULE)
+				if(classifiedItems.get(tmp.getItem_id()).getClassificationMethod().equals(DataInputMethods.USER_CLASSIFICATION_RULE)
 						||
-						classifiedItems.get(tmp.getItem_id()).split("&&&")[2].equals(DataInputMethods.BINARY_CLASSIFICATION)){
-					tmp.setRule_Segment_number( classifiedItems.get(tmp.getItem_id()).split("&&&")[0] );
-					tmp.setRule_Segment_id( classifiedItems.get(tmp.getItem_id()).split("&&&")[4] );
-					tmp.setRule_Segment_name( classifiedItems.get(tmp.getItem_id()).split("&&&")[1] );
-					tmp.setSource_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
-					tmp.setAuthor_Rules(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).split("&&&")[3]));
+						classifiedItems.get(tmp.getItem_id()).getClassificationMethod().equals(DataInputMethods.BINARY_CLASSIFICATION)){
+					tmp.setRule_Segment_number( classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassNumber() );
+					tmp.setRule_Segment_id( classifiedItems.get(tmp.getItem_id()).getClassSegment().getSegmentId() );
+					tmp.setRule_Segment_name( classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassName() );
+					tmp.setSource_Rules(classifiedItems.get(tmp.getItem_id()).getClassificationMethod());
+					tmp.setAuthor_Rules(Tools.userID2Author.get(classifiedItems.get(tmp.getItem_id()).getUserID()));
 					tmp.setReviewer_Rules(tmp.getAuthor_Rules());
-					tmp.setRule_id_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[5]);
-					tmp.setRule_description_Rules(classifiedItems.get(tmp.getItem_id()).split("&&&")[5]);
+					tmp.setRule_id_Rules(classifiedItems.get(tmp.getItem_id()).getRuleID());
+					tmp.setRule_description_Rules(classifiedItems.get(tmp.getItem_id()).getRuleID());
 					QueryFormater.ADD_UPLOAD_ITEM_CLASS(tmp, projectGranularity, active_project);
 				}
 				
@@ -192,7 +192,7 @@ public class ItemFetcher {
 				}else {
 					key = tmp.getShort_description().split(" ")[0];
 				}
-				String val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
+				String val = classifiedItems.get(tmp.getItem_id()).getClassSegment().getSegmentId()+"&&&"+tmp.getDisplay_segment_name();
 				try{
 					proposer.addClassifiedFW(key,val);
 				}catch(Exception V) {
@@ -202,7 +202,7 @@ public class ItemFetcher {
 				
 				if(tmp.getMaterial_group()!=null) {
 					key = tmp.getMaterial_group();
-					val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
+					val = classifiedItems.get(tmp.getItem_id()).getClassSegment().getSegmentId()+"&&&"+tmp.getDisplay_segment_name();
 					try{
 						proposer.addClassifiedMG(key,val);
 					}catch(Exception V) {
@@ -240,7 +240,7 @@ public class ItemFetcher {
 					key = WordUtils.getSearchWords(key);
 					tmp.addF1(key.split(" ")[0].toUpperCase());//#
 					tmp.addF1F2(key.toUpperCase());//#
-					val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
+					val = classifiedItems.get(tmp.getItem_id()).getClassSegment().getSegmentId()+"&&&"+tmp.getDisplay_segment_name();
 					try{
 						proposer.addClassifiedFor(key,val);
 					}catch(Exception V) {
@@ -257,7 +257,7 @@ public class ItemFetcher {
 				try {
 						if(desc.toUpperCase().contains(dw.toUpperCase())){
 							tmp.setDWG(true);//#
-							val = classifiedItems.get(tmp.getItem_id()).split("&&&")[4]+"&&&"+tmp.getDisplay_segment_name();
+							val = classifiedItems.get(tmp.getItem_id()).getClassSegment().getSegmentId()+"&&&"+tmp.getDisplay_segment_name();
 							try{
 								proposer.addClassifiedDW(dw,val);
 							}catch(Exception V) {
@@ -339,9 +339,9 @@ public class ItemFetcher {
 			tmp.setRule_description(rs.getString("rule_application_description_form"));
 			try{
 				
-				tmp.setSegment_id(classifiedItems.get(tmp.getItem_id()).split("&&&")[0]);
-				tmp.setSegment_name(classifiedItems.get(tmp.getItem_id()).split("&&&")[1]);
-				tmp.setSource(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
+				tmp.setSegment_id(classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassNumber());
+				tmp.setSegment_name(classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassName());
+				tmp.setSource(classifiedItems.get(tmp.getItem_id()).getClassificationMethod());
 			}catch(Exception V) {
 				
 			}
@@ -420,9 +420,9 @@ public class ItemFetcher {
 			tmp.setRule_id(rs.getString("rule_id"));
 			tmp.setRule_description(rs.getString("rule_application_description_form"));
 			try{
-				tmp.setSegment_id(classifiedItems.get(tmp.getItem_id()).split("&&&")[0]);
-				tmp.setSegment_name(classifiedItems.get(tmp.getItem_id()).split("&&&")[1]);
-				tmp.setSource(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
+				tmp.setSegment_id(classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassNumber());
+				tmp.setSegment_name(classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassName());
+				tmp.setSource(classifiedItems.get(tmp.getItem_id()).getClassificationMethod());
 			}catch(Exception V) {
 				
 			}
@@ -504,9 +504,9 @@ public class ItemFetcher {
 			tmp.setRule_id(rs.getString("rule_id"));
 			tmp.setRule_description(rs.getString("rule_application_description_form"));
 			try{
-				tmp.setSegment_id(classifiedItems.get(tmp.getItem_id()).split("&&&")[0]);
-				tmp.setSegment_name(classifiedItems.get(tmp.getItem_id()).split("&&&")[1]);
-				tmp.setSource(classifiedItems.get(tmp.getItem_id()).split("&&&")[2]);
+				tmp.setSegment_id(classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassNumber());
+				tmp.setSegment_name(classifiedItems.get(tmp.getItem_id()).getClassSegment().getClassName());
+				tmp.setSource(classifiedItems.get(tmp.getItem_id()).getClassificationMethod());
 			}catch(Exception V) {
 				
 			}

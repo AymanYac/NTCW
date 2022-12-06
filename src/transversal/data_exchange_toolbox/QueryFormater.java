@@ -1,5 +1,6 @@
 package transversal.data_exchange_toolbox;
 
+import model.ClassSegment;
 import model.DataInputMethods;
 import model.ItemFetcherRow;
 import transversal.generic.Tools;
@@ -75,21 +76,27 @@ public class QueryFormater {
 				") performance group by grouping sets ((user_id,classification_date))";
 	}
 
-	public static HashMap<String, String> FETCH_ITEM_CLASSES_NO_UPLOAD_PRIORITY( String joinStatement, Integer projectGranularity, String active_project) throws SQLException, ClassNotFoundException {
-		
+	public static HashMap<String, ItemClassificationData> FETCH_ITEM_CLASSES_NO_UPLOAD_PRIORITY(String joinStatement, Integer projectGranularity, String active_project) throws SQLException, ClassNotFoundException {
+
+		HashMap<String, ClassSegment> sid2Segments = Tools.get_project_segments(active_project);
+
 		Connection conn = Tools.spawn_connection_from_pool();
 		Statement st = conn.createStatement();
 		
 		ResultSet rs =st.executeQuery(QueryFormater.ManualFetchLatestClassifiedItems(projectGranularity, active_project,null,null)
 				+ joinStatement);
 		
-		HashMap<String, String> classifiedItems = new HashMap<String,String>();
+		HashMap<String, ItemClassificationData> classifiedItems = new HashMap<>();
 		while(rs.next()) {
 			
 				if(rs.getString(2)!=null) {
 					//2 : level_granularity_number
 					//3 : level_granularity_name_translated
-					classifiedItems.put(rs.getString("item_id"), rs.getString(2)+"&&&"+rs.getString(3)+"&&&"+rs.getString("classification_method")+"&&&"+rs.getString("user_id")+"&&&"+rs.getString("segment_id"));
+					ItemClassificationData tmp = new ItemClassificationData();
+					tmp.setClassSegment(sid2Segments.get(rs.getString("segment_id")));
+					tmp.setClassificationMethod(rs.getString("classification_method"));
+					tmp.setUserID(rs.getString("user_id"));
+					classifiedItems.put(rs.getString("item_id"), tmp);
 				}
 				
 		}
@@ -100,8 +107,10 @@ public class QueryFormater {
 		return classifiedItems;
 	}
 
-	public static HashMap<String, String> FETCH_ITEM_CLASSES_WITH_UPLOAD_PRIORITY(String joinStatement,
+	public static HashMap<String, ItemClassificationData> FETCH_ITEM_CLASSES_WITH_UPLOAD_PRIORITY(String joinStatement,
 			Integer projectGranularity, String active_project) throws ClassNotFoundException, SQLException {
+
+		HashMap<String, ClassSegment> sid2Segments = Tools.get_project_segments(active_project);
 		// Load items with classification : upload or manual
 		ArrayList<String> methods = new ArrayList<String>();
 		methods.add(DataInputMethods.MANUAL);
@@ -116,13 +125,17 @@ public class QueryFormater {
 		ResultSet rs =st.executeQuery(QueryFormater.ManualFetchLatestClassifiedItems(projectGranularity, active_project,methods,acceptBlanks)
 				+ joinStatement);
 		
-		HashMap<String, String> classifiedItems = new HashMap<String,String>();
+		HashMap<String, ItemClassificationData> classifiedItems = new HashMap<String,ItemClassificationData>();
 		while(rs.next()) {
 			
 				if(rs.getString(2)!=null && rs.getString("classification_method").equals(DataInputMethods.MANUAL)) {
 					//2 : level_granularity_number
 					//3 : level_granularity_name_translated
-					classifiedItems.put(rs.getString("item_id"), rs.getString(2)+"&&&"+rs.getString(3)+"&&&"+rs.getString("classification_method")+"&&&"+rs.getString("user_id")+"&&&"+rs.getString("segment_id"));
+					ItemClassificationData tmp = new ItemClassificationData();
+					tmp.setClassSegment(sid2Segments.get(rs.getString("segment_id")));
+					tmp.setClassificationMethod(rs.getString("classification_method"));
+					tmp.setUserID(rs.getString("user_id"));
+					classifiedItems.put(rs.getString("item_id"), tmp);
 				}
 				
 		}
@@ -143,9 +156,12 @@ public class QueryFormater {
 		while(rs.next()) {
 			
 				if(rs.getString(2)!=null && !classifiedItems.containsKey( rs.getString("item_id") )) {
-					//2 : level_granularity_number
-					//3 : level_granularity_name_translated
-					classifiedItems.put(rs.getString("item_id"), rs.getString(2)+"&&&"+rs.getString(3)+"&&&"+rs.getString("classification_method")+"&&&"+rs.getString("user_id")+"&&&"+rs.getString("segment_id")+"&&&"+rs.getString("rule_id"));
+					ItemClassificationData tmp = new ItemClassificationData();
+					tmp.setClassSegment(sid2Segments.get(rs.getString("segment_id")));
+					tmp.setClassificationMethod(rs.getString("classification_method"));
+					tmp.setUserID(rs.getString("user_id"));
+					tmp.setRuleID(rs.getString("rule_id"));
+					classifiedItems.put(rs.getString("item_id"), tmp);
 				}
 				
 		}
@@ -205,5 +221,42 @@ public class QueryFormater {
 		// TODO Auto-generated method stub
 		return "to_char(uom_multiplier, 'FM999999999999999999999999999999999999999999999990.09999999999999999999999999999999999999999FM') as "+colName;
 	}
-	
+
+	public static class ItemClassificationData {
+		ClassSegment classSegment;
+		String classificationMethod;
+		String UserID;
+		String RuleID;
+
+		public ClassSegment getClassSegment() {
+			return classSegment;
+		}
+
+		public void setClassSegment(ClassSegment classSegment) {
+			this.classSegment = classSegment;
+		}
+
+		public String getClassificationMethod() {
+			return classificationMethod;
+		}
+
+		public void setClassificationMethod(String classificationMethod) {
+			this.classificationMethod = classificationMethod;
+		}
+
+		public String getUserID() {
+			return UserID;
+		}
+
+		public void setUserID(String userID) {
+			UserID = userID;
+		}
+
+		public String getRuleID(){
+			return RuleID;
+		}
+		public void setRuleID(String rule_id) {
+			RuleID = rule_id;
+		}
+	}
 }

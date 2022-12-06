@@ -1,7 +1,6 @@
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.Label?>
-
 <BorderPane fx:id="titleBar" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scenes.paneScenes.TitlePaneControler" stylesheets="@../../styles/tilePane.css">
     <top>
         <HBox prefHeight="0"/>

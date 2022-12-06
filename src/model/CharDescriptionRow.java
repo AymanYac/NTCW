@@ -20,7 +20,10 @@ import transversal.language_toolbox.Unidecode;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -201,7 +204,7 @@ public class CharDescriptionRow {
 				return class_segment;
 			}
 			try {
-				return Tools.get_project_segments(null).get(class_segment_string.split("&&&")[0]);
+				return Tools.get_project_segments((UserAccount) null).get(class_segment_string.split("&&&")[0]);
 			} catch (SQLException | ClassNotFoundException throwables) {
 	//			throwables.printStackTrace();
 				return null;

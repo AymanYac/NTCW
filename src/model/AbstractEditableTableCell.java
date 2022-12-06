@@ -1,6 +1,5 @@
 package model;
-import java.util.ArrayList;
-import java.util.List;
+
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -11,6 +10,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 /**
  * Provides the basis for an editable table cell using a text field. Sub-classes can provide formatters for display and a
  * commitHelper to control when editing is committed.

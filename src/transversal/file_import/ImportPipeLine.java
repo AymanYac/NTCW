@@ -6,7 +6,8 @@ import model.UnitOfMeasure;
 import model.UserAccount;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
-import transversal.generic.CustomKeyboardListener;
+import service.CharItemFetcher;
+import service.ClassCharacteristicsLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ImportPipeLine {
 
+    private static final String TaxonomyGranularity = "4";
     public static UserAccount account;
     public static Workbook importFile;
     public static HashMap<String, UnitOfMeasure> ImportedUoMs;
@@ -45,14 +47,19 @@ public class ImportPipeLine {
         ImportPipeLine.ImportedUoMs=UnitOfMeasure.fetch_units_of_measures("en");
     }
 
-    private boolean importTaxonomy() throws InterruptedException {
+    private void importTaxonomy() throws InterruptedException, SQLException, ClassNotFoundException {
+        CharItemFetcher.fetchAllItems(account.getActive_project(),true);
+        ClassCharacteristicsLoader.loadAllClassCharacteristic(account.getActive_project(),true);
+        CharItemFetcher.initClassDataFields();
+        ClassCharacteristicsLoader.loadKnownValuesAssociated2Items(account.getActive_project(),true);
+
         Iterator<Row> iterator = ImportPipeLine.importFile.getSheet("Taxonomy").rowIterator();
         TaxonomyPipeline.parseHeader(iterator.next());
         while (iterator.hasNext()){
             Row currentRow = iterator.next();
             ImportPipeLine.pl.execute(TaxonomyPipeline.process(currentRow));
         }
-        return pl.awaitTermination(Integer.MAX_VALUE, TimeUnit.MINUTES);
+        pl.awaitTermination(Integer.MAX_VALUE, TimeUnit.MINUTES);
     }
 
     private void importArticles() {
@@ -148,7 +155,12 @@ public class ImportPipeLine {
         private static class TaxoRow {
 
             public TaxoRow(Row current_row) {
+                String classCommand = current_row.getCell(columnMap.get("classCommand"), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+                switch (classCommand){
+                    case "ignore":
+                        String classID = current_row.getCell(columnMap.get("number_"+ImportPipeLine.TaxonomyGranularity), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
 
+                }
             }
         }
     }

@@ -4,15 +4,13 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.util.Pair;
 import model.CircularArrayList;
-import model.ObservableDeque;
-import org.icepdf.core.pobjects.Destination;
 import org.icepdf.core.pobjects.Document;
 import org.icepdf.core.pobjects.graphics.text.LineText;
 import org.icepdf.core.search.DocumentSearchController;
 import org.icepdf.ri.common.SwingController;
 import org.icepdf.ri.common.SwingWorker;
+
 import java.util.List;
-import java.util.Vector;
 
 public class DocumentSearchTask {
 

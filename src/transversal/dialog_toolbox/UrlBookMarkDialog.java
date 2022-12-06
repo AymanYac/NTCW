@@ -1,14 +1,5 @@
 package transversal.dialog_toolbox;
 
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import model.CharDescriptionRow;
-import org.controlsfx.control.ToggleSwitch;
-
 public class UrlBookMarkDialog {
     static boolean pageCorrectionEnded = true;
 

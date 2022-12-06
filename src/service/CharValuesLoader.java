@@ -42,7 +42,7 @@ public class CharValuesLoader {
 				if(!CharItemFetcher.classifiedItems.containsKey(rs.getString("item_id"))){
 					continue;
 				}
-				String loop_class_id = CharItemFetcher.classifiedItems.get(rs.getString("item_id")).split("&&&")[4];;
+				String loop_class_id = CharItemFetcher.classifiedItems.get(rs.getString("item_id")).getClassSegment().getSegmentId();
 				String item_id = rs.getString("item_id");
 				String characteristic_id = rs.getString("characteristic_id");
 				String user_id = rs.getString("user_id");

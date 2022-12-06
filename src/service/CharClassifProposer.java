@@ -5,7 +5,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import model.*;
 import transversal.data_exchange_toolbox.CharDescriptionExportServices;
