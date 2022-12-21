@@ -7,7 +7,11 @@ import model.UserAccount;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import service.CharItemFetcher;
+import service.CharPatternServices;
+import service.CharValuesLoader;
 import service.ClassCharacteristicsLoader;
+import transversal.data_exchange_toolbox.QueryFormater;
+import transversal.generic.Tools;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,10 +52,15 @@ public class ImportPipeLine {
     }
 
     private void importTaxonomy() throws InterruptedException, SQLException, ClassNotFoundException {
+        CharItemFetcher.classifiedItems = QueryFormater.FETCH_ITEM_CLASSES_WITH_UPLOAD_PRIORITY("", Tools.get_project_granularity(account.getActive_project()),account.getActive_project());
+        Tools.get_project_segments(account);
+        CharPatternServices.loadDescriptionRules(account.getActive_project());
         CharItemFetcher.fetchAllItems(account.getActive_project(),true);
         ClassCharacteristicsLoader.loadAllClassCharacteristic(account.getActive_project(),true);
         CharItemFetcher.initClassDataFields();
         ClassCharacteristicsLoader.loadKnownValuesAssociated2Items(account.getActive_project(),true);
+        //CharValuesLoader.fetchAllKnownValuesAssociated2Items(account.getActive_project(),true);
+
 
         Iterator<Row> iterator = ImportPipeLine.importFile.getSheet("Taxonomy").rowIterator();
         TaxonomyPipeline.parseHeader(iterator.next());
