@@ -113,6 +113,7 @@ public class WordUtils {
 
 
 		public static String keepalpha(String input,boolean AlphabetOnly,boolean decode) {
+			input=(input!=null?input:"");
 			if(decode) {
 				Unidecode unidecode = Unidecode.toAscii();
 				input = unidecode.decodeAndTrim(input).toUpperCase();
